@@ -28,7 +28,6 @@ PLYLoader::PLYLoader(const std::string &filename) {
     }
 
     std::stringstream sst(line);
-    std::cout << "line:" << line << std::endl;
     std::string token;
 
     if (line.find("element vertex") != std::string::npos) {

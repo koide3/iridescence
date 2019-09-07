@@ -26,6 +26,7 @@ public:
       return false;
     }
 
+    primitive_type = 0;
     model_control.reset(new guik::ModelControl("cube"));
 
     return true;
@@ -42,6 +43,13 @@ public:
         ImGui::EndMenu();
       }
       ImGui::EndMainMenuBar();
+    }
+
+    {
+      const char* items[] = {"ICOSAHEDRON", "SPHERE", "CUBE", "COORDINATE_SYSTEM", "BUNNY"};
+      ImGui::Begin("primitive", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+      ImGui::Combo("type", &primitive_type, items, IM_ARRAYSIZE(items));
+      ImGui::End();
     }
 
     // render textures
@@ -89,13 +97,14 @@ public:
     main_canvas->shader->set_uniform("material_emission", Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
     main_canvas->shader->set_uniform("model_matrix", model_control->model_matrix());
-    glk::Primitives::instance()->primitive(glk::Primitives::ICOSAHEDRON).draw(*main_canvas->shader);
+    glk::Primitives::instance()->primitive(static_cast<glk::Primitives::PrimitiveType>(primitive_type)).draw(*main_canvas->shader);
 
     main_canvas->unbind();
     main_canvas->render_to_screen();
   }
 
 private:
+  int primitive_type;
   std::unique_ptr<guik::GLCanvas> main_canvas;
   std::unique_ptr<guik::ModelControl> model_control;
 };

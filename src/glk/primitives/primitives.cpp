@@ -6,6 +6,7 @@
 #include <glk/primitives/cube.hpp>
 #include <glk/primitives/icosahedron.hpp>
 #include <glk/primitives/coordinate_system.hpp>
+#include <glk/loaders/ply_loader.hpp>
 
 namespace glk {
 
@@ -33,6 +34,10 @@ const glk::Drawable& Primitives::primitive(PrimitiveType type) {
         glk::Cube cube;
         glk::Flatize flat(cube.vertices, cube.indices);
         meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices));
+      } break;
+      case BUNNY: {
+        glk::PLYLoader ply("data/models/bunny.ply");
+        meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices));
       } break;
       case COORDINATE_SYSTEM: {
         meshes[type].reset(new glk::CoordinateSystem());
