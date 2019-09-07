@@ -71,6 +71,11 @@
     "random": "cpp",
     "set": "cpp",
     "string": "cpp",
-    "string_view": "cpp"
-  }
+    "string_view": "cpp",
+    "dense": "cpp",
+    "core": "cpp",
+    "geometry": "cpp"
+  },
+  "editor.tabSize": 2,
+  "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, ColumnLimit: 256, AccessModifierOffset: -2, SortIncludes: false}"
 }

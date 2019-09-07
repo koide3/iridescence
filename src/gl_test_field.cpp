@@ -1,34 +1,29 @@
 #include <memory>
 #include <imgui.h>
-#include <imgui_internal.h>
-#include <portable-file-dialogs.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <GL/gl3w.h>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <glk/glsl_shader.hpp>
 
-#include <glk/frame_buffer.hpp>
-#include <glk/texture_renderer.hpp>
 #include <glk/primitives/primitives.hpp>
 
 #include <guik/gl_canvas.hpp>
 #include <guik/model_control.hpp>
-#include <guik/camera_control.hpp>
 #include <guik/imgui_application.hpp>
-
 
 class GLTestField : public guik::Application {
 public:
-  GLTestField()
-  : Application()
-  {}
+  GLTestField() : Application() {}
 
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version) override {
     Application::init(size, glsl_version);
 
     std::string data_directory = "data";
     main_canvas.reset(new guik::GLCanvas(data_directory, size));
-    if(!main_canvas->ready()) {
-      glfwSetWindowShouldClose(window, 1);
+    if (!main_canvas->ready()) {
+      close();
+      return false;
     }
 
     model_control.reset(new guik::ModelControl("cube"));
@@ -37,11 +32,12 @@ public:
   }
 
   virtual void draw_ui() override {
+    int nf;
     // main menu
-    if(ImGui::BeginMainMenuBar()) {
-      if(ImGui::BeginMenu("File")) {
-        if(ImGui::MenuItem("Quit")) {
-          glfwSetWindowShouldClose(window, 1);
+    if (ImGui::BeginMainMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Quit")) {
+          close();
         }
         ImGui::EndMenu();
       }
@@ -52,18 +48,18 @@ public:
     {
       ImGui::Begin("textures", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
       ImGui::Text("depth");
-      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->depth().id(), ImVec2(1920/4, 1080/4), ImVec2(0, 1), ImVec2(1, 0));
+      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->depth().id(), ImVec2(1920 / 4, 1080 / 4), ImVec2(0, 1), ImVec2(1, 0));
       ImGui::Text("material color");
-      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->color(1).id(), ImVec2(1920/4, 1080/4), ImVec2(0, 1), ImVec2(1, 0));
+      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->color(1).id(), ImVec2(1920 / 4, 1080 / 4), ImVec2(0, 1), ImVec2(1, 0));
       ImGui::Text("normal");
-      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->color(2).id(), ImVec2(1920/4, 1080/4), ImVec2(0, 1), ImVec2(1, 0));
+      ImGui::Image((void*)(intptr_t)main_canvas->frame_buffer->color(2).id(), ImVec2(1920 / 4, 1080 / 4), ImVec2(0, 1), ImVec2(1, 0));
       ImGui::End();
     }
 
     model_control->draw_ui();
 
     // mouse control
-    if(!ImGui::GetIO().WantCaptureMouse) {
+    if (!ImGui::GetIO().WantCaptureMouse) {
       main_canvas->mouse_control();
     }
   }
@@ -107,7 +103,7 @@ private:
 int main(int argc, char** argv) {
   std::unique_ptr<guik::Application> app(new GLTestField());
 
-  if(!app->init(Eigen::Vector2i(1920, 1080), "#version 130")) {
+  if (!app->init(Eigen::Vector2i(1920, 1080), "#version 130")) {
     return 1;
   }
 
