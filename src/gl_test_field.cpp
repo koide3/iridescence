@@ -12,6 +12,8 @@
 #include <guik/model_control.hpp>
 #include <guik/imgui_application.hpp>
 
+#include <ros/package.h>
+
 class GLTestField : public guik::Application {
 public:
   GLTestField() : Application() {}
@@ -19,7 +21,7 @@ public:
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version) override {
     Application::init(size, glsl_version);
 
-    std::string data_directory = "data";
+    std::string data_directory = ros::package::getPath("gl_test_field") + "/data";
     main_canvas.reset(new guik::GLCanvas(data_directory, size));
     if (!main_canvas->ready()) {
       close();
@@ -33,7 +35,6 @@ public:
   }
 
   virtual void draw_ui() override {
-    int nf;
     // main menu
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("File")) {
@@ -116,7 +117,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  app->run();
+  app->spin();
 
   return 0;
 }

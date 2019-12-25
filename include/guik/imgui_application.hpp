@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <imgui.h>
-#include <GL/gl3w.h>
 #include <Eigen/Core>
 
 class GLFWwindow;
@@ -17,12 +16,16 @@ public:
 
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version = "#version 330");
 
-  void run();
+  void spin();
+  bool spin_once();
+
+  void begin_ui();
+  void begin_gl();
+  bool end();
 
   void close();
 
   virtual void draw_ui();
-
   virtual void draw_gl();
 
 protected:

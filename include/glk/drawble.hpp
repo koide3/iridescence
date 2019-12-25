@@ -11,6 +11,8 @@ namespace glk {
 
 class Drawable {
 public:
+  using Ptr = std::shared_ptr<Drawable>;
+
   virtual ~Drawable() {}
 
   virtual void draw(glk::GLSLShader& shader) const = 0;

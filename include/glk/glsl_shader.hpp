@@ -21,6 +21,12 @@ public:
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
 
+  float get_uniformf(const std::string& name) {
+    float value;
+    glGetUniformfv(shader_program, uniform(name), &value);
+    return value;
+  }
+
   Eigen::Vector4f get_uniform4f(const std::string& name) {
     Eigen::Vector4f vec;
     glGetUniformfv(shader_program, uniform(name), vec.data());
@@ -40,6 +46,11 @@ public:
   void set_uniform(const std::string& name, const Eigen::Vector4f& vector) { glUniform4fv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Vector4i& vector) { glUniform4iv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Matrix4f& matrix) { glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data()); }
+
+  void set_uniform(const std::string& name, const Eigen::Matrix4d& matrix_) {
+    Eigen::Matrix4f matrix = matrix_.cast<float>();
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
+  }
 
 private:
   GLuint read_shader_from_file(const std::string& filename, GLuint shader_type);

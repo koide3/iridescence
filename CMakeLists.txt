@@ -8,7 +8,20 @@ find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
 find_package(Eigen3 REQUIRED)
+find_package(PCL REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
+
+find_package(catkin REQUIRED COMPONENTS roslib)
+
+###################################
+## catkin specific configuration ##
+###################################
+catkin_package(
+  INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w
+  LIBRARIES dl glfw imgui guik ${catkin_LIBRARIES}
+#  CATKIN_DEPENDS roscpp rospy
+#  DEPENDS system_lib
+)
 
 ###########
 ## Build ##
@@ -23,6 +36,8 @@ include_directories(
   ${GLM_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 # imgui
@@ -32,7 +47,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ## Build ##
 ###########
 
-add_library(imgui STATIC
+add_library(imgui SHARED
   thirdparty/gl3w/gl3w.c
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -47,8 +62,11 @@ target_link_libraries(imgui
   dl
 )
 
-add_library(guik STATIC
+add_library(guik SHARED
   src/glk/mesh.cpp
+  src/glk/lines.cpp
+  src/glk/thin_lines.cpp
+  src/glk/pointcloud_buffer.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
   src/glk/primitives/primitives.cpp
@@ -57,6 +75,10 @@ add_library(guik STATIC
   src/guik/model_control.cpp
   src/guik/camera_control.cpp
   src/guik/imgui_application.cpp
+  src/guik/viewer/light_viewer.cpp
+)
+target_link_libraries(imgui
+  ${PCL_LIBRARIES}
 )
 
 add_executable(gl_test_field
@@ -65,6 +87,7 @@ add_executable(gl_test_field
 target_link_libraries(gl_test_field
   imgui
   guik
+  ${catkin_LIBRARIES}
 )
 
 

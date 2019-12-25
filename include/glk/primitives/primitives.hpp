@@ -10,7 +10,7 @@ private:
   Primitives() { meshes.resize(NUM_PRIMITIVES, nullptr); }
 
 public:
-  enum PrimitiveType { ICOSAHEDRON = 0, SPHERE, CUBE, COORDINATE_SYSTEM, BUNNY, NUM_PRIMITIVES };
+  enum PrimitiveType { ICOSAHEDRON = 0, SPHERE, CUBE, CONE, GRID, COORDINATE_SYSTEM, BUNNY, NUM_PRIMITIVES };
 
   static Primitives *instance() {
     if (instance_ == nullptr) {
@@ -20,6 +20,7 @@ public:
   }
 
   const glk::Drawable &primitive(PrimitiveType type);
+  std::shared_ptr<glk::Drawable> primitive_ptr(PrimitiveType type);
 
 private:
   static Primitives *instance_;

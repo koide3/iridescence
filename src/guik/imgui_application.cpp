@@ -27,7 +27,9 @@ Application ::~Application() {
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
-  glfwSetErrorCallback([](int err, const char* desc) { std::cerr << "glfw error " << err << ": " << desc << std::endl; });
+  glfwSetErrorCallback([](int err, const char* desc) {
+    std::cerr << "glfw error " << err << ": " << desc << std::endl;
+  });
   if (!glfwInit()) {
     std::cerr << "failed to initialize GLFW" << std::endl;
     return false;
@@ -61,7 +63,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   return true;
 }
 
-void Application::run() {
+void Application::spin() {
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
     ImGui_ImplOpenGL3_NewFrame();
@@ -75,7 +77,7 @@ void Application::run() {
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
-    glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+    glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     draw_gl();
@@ -85,7 +87,57 @@ void Application::run() {
   }
 }
 
-void Application::close() { glfwSetWindowShouldClose(window, 1); }
+bool Application::spin_once() {
+  glfwPollEvents();
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  draw_ui();
+
+  ImGui::Render();
+
+  int display_w, display_h;
+  glfwGetFramebufferSize(window, &display_w, &display_h);
+  glViewport(0, 0, display_w, display_h);
+  glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  draw_gl();
+
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  glfwSwapBuffers(window);
+
+  return !glfwWindowShouldClose(window);
+}
+
+void Application::begin_ui() {
+  glfwPollEvents();
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+}
+
+void Application::begin_gl() {
+  ImGui::Render();
+
+  int display_w, display_h;
+  glfwGetFramebufferSize(window, &display_w, &display_h);
+  glViewport(0, 0, display_w, display_h);
+  glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+bool Application::end() {
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  glfwSwapBuffers(window);
+
+  return !glfwWindowShouldClose(window);
+}
+
+void Application::close() {
+  glfwSetWindowShouldClose(window, 1);
+}
 
 void Application::draw_ui() { ImGui::ShowDemoWindow(); }
 

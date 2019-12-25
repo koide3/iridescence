@@ -23,16 +23,21 @@ namespace guik {
 GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size) : size(size) {
   frame_buffer.reset(new glk::FrameBuffer(size, 3));
   shader.reset(new glk::GLSLShader());
-  // if(!shader->init(data_directory + "/shader/rainbow")) {
-  //   shader.reset();
-  //   return;
-  // }
-
-  if (!shader->init(data_directory + "/shader/phong")) {
+  if(!shader->init(data_directory + "/shader/rainbow")) {
     shader.reset();
     return;
   }
+
   shader->use();
+
+  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale", 1.0f);
+
+  shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+
+  shader->set_uniform("color_mode", 0);
+  shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+  shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
 
   camera_control.reset(new guik::ArcCameraControl());
   texture_renderer.reset(new glk::TextureRenderer(data_directory));
@@ -79,6 +84,7 @@ void GLCanvas::bind() {
   shader->set_uniform("projection_matrix", projection_matrix);
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
 
 /**
@@ -87,6 +93,7 @@ void GLCanvas::bind() {
  */
 void GLCanvas::unbind() {
   glDisable(GL_DEPTH_TEST);
+  glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glFlush();
 
   frame_buffer->unbind();
