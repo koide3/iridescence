@@ -58,6 +58,11 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 }
 
+void LightViewer::clear() {
+  ui_callbacks.clear();
+  drawables.clear();
+}
+
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if(!callback) {
     ui_callbacks.erase(name);
@@ -69,6 +74,15 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
 
 void LightViewer::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
+}
+
+ShaderSetting::Ptr LightViewer::shader_setting(const std::string& name) {
+  auto found = drawables.find(name);
+  if(found == drawables.end()) {
+    return nullptr;
+  }
+
+  return found->second.first;
 }
 
 }  // namespace guik

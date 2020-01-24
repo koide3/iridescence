@@ -45,6 +45,7 @@ public:
     add("point_scale", 1.0f);
     add("model_matrix", Eigen::Matrix4f::Identity().eval());
   }
+  virtual ~ShaderSetting() {}
 
   template<typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
@@ -60,6 +61,22 @@ public:
 
 public:
   std::vector<ShaderParameterInterface::Ptr> params;
+};
+
+struct FlatColor : public ShaderSetting {
+public:
+  FlatColor(const Eigen::Vector4f& color) : ShaderSetting() {
+    add("color_mode", 1);
+    add("material_color", color);
+  }
+
+  FlatColor(const Eigen::Vector4f& color, const Eigen::Matrix4f& matrix) : ShaderSetting() {
+    add("color_mode", 1);
+    add("material_color", color);
+    add("model_matrix", matrix);
+  }
+
+  virtual ~FlatColor() override {}
 };
 
 }  // namespace guik

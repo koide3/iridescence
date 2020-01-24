@@ -20,7 +20,7 @@ catkin_package(
   INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w
   LIBRARIES dl glfw imgui guik ${catkin_LIBRARIES}
 #  CATKIN_DEPENDS roscpp rospy
-#  DEPENDS system_lib
+  DEPENDS roslib
 )
 
 ###########
@@ -47,7 +47,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ## Build ##
 ###########
 
-add_library(imgui SHARED
+add_library(imgui
   thirdparty/gl3w/gl3w.c
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -62,7 +62,7 @@ target_link_libraries(imgui
   dl
 )
 
-add_library(guik SHARED
+add_library(guik
   src/glk/mesh.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
@@ -79,6 +79,7 @@ add_library(guik SHARED
 )
 target_link_libraries(imgui
   ${PCL_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 add_executable(gl_test_field

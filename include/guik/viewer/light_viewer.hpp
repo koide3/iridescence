@@ -21,8 +21,11 @@ public:
   virtual void draw_ui() override;
   virtual void draw_gl() override;
 
-  virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
-  virtual void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
+  void clear();
+  void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+  void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
+
+  ShaderSetting::Ptr shader_setting(const std::string& name);
 
   static LightViewer* instance() {
     if(!inst) {
