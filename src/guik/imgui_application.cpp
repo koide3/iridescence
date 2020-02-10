@@ -44,7 +44,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   }
 
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
+  glfwSwapInterval(0);
 
   if (gl3wInit()) {
     std::cerr << "failed to initialize GL3W" << std::endl;

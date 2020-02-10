@@ -16,7 +16,7 @@ namespace glk {
 
 Primitives* Primitives::instance_ = nullptr;
 
-const glk::Drawable& Primitives::primitive(PrimitiveType type) {
+const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
   if(meshes[type] == nullptr) {
     switch(type) {
       default:
@@ -76,7 +76,7 @@ private:
   const glk::Drawable& primitive;
 };
 
-std::shared_ptr<glk::Drawable> Primitives::primitive_ptr(PrimitiveType type) {
+std::shared_ptr<glk::Drawable> Primitives::create_primitive_ptr(PrimitiveType type) {
   return std::make_shared<PrimitiveWrapper>(primitive(type));
 }
 

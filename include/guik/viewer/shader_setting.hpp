@@ -63,6 +63,21 @@ public:
   std::vector<ShaderParameterInterface::Ptr> params;
 };
 
+struct Rainbow : public ShaderSetting {
+public:
+  Rainbow() : ShaderSetting() {
+    add("color_mode", 0);
+  }
+
+  Rainbow(const Eigen::Matrix4f& matrix) : ShaderSetting() {
+    add("color_mode", 0);
+    add("model_matrix", matrix);
+  }
+
+  virtual ~Rainbow() override {}
+};
+
+
 struct FlatColor : public ShaderSetting {
 public:
   FlatColor(const Eigen::Vector4f& color) : ShaderSetting() {
@@ -77,6 +92,20 @@ public:
   }
 
   virtual ~FlatColor() override {}
+};
+
+struct VertexColor : public ShaderSetting {
+public:
+  VertexColor() : ShaderSetting() {
+    add("color_mode", 2);
+  }
+
+  VertexColor(const Eigen::Matrix4f& matrix) : ShaderSetting() {
+    add("color_mode", 2);
+    add("model_matrix", matrix);
+  }
+
+  virtual ~VertexColor() override {}
 };
 
 }  // namespace guik

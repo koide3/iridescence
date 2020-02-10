@@ -26,6 +26,18 @@ PointCloudBuffer::PointCloudBuffer(const std::string& cloud_filename) {
   glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZI), cloud->points.data(), GL_STATIC_DRAW);
 }
 
+PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud) {
+  stride = sizeof(pcl::PointXYZ);
+  num_points = cloud->size();
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZ), cloud->points.data(), GL_STATIC_DRAW);
+}
+
 PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr& cloud) {
   stride = sizeof(pcl::PointXYZI);
   num_points = cloud->size();

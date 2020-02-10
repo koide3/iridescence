@@ -21,7 +21,11 @@ public:
   virtual void draw_ui() override;
   virtual void draw_gl() override;
 
+  void clear_text();
+  void append_text(const std::string& text);
+
   void clear();
+  bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
   void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
@@ -41,6 +45,7 @@ private:
 
   std::unique_ptr<guik::GLCanvas> canvas;
 
+  std::vector<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;
 };

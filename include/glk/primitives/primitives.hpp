@@ -19,8 +19,17 @@ public:
     return instance_;
   }
 
-  const glk::Drawable &primitive(PrimitiveType type);
-  std::shared_ptr<glk::Drawable> primitive_ptr(PrimitiveType type);
+  static const glk::Drawable& primitive(PrimitiveType type) {
+    return Primitives::instance()->create_primitive(type);
+  }
+
+  static std::shared_ptr<glk::Drawable> primitive_ptr(PrimitiveType type) {
+    return Primitives::instance()->create_primitive_ptr(type);
+  }
+
+private:
+  const glk::Drawable& create_primitive(PrimitiveType type);
+  std::shared_ptr<glk::Drawable> create_primitive_ptr(PrimitiveType type);
 
 private:
   static Primitives *instance_;

@@ -27,6 +27,21 @@ bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version) {
 }
 
 void LightViewer::draw_ui() {
+  if(!texts.empty()) {
+    std::stringstream sst;
+    for(const auto& text: texts) {
+      sst << text << std::endl;
+    }
+
+    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Text(sst.str().c_str());
+
+    if(ImGui::Button("clear")) {
+      texts.clear();
+    }
+    ImGui::End();
+  }
+
   for(const auto& callback: ui_callbacks) {
     callback.second();
   }
@@ -58,9 +73,33 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 }
 
+void LightViewer::clear_text() {
+  texts.clear();
+}
+
+void LightViewer::append_text(const std::string& text) {
+  texts.push_back(text);
+}
+
 void LightViewer::clear() {
   ui_callbacks.clear();
   drawables.clear();
+}
+
+bool LightViewer::spin_until_click() {
+  bool kill_switch = false;
+
+  register_ui_callback("kill_switch", [&]() { kill_switch = ImGui::Button("break"); });
+
+  while(!kill_switch) {
+    if(!spin_once()) {
+      return false;
+    }
+  }
+
+  register_ui_callback("kill_switch", nullptr);
+
+  return true;
 }
 
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
