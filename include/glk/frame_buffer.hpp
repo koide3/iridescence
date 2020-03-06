@@ -18,6 +18,8 @@ public:
   void bind();
   void unbind() const;
 
+  Eigen::Vector2i size() const { return Eigen::Vector2i(width, height); }
+
   const Texture& color() { return *color_buffers[0]; }
   const Texture& color(int i) { return *color_buffers[i]; }
   const Texture& depth() { return *depth_buffer; }

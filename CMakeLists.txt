@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS roslib)
 ## catkin specific configuration ##
 ###################################
 catkin_package(
-  INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w
+  INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
   LIBRARIES dl glfw imgui guik ${catkin_LIBRARIES}
 #  CATKIN_DEPENDS roscpp rospy
   DEPENDS roslib
