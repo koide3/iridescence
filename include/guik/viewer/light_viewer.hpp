@@ -24,6 +24,8 @@ public:
   void clear_text();
   void append_text(const std::string& text);
 
+  void lookat(const Eigen::Vector3f& pt);
+
   void clear();
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);

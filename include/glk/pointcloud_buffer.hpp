@@ -16,8 +16,13 @@ public:
     using Ptr = std::shared_ptr<PointCloudBuffer>;
 
     PointCloudBuffer(const std::string& cloud_filename);
-    PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud);
-    PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr& cloud);
+
+    template<typename PointT>
+    PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<PointT>>& cloud);
+
+    template<typename PointT>
+    PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<PointT>>& cloud);
+
     virtual ~PointCloudBuffer() override;
 
     virtual void draw(glk::GLSLShader& shader) const override;

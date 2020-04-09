@@ -26,8 +26,9 @@ PointCloudBuffer::PointCloudBuffer(const std::string& cloud_filename) {
   glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZI), cloud->points.data(), GL_STATIC_DRAW);
 }
 
-PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud) {
-  stride = sizeof(pcl::PointXYZ);
+template<typename PointT>
+PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<PointT>>& cloud) {
+  stride = sizeof(PointT);
   num_points = cloud->size();
 
   glGenVertexArrays(1, &vao);
@@ -35,11 +36,12 @@ PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZ>::ConstPt
 
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZ), cloud->points.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(PointT), cloud->points.data(), GL_STATIC_DRAW);
 }
 
-PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr& cloud) {
-  stride = sizeof(pcl::PointXYZI);
+template<typename PointT>
+PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<PointT>>& cloud) {
+  stride = sizeof(PointT);
   num_points = cloud->size();
 
   glGenVertexArrays(1, &vao);
@@ -47,8 +49,15 @@ PointCloudBuffer::PointCloudBuffer(const pcl::PointCloud<pcl::PointXYZI>::ConstP
 
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZI), cloud->points.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(PointT), cloud->points.data(), GL_STATIC_DRAW);
 }
+
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>& cloud);
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI>>& cloud);
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointNormal>>& cloud);
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZ>>& cloud);
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZI>>& cloud);
+template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointNormal>>& cloud);
 
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);

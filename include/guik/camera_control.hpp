@@ -12,6 +12,8 @@ class CameraControl {
 public:
   virtual ~CameraControl() {}
 
+  virtual void lookat(const Eigen::Vector3f& pt) {}
+
   virtual void mouse(const Eigen::Vector2i& p, int button, bool down) = 0;
 
   virtual void drag(const Eigen::Vector2i& p, int button) = 0;
@@ -29,9 +31,10 @@ public:
 
   virtual ~ArcCameraControl() override;
 
-  void mouse(const Eigen::Vector2i& p, int button, bool down) override;
-  void drag(const Eigen::Vector2i& p, int button) override;
-  void scroll(const Eigen::Vector2f& rel) override;
+  virtual void lookat(const Eigen::Vector3f& pt) override;
+  virtual void mouse(const Eigen::Vector2i& p, int button, bool down) override;
+  virtual void drag(const Eigen::Vector2i& p, int button) override;
+  virtual void scroll(const Eigen::Vector2f& rel) override;
 
   Eigen::Quaternionf rotation() const;
   Eigen::Matrix4f view_matrix() const override;

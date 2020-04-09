@@ -73,6 +73,10 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 }
 
+void LightViewer::lookat(const Eigen::Vector3f& pt) {
+  canvas->camera_control->lookat(pt);
+}
+
 void LightViewer::clear_text() {
   texts.clear();
 }

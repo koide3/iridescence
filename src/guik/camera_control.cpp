@@ -9,12 +9,16 @@
 
 namespace guik {
 
-ArcCameraControl::ArcCameraControl() : center(0.0f, 0.0f, 0.0f), distance(10.0f), left_button_down(false), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
+ArcCameraControl::ArcCameraControl() : center(0.0f, 0.0f, 0.0f), distance(80.0f), left_button_down(false), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
   left_button_down = false;
   middle_button_down = false;
 }
 
 ArcCameraControl::~ArcCameraControl() {}
+
+void ArcCameraControl::lookat(const Eigen::Vector3f& pt) {
+  center = pt;
+}
 
 void ArcCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
   if (button == 0) {

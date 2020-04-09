@@ -67,6 +67,8 @@ add_library(guik
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
   src/glk/pointcloud_buffer.cpp
+  src/glk/pointnormals_buffer.cpp
+  src/glk/point_correspondences.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
   src/glk/primitives/primitives.cpp
