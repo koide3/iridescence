@@ -79,7 +79,8 @@ add_library(guik
   src/guik/imgui_application.cpp
   src/guik/viewer/light_viewer.cpp
 )
-target_link_libraries(imgui
+target_link_libraries(guik
+  imgui
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
 )
