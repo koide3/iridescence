@@ -16,6 +16,7 @@ public:
     using Ptr = std::shared_ptr<PointCloudBuffer>;
 
     PointCloudBuffer(const std::string& cloud_filename);
+    PointCloudBuffer(const float* data, int stride, int num_points);
 
     template<typename PointT>
     PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<PointT>>& cloud);
