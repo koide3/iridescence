@@ -90,6 +90,10 @@ void LightViewer::clear() {
   drawables.clear();
 }
 
+void LightViewer::clear_drawables() {
+  drawables.clear();
+}
+
 bool LightViewer::spin_until_click() {
   bool kill_switch = false;
 

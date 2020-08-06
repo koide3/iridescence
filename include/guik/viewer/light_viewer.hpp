@@ -27,6 +27,7 @@ public:
   void lookat(const Eigen::Vector3f& pt);
 
   void clear();
+  void clear_drawables();
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
   void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
