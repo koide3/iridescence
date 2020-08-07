@@ -12,6 +12,9 @@
 namespace guik {
 
 class LightViewer : public guik::Application {
+private:
+  class InfoWindow;
+
 public:
   LightViewer();
   ~LightViewer();
@@ -28,9 +31,12 @@ public:
 
   void clear();
   void clear_drawables();
+  void clear_drawables(const std::function<bool(const std::string&)>& fn);
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
   void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
+
+  void show_info_window();
 
   ShaderSetting::Ptr shader_setting(const std::string& name);
 
@@ -47,6 +53,8 @@ private:
   static LightViewer* inst;
 
   std::unique_ptr<guik::GLCanvas> canvas;
+
+  std::unique_ptr<InfoWindow> info_window;
 
   std::vector<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;

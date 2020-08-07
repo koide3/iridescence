@@ -76,7 +76,8 @@ void GLCanvas::bind() {
   shader->use();
 
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
-  glm::mat4 proj = glm::perspective<float>(120.0, size[0] / static_cast<float>(size[1]), 1.0, 500.0);
+  Eigen::Vector2f depth_range = camera_control->depth_range();
+  glm::mat4 proj = glm::perspective<float>(120.0, size[0] / static_cast<float>(size[1]), depth_range[0], depth_range[1]);
   Eigen::Matrix4f projection_matrix = Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(proj));
 
   shader->set_uniform("view_matrix", view_matrix);

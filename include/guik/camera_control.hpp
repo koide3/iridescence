@@ -20,6 +20,8 @@ public:
 
   virtual void scroll(const Eigen::Vector2f& rel) = 0;
 
+  virtual Eigen::Vector2f depth_range() const { return Eigen::Vector2f(0.0f, 1.0f); }
+
   virtual Eigen::Matrix4f view_matrix() const = 0;
 };
 
@@ -35,6 +37,7 @@ public:
   virtual void mouse(const Eigen::Vector2i& p, int button, bool down) override;
   virtual void drag(const Eigen::Vector2i& p, int button) override;
   virtual void scroll(const Eigen::Vector2f& rel) override;
+  virtual Eigen::Vector2f depth_range() const override;
 
   Eigen::Quaternionf rotation() const;
   Eigen::Matrix4f view_matrix() const override;

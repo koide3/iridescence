@@ -1,9 +1,104 @@
 #include <guik/viewer/light_viewer.hpp>
 
+#include <chrono>
+#include <future>
+#include <boost/format.hpp>
+#include <boost/process.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 
 namespace guik {
+
+class LightViewer::InfoWindow {
+public:
+  InfoWindow() {
+    show_cpu_info = show_gpu_info = true;
+    async_cpu_info = std::async(std::launch::async, [](){ return std::string("No CPU info"); });
+    async_gpu_info = std::async(std::launch::async, [](){ return std::string("No GPU info"); });
+  }
+  ~InfoWindow() {
+
+  }
+
+  bool draw_ui() {
+    bool show_window = true;
+
+    ImGui::Begin("info", &show_window, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
+    ImGui::Checkbox("CPU", &show_cpu_info);
+    ImGui::SameLine();
+    ImGui::Checkbox("GPU", &show_gpu_info);
+    ImGui::Separator();
+    ImGui::Text("FPS:%.1f", ImGui::GetIO().Framerate);
+
+    if(show_cpu_info) {
+      ImGui::Separator();
+      if(async_cpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+        cpu_info = async_cpu_info.get();
+        async_cpu_info = std::async(std::launch::async, [this]() { return get_cpu_info(); });
+      }
+
+      ImGui::Text(cpu_info.c_str());
+    }
+
+    if(show_gpu_info) {
+      ImGui::Separator();
+      if(async_gpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+        gpu_info = async_gpu_info.get();
+        async_gpu_info = std::async(std::launch::async, [this]() { return get_gpu_info(); });
+      }
+
+      ImGui::Text(gpu_info.c_str());
+    }
+
+    ImGui::End();
+
+    return show_window;
+  }
+
+private:
+  std::string get_cpu_info() const {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    return "No CPU info";
+  }
+
+  std::string get_gpu_info() const {
+    boost::process::ipstream pipe_stream;
+    boost::process::child c("nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader", boost::process::std_out > pipe_stream);
+
+    std::stringstream sst;
+
+    std::string line;
+    while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+      std::vector<std::string> tokens;
+      boost::split(tokens, line, boost::is_any_of(","));
+
+      if(tokens.size() != 6) {
+        continue;
+      }
+
+      sst << boost::format("%5s %20s : GPU %5s    Memory %5s (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[3] % tokens[4] % tokens[5];
+    }
+    c.wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    if(sst.str().empty()) {
+      return "Failed to retrieve GPU info";
+    }
+
+    return sst.str();
+  }
+
+private:
+  bool show_cpu_info;
+  std::string cpu_info;
+  std::future<std::string> async_cpu_info;
+
+  bool show_gpu_info;
+  std::string gpu_info;
+  std::future<std::string> async_gpu_info;
+};
 
 LightViewer* LightViewer::inst = nullptr;
 
@@ -27,6 +122,12 @@ bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version) {
 }
 
 void LightViewer::draw_ui() {
+  if(info_window) {
+    if(!info_window->draw_ui()) {
+      info_window.reset();
+    }
+  }
+
   if(!texts.empty()) {
     std::stringstream sst;
     for(const auto& text: texts) {
@@ -66,7 +167,9 @@ void LightViewer::draw_gl() {
     shader_setting->set(*canvas->shader);
 
     const auto& drawable = iter.second.second;
-    drawable->draw(*canvas->shader);
+    if(drawable) {
+      drawable->draw(*canvas->shader);
+    }
   }
 
   canvas->unbind();
@@ -92,6 +195,16 @@ void LightViewer::clear() {
 
 void LightViewer::clear_drawables() {
   drawables.clear();
+}
+
+void LightViewer::clear_drawables(const std::function<bool(const std::string&)>& fn) {
+  for(auto it = drawables.begin(); it != drawables.end(); ) {
+    if(fn(it->first)) {
+      it = drawables.erase(it);
+    } else {
+      it++;
+    }
+  }
 }
 
 bool LightViewer::spin_until_click() {
@@ -121,6 +234,13 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
 
 void LightViewer::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
+}
+
+
+void LightViewer::show_info_window() {
+  if(info_window == nullptr) {
+    info_window.reset(new InfoWindow());
+  }
 }
 
 ShaderSetting::Ptr LightViewer::shader_setting(const std::string& name) {
