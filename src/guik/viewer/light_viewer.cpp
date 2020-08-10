@@ -84,10 +84,10 @@ private:
       int mem_free = values[3];
       int mem_inact = values[4];
       int mem_active = values[5];
-      double mem_percent = 100 * mem_free / static_cast<double>(mem_free + mem_inact + mem_active);
+      double mem_percent = 100 * mem_active / static_cast<double>(mem_free + mem_inact + mem_active);
       int cpu_idle = values[14];
 
-      sst << boost::format("CPU %02d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % mem_free % (mem_free + mem_inact + mem_active);
+      sst << boost::format("CPU %02d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % mem_active % (mem_free + mem_inact + mem_active);
     }
     c.wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -165,13 +165,11 @@ void LightViewer::draw_ui() {
   }
 
   if(!texts.empty()) {
-    std::stringstream sst;
-    for(const auto& text: texts) {
-      sst << text << std::endl;
-    }
-
     ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
-    ImGui::Text(sst.str().c_str());
+    for(int i=std::max<int>(0, texts.size() - 32); i<texts.size(); i++) {
+      const auto& text = texts[i];
+      ImGui::Text(text.c_str());
+    }
 
     if(ImGui::Button("clear")) {
       texts.clear();
