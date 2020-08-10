@@ -1,5 +1,6 @@
 #include <guik/viewer/light_viewer.hpp>
 
+#include <regex>
 #include <chrono>
 #include <future>
 #include <boost/format.hpp>
@@ -59,8 +60,43 @@ public:
 
 private:
   std::string get_cpu_info() const {
+    boost::process::ipstream pipe_stream;
+    boost::process::child c("vmstat 1 2 --unit M -a", boost::process::std_out > pipe_stream);
+
+    std::stringstream sst;
+
+    std::string line;
+    while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+      std::regex pattern("([0-9]+)(\\s+[0-9]+){16}");
+      std::smatch matched;
+
+      if(!std::regex_search(line, matched, pattern)) {
+        continue;
+      }
+
+      std::stringstream line_sst(line);
+      std::vector<int> values(16);
+      for(int i=0; i<values.size(); i++) {
+        line_sst >> values[i];
+      }
+
+      sst.str("");
+      int mem_free = values[3];
+      int mem_inact = values[4];
+      int mem_active = values[5];
+      double mem_percent = 100 * mem_free / static_cast<double>(mem_free + mem_inact + mem_active);
+      int cpu_idle = values[14];
+
+      sst << boost::format("CPU %02d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % mem_free % (mem_free + mem_inact + mem_active);
+    }
+    c.wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    return "No CPU info";
+
+    if(sst.str().empty()) {
+      return "Failed to retrieve CPU info";
+    }
+
+    return sst.str();
   }
 
   std::string get_gpu_info() const {

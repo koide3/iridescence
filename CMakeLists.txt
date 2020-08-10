@@ -94,5 +94,14 @@ target_link_libraries(gl_test_field
   ${catkin_LIBRARIES}
 )
 
+add_executable(light_viewer_test
+  src/light_viewer_test.cpp
+)
+target_link_libraries(light_viewer_test
+  imgui
+  guik
+  ${catkin_LIBRARIES}
+)
+
 
 file(COPY data DESTINATION .)
