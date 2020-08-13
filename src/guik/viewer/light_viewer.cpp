@@ -266,6 +266,14 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
   ui_callbacks[name] = callback;
 }
 
+std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> LightViewer::find_drawable(const std::string& name) {
+  auto found = drawables.find(name);
+  if(found != drawables.end()) {
+    return found->second;
+  }
+  return std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>();
+}
+
 void LightViewer::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
