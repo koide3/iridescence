@@ -43,6 +43,7 @@ public:
   Eigen::Matrix4f view_matrix() const override;
 
 private:
+  Eigen::Vector3f center_offset;
   Eigen::Vector3f center;
   double distance;
 

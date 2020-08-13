@@ -9,7 +9,7 @@
 
 namespace guik {
 
-ArcCameraControl::ArcCameraControl() : center(0.0f, 0.0f, 0.0f), distance(80.0f), left_button_down(false), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
+ArcCameraControl::ArcCameraControl() : center_offset(0.0f, 0.0f, 0.0f), center(0.0f, 0.0f, 0.0f), distance(80.0f), left_button_down(false), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
   left_button_down = false;
   middle_button_down = false;
 }
@@ -17,7 +17,7 @@ ArcCameraControl::ArcCameraControl() : center(0.0f, 0.0f, 0.0f), distance(80.0f)
 ArcCameraControl::~ArcCameraControl() {}
 
 void ArcCameraControl::lookat(const Eigen::Vector3f& pt) {
-  center = pt;
+  center_offset = pt;
 }
 
 void ArcCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
@@ -64,10 +64,11 @@ Eigen::Vector2f ArcCameraControl::depth_range() const {
 Eigen::Quaternionf ArcCameraControl::rotation() const { return Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY()); }
 
 Eigen::Matrix4f ArcCameraControl::view_matrix() const {
-  Eigen::Vector3f offset = rotation() * Eigen::Vector3f(distance, 0.0f, 0.0f);
-  Eigen::Vector3f eye = center + offset;
+  Eigen::Vector3f center_ = center_offset + center;
+  Eigen::Vector3f eye_offset = rotation() * Eigen::Vector3f(distance, 0.0f, 0.0f);
+  Eigen::Vector3f eye = center_ + eye_offset;
 
-  glm::mat4 mat = glm::lookAt(glm::vec3(eye[0], eye[1], eye[2]), glm::vec3(center[0], center[1], center[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+  glm::mat4 mat = glm::lookAt(glm::vec3(eye[0], eye[1], eye[2]), glm::vec3(center_[0], center_[1], center_[2]), glm::vec3(0.0f, 0.0f, 1.0f));
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat));
 }
 
