@@ -139,6 +139,13 @@ add_executable(light_viewer_pointcloud
 target_link_libraries(light_viewer_pointcloud
   guik
 )
+
+add_executable(light_viewer_kitti
+  src/example/light_viewer_kitti.cpp
+)
+target_link_libraries(light_viewer_kitti
+  guik
+)
 endif()
 
 file(COPY data DESTINATION .)

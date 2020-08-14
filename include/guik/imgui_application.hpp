@@ -24,6 +24,7 @@ public:
   bool end();
 
   void close();
+  bool closed();
 
   virtual void draw_ui();
   virtual void draw_gl();

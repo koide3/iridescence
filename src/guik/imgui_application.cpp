@@ -143,6 +143,10 @@ void Application::close() {
   glfwSetWindowShouldClose(window, 1);
 }
 
+bool Application::closed() {
+  return glfwWindowShouldClose(window);
+}
+
 void Application::draw_ui() { ImGui::ShowDemoWindow(); }
 
 void Application::draw_gl() {}

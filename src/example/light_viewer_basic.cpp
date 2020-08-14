@@ -5,6 +5,7 @@ int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
 
   viewer->register_ui_callback("ui", [&]() {
+    ImGui::Text("Basic example");
     if(ImGui::Button("Close")) {
       viewer->close();
     }
