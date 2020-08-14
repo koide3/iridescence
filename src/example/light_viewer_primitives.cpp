@@ -1,5 +1,6 @@
 #include <glk/lines.hpp>
 #include <glk/thin_lines.hpp>
+#include <glk/colormap.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
@@ -12,9 +13,9 @@ int main(int argc, char** argv) {
     line_vertices.push_back(Eigen::Vector3f(x, std::cos(x), 1.0f));
     line_vertices.push_back(Eigen::Vector3f(x + 0.1, std::cos(x + 0.1), 1.0f));
 
-    double p = (x + 5.0) / 10.0;
-    line_colors.push_back(Eigen::Vector4f(p, 1 - p, 0.0f, 1.0f));
-    line_colors.push_back(Eigen::Vector4f(p, 1 - p, 0.0f, 1.0f));
+    Eigen::Vector4f color = glk::colormapf(glk::COLORMAP_TYPE::TURBO, (x + 5.0) / 10.0);
+    line_colors.push_back(color);
+    line_colors.push_back(color);
   }
 
   // thin lines (GL_LINES)
@@ -36,16 +37,16 @@ int main(int argc, char** argv) {
 
   // primitives
   transform = (Eigen::Translation3f(Eigen::Vector3f(-5.0f, 9.0f, 1.0f)) * Eigen::UniformScaling<float>(0.5f) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON), guik::FlatColor(Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f), transform));
+  viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON), guik::Rainbow(transform));
 
   transform = (Eigen::Translation3f(Eigen::Vector3f(-2.5f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("sphere", glk::Primitives::primitive_ptr(glk::Primitives::SPHERE), guik::FlatColor(Eigen::Vector4f(0.0f, 1.0f, 0.0f, 1.0f), transform));
+  viewer->update_drawable("sphere", glk::Primitives::primitive_ptr(glk::Primitives::SPHERE), guik::Rainbow(transform));
 
   transform = (Eigen::Translation3f(Eigen::Vector3f(2.5f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("cube", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(Eigen::Vector4f(0.0f, 0.0f, 1.0f, 1.0f), transform));
+  viewer->update_drawable("cube", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow(transform));
 
   transform = (Eigen::Translation3f(Eigen::Vector3f(5.0f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("cone", glk::Primitives::primitive_ptr(glk::Primitives::CONE), guik::FlatColor(Eigen::Vector4f(1.0f, 1.0f, 0.0f, 1.0f), transform));
+  viewer->update_drawable("cone", glk::Primitives::primitive_ptr(glk::Primitives::CONE), guik::Rainbow(transform));
 
 
   for(double t = 0.0; ; t += 0.001) {
