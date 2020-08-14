@@ -10,7 +10,7 @@
 
 namespace guik {
 
-ModelControl::ModelControl(const std::string& name) : name(name), pose(Eigen::Isometry3f::Identity()), gizmo_operation(ImGuizmo::OPERATION::ROTATE) {}
+ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix) : name(name), pose(init_model_matrix), gizmo_operation(ImGuizmo::OPERATION::ROTATE) {}
 
 void ModelControl::draw_ui() {
   ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);

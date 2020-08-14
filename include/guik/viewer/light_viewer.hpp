@@ -32,15 +32,21 @@ public:
   void clear();
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
+
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
   std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> find_drawable(const std::string& name);
+  void remove_drawable(const std::string& name);
   void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
   void show_info_window();
 
   ShaderSetting::Ptr shader_setting(const std::string& name);
+
+  Eigen::Vector2i canvas_size() const { return canvas->size; }
+  Eigen::Matrix4f view_matrix() const { return canvas->camera_control->view_matrix(); }
+  Eigen::Matrix4f projection_matrix() const { return canvas->projection_control->projection_matrix(); }
 
   static LightViewer* instance() {
     if(!inst) {

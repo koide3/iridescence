@@ -15,6 +15,7 @@
 
 #include <ros/package.h>
 
+// Full application example
 class GLTestField : public guik::Application {
 public:
   GLTestField() : Application() {}

@@ -274,6 +274,13 @@ std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> LightViewer::find_drawable(con
   return std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>();
 }
 
+void LightViewer::remove_drawable(const std::string& name) {
+  auto found = drawables.find(name);
+  if(found != drawables.end()) {
+    drawables.erase(found);
+  }
+}
+
 void LightViewer::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }

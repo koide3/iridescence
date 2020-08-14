@@ -97,22 +97,33 @@ target_link_libraries(guik
 )
 
 add_executable(gl_test_field
-  src/gl_test_field.cpp
+  src/example/gl_test_field.cpp
 )
 target_link_libraries(gl_test_field
-  imgui
   guik
-  ${catkin_LIBRARIES}
 )
 
-add_executable(light_viewer_test
-  src/light_viewer_test.cpp
+add_executable(light_viewer_primitives
+  src/example/light_viewer_primitives.cpp
 )
-target_link_libraries(light_viewer_test
-  imgui
+target_link_libraries(light_viewer_primitives
   guik
-  ${catkin_LIBRARIES}
 )
 
+add_executable(light_viewer_imgui
+  src/example/light_viewer_imgui.cpp
+)
+target_link_libraries(light_viewer_imgui
+  guik
+)
+
+if(PCL_FOUND)
+add_executable(light_viewer_pointcloud
+  src/example/light_viewer_pointcloud.cpp
+)
+target_link_libraries(light_viewer_pointcloud
+  guik
+)
+endif()
 
 file(COPY data DESTINATION .)
