@@ -8,14 +8,16 @@
 #include <glk/texture_renderer.hpp>
 
 #include <guik/camera_control.hpp>
+#include <guik/projection_control.hpp>
 
 namespace guik {
 
 class GLCanvas {
 public:
-  GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size);
+  GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name = "rainbow");
 
   bool ready() const;
+  bool load_shader(const std::string& data_directory, const std::string& shader_name);
 
   void set_size(const Eigen::Vector2i& size);
   void mouse_control();
@@ -38,6 +40,7 @@ public:
   std::unique_ptr<glk::TextureRenderer> texture_renderer;
 
   std::unique_ptr<guik::CameraControl> camera_control;
+  std::unique_ptr<guik::ProjectionControl> projection_control;
 };
 
 }  // namespace guik

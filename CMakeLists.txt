@@ -8,8 +8,12 @@ find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
+
+find_package(PCL)
+if(PCL_FOUND)
+  add_definitions(-DGLK_USE_PCL)
+endif()
 
 find_package(catkin REQUIRED COMPONENTS roslib)
 
@@ -31,6 +35,7 @@ include_directories(
   include
   thirdparty/imgui
   thirdparty/imgui/examples
+  thirdparty/ImGuizmo
   thirdparty/portable-file-dialogs
   thirdparty/gl3w
   ${GLM_INCLUDE_DIRS}
@@ -53,6 +58,10 @@ add_library(imgui
   thirdparty/imgui/imgui_demo.cpp
   thirdparty/imgui/imgui_draw.cpp
   thirdparty/imgui/imgui_widgets.cpp
+  thirdparty/ImGuizmo/ImCurveEdit.cpp
+  thirdparty/ImGuizmo/ImGradient.cpp
+  thirdparty/ImGuizmo/ImGuizmo.cpp
+  thirdparty/ImGuizmo/ImSequencer.cpp
   thirdparty/imgui/examples/imgui_impl_glfw.cpp
   thirdparty/imgui/examples/imgui_impl_opengl3.cpp
 )
@@ -76,11 +85,13 @@ add_library(guik
   src/guik/gl_canvas.cpp
   src/guik/model_control.cpp
   src/guik/camera_control.cpp
+  src/guik/projection_control.cpp
   src/guik/imgui_application.cpp
   src/guik/viewer/light_viewer.cpp
 )
 target_link_libraries(guik
   imgui
+  pthread
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
 )

@@ -20,10 +20,10 @@ namespace guik {
  * @param data_directory
  * @param size
  */
-GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size) : size(size) {
+GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name) : size(size) {
   frame_buffer.reset(new glk::FrameBuffer(size, 3));
   shader.reset(new glk::GLSLShader());
-  if(!shader->init(data_directory + "/shader/rainbow")) {
+  if(!shader->init(data_directory + "/shader/" + shader_name)) {
     shader.reset();
     return;
   }
@@ -40,6 +40,7 @@ GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& siz
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
 
   camera_control.reset(new guik::ArcCameraControl());
+  projection_control.reset(new guik::ProjectionControl(size));
   texture_renderer.reset(new glk::TextureRenderer(data_directory));
 }
 
@@ -52,12 +53,37 @@ GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& siz
 bool GLCanvas::ready() const { return frame_buffer && shader && camera_control && texture_renderer; }
 
 /**
+ * @brief
+ */
+bool GLCanvas::load_shader(const std::string& data_directory, const std::string& shader_name) {
+  shader.reset(new glk::GLSLShader());
+  if(!shader->init(data_directory + "/shader/" + shader_name)) {
+    shader.reset();
+    return false;
+  }
+
+  shader->use();
+
+  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale", 1.0f);
+
+  shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+
+  shader->set_uniform("color_mode", 0);
+  shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+  shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+
+  return true;
+}
+
+/**
  * @brief Set the Size object
  *
  * @param size
  */
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
   this->size = size;
+  projection_control->set_size(size);
   frame_buffer.reset(new glk::FrameBuffer(size, 2));
 }
 
@@ -76,9 +102,7 @@ void GLCanvas::bind() {
   shader->use();
 
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
-  Eigen::Vector2f depth_range = camera_control->depth_range();
-  glm::mat4 proj = glm::perspective<float>(120.0, size[0] / static_cast<float>(size[1]), depth_range[0], depth_range[1]);
-  Eigen::Matrix4f projection_matrix = Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(proj));
+  Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
 
   shader->set_uniform("view_matrix", view_matrix);
   shader->set_uniform("inv_view_matrix", view_matrix.inverse().eval());
@@ -213,8 +237,7 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
  */
 Eigen::Vector3f GLCanvas::unproject(const Eigen::Vector2i& p, float depth) const {
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
-  glm::mat4 proj = glm::perspective<float>(120.0, 1.0, 1.0, 500.0);
-  Eigen::Matrix4f projection_matrix = Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(proj));
+  Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
 
   Eigen::Matrix4f vp = projection_matrix * view_matrix;
 

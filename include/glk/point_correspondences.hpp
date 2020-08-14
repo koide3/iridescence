@@ -6,9 +6,11 @@
 #include <glk/drawble.hpp>
 #include <glk/thin_lines.hpp>
 
+#ifdef GLK_USE_PCL
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/correspondence.h>
+#endif
 
 namespace glk {
 
@@ -17,8 +19,11 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<PointCorrespondences>;
 
+#ifdef GLK_USE_PCL
   template<typename PointT>
   PointCorrespondences(const boost::shared_ptr<const pcl::PointCloud<PointT>>& source_cloud, const boost::shared_ptr<const pcl::PointCloud<PointT>>& target_cloud, const pcl::CorrespondencesConstPtr& correspondences);
+#endif
+
   virtual ~PointCorrespondences() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;

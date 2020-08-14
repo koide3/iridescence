@@ -2,6 +2,7 @@
 
 namespace glk {
 
+#ifdef GLK_USE_PCL
 PointNormalsBuffer::PointNormalsBuffer(const pcl::PointCloud<pcl::PointNormal>::ConstPtr& cloud, double normal_length) {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> lines(cloud->size() * 2);
 
@@ -12,6 +13,7 @@ PointNormalsBuffer::PointNormalsBuffer(const pcl::PointCloud<pcl::PointNormal>::
 
   normal_lines.reset(new ThinLines(lines));
 }
+#endif
 
 PointNormalsBuffer::~PointNormalsBuffer() {}
 
