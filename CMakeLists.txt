@@ -104,6 +104,13 @@ target_link_libraries(gl_test_field
   guik
 )
 
+add_executable(light_viewer_basic
+  src/example/light_viewer_basic.cpp
+)
+target_link_libraries(light_viewer_basic
+  guik
+)
+
 add_executable(light_viewer_primitives
   src/example/light_viewer_primitives.cpp
 )
