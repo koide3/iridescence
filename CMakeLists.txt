@@ -125,6 +125,13 @@ target_link_libraries(light_viewer_imgui
   guik
 )
 
+add_executable(light_viewer_custom
+  src/example/light_viewer_custom.cpp
+)
+target_link_libraries(light_viewer_custom
+  guik
+)
+
 if(PCL_FOUND)
 add_executable(light_viewer_pointcloud
   src/example/light_viewer_pointcloud.cpp
