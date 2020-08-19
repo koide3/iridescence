@@ -81,6 +81,7 @@ add_library(guik
   src/glk/colormap.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
+  src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
   src/glk/loaders/ply_loader.cpp
   src/guik/gl_canvas.cpp
@@ -129,6 +130,13 @@ add_executable(light_viewer_custom
   src/example/light_viewer_custom.cpp
 )
 target_link_libraries(light_viewer_custom
+  guik
+)
+
+add_executable(light_viewer_effects
+  src/example/light_viewer_effects.cpp
+)
+target_link_libraries(light_viewer_effects
   guik
 )
 

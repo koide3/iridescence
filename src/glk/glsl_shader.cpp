@@ -14,8 +14,12 @@
 namespace glk {
 
 bool GLSLShader::init(const std::string& shader_path) {
-  GLuint vertex_shader = read_shader_from_file(shader_path + ".vert", GL_VERTEX_SHADER);
-  GLuint fragment_shader = read_shader_from_file(shader_path + ".frag", GL_FRAGMENT_SHADER);
+  return init(shader_path + ".vert", shader_path + ".frag");
+}
+
+bool GLSLShader::init(const std::string& vertex_shader_path, const std::string& fragment_shader_path) {
+  GLuint vertex_shader = read_shader_from_file(vertex_shader_path, GL_VERTEX_SHADER);
+  GLuint fragment_shader = read_shader_from_file(fragment_shader_path, GL_FRAGMENT_SHADER);
 
   shader_program = glCreateProgram();
   glAttachShader(shader_program, vertex_shader);
@@ -33,7 +37,7 @@ bool GLSLShader::init(const std::string& shader_path) {
   std::vector<char> error_message(info_log_length);
   glGetProgramInfoLog(shader_program, info_log_length, nullptr, error_message.data());
 
-  if (result != GL_TRUE) {
+  if(result != GL_TRUE) {
     std::cerr << "error : failed to link program" << std::endl;
     std::cerr << std::string(error_message.begin(), error_message.end()) << std::endl;
     return false;

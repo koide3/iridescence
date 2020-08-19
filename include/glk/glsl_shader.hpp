@@ -1,6 +1,7 @@
 #ifndef GLK_GLSL_SHADER_HPP
 #define GLK_GLSL_SHADER_HPP
 
+#include <vector>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -15,7 +16,9 @@ public:
   GLSLShader() {}
 
   bool init(const std::string& shader_path);
+  bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
 
+  GLuint id() const { return shader_program; }
   void use() const { glUseProgram(shader_program); }
 
   GLint attrib(const std::string& name);
@@ -44,8 +47,14 @@ public:
   void set_uniform(const std::string& name, const Eigen::Vector2f& vector) { glUniform2fv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Vector3f& vector) { glUniform3fv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Vector4f& vector) { glUniform4fv(uniform(name), 1, vector.data()); }
+  void set_uniform(const std::string& name, const Eigen::Vector2i& vector) { glUniform4iv(uniform(name), 1, vector.data()); }
+  void set_uniform(const std::string& name, const Eigen::Vector3i& vector) { glUniform3iv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Vector4i& vector) { glUniform4iv(uniform(name), 1, vector.data()); }
   void set_uniform(const std::string& name, const Eigen::Matrix4f& matrix) { glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data()); }
+
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>& vectors) { glUniform2fv(uniform(name), vectors.size(), vectors[0].data()); }
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vectors) { glUniform3fv(uniform(name), vectors.size(), vectors[0].data()); }
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& vectors) { glUniform4fv(uniform(name), vectors.size(), vectors[0].data()); }
 
   void set_uniform(const std::string& name, const Eigen::Matrix4d& matrix_) {
     Eigen::Matrix4f matrix = matrix_.cast<float>();

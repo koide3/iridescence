@@ -214,6 +214,10 @@ void LightViewer::lookat(const Eigen::Vector3f& pt) {
   canvas->camera_control->lookat(pt);
 }
 
+void LightViewer::set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
+  canvas->set_effect(effect);
+}
+
 void LightViewer::clear_text() {
   texts.clear();
 }
