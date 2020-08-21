@@ -161,6 +161,7 @@ void GLCanvas::mouse_control() {
     }
 
     camera_control->scroll(Eigen::Vector2f(io.MouseWheel, io.MouseWheelH));
+    projection_control->set_depth_range(camera_control->depth_range());
   }
 }
 
