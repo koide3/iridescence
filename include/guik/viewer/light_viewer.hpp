@@ -28,6 +28,7 @@ public:
   void append_text(const std::string& text);
 
   void lookat(const Eigen::Vector3f& pt);
+  void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
 
   void clear();
   void clear_drawables();

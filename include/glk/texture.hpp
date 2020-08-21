@@ -21,6 +21,7 @@ public:
   ~Texture() { glDeleteRenderbuffers(1, &texture); }
 
   GLuint id() const { return texture; }
+  Eigen::Vector2i size() const { return Eigen::Vector2i(width, height); }
 
   template <typename T>
   std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE) const {

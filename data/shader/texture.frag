@@ -1,9 +1,9 @@
 #version 130
-uniform sampler2D texture_sampler;
+uniform sampler2D color_sampler;
 
 in vec2 texcoord;
 out vec4 color;
 
 void main() {
-    color = texture(texture_sampler, texcoord);
+  color = texture(color_sampler, texcoord);
 }
