@@ -30,7 +30,7 @@ public:
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
-  std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size);
+  std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
   void show_info_window();
 

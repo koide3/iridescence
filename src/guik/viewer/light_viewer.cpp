@@ -121,7 +121,12 @@ void LightViewer::show_info_window() {
   }
 }
 
-std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
+std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size_) {
+  Eigen::Vector2i canvas_size = canvas_size_;
+  if(canvas_size[0] <= 0 || canvas_size[1] <= 1) {
+    canvas_size = Eigen::Vector2i(512, 512);
+  }
+
   auto found = sub_contexts.find(context_name);
   if(found == sub_contexts.end()) {
     std::shared_ptr<LightViewerContext> context(new LightViewerContext(context_name));

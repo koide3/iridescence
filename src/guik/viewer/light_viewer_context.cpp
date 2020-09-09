@@ -17,6 +17,8 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
     return false;
   }
 
+  global_shader_setting.add("model_matrix", Eigen::Matrix4f::Identity().eval());
+
   return true;
 }
 
@@ -38,8 +40,9 @@ void LightViewerContext::draw_ui() {
 void LightViewerContext::draw_gl() {
   canvas->bind();
 
-  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+  global_shader_setting.set(*canvas->shader);
 
+  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
   canvas->shader->set_uniform("color_mode", 1);
   canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
   glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);

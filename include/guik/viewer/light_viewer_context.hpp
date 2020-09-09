@@ -20,10 +20,12 @@ public:
 
   bool init_canvas(const Eigen::Vector2i& size);
 
+  guik::ShaderSetting& shader_setting() { return global_shader_setting; }
+  const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
+
   void lookat(const Eigen::Vector3f& pt);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
 
-  void clear();
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
 
@@ -38,9 +40,9 @@ public:
 protected:
   std::string context_name;
   std::unique_ptr<guik::GLCanvas> canvas;
+  guik::ShaderSetting global_shader_setting;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;
 };
-
 }
 
 #endif
