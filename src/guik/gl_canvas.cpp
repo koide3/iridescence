@@ -9,6 +9,8 @@
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
+#include <glk/effects/plain_rendering.hpp>
+#include <glk/effects/screen_space_ambient_occlusion.hpp>
 
 #include <guik/camera_control.hpp>
 
@@ -20,7 +22,7 @@ namespace guik {
  * @param data_directory
  * @param size
  */
-GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name) : size(size) {
+GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name) : data_directory(data_directory), size(size) {
   frame_buffer.reset(new glk::FrameBuffer(size, 3));
   shader.reset(new glk::GLSLShader());
   if(!shader->init(data_directory + "/shader/" + shader_name)) {
@@ -76,6 +78,10 @@ bool GLCanvas::load_shader(const std::string& data_directory, const std::string&
   return true;
 }
 
+void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
+  texture_renderer->set_effect(effect);
+}
+
 /**
  * @brief Set the Size object
  *
@@ -128,7 +134,9 @@ void GLCanvas::unbind() {
  * @brief
  *
  */
-void GLCanvas::render_to_screen(int color_buffer_id) { texture_renderer->draw(frame_buffer->color(color_buffer_id).id()); }
+void GLCanvas::render_to_screen(int color_buffer_id) {
+  texture_renderer->draw(frame_buffer->color(color_buffer_id), frame_buffer->depth());
+}
 
 /**
  * @brief
@@ -153,6 +161,7 @@ void GLCanvas::mouse_control() {
     }
 
     camera_control->scroll(Eigen::Vector2f(io.MouseWheel, io.MouseWheelH));
+    projection_control->set_depth_range(camera_control->depth_range());
   }
 }
 

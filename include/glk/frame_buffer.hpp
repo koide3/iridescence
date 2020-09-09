@@ -18,11 +18,13 @@ public:
   void bind();
   void unbind() const;
 
+  void add_color_buffer(GLuint internal_format = GL_RGBA, GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE);
+
   Eigen::Vector2i size() const { return Eigen::Vector2i(width, height); }
 
-  const Texture& color() { return *color_buffers[0]; }
-  const Texture& color(int i) { return *color_buffers[i]; }
-  const Texture& depth() { return *depth_buffer; }
+  const Texture& color() const { return *color_buffers[0]; }
+  const Texture& color(int i) const { return *color_buffers[i]; }
+  const Texture& depth() const { return *depth_buffer; }
 
 private:
   int width;

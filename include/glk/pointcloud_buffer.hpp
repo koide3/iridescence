@@ -17,6 +17,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     using Ptr = std::shared_ptr<PointCloudBuffer>;
 
+    PointCloudBuffer(int stride, int num_points);
     PointCloudBuffer(const float* data, int stride, int num_points);
 
 #ifdef GLK_USE_PCL
@@ -32,6 +33,9 @@ public:
     virtual ~PointCloudBuffer() override;
 
     virtual void draw(glk::GLSLShader& shader) const override;
+
+    GLuint vba_id() const { return vao; }
+    GLuint vbo_id() const { return vbo; }
 
 private:
     GLuint vao;

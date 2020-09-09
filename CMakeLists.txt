@@ -10,9 +10,9 @@ find_package(OpenGL REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
-find_package(PCL)
+find_package(PCL REQUIRED)
 if(PCL_FOUND)
-  add_definitions(-DGLK_USE_PCL)
+  add_definitions(-DGLK_USE_PCL=1)
 endif()
 
 find_package(catkin REQUIRED COMPONENTS roslib)
@@ -81,6 +81,7 @@ add_library(guik
   src/glk/colormap.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
+  src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
   src/glk/loaders/ply_loader.cpp
   src/guik/gl_canvas.cpp
@@ -89,6 +90,7 @@ add_library(guik
   src/guik/projection_control.cpp
   src/guik/imgui_application.cpp
   src/guik/viewer/light_viewer.cpp
+  src/guik/viewer/light_viewer_context.cpp
 )
 target_link_libraries(guik
   imgui
@@ -129,6 +131,13 @@ add_executable(light_viewer_custom
   src/example/light_viewer_custom.cpp
 )
 target_link_libraries(light_viewer_custom
+  guik
+)
+
+add_executable(light_viewer_effects
+  src/example/light_viewer_effects.cpp
+)
+target_link_libraries(light_viewer_effects
   guik
 )
 

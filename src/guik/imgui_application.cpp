@@ -1,6 +1,7 @@
 #include <guik/imgui_application.hpp>
 
 #include <iostream>
+#include <unordered_map>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -27,6 +28,12 @@ Application ::~Application() {
   glfwTerminate();
 }
 
+// dirty implementation
+std::unordered_map<GLFWwindow*, Application*> appmap;
+void fb_size_callback(GLFWwindow* window, int width, int height) {
+  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width, height));
+}
+
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   glfwSetErrorCallback([](int err, const char* desc) {
     std::cerr << "glfw error " << err << ": " << desc << std::endl;
@@ -43,6 +50,9 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   if (window == nullptr) {
     return false;
   }
+  appmap[window] = this;
+
+  glfwSetFramebufferSizeCallback(window, fb_size_callback);
 
   glfwMakeContextCurrent(window);
   glfwSwapInterval(0);
@@ -62,6 +72,16 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   return true;
+}
+
+Eigen::Vector2i Application::framebuffer_size() {
+  int width, height;
+  glfwGetFramebufferSize(window, &width, &height);
+  return Eigen::Vector2i(width, height);
+}
+
+void Application::framebuffer_size_callback(const Eigen::Vector2i& size) {
+  std::cout << "FB:" << size.transpose() << std::endl;
 }
 
 void Application::spin() {

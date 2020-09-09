@@ -16,6 +16,11 @@ public:
     this->size = size;
   }
 
+  void set_depth_range(const Eigen::Vector2f& range) {
+    this->near = range[0];
+    this->far = range[1];
+  }
+
   Eigen::Matrix4f projection_matrix() const;
 
   void draw_ui();

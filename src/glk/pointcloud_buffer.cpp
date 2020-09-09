@@ -8,6 +8,18 @@
 
 namespace glk {
 
+PointCloudBuffer::PointCloudBuffer(int stride, int num_points) {
+  this->stride = stride;
+  this->num_points = num_points;
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, stride * num_points, nullptr, GL_STATIC_DRAW);
+}
+
 PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points) {
   this->stride = stride;
   this->num_points = num_points;
