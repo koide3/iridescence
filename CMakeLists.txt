@@ -10,9 +10,9 @@ find_package(OpenGL REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
-find_package(PCL)
+find_package(PCL REQUIRED)
 if(PCL_FOUND)
-  add_definitions(-DGLK_USE_PCL)
+  add_definitions(-DGLK_USE_PCL=1)
 endif()
 
 find_package(catkin REQUIRED COMPONENTS roslib)
@@ -90,6 +90,7 @@ add_library(guik
   src/guik/projection_control.cpp
   src/guik/imgui_application.cpp
   src/guik/viewer/light_viewer.cpp
+  src/guik/viewer/light_viewer_context.cpp
 )
 target_link_libraries(guik
   imgui

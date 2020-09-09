@@ -16,6 +16,9 @@ public:
 
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version = "#version 330");
 
+  Eigen::Vector2i framebuffer_size();
+  virtual void framebuffer_size_callback(const Eigen::Vector2i& size);
+
   void spin();
   bool spin_once();
 
