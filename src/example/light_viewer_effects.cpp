@@ -4,8 +4,6 @@
 
 #include <guik/viewer/light_viewer.hpp>
 
-#include <ros/package.h>
-
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
 
@@ -13,9 +11,9 @@ int main(int argc, char** argv) {
   viewer->register_ui_callback("effect_ui", [&]() {
     if(ImGui::Checkbox("SSAO", &enable_ssao)) {
       if(enable_ssao) {
-        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(ros::package::getPath("gl_test_field") + "/data"));
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>());
       } else {
-        viewer->set_screen_effect(std::make_shared<glk::PlainRendering>(ros::package::getPath("gl_test_field") + "/data"));
+        viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
       }
     }
   });

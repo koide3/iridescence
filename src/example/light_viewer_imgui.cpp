@@ -1,5 +1,4 @@
 #include <imgui.h>
-#include <ros/package.h>
 
 #include <glk/primitives/primitives.hpp>
 
@@ -57,8 +56,7 @@ int main(int argc, char** argv) {
   });
 
   // create sub GL canvas
-  std::string data_directory = ros::package::getPath("gl_test_field") + "/data";
-  guik::GLCanvas canvas(data_directory, Eigen::Vector2i(512, 512));
+  guik::GLCanvas canvas(Eigen::Vector2i(512, 512));
 
   viewer->register_ui_callback("sub_gl_window_ui", [&]() {
     // rendering (this can be done outside of this callback)

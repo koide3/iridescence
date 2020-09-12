@@ -14,10 +14,10 @@ namespace guik {
 
 class GLCanvas {
 public:
-  GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name = "rainbow");
+  GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name = "rainbow");
 
   bool ready() const;
-  bool load_shader(const std::string& data_directory, const std::string& shader_name);
+  bool load_shader(const std::string& shader_name);
 
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   void set_size(const Eigen::Vector2i& size);
@@ -35,8 +35,6 @@ public:
   void draw_ui();
 
 public:
-  std::string data_directory;
-
   Eigen::Vector2i size;
   std::unique_ptr<glk::GLSLShader> shader;
   std::unique_ptr<glk::FrameBuffer> frame_buffer;

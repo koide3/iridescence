@@ -1,6 +1,7 @@
 #include <glk/primitives/primitives.hpp>
 
 #include <iostream>
+#include <glk/path.hpp>
 #include <glk/mesh.hpp>
 #include <glk/lines.hpp>
 #include <glk/mesh_utils.hpp>
@@ -61,7 +62,7 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
       case BUNNY:
       case WIRE_BUNNY:
       {
-        glk::PLYLoader ply("data/models/bunny.ply");
+        glk::PLYLoader ply(get_data_path() + "/models/bunny.ply");
         meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices, wireframe));
       } break;
       case COORDINATE_SYSTEM: {

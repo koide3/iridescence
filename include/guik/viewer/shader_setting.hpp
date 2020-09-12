@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <unordered_map>
-#include <ros/package.h>
 
 #include <glk/drawble.hpp>
 #include <guik/gl_canvas.hpp>

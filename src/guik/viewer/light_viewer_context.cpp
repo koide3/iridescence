@@ -11,8 +11,7 @@ LightViewerContext::LightViewerContext(const std::string& context_name)
 LightViewerContext::~LightViewerContext() {}
 
 bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
-  std::string data_directory = ros::package::getPath("gl_test_field") + "/data";
-  canvas.reset(new guik::GLCanvas(data_directory, size));
+  canvas.reset(new guik::GLCanvas(size));
   if(!canvas->ready()) {
     return false;
   }

@@ -14,7 +14,7 @@ namespace glk {
  */
 class TextureRenderer {
 public:
-  TextureRenderer(const std::string& data_directory);
+  TextureRenderer();
   ~TextureRenderer();
 
   void draw(const glk::Texture& color_texture, const glk::Texture& depth_texture);

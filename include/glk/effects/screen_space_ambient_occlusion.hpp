@@ -2,6 +2,7 @@
 #define GLK_SCREEN_SPACE_AMBIENT_OCCLUSION_HPP
 
 #include <random>
+#include <glk/path.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/effects/screen_effect.hpp>
 
@@ -9,8 +10,8 @@ namespace glk {
 
 class ScreenSpaceAmbientOcclusion : public ScreenEffect {
 public:
-  ScreenSpaceAmbientOcclusion(const std::string& data_directory) {
-    if(!ssao_shader.init(data_directory + "/shader/texture.vert", data_directory + "/shader/ssao.frag")) {
+  ScreenSpaceAmbientOcclusion() {
+    if(!ssao_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssao.frag")) {
       return;
     }
     std::mt19937 mt;

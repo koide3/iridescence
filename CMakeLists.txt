@@ -72,6 +72,7 @@ target_link_libraries(imgui
 )
 
 add_library(guik
+  src/glk/path.cpp
   src/glk/mesh.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp

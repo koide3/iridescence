@@ -1,14 +1,15 @@
 #ifndef GLK_PLAIN_EFFECT_HPP
 #define GLK_PLAIN_EFFECT_HPP
 
+#include <glk/path.hpp>
 #include <glk/effects/screen_effect.hpp>
 
 namespace glk {
 
 class PlainRendering : public ScreenEffect {
 public:
-  PlainRendering(const std::string& data_directory) {
-    if(!plain_shader.init(data_directory + "/shader/texture")) {
+  PlainRendering() {
+    if(!plain_shader.init(get_data_path() + "/shader/texture")) {
       return;
     }
   }

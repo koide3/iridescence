@@ -1,13 +1,14 @@
 #include <glk/texture_renderer.hpp>
 
 #include <iostream>
+#include <glk/path.hpp>
 #include <glk/effects/plain_rendering.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 
 namespace glk {
 
-TextureRenderer::TextureRenderer(const std::string& data_directory) {
-  effect = std::make_shared<PlainRendering>(data_directory);
+TextureRenderer::TextureRenderer() {
+  effect = std::make_shared<PlainRendering>();
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices = {Eigen::Vector3f(-1.0f, -1.0f, 0.0f), Eigen::Vector3f(1.0f, -1.0f, 0.0f), Eigen::Vector3f(-1.0f, 1.0f, 0.0f), Eigen::Vector3f(1.0f, 1.0f, 0.0f)};
 

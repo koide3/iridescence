@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <glk/path.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
@@ -19,13 +20,12 @@ namespace guik {
 /**
  * @brief Construct a new GLCanvas object
  *
- * @param data_directory
  * @param size
  */
-GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& size, const std::string& shader_name) : data_directory(data_directory), size(size) {
+GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size) {
   frame_buffer.reset(new glk::FrameBuffer(size, 3));
   shader.reset(new glk::GLSLShader());
-  if(!shader->init(data_directory + "/shader/" + shader_name)) {
+  if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
     return;
   }
@@ -43,7 +43,7 @@ GLCanvas::GLCanvas(const std::string& data_directory, const Eigen::Vector2i& siz
 
   camera_control.reset(new guik::ArcCameraControl());
   projection_control.reset(new guik::ProjectionControl(size));
-  texture_renderer.reset(new glk::TextureRenderer(data_directory));
+  texture_renderer.reset(new glk::TextureRenderer());
 }
 
 /**
@@ -57,9 +57,9 @@ bool GLCanvas::ready() const { return frame_buffer && shader && camera_control &
 /**
  * @brief
  */
-bool GLCanvas::load_shader(const std::string& data_directory, const std::string& shader_name) {
+bool GLCanvas::load_shader(const std::string& shader_name) {
   shader.reset(new glk::GLSLShader());
-  if(!shader->init(data_directory + "/shader/" + shader_name)) {
+  if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
     return false;
   }

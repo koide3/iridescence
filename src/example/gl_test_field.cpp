@@ -13,8 +13,6 @@
 #include <guik/model_control.hpp>
 #include <guik/imgui_application.hpp>
 
-#include <ros/package.h>
-
 // Full application example
 class GLTestField : public guik::Application {
 public:
@@ -23,8 +21,7 @@ public:
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version) override {
     Application::init(size, glsl_version);
 
-    std::string data_directory = ros::package::getPath("gl_test_field") + "/data";
-    main_canvas.reset(new guik::GLCanvas(data_directory, size, "phong"));
+    main_canvas.reset(new guik::GLCanvas(size, "phong"));
     if (!main_canvas->ready()) {
       close();
       return false;
