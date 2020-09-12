@@ -12,7 +12,7 @@ namespace glk {
 
 class Mesh : public Drawable {
 public:
-  Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices);
+  Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices, bool wireframe=false);
   virtual ~Mesh();
 
   virtual void draw(glk::GLSLShader& shader) const override;
@@ -22,6 +22,8 @@ private:
   Mesh& operator=(const Mesh&);
 
 private:
+  bool wireframe;
+
   int num_vertices;
   int num_indices;
 

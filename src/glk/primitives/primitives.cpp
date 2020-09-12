@@ -18,39 +18,51 @@ Primitives* Primitives::instance_ = nullptr;
 
 const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
   if(meshes[type] == nullptr) {
+    bool wireframe = int(type) >= WIRE_ICOSAHEDRON;
+
     switch(type) {
       default:
         std::cerr << "error : unknown primitive type " << type << std::endl;
         break;
-      case ICOSAHEDRON: {
+      case ICOSAHEDRON:
+      case WIRE_ICOSAHEDRON:
+      {
         glk::Icosahedron icosahedron;
         glk::Flatize flat(icosahedron.vertices, icosahedron.indices);
-        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices));
+        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
       } break;
-      case SPHERE: {
+      case SPHERE:
+      case WIRE_SPHERE:
+      {
         glk::Icosahedron icosahedron;
         icosahedron.subdivide();
         icosahedron.subdivide();
         icosahedron.spherize();
-        meshes[type].reset(new glk::Mesh(icosahedron.vertices, icosahedron.normals, icosahedron.indices));
+        meshes[type].reset(new glk::Mesh(icosahedron.vertices, icosahedron.normals, icosahedron.indices, wireframe));
       } break;
-      case CUBE: {
+      case CUBE:
+      case WIRE_CUBE:
+      {
         glk::Cube cube;
         glk::Flatize flat(cube.vertices, cube.indices);
-        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices));
+        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
       } break;
-      case CONE: {
+      case CONE:
+      case WIRE_CONE:
+      {
         glk::Cone cone;
         glk::Flatize flat(cone.vertices, cone.indices);
-        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices));
+        meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
       } break;
       case GRID: {
         glk::Grid grid;
         meshes[type].reset(new glk::Lines(0.01f, grid.vertices));
       } break;
-      case BUNNY: {
+      case BUNNY:
+      case WIRE_BUNNY:
+      {
         glk::PLYLoader ply("data/models/bunny.ply");
-        meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices));
+        meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices, wireframe));
       } break;
       case COORDINATE_SYSTEM: {
         glk::CoordinateSystem coord;

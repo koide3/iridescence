@@ -9,8 +9,10 @@
 
 namespace glk {
 
-Mesh::Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices)
-    : num_vertices(vertices.size()), num_indices(indices.size()) {
+Mesh::Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices, bool wireframe)
+: wireframe(wireframe),
+  num_vertices(vertices.size()), num_indices(indices.size())
+{
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
@@ -41,6 +43,10 @@ void Mesh::draw(glk::GLSLShader& shader) const {
   GLint position_loc = shader.attrib("vert_position");
   GLint normal_loc = shader.attrib("vert_normal");
 
+  if(wireframe) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+
   glBindVertexArray(vao);
 
   glEnableVertexAttribArray(position_loc);
@@ -61,6 +67,10 @@ void Mesh::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  if(wireframe) {
+    glPolygonMode(GL_FRONT, GL_FILL);
+  }
 }
 
 }  // namespace glk
