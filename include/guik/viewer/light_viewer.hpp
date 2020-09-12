@@ -1,6 +1,8 @@
 #ifndef GUIK_VIEWER_HPP
 #define GUIK_VIEWER_HPP
 
+#include <mutex>
+#include <deque>
 #include <memory>
 #include <unordered_map>
 
@@ -30,6 +32,7 @@ public:
   bool spin_until_click();
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
+  void invoke(const std::function<void()>& func);
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
   void show_info_window();
@@ -51,10 +54,14 @@ private:
 
   std::unique_ptr<InfoWindow> info_window;
 
-  std::vector<std::string> texts;
+  std::mutex texts_mutex;
+  std::deque<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
+
+  std::mutex invoke_requests_mutex;
+  std::deque<std::function<void()>> invoke_requests;
 };
 
 }  // namespace plio

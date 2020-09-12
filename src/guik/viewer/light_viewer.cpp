@@ -38,21 +38,34 @@ void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
 }
 
 void LightViewer::draw_ui() {
+  std::unique_lock<std::mutex> lock(invoke_requests_mutex);
+  while(!invoke_requests.empty()) {
+    invoke_requests.front()();
+    invoke_requests.pop_front();
+  }
+  lock.unlock();
+
   if(info_window) {
     if(!info_window->draw_ui()) {
       info_window.reset();
     }
   }
 
+  std::vector<std::string> texts_;
+  {
+    std::lock_guard<std::mutex> texts_lock(texts_mutex);
+    std::vector<std::string>(texts.begin(), texts.end()).swap(texts_);
+  }
+
   if(!texts.empty()) {
     ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
-    for(int i=std::max<int>(0, texts.size() - 32); i<texts.size(); i++) {
-      const auto& text = texts[i];
+    for(int i = std::max<int>(0, texts_.size() - 32); i < texts_.size(); i++) {
+      const auto& text = texts_[i];
       ImGui::Text(text.c_str());
     }
 
     if(ImGui::Button("clear")) {
-      texts.clear();
+      clear_text();
     }
     ImGui::End();
   }
@@ -78,10 +91,12 @@ void LightViewer::draw_gl() {
 }
 
 void LightViewer::clear_text() {
+  std::lock_guard<std::mutex> lock(texts_mutex);
   texts.clear();
 }
 
 void LightViewer::append_text(const std::string& text) {
+  std::lock_guard<std::mutex> lock(texts_mutex);
   texts.push_back(text);
 }
 
@@ -119,6 +134,11 @@ void LightViewer::show_info_window() {
   if(info_window == nullptr) {
     info_window.reset(new InfoWindow());
   }
+}
+
+void LightViewer::invoke(const std::function<void()>& func) {
+  std::lock_guard<std::mutex> lock(invoke_requests_mutex);
+  invoke_requests.push_back(func);
 }
 
 std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size_) {
