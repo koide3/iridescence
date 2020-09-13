@@ -1,11 +1,5 @@
 #include <glk/pointcloud_buffer.hpp>
 
-#ifdef GLK_USE_PCL
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#endif
-
 namespace glk {
 
 PointCloudBuffer::PointCloudBuffer(int stride, int num_points) {
@@ -31,62 +25,6 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
 }
-
-#ifdef GLK_USE_PCL
-
-PointCloudBuffer::PointCloudBuffer(const std::string& cloud_filename) {
-  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  if(pcl::io::loadPCDFile(cloud_filename, *cloud)) {
-    std::cerr << "error: failed to load " << cloud_filename << std::endl;
-    num_points = 0;
-    return;
-  }
-
-  stride = sizeof(pcl::PointXYZI);
-  num_points = cloud->size();
-
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(pcl::PointXYZI), cloud->points.data(), GL_STATIC_DRAW);
-}
-
-template<typename PointT>
-PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<PointT>>& cloud) {
-  stride = sizeof(PointT);
-  num_points = cloud->size();
-
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(PointT), cloud->points.data(), GL_STATIC_DRAW);
-}
-
-template<typename PointT>
-PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<PointT>>& cloud) {
-  stride = sizeof(PointT);
-  num_points = cloud->size();
-
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, cloud->size() * sizeof(PointT), cloud->points.data(), GL_STATIC_DRAW);
-}
-
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>& cloud);
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI>>& cloud);
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<pcl::PointCloud<pcl::PointNormal>>& cloud);
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZ>>& cloud);
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZI>>& cloud);
-template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointNormal>>& cloud);
-
-#endif
 
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);

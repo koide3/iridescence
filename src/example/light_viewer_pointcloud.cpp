@@ -7,6 +7,7 @@
 #include <portable-file-dialogs.h>
 
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/pointcloud_buffer_pcl.hpp>
 #include <glk/primitives/primitives.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::io::loadPCDFile(results[0], *cloud);
 
-        auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(cloud);
+        auto cloud_buffer = glk::create_point_cloud_buffer(*cloud);
         viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random()));
 
         // *** example usage ***
