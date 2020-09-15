@@ -81,10 +81,10 @@ private:
       int mem_free = values[3];
       int mem_inact = values[4];
       int mem_active = values[5];
-      double mem_percent = 100 * mem_active / static_cast<double>(mem_free + mem_inact + mem_active);
+      double mem_percent = 100 * (mem_active + mem_inact) / static_cast<double>(mem_free + mem_inact + mem_active);
       int cpu_idle = values[14];
 
-      sst << boost::format("CPU %02d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % mem_active % (mem_free + mem_inact + mem_active);
+      sst << boost::format("CPU %2d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % (mem_active + mem_inact) % (mem_free + mem_inact + mem_active);
     }
     c.wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -111,7 +111,7 @@ private:
         continue;
       }
 
-      sst << boost::format("%5s %20s : GPU %5s    Memory %5s (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[3] % tokens[4] % tokens[5];
+      sst << boost::format("%5s %20s : GPU %5s    Memory (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[4] % tokens[5];
     }
     c.wait();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

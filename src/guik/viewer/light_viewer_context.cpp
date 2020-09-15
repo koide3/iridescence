@@ -46,11 +46,15 @@ void LightViewerContext::draw_gl() {
   canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
   glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
 
-  for(const auto& iter : drawables) {
-    const auto& shader_setting = iter.second.first;
+  for(const auto& itr : drawables) {
+    if(drawable_filter && !drawable_filter(itr.first)) {
+      continue;
+    }
+
+    const auto& shader_setting = itr.second.first;
     shader_setting->set(*canvas->shader);
 
-    const auto& drawable = iter.second.second;
+    const auto& drawable = itr.second.second;
     if(drawable) {
       drawable->draw(*canvas->shader);
     }
@@ -101,5 +105,11 @@ void LightViewerContext::update_drawable(const std::string& name, const glk::Dra
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
 
+void LightViewerContext::clear_drawable_filter() {
+  drawable_filter = nullptr;
+}
 
+void LightViewerContext::set_drawable_filter(const std::function<bool(const std::string&)>& filter) {
+  drawable_filter = filter;
+}
 }
