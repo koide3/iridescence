@@ -8,7 +8,10 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/approximate_voxel_grid.h>
 
+#include <portable-file-dialogs.h>
+
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/pointcloud_buffer_pcl.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
@@ -65,12 +68,13 @@ private:
 
 
 int main(int argc, char** argv) {
-  if(argc < 2) {
-    std::cout << "usage: light_viewer_kitti /your/kitti/path/sequences/00/velodyne" << std::endl;
+  // "/your/kitti/path/sequences/00/velodyne"
+  std::string kitti_path = pfd::select_folder("Select KITTI directory that contains *.bin").result();
+  if(kitti_path.empty()) {
     return 0;
   }
 
-  KittiLoader kitti(argv[1]);
+  KittiLoader kitti(kitti_path);
 
   // downsampling filter
   float downsample_resolution = 1.0f;
@@ -92,7 +96,7 @@ int main(int argc, char** argv) {
   // viewer setting
   auto viewer = guik::LightViewer::instance();
 
-  bool step_execution = true;
+  bool step_execution = false;
   viewer->register_ui_callback("registration config", [&]() {
     if(ImGui::Button("clear map")) {
       viewer->clear_drawables([](const std::string& name){ return name.find("frame_") != std::string::npos; });
@@ -124,8 +128,8 @@ int main(int argc, char** argv) {
 
     viewer->append_text((boost::format("%d : %.3f s : %d pts   fitness_score %.3f") % i % ImGui::GetTime() % source->size() % gicp.getFitnessScore()).str());
 
-    auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(kitti.cloud(i));
-    viewer->update_drawable("current_frame", cloud_buffer, guik::FlatColor(Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f), pose.cast<float>().matrix()).add("point_scale", 10.0f));
+    auto cloud_buffer = glk::create_point_cloud_buffer(*kitti.cloud(i));
+    viewer->update_drawable("current_frame", cloud_buffer, guik::FlatColor(Eigen::Vector4f(1.0f, 0.5f, 0.0f, 1.0f), pose.cast<float>().matrix()).add("point_scale", 3.0f));
     viewer->update_drawable("frame_" + std::to_string(i), cloud_buffer, guik::Rainbow(pose.cast<float>().matrix()));
     viewer->update_drawable("coord_" + std::to_string(i), glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(pose.cast<float>().cast<float>().matrix()));
     viewer->lookat(pose.translation().cast<float>());
@@ -137,6 +141,7 @@ int main(int argc, char** argv) {
 
       ImGui::SameLine();
       if(ImGui::Button("step execution")) {
+        step_execution = true;
         step_clicked = true;
       }
     });

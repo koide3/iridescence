@@ -11,9 +11,6 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
 find_package(PCL REQUIRED)
-if(PCL_FOUND)
-  add_definitions(-DGLK_USE_PCL=1)
-endif()
 
 find_package(catkin REQUIRED COMPONENTS roslib)
 
@@ -125,6 +122,13 @@ add_executable(light_viewer_imgui
   src/example/light_viewer_imgui.cpp
 )
 target_link_libraries(light_viewer_imgui
+  guik
+)
+
+add_executable(light_viewer_multi_thread
+  src/example/light_viewer_multi_thread.cpp
+)
+target_link_libraries(light_viewer_multi_thread
   guik
 )
 

@@ -7,6 +7,7 @@
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
 
+  // sine wave
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> line_vertices;
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> line_colors;
   for(double x = -5.0; x <= 5.0; x += 0.1) {
@@ -42,21 +43,32 @@ int main(int argc, char** argv) {
   transform = (Eigen::Translation3f(Eigen::Vector3f(-2.5f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
   viewer->update_drawable("sphere", glk::Primitives::primitive_ptr(glk::Primitives::SPHERE), guik::Rainbow(transform));
 
+  transform = (Eigen::Isometry3f::Identity() * Eigen::Translation3f(Eigen::Vector3f(0, 9.0f, 0.0f)) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f)).matrix();
+  viewer->update_drawable("bunny", glk::Primitives::primitive_ptr(glk::Primitives::BUNNY), guik::Rainbow(transform));
+
   transform = (Eigen::Translation3f(Eigen::Vector3f(2.5f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
   viewer->update_drawable("cube", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow(transform));
 
   transform = (Eigen::Translation3f(Eigen::Vector3f(5.0f, 9.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
   viewer->update_drawable("cone", glk::Primitives::primitive_ptr(glk::Primitives::CONE), guik::Rainbow(transform));
 
+  // wireframes
+  transform = (Eigen::Translation3f(Eigen::Vector3f(-5.0f, 12.0f, 1.0f)) * Eigen::UniformScaling<float>(0.5f) * Eigen::Isometry3f::Identity()).matrix();
+  viewer->update_drawable("wire_icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_ICOSAHEDRON), guik::Rainbow(transform));
 
-  for(double t = 0.0; ; t += 0.001) {
-    transform = (Eigen::Translation3f(Eigen::Vector3f(std::cos(t) * 20.0, std::sin(t) * 20.0, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
-    viewer->update_drawable("moving_sphere", glk::Primitives::primitive_ptr(glk::Primitives::SPHERE), guik::FlatColor(Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f), transform));
+  transform = (Eigen::Translation3f(Eigen::Vector3f(-2.5f, 12.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
+  viewer->update_drawable("wire_sphere", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_SPHERE), guik::Rainbow(transform));
 
-    if(!viewer->spin_once()) {
-      break;
-    }
-  }
+  transform = (Eigen::Isometry3f::Identity() * Eigen::Translation3f(Eigen::Vector3f(0, 12.0f, 0.0f)) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f)).matrix();
+  viewer->update_drawable("wire_bunny", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_BUNNY), guik::Rainbow(transform));
+
+  transform = (Eigen::Translation3f(Eigen::Vector3f(2.5f, 12.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
+  viewer->update_drawable("wire_cube", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CUBE), guik::Rainbow(transform));
+
+  transform = (Eigen::Translation3f(Eigen::Vector3f(5.0f, 12.0f, 1.0f)) * Eigen::Isometry3f::Identity()).matrix();
+  viewer->update_drawable("wire_cone", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CONE), guik::Rainbow(transform));
+
+  viewer->spin();
 
   return 0;
 }

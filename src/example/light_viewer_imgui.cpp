@@ -29,7 +29,6 @@ int main(int argc, char** argv) {
   viewer->register_ui_callback("model_control_ui", [&]() {
     model_control.draw_ui();
     model_control.draw_gizmo(0, 0, viewer->canvas_size().x(), viewer->canvas_size().y(), viewer->view_matrix(), viewer->projection_matrix());
-
     viewer->update_drawable("coord", glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(model_control.model_matrix()));
   });
 
@@ -40,12 +39,10 @@ int main(int argc, char** argv) {
     if(ImGui::Button("+X")) {
       my_transform = Eigen::Translation3f(1.0f, 0.0f, 0.0f) * my_transform;
     }
-
     ImGui::SameLine();
     if(ImGui::Button("+Y")) {
       my_transform = Eigen::Translation3f(0.0f, 1.0f, 0.0f) * my_transform;
     }
-
     ImGui::SameLine();
     if(ImGui::Button("+Z")) {
       my_transform = Eigen::Translation3f(0.0f, 0.0f, 1.0f) * my_transform;
@@ -55,23 +52,24 @@ int main(int argc, char** argv) {
     viewer->update_drawable("my_coord", glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(my_transform.matrix()));
   });
 
-  // create sub GL canvas
-  guik::GLCanvas canvas(Eigen::Vector2i(512, 512));
+  // create sub viewer
+  auto sub_viewer = viewer->sub_viewer("sub viewer", Eigen::Vector2i(512, 512));
+  sub_viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON), guik::Rainbow());
 
+  // create sub GL canvas for low-level control
+  guik::GLCanvas canvas(Eigen::Vector2i(512, 512));
   viewer->register_ui_callback("sub_gl_window_ui", [&]() {
     // rendering (this can be done outside of this callback)
     canvas.bind();
-    guik::Rainbow shader_setting;
-    shader_setting.set(*canvas.shader);
-
+    guik::Rainbow().set(*canvas.shader);
     glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON)->draw(*canvas.shader);
     canvas.unbind();
 
     // show the image rendered on canvas's frame buffer
-    ImGui::Begin("sub window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("your sub window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
-    ImGui::BeginChild("canvas", ImVec2(512, 512), false, flags);
+    ImGuiWindowFlags child_window_flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
+    ImGui::BeginChild("canvas", ImVec2(512, 512), false, child_window_flags);
 
     if(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing()) {
       canvas.mouse_control();
