@@ -61,9 +61,9 @@ public:
 private:
   int num_points;
 
-  GLuint vao; // vertex array object
-  GLuint vbo; // vertex buffer object
-  GLuint cbo; // color buffer object
+  GLuint vao;  // vertex array object
+  GLuint vbo;  // vertex buffer object
+  GLuint cbo;  // color buffer object
 };
 
 int main(int argc, char** argv) {

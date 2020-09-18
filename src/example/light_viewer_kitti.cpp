@@ -17,9 +17,7 @@
 
 class KittiLoader {
 public:
-  KittiLoader(const std::string& dataset_path)
-  : dataset_path(dataset_path)
-  {
+  KittiLoader(const std::string& dataset_path) : dataset_path(dataset_path) {
     for(num_frames = 0;; num_frames++) {
       std::string filename = (boost::format("%s/%06d.bin") % dataset_path % num_frames).str();
       if(!boost::filesystem::exists(filename)) {
@@ -33,7 +31,9 @@ public:
   }
   ~KittiLoader() {}
 
-  size_t size() const { return num_frames; }
+  size_t size() const {
+    return num_frames;
+  }
 
   pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud(size_t i) const {
     std::string filename = (boost::format("%s/%06d.bin") % dataset_path % i).str();
@@ -65,7 +65,6 @@ private:
   int num_frames;
   std::string dataset_path;
 };
-
 
 int main(int argc, char** argv) {
   // "/your/kitti/path/sequences/00/velodyne"
@@ -99,7 +98,7 @@ int main(int argc, char** argv) {
   bool step_execution = false;
   viewer->register_ui_callback("registration config", [&]() {
     if(ImGui::Button("clear map")) {
-      viewer->clear_drawables([](const std::string& name){ return name.find("frame_") != std::string::npos; });
+      viewer->clear_drawables([](const std::string& name) { return name.find("frame_") != std::string::npos; });
     }
 
     ImGui::SameLine();
@@ -112,7 +111,7 @@ int main(int argc, char** argv) {
     }
   });
 
-  for(int i=1; i<kitti.size() && !viewer->closed(); i++) {
+  for(int i = 1; i < kitti.size() && !viewer->closed(); i++) {
     // set the current frame as source
     voxelgrid.setInputCloud(kitti.cloud(i));
     auto source = boost::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
@@ -146,7 +145,8 @@ int main(int argc, char** argv) {
       }
     });
 
-    while(viewer->spin_once() && step_execution && !step_clicked) {}
+    while(viewer->spin_once() && step_execution && !step_clicked) {
+    }
   }
 
   return 0;

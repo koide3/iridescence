@@ -20,8 +20,12 @@ public:
 
   bool init_canvas(const Eigen::Vector2i& size);
 
-  guik::ShaderSetting& shader_setting() { return global_shader_setting; }
-  const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
+  guik::ShaderSetting& shader_setting() {
+    return global_shader_setting;
+  }
+  const guik::ShaderSetting& shader_setting() const {
+    return global_shader_setting;
+  }
 
   void lookat(const Eigen::Vector3f& pt);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
@@ -33,21 +37,28 @@ public:
   void remove_drawable(const std::string& name);
   void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
-  void clear_drawable_filter();
-  void set_drawable_filter(const std::function<bool(const std::string&)>& filter);
+  void clear_drawable_filters();
+  void add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter);
+  void remove_drawable_filter(const std::string& filter_name);
 
-  Eigen::Vector2i canvas_size() const { return canvas->size; }
-  Eigen::Matrix4f view_matrix() const { return canvas->camera_control->view_matrix(); }
-  Eigen::Matrix4f projection_matrix() const { return canvas->projection_control->projection_matrix(); }
+  Eigen::Vector2i canvas_size() const {
+    return canvas->size;
+  }
+  Eigen::Matrix4f view_matrix() const {
+    return canvas->camera_control->view_matrix();
+  }
+  Eigen::Matrix4f projection_matrix() const {
+    return canvas->projection_control->projection_matrix();
+  }
 
 protected:
   std::string context_name;
   std::unique_ptr<guik::GLCanvas> canvas;
   guik::ShaderSetting global_shader_setting;
 
-  std::function<bool(const std::string&)> drawable_filter;
+  std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;
 };
-}
+}  // namespace guik
 
 #endif

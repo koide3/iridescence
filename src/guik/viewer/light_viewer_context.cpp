@@ -4,9 +4,7 @@
 
 namespace guik {
 
-LightViewerContext::LightViewerContext(const std::string& context_name)
-: context_name(context_name)
-{}
+LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {}
 
 LightViewerContext::~LightViewerContext() {}
 
@@ -47,7 +45,15 @@ void LightViewerContext::draw_gl() {
   glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
 
   for(const auto& itr : drawables) {
-    if(drawable_filter && !drawable_filter(itr.first)) {
+    bool draw = true;
+    for(const auto& filter : drawable_filters) {
+      if(!filter.second(itr.first)) {
+        draw = false;
+        break;
+      }
+    }
+
+    if(!draw) {
       continue;
     }
 
@@ -100,16 +106,23 @@ void LightViewerContext::remove_drawable(const std::string& name) {
   }
 }
 
-
 void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
 
-void LightViewerContext::clear_drawable_filter() {
-  drawable_filter = nullptr;
+void LightViewerContext::clear_drawable_filters() {
+  drawable_filters.clear();
 }
 
-void LightViewerContext::set_drawable_filter(const std::function<bool(const std::string&)>& filter) {
-  drawable_filter = filter;
+void LightViewerContext::add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter) {
+  drawable_filters[filter_name] = filter;
 }
+
+void LightViewerContext::remove_drawable_filter(const std::string& filter_name) {
+  auto found = drawable_filters.find(filter_name);
+  if(found != drawable_filters.end()) {
+    drawable_filters.erase(found);
+  }
 }
+
+}  // namespace guik

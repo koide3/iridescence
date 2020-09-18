@@ -12,12 +12,12 @@ int main(int argc, char** argv) {
   // main menu example
   viewer->register_ui_callback("main_menu_ui", [&]() {
     ImGui::BeginMainMenuBar();
-      if(ImGui::BeginMenu("File")) {
-        if(ImGui::MenuItem("Quit")) {
-          viewer->close();
-        }
-        ImGui::EndMenu();
+    if(ImGui::BeginMenu("File")) {
+      if(ImGui::MenuItem("Quit")) {
+        viewer->close();
       }
+      ImGui::EndMenu();
+    }
     ImGui::EndMainMenuBar();
   });
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   auto sub_viewer = viewer->sub_viewer("sub viewer", Eigen::Vector2i(512, 512));
   sub_viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON), guik::Rainbow());
 
-  // create sub GL canvas for low-level control
+  // create another sub viewer with GLCanvas for low-level control
   guik::GLCanvas canvas(Eigen::Vector2i(512, 512));
   viewer->register_ui_callback("sub_gl_window_ui", [&]() {
     // rendering (this can be done outside of this callback)

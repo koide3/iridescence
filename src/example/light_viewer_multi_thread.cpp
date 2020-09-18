@@ -30,7 +30,7 @@ void run() {
 }
 
 int main(int argc, char** argv) {
-  // the fist call of ```guik::LightViewer::instance()``` in the main thread
+  // the fist call of ```guik::LightViewer::instance()``` must be done in the main thread
   auto viewer = guik::LightViewer::instance();
 
   std::thread thread(run);

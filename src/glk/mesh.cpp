@@ -69,7 +69,7 @@ void Mesh::draw(glk::GLSLShader& shader) const {
   glBindVertexArray(0);
 
   if(wireframe) {
-    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 }
 

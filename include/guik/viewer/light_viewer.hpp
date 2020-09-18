@@ -19,7 +19,7 @@ public:
   static LightViewer* instance() {
     if(!inst) {
       inst = new LightViewer();
-      inst->init(Eigen::Vector2i(1920, 1080), "#version 130");
+      inst->init(Eigen::Vector2i(1920, 1080), "#version 330");
     }
 
     return inst;
