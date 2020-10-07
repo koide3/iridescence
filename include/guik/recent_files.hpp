@@ -2,6 +2,7 @@
 #define GUIK_RECENT_FILES_HPP
 
 #include <deque>
+#include <vector>
 #include <string>
 
 namespace guik {
@@ -14,6 +15,7 @@ public:
 
   void clear();
   void push(const std::string& filename);
+  void push(const std::vector<std::string>& filenames);
 
   bool empty() const;
   size_t size() const;

@@ -41,6 +41,12 @@ void RecentFiles::push(const std::string& filename) {
   }
 }
 
+void RecentFiles::push(const std::vector<std::string>& filenames) {
+  for(const auto& filename : filenames) {
+    push(filename);
+  }
+}
+
 bool RecentFiles::empty() const {
   return recent_files.empty();
 }
