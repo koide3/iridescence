@@ -87,6 +87,7 @@ add_library(guik
   src/guik/camera_control.cpp
   src/guik/projection_control.cpp
   src/guik/imgui_application.cpp
+  src/guik/recent_files.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
 )

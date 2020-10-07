@@ -1,5 +1,6 @@
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
+#include <guik/recent_files.hpp>
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
