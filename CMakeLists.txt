@@ -147,6 +147,13 @@ target_link_libraries(light_viewer_effects
   guik
 )
 
+add_executable(light_viewer_picking
+  src/example/light_viewer_picking.cpp
+)
+target_link_libraries(light_viewer_picking
+  guik
+)
+
 if(PCL_FOUND)
 add_executable(light_viewer_pointcloud
   src/example/light_viewer_pointcloud.cpp

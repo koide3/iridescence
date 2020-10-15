@@ -52,7 +52,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
  * @return true
  * @return false
  */
-bool GLCanvas::ready() const { return frame_buffer && shader && camera_control && texture_renderer; }
+bool GLCanvas::ready() const {
+  return frame_buffer && shader && camera_control && texture_renderer;
+}
 
 /**
  * @brief
@@ -149,14 +151,14 @@ void GLCanvas::mouse_control() {
 
   Eigen::Vector2i p(mouse_pos.x, mouse_pos.y);
 
-  for (int i = 0; i < 3; i++) {
-    if (ImGui::IsMouseClicked(i)) {
+  for(int i = 0; i < 3; i++) {
+    if(ImGui::IsMouseClicked(i)) {
       camera_control->mouse(p, i, true);
     }
-    if (ImGui::IsMouseReleased(i)) {
+    if(ImGui::IsMouseReleased(i)) {
       camera_control->mouse(p, i, false);
     }
-    if (ImGui::IsMouseDragging(i)) {
+    if(ImGui::IsMouseDragging(i)) {
       camera_control->drag(p, i);
     }
 
@@ -173,7 +175,7 @@ void GLCanvas::mouse_control() {
  * @return Eigen::Vector4i
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
-  if (p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
+  if(p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
     return Eigen::Vector4i(-1, -1, -1, -1);
   }
 
@@ -181,19 +183,19 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
 
   std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
 
-  for (int i = -window; i <= window; i++) {
-    for (int j = -window; j <= window; j++) {
+  for(int i = -window; i <= window; i++) {
+    for(int j = -window; j <= window; j++) {
       ps.push_back(Eigen::Vector2i(i, j));
     }
   }
 
   std::sort(ps.begin(), ps.end(), [=](const Eigen::Vector2i& lhs, const Eigen::Vector2i& rhs) { return lhs.norm() < rhs.norm(); });
-  for (int i = 0; i < ps.size(); i++) {
+  for(int i = 0; i < ps.size(); i++) {
     Eigen::Vector2i p_ = p + ps[i];
     int index = ((size[1] - p[1]) * size[0] + p_[0]) * 4;
     Eigen::Vector4i info = Eigen::Map<Eigen::Vector4i>(&pixels[index]);
 
-    if (info[3] >= 0) {
+    if(info[3] >= 0) {
       return info;
     }
   }
@@ -209,7 +211,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
  * @return float
  */
 float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
-  if (p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
+  if(p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
     return -1.0f;
   }
 
@@ -217,19 +219,19 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
 
   std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
 
-  for (int i = -window; i <= window; i++) {
-    for (int j = -window; j <= window; j++) {
+  for(int i = -window; i <= window; i++) {
+    for(int j = -window; j <= window; j++) {
       ps.push_back(Eigen::Vector2i(i, j));
     }
   }
 
   std::sort(ps.begin(), ps.end(), [=](const Eigen::Vector2i& lhs, const Eigen::Vector2i& rhs) { return lhs.norm() < rhs.norm(); });
-  for (int i = 0; i < ps.size(); i++) {
+  for(int i = 0; i < ps.size(); i++) {
     Eigen::Vector2i p_ = p + ps[i];
     int index = ((size[1] - p[1]) * size[0] + p_[0]);
     float depth = pixels[index];
 
-    if (depth < 1.0f) {
+    if(depth < 1.0f) {
       return depth;
     }
   }
@@ -248,12 +250,14 @@ Eigen::Vector3f GLCanvas::unproject(const Eigen::Vector2i& p, float depth) const
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
   Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
 
-  Eigen::Matrix4f vp = projection_matrix * view_matrix;
+  glm::mat4 view = glm::make_mat4(view_matrix.data());
+  glm::mat4 projection = glm::make_mat4(projection_matrix.data());
 
-  Eigen::Vector2f p_(static_cast<float>(p[0]) / size[0], static_cast<float>(p[1]) / size[1]);
-  Eigen::Vector4f unprojected = vp.inverse() * Eigen::Vector4f(p_[0], 1.0f - p_[1], depth, 1.0f);
+  glm::vec4 viewport = glm::vec4(0, 0, size[0], size[1]);
+  glm::vec3 wincoord = glm::vec3(p[0], size[1] - p[1], depth);
+  glm::vec3 objcoord = glm::unProject(wincoord, view, projection, viewport);
 
-  return unprojected.head<3>();
+  return Eigen::Vector3f(objcoord.x, objcoord.y, objcoord.z);
 }
 
 void GLCanvas::draw_ui() {

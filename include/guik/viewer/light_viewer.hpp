@@ -64,6 +64,6 @@ private:
   std::deque<std::function<void()>> invoke_requests;
 };
 
-}  // namespace plio
+}  // namespace guik
 
 #endif

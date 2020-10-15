@@ -125,4 +125,12 @@ void LightViewerContext::remove_drawable_filter(const std::string& filter_name) 
   }
 }
 
+float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {
+  return canvas->pick_depth(p, 2);
+}
+
+Eigen::Vector3f LightViewerContext::unproject(const Eigen::Vector2i& p, float depth) const {
+  return canvas->unproject(p, depth);
+}
+
 }  // namespace guik

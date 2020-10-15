@@ -51,6 +51,9 @@ public:
     return canvas->projection_control->projection_matrix();
   }
 
+  float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
+  Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
+
 protected:
   std::string context_name;
   std::unique_ptr<guik::GLCanvas> canvas;
