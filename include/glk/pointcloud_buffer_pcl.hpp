@@ -18,7 +18,7 @@ std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointClou
 }
 
 template<>
-std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<pcl::PointXYZ>& cloud) {
+inline std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<pcl::PointXYZ>& cloud) {
   return std::make_shared<PointCloudBuffer>(&cloud.at(0).x, sizeof(pcl::PointXYZ), cloud.size());
 }
 
