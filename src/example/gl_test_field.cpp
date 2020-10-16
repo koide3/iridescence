@@ -22,7 +22,7 @@ public:
     Application::init(size, glsl_version);
 
     main_canvas.reset(new guik::GLCanvas(size, "phong"));
-    if (!main_canvas->ready()) {
+    if(!main_canvas->ready()) {
       close();
       return false;
     }
@@ -38,9 +38,9 @@ public:
    */
   virtual void draw_ui() override {
     // main menu
-    if (ImGui::BeginMainMenuBar()) {
-      if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Quit")) {
+    if(ImGui::BeginMainMenuBar()) {
+      if(ImGui::BeginMenu("File")) {
+        if(ImGui::MenuItem("Quit")) {
           close();
         }
         ImGui::EndMenu();
@@ -74,7 +74,7 @@ public:
     model_control->draw_gizmo(0, 0, 1920, 1080, view_matrix, projection_matrix);
 
     // mouse control
-    if (!ImGui::GetIO().WantCaptureMouse && !ImGuizmo::IsUsing()) {
+    if(!ImGui::GetIO().WantCaptureMouse && !ImGuizmo::IsUsing()) {
       main_canvas->mouse_control();
     }
   }
@@ -122,7 +122,7 @@ private:
 int main(int argc, char** argv) {
   std::unique_ptr<guik::Application> app(new GLTestField());
 
-  if (!app->init(Eigen::Vector2i(1920, 1080), "#version 330")) {
+  if(!app->init(Eigen::Vector2i(1920, 1080), "#version 330")) {
     return 1;
   }
 

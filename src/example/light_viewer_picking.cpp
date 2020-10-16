@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     if(ImGui::IsMouseClicked(1)) {
       // get the depth of the clicked position
       float depth = viewer->pick_depth(Eigen::Vector2i(mouse_pos.x, mouse_pos.y));
-      if(depth >= 1.0) {
+      if(depth >= 1.0f || depth <= 0.0f) {
         return;
       }
 

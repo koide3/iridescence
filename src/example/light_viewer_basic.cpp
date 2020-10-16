@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 
   while(viewer->spin_once()) {
     Eigen::Matrix4f transform = (Eigen::AngleAxisf(ImGui::GetTime(), Eigen::Vector3f::UnitZ()) * Eigen::UniformScaling<float>(scale) * Eigen::Isometry3f::Identity()).matrix();
-    viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow(transform));
+    viewer->update_drawable("cube", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow(transform));
   }
 
   return 0;
