@@ -10,10 +10,33 @@ namespace glk {
 
 template<typename PointT>
 std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<PointT>& cloud) {
-  return std::make_shared<PointCloudBuffer>(&cloud.at(0).x, sizeof(PointT), cloud.size());
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points(cloud.size());
+  for(int i = 0; i < cloud.size(); i++) {
+    points[i] = cloud[i].getVector3fMap();
+  }
+  return std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
 }
 
-// template PointCloudBuffer::PointCloudBuffer(const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZI>>& cloud);
+template<>
+std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<pcl::PointXYZ>& cloud) {
+  return std::make_shared<PointCloudBuffer>(&cloud.at(0).x, sizeof(pcl::PointXYZ), cloud.size());
+}
+
+template<typename PointT>
+std::shared_ptr<PointCloudBuffer> create_colored_point_cloud_buffer(const pcl::PointCloud<PointT>& cloud) {
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points(cloud.size());
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(cloud.size());
+
+  for(int i = 0; i < cloud.size(); i++) {
+    points[i] = cloud[i].getVector3fMap();
+    colors[i] = Eigen::Vector4f(cloud[i].r, cloud[i].g, cloud[i].b, cloud[i].a) / 255.0f;
+  }
+
+  auto cloud_buffer = std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), points.size());
+  cloud_buffer->add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+
+  return cloud_buffer;
+}
 
 }  // namespace glk
 

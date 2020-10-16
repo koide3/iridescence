@@ -5,7 +5,7 @@ uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 
-// colormode = 0 : rainbow
+// colormode = 0 : rainbow (height encoding)
 // colormode = 1 : material_color
 // colormode = 2 : vert_color
 uniform int color_mode;

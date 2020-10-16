@@ -37,11 +37,25 @@ int main(int argc, char** argv) {
         // viewer->update_drawable(results[0], cloud_buffer, guik::Rainbow());
 
         // with some transformation and bigger points
-        // viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random(), Eigen::Matrix4f::Identity()).add("point_scale", 3.0f));
+        // viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random(), Eigen::Matrix4f::Identity()).add("point_scale", 5.0f));
+
+        // with point color
+        // std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(cloud->size());
+        // for(int i = 0; i < cloud->size(); i++) {
+        //   colors[i] = cloud->at(i).getVector4fMap() * 0.1f;
+        // }
+        // cloud_buffer->add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+        // viewer->update_drawable(results[0], cloud_buffer, guik::VertexColor());
+
+        // another way to create colored points with pcl::PointXYZRGBA
+        // pcl::PointCloud<pcl::PointXYZRGBA>::Ptr colored(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        // colored = ...
+        // auto cloud_buffer = glk::create_colored_point_cloud_buffer(*colored);
+        // viewer->update_drawable(results[0], cloud_buffer, guik::VertexColor());
       }
     }
 
-    for(int i=0; i<filenames.size(); i++) {
+    for(int i = 0; i < filenames.size(); i++) {
       std::string button_name = "remove##" + std::to_string(i);
       std::string filename = filenames[i];
       if(ImGui::Button(button_name.c_str())) {
