@@ -14,20 +14,23 @@ find_package(PCL REQUIRED)
 
 find_package(catkin COMPONENTS roslib)
 
+set(built_in_ros FALSE)
+if(catkin_FOUND AND NOT "${CATKIN_DEVEL_PREFIX}" MATCHES "${CMAKE_CURRENT_SOURCE_DIR}.*")
+  set(built_in_ros TRUE)
+endif()
+message(STATUS "built_in_ros:${built_in_ros}")
+
 ###################################
 ## catkin specific configuration ##
 ###################################
-if(catkin_FOUND)
+if(built_in_ros)
   # check if the package is built in a catkin workspace
-  get_filename_component(devel_directory ${CATKIN_DEVEL_PREFIX} NAME_WE)
-  if(${devel_directory} STREQUAL "devel")
-    catkin_package(
-      INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-      LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
-      #  CATKIN_DEPENDS roscpp rospy
-      DEPENDS roslib
-    )
-  endif()
+  catkin_package(
+    INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
+    LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
+    #  CATKIN_DEPENDS roscpp rospy
+    DEPENDS roslib
+  )
 endif()
 
 ###########
@@ -76,7 +79,7 @@ target_link_libraries(gl_imgui
 )
 
 set(path_src path_std.cpp)
-if(catkin_FOUND AND ${devel_directory} STREQUAL "devel")
+if(built_in_ros)
   set(path_src path_ros.cpp)
 endif()
 
