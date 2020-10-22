@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS roslib)
 ###################################
 catkin_package(
   INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-  LIBRARIES dl glfw imgui guik ${catkin_LIBRARIES}
+  LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
 #  CATKIN_DEPENDS roscpp rospy
   DEPENDS roslib
 )
@@ -49,7 +49,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ## Build ##
 ###########
 
-add_library(imgui
+add_library(gl_imgui
   thirdparty/gl3w/gl3w.c
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -62,13 +62,13 @@ add_library(imgui
   thirdparty/imgui/examples/imgui_impl_glfw.cpp
   thirdparty/imgui/examples/imgui_impl_opengl3.cpp
 )
-target_link_libraries(imgui
+target_link_libraries(gl_imgui
   ${OPENGL_LIBRARIES}
   glfw
   dl
 )
 
-add_library(guik
+add_library(gl_test_field
   src/glk/path.cpp
   src/glk/mesh.cpp
   src/glk/lines.cpp
@@ -91,83 +91,31 @@ add_library(guik
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
 )
-target_link_libraries(guik
-  imgui
+target_link_libraries(gl_test_field
+  gl_imgui
   pthread
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 
-add_executable(gl_test_field
-  src/example/gl_test_field.cpp
-)
-target_link_libraries(gl_test_field
-  guik
-)
-
-add_executable(light_viewer_basic
-  src/example/light_viewer_basic.cpp
-)
-target_link_libraries(light_viewer_basic
-  guik
-)
-
-add_executable(light_viewer_primitives
-  src/example/light_viewer_primitives.cpp
-)
-target_link_libraries(light_viewer_primitives
-  guik
-)
-
-add_executable(light_viewer_imgui
-  src/example/light_viewer_imgui.cpp
-)
-target_link_libraries(light_viewer_imgui
-  guik
-)
-
-add_executable(light_viewer_multi_thread
-  src/example/light_viewer_multi_thread.cpp
-)
-target_link_libraries(light_viewer_multi_thread
-  guik
-)
-
-add_executable(light_viewer_custom
-  src/example/light_viewer_custom.cpp
-)
-target_link_libraries(light_viewer_custom
-  guik
-)
-
-add_executable(light_viewer_effects
-  src/example/light_viewer_effects.cpp
-)
-target_link_libraries(light_viewer_effects
-  guik
-)
-
-add_executable(light_viewer_picking
-  src/example/light_viewer_picking.cpp
-)
-target_link_libraries(light_viewer_picking
-  guik
-)
-
-if(PCL_FOUND)
-add_executable(light_viewer_pointcloud
-  src/example/light_viewer_pointcloud.cpp
-)
-target_link_libraries(light_viewer_pointcloud
-  guik
-)
-
-add_executable(light_viewer_kitti
-  src/example/light_viewer_kitti.cpp
-)
-target_link_libraries(light_viewer_kitti
-  guik
-)
-endif()
-
+# copy shader files
 file(COPY data DESTINATION .)
+
+# build examples
+list(APPEND Examples gl_test_field_example)
+file(GLOB example_sources "src/example/*.cpp")
+
+foreach(example_src IN LISTS example_sources)
+  get_filename_component(example_name ${example_src} NAME_WE)
+
+  if(${example_name} STREQUAL "light_viewer_pointcloud" AND NOT PCL_FOUND)
+    continue()
+  endif()
+
+  add_executable(${example_name}
+    ${example_src}
+  )
+  target_link_libraries(${example_name}
+    gl_test_field
+  )
+endforeach()
