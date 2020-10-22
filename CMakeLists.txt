@@ -12,18 +12,22 @@ find_package(Boost REQUIRED filesystem program_options)
 
 find_package(PCL REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS roslib)
+find_package(catkin COMPONENTS roslib)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 if(catkin_FOUND)
-  catkin_package(
-    INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
-    #  CATKIN_DEPENDS roscpp rospy
-    DEPENDS roslib
-  )
+  # check if the package is built in a catkin workspace
+  get_filename_component(devel_directory ${CATKIN_DEVEL_PREFIX} NAME_WE)
+  if(${devel_directory} STREQUAL "devel")
+    catkin_package(
+      INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
+      LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
+      #  CATKIN_DEPENDS roscpp rospy
+      DEPENDS roslib
+    )
+  endif()
 endif()
 
 ###########
@@ -43,6 +47,7 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
+
 
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
@@ -70,13 +75,13 @@ target_link_libraries(gl_imgui
   dl
 )
 
-set(PATH_SRC path_std.cpp)
-if(catkin_FOUND)
-  set(PATH_SRC path_ros.cpp)
+set(path_src path_std.cpp)
+if(catkin_FOUND AND ${devel_directory} STREQUAL "devel")
+  set(path_src path_ros.cpp)
 endif()
 
 add_library(gl_test_field
-  src/glk/${PATH_SRC}
+  src/glk/${path_src}
   src/glk/mesh.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
