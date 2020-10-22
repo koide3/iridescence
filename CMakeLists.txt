@@ -17,12 +17,14 @@ find_package(catkin REQUIRED COMPONENTS roslib)
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package(
-  INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-  LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
-#  CATKIN_DEPENDS roscpp rospy
-  DEPENDS roslib
-)
+if(catkin_FOUND)
+  catkin_package(
+    INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
+    LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
+    #  CATKIN_DEPENDS roscpp rospy
+    DEPENDS roslib
+  )
+endif()
 
 ###########
 ## Build ##
@@ -68,8 +70,13 @@ target_link_libraries(gl_imgui
   dl
 )
 
+set(PATH_SRC path_std.cpp)
+if(catkin_FOUND)
+  set(PATH_SRC path_ros.cpp)
+endif()
+
 add_library(gl_test_field
-  src/glk/path.cpp
+  src/glk/${PATH_SRC}
   src/glk/mesh.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
@@ -102,7 +109,6 @@ target_link_libraries(gl_test_field
 file(COPY data DESTINATION .)
 
 # build examples
-list(APPEND Examples gl_test_field_example)
 file(GLOB example_sources "src/example/*.cpp")
 
 foreach(example_src IN LISTS example_sources)
