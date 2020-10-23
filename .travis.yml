@@ -15,6 +15,10 @@ matrix:
       env: DIST=focal
     - name: "focal_llvm"
       env: DIST=focal_llvm
+    - name: "melodic"
+      env: DIST=melodic
+    - name: "noetic"
+      env: DIST=noetic
 
 script:
   - docker build -f docker/$DIST/Dockerfile .
