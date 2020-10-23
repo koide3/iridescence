@@ -10,7 +10,7 @@ find_package(OpenGL REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
-find_package(PCL REQUIRED)
+find_package(PCL)
 
 find_package(catkin COMPONENTS roslib)
 
@@ -122,8 +122,10 @@ file(GLOB example_sources "src/example/*.cpp")
 foreach(example_src IN LISTS example_sources)
   get_filename_component(example_name ${example_src} NAME_WE)
 
-  if(${example_name} STREQUAL "light_viewer_pointcloud" AND NOT PCL_FOUND)
-    continue()
+  if(${example_name} STREQUAL "light_viewer_pointcloud" OR ${example_name} STREQUAL "light_viewer_kitti")
+    if(NOT PCL_FOUND)
+      continue()
+    endif()
   endif()
 
   add_executable(${example_name}

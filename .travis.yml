@@ -1,0 +1,14 @@
+sudo: required
+language: generic
+dist: xenial
+
+services:
+  - docker
+
+matrix:
+  include:
+    - name: "noetic"
+      env: DIST=noetic
+
+script:
+  - docker build -f docker/$DIST/Dockerfile .
