@@ -7,8 +7,14 @@ services:
 
 matrix:
   include:
-    - name: "noetic"
-      env: DIST=noetic
+    - name: "bionic"
+      env: DIST=bionic
+    - name: "bionic_llvm"
+      env: DIST=bionic_llvm
+    - name: "focal"
+      env: DIST=focal
+    - name: "focal_llvm"
+      env: DIST=focal_llvm
 
 script:
   - docker build -f docker/$DIST/Dockerfile .

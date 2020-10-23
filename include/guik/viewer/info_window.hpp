@@ -4,7 +4,14 @@
 #include <regex>
 #include <chrono>
 #include <future>
+#if BOOST_VERSION >= 107100
 #include <boost/process.hpp>
+#else
+#include <boost/process/io.hpp>
+#include <boost/process/pipe.hpp>
+#include <boost/process/child.hpp>
+#endif
+
 #include <boost/algorithm/string.hpp>
 
 #include <guik/viewer/light_viewer.hpp>

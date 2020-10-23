@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gl_test_field)
 
-# add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(GLM REQUIRED)
@@ -110,6 +110,7 @@ target_link_libraries(gl_test_field
   gl_imgui
   pthread
   ${PCL_LIBRARIES}
+  ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 
