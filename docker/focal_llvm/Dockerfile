@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y --no-install-recommends git
+
 COPY . /root/gl_test_field
 WORKDIR /root/gl_test_field
 RUN rm -rf /root/gl_test_field/build
