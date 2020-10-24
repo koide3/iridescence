@@ -5,6 +5,7 @@
 #include <vector>
 #include <Eigen/Dense>
 #include <glk/drawble.hpp>
+#include <glk/colormap.hpp>
 
 namespace glk {
 
@@ -25,6 +26,7 @@ public:
   virtual ~PointCloudBuffer() override;
 
   void add_color(const float* data, int stride, int num_points);
+  void add_intensity(glk::COLORMAP_TYPE colormap, const float* data, int stride, int num_points);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
   virtual void draw(glk::GLSLShader& shader) const override;

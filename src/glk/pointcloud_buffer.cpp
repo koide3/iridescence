@@ -1,6 +1,7 @@
 #include <glk/pointcloud_buffer.hpp>
 
 #include <iostream>
+#include <glk/colormap.hpp>
 
 namespace glk {
 
@@ -38,6 +39,15 @@ PointCloudBuffer::~PointCloudBuffer() {
 
 void PointCloudBuffer::add_color(const float* data, int stride, int num_points) {
   add_buffer("vert_color", 4, data, stride, num_points);
+}
+
+void PointCloudBuffer::add_intensity(glk::COLORMAP_TYPE colormap, const float* data, int stride, int num_points) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(num_points);
+  for(int i = 0; i < num_points; i++) {
+    colors[i] = glk::colormapf(colormap, data[(stride / sizeof(float)) * i]);
+  }
+
+  add_color(colors[0].data(), sizeof(Eigen::Vector4f), num_points);
 }
 
 void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points) {
