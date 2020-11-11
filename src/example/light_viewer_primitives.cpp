@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     line_vertices.push_back(Eigen::Vector3f(x, std::cos(x), 1.0f));
     line_vertices.push_back(Eigen::Vector3f(x + 0.1, std::cos(x + 0.1), 1.0f));
 
-    Eigen::Vector4f color = glk::colormapf(glk::COLORMAP_TYPE::TURBO, (x + 5.0) / 10.0);
+    Eigen::Vector4f color = glk::colormapf(glk::COLORMAP::TURBO, (x + 5.0) / 10.0);
     line_colors.push_back(color);
     line_colors.push_back(color);
   }
