@@ -7,8 +7,8 @@
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
 
-#include <guik/camera_control.hpp>
-#include <guik/projection_control.hpp>
+#include <guik/camera/camera_control.hpp>
+#include <guik/camera/projection_control.hpp>
 
 namespace guik {
 
@@ -40,8 +40,8 @@ public:
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::TextureRenderer> texture_renderer;
 
-  std::unique_ptr<guik::CameraControl> camera_control;
-  std::unique_ptr<guik::ProjectionControl> projection_control;
+  std::shared_ptr<guik::CameraControl> camera_control;
+  std::shared_ptr<guik::ProjectionControl> projection_control;
 };
 
 }  // namespace guik

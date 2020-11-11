@@ -18,8 +18,10 @@ public:
   ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix = Eigen::Matrix4f::Identity());
 
   void draw_ui();
-  void draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window=false);
+  void draw_gizmo_ui();
+  void draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window = false);
 
+  const std::string& model_name() const;
   Eigen::Matrix4f model_matrix() const;
   void set_model_matrix(const Eigen::Matrix4f& matrix) { pose = Eigen::Affine3f(matrix); }
 

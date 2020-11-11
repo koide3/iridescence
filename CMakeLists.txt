@@ -83,7 +83,7 @@ if(built_in_ros)
   set(path_src path_ros.cpp)
 endif()
 
-add_library(gl_test_field
+add_library(iridescent
   src/glk/${path_src}
   src/glk/mesh.cpp
   src/glk/lines.cpp
@@ -99,14 +99,16 @@ add_library(gl_test_field
   src/glk/loaders/ply_loader.cpp
   src/guik/gl_canvas.cpp
   src/guik/model_control.cpp
-  src/guik/camera_control.cpp
-  src/guik/projection_control.cpp
   src/guik/imgui_application.cpp
   src/guik/recent_files.cpp
+  src/guik/camera/orbit_camera_control_xy.cpp
+  src/guik/camera/orbit_camera_control_xz.cpp
+  src/guik/camera/topdown_camera_control.cpp
+  src/guik/camera/projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
 )
-target_link_libraries(gl_test_field
+target_link_libraries(iridescent
   gl_imgui
   pthread
   ${PCL_LIBRARIES}
@@ -133,6 +135,6 @@ foreach(example_src IN LISTS example_sources)
     ${example_src}
   )
   target_link_libraries(${example_name}
-    gl_test_field
+    iridescent
   )
 endforeach()

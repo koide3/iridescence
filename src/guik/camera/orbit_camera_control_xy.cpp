@@ -1,6 +1,7 @@
-#include <guik/camera_control.hpp>
+#include <guik/camera/orbit_camera_control_xy.hpp>
 
 #include <memory>
+#include <iostream>
 #include <GL/gl3w.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,18 +10,18 @@
 
 namespace guik {
 
-ArcCameraControl::ArcCameraControl() : center_offset(0.0f, 0.0f, 0.0f), center(0.0f, 0.0f, 0.0f), distance(80.0f), left_button_down(false), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
+OrbitCameraControlXY::OrbitCameraControlXY() : center_offset(0.0f, 0.0f, 0.0f), center(0.0f, 0.0f, 0.0f), distance(80.0f), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
   left_button_down = false;
   middle_button_down = false;
 }
 
-ArcCameraControl::~ArcCameraControl() {}
+OrbitCameraControlXY::~OrbitCameraControlXY() {}
 
-void ArcCameraControl::lookat(const Eigen::Vector3f& pt) {
+void OrbitCameraControlXY::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;
 }
 
-void ArcCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
+void OrbitCameraControlXY::mouse(const Eigen::Vector2i& p, int button, bool down) {
   if (button == 0) {
     left_button_down = down;
   }
@@ -30,7 +31,7 @@ void ArcCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
   drag_last_pos = p;
 }
 
-void ArcCameraControl::drag(const Eigen::Vector2i& p, int button) {
+void OrbitCameraControlXY::drag(const Eigen::Vector2i& p, int button) {
   Eigen::Vector2i rel = p - drag_last_pos;
 
   if (left_button_down) {
@@ -47,7 +48,7 @@ void ArcCameraControl::drag(const Eigen::Vector2i& p, int button) {
   drag_last_pos = p;
 }
 
-void ArcCameraControl::scroll(const Eigen::Vector2f& rel) {
+void OrbitCameraControlXY::scroll(const Eigen::Vector2f& rel) {
   if (rel[0] > 0) {
     distance = distance * 0.8f;
   } else if (rel[0] < 0) {
@@ -57,19 +58,22 @@ void ArcCameraControl::scroll(const Eigen::Vector2f& rel) {
   distance = std::max(0.1, distance);
 }
 
-Eigen::Vector2f ArcCameraControl::depth_range() const {
+Eigen::Vector2f OrbitCameraControlXY::depth_range() const {
   return Eigen::Vector2f(distance / 10.0f, distance * 10.0f);
 }
 
-Eigen::Quaternionf ArcCameraControl::rotation() const { return Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY()); }
+Eigen::Quaternionf OrbitCameraControlXY::rotation() const {
+  return Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY());
+}
 
-Eigen::Matrix4f ArcCameraControl::view_matrix() const {
+Eigen::Matrix4f OrbitCameraControlXY::view_matrix() const {
   Eigen::Vector3f center_ = center_offset + center;
   Eigen::Vector3f eye_offset = rotation() * Eigen::Vector3f(distance, 0.0f, 0.0f);
   Eigen::Vector3f eye = center_ + eye_offset;
+  Eigen::Vector3f up = Eigen::Vector3f::UnitZ();
 
-  glm::mat4 mat = glm::lookAt(glm::vec3(eye[0], eye[1], eye[2]), glm::vec3(center_[0], center_[1], center_[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-  return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat));
+  glm::mat4 mat = glm::lookAt(glm::vec3(eye[0], eye[1], eye[2]), glm::vec3(center_[0], center_[1], center_[2]), glm::vec3(up[0], up[1], up[2]));
+  return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat)).eval();
 }
 
 }  // namespace guik

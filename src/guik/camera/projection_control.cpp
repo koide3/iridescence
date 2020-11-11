@@ -1,4 +1,4 @@
-#include <guik/projection_control.hpp>
+#include <guik/camera/projection_control.hpp>
 
 #include <imgui.h>
 

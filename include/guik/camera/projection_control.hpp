@@ -16,6 +16,14 @@ public:
     this->size = size;
   }
 
+  float get_fov() const {
+    return fovy;
+  }
+
+  void set_fov(float fov) {
+    fovy = fov;
+  }
+
   void set_depth_range(const Eigen::Vector2f& range) {
     this->near = range[0];
     this->far = range[1];

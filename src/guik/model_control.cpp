@@ -15,10 +15,7 @@ ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_
 void ModelControl::draw_ui() {
   ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-  int op = static_cast<int>(gizmo_operation);
-  std::vector<const char*> operations = { "TRANSLATE", "ROTATE", "SCALE" };
-  ImGui::Combo("Gizmo mode", &op, operations.data(), operations.size());
-  gizmo_operation = static_cast<ImGuizmo::OPERATION>(op);
+  draw_gizmo_ui();
 
   float value = 0.0f;
   ImGui::SetNextItemWidth(50);
@@ -75,6 +72,13 @@ void ModelControl::draw_ui() {
   ImGui::End();
 }
 
+void ModelControl::draw_gizmo_ui() {
+  int op = static_cast<int>(gizmo_operation);
+  std::vector<const char*> operations = {"TRANSLATE", "ROTATE", "SCALE"};
+  ImGui::Combo("Gizmo mode", &op, operations.data(), operations.size());
+  gizmo_operation = static_cast<ImGuizmo::OPERATION>(op);
+}
+
 void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window) {
   ImGuizmo::Enable(true);
   if(on_window) {
@@ -88,6 +92,8 @@ void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const 
 
   pose = Eigen::Affine3f(model);
 }
+
+const std::string& ModelControl::model_name() const { return name; }
 
 Eigen::Matrix4f ModelControl::model_matrix() const { return pose.matrix(); }
 

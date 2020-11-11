@@ -13,7 +13,8 @@
 #include <glk/effects/plain_rendering.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 
-#include <guik/camera_control.hpp>
+#include <guik/camera/camera_control.hpp>
+#include <guik/camera/orbit_camera_control_xy.hpp>
 
 namespace guik {
 
@@ -41,7 +42,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
 
-  camera_control.reset(new guik::ArcCameraControl());
+  camera_control.reset(new guik::OrbitCameraControlXY());
   projection_control.reset(new guik::ProjectionControl(size));
   texture_renderer.reset(new glk::TextureRenderer());
 }

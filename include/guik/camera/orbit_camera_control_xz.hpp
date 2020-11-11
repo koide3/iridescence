@@ -1,0 +1,23 @@
+#ifndef GUIK_ORBIT_CAMERA_CONTROL_XZ_HPP
+#define GUIK_ORBIT_CAMERA_CONTROL_XZ_HPP
+
+#include <guik/camera/orbit_camera_control_xy.hpp>
+
+namespace guik {
+
+class OrbitCameraControlXZ : public OrbitCameraControlXY {
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  OrbitCameraControlXZ();
+  virtual ~OrbitCameraControlXZ() override;
+
+  virtual void drag(const Eigen::Vector2i& p, int button) override;
+
+  virtual Eigen::Quaternionf rotation() const override;
+  virtual Eigen::Matrix4f view_matrix() const override;
+};
+
+}  // namespace guik
+
+#endif

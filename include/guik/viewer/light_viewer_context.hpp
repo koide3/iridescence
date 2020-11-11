@@ -6,6 +6,8 @@
 
 #include <glk/drawble.hpp>
 #include <guik/gl_canvas.hpp>
+#include <guik/camera/camera_control.hpp>
+#include <guik/camera/projection_control.hpp>
 #include <guik/viewer/shader_setting.hpp>
 
 namespace guik {
@@ -28,6 +30,7 @@ public:
   }
 
   void lookat(const Eigen::Vector3f& pt);
+  void set_draw_xy_grid(bool draw_xy_grid);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
 
   void clear_drawables();
@@ -40,6 +43,11 @@ public:
   void clear_drawable_filters();
   void add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter);
   void remove_drawable_filter(const std::string& filter_name);
+
+  const std::shared_ptr<CameraControl>& get_camera_control() const;
+  const std::shared_ptr<ProjectionControl>& get_projection_control() const;
+  void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
+  void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
   Eigen::Vector2i canvas_size() const {
     return canvas->size;
@@ -58,6 +66,8 @@ protected:
   std::string context_name;
   std::unique_ptr<guik::GLCanvas> canvas;
   guik::ShaderSetting global_shader_setting;
+
+  bool draw_xy_grid;
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;

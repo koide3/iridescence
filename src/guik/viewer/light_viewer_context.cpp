@@ -4,7 +4,9 @@
 
 namespace guik {
 
-LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {}
+LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
+  draw_xy_grid = true;
+}
 
 LightViewerContext::~LightViewerContext() {}
 
@@ -41,8 +43,10 @@ void LightViewerContext::draw_gl() {
 
   canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
   canvas->shader->set_uniform("color_mode", 1);
-  canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
-  glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
+  if(draw_xy_grid) {
+    canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
+    glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
+  }
 
   for(const auto& itr : drawables) {
     bool draw = true;
@@ -71,6 +75,10 @@ void LightViewerContext::draw_gl() {
 
 void LightViewerContext::lookat(const Eigen::Vector3f& pt) {
   canvas->camera_control->lookat(pt);
+}
+
+void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
+  this->draw_xy_grid = draw_xy_grid;
 }
 
 void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
@@ -123,6 +131,22 @@ void LightViewerContext::remove_drawable_filter(const std::string& filter_name) 
   if(found != drawable_filters.end()) {
     drawable_filters.erase(found);
   }
+}
+
+const std::shared_ptr<CameraControl>& LightViewerContext::get_camera_control() const {
+  return canvas->camera_control;
+}
+
+const std::shared_ptr<ProjectionControl>& LightViewerContext::get_projection_control() const {
+  return canvas->projection_control;
+}
+
+void LightViewerContext::set_camera_control(const std::shared_ptr<CameraControl>& camera_control) {
+  canvas->camera_control = camera_control;
+}
+
+void LightViewerContext::set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control) {
+  canvas->projection_control = projection_control;
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {

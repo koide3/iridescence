@@ -35,9 +35,11 @@ public:
   void invoke(const std::function<void()>& func);
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
+  void show_viewer_ui();
   void show_info_window();
 
 private:
+  class ViewerUI;
   class InfoWindow;
 
   LightViewer();
@@ -52,6 +54,7 @@ private:
 private:
   static LightViewer* inst;
 
+  std::unique_ptr<ViewerUI> viewer_ui;
   std::unique_ptr<InfoWindow> info_window;
 
   std::mutex texts_mutex;

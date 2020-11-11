@@ -1,5 +1,8 @@
 #include <guik/viewer/light_viewer.hpp>
 
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+
 #include <regex>
 #include <chrono>
 #include <future>
@@ -7,6 +10,7 @@
 
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
+#include <guik/viewer/viewer_ui.hpp>
 #include <guik/viewer/info_window.hpp>
 
 namespace guik {
@@ -44,6 +48,14 @@ void LightViewer::draw_ui() {
     invoke_requests.pop_front();
   }
   lock.unlock();
+
+  if(viewer_ui) {
+    if(!viewer_ui->draw_ui()) {
+      viewer_ui.reset();
+    }
+  } else if(ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
+    viewer_ui.reset(new ViewerUI(this));
+  }
 
   if(info_window) {
     if(!info_window->draw_ui()) {
@@ -128,6 +140,12 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
   }
 
   ui_callbacks[name] = callback;
+}
+
+void LightViewer::show_viewer_ui() {
+  if(viewer_ui == nullptr) {
+    viewer_ui.reset(new ViewerUI(this));
+  }
 }
 
 void LightViewer::show_info_window() {
