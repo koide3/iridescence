@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gl_test_field)
+project(iridescent)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -27,7 +27,7 @@ if(built_in_ros)
   # check if the package is built in a catkin workspace
   catkin_package(
     INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui gl_test_field ${catkin_LIBRARIES}
+    LIBRARIES dl glfw gl_imgui iridescent ${catkin_LIBRARIES}
     #  CATKIN_DEPENDS roscpp rospy
     DEPENDS roslib
   )

@@ -15,7 +15,7 @@ void set_data_path(const std::string& path) {
 
 std::string get_data_path() {
   if(data_path.empty()) {
-    data_path = ros::package::getPath("gl_test_field") + "/data";
+    data_path = ros::package::getPath("iridescent") + "/data";
     std::cout << "data_path:" << data_path << std::endl;
   }
 
