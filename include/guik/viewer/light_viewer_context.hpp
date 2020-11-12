@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <glk/drawble.hpp>
+#include <glk/colormap.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/projection_control.hpp>
@@ -31,6 +32,7 @@ public:
 
   void lookat(const Eigen::Vector3f& pt);
   void set_draw_xy_grid(bool draw_xy_grid);
+  void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
 
   void clear_drawables();

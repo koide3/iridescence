@@ -81,6 +81,10 @@ void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   this->draw_xy_grid = draw_xy_grid;
 }
 
+void LightViewerContext::set_colormap(glk::COLORMAP colormap) {
+  canvas->set_colormap(colormap);
+}
+
 void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   canvas->set_effect(effect);
 }

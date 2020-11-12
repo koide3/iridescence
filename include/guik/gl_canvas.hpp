@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 
+#include <glk/colormap.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
@@ -19,8 +20,9 @@ public:
   bool ready() const;
   bool load_shader(const std::string& shader_name);
 
-  void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   void set_size(const Eigen::Vector2i& size);
+  void set_colormap(glk::COLORMAP colormap_type);
+  void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   void mouse_control();
 
   void bind();
@@ -40,6 +42,7 @@ public:
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::TextureRenderer> texture_renderer;
 
+  std::unique_ptr<glk::Texture1D> colormap;
   std::shared_ptr<guik::CameraControl> camera_control;
   std::shared_ptr<guik::ProjectionControl> projection_control;
 };

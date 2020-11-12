@@ -20,6 +20,13 @@ far(1000.0f)
 
 ProjectionControl::~ProjectionControl() {}
 
+void ProjectionControl::set_depth_range(const Eigen::Vector2f& range) {
+  this->near = range[0];
+  this->far = range[1];
+
+  width = (this->far - this->near) * 0.1;
+}
+
 Eigen::Matrix4f ProjectionControl::projection_matrix() const {
   double aspect_ratio = size[0] / static_cast<float>(size[1]);
 
@@ -38,22 +45,10 @@ void ProjectionControl::show() {
 }
 
 void ProjectionControl::draw_ui() {
-  if(!show_window) {
-    return;
-  }
-
-  ImGui::Begin("projection control", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
   const char* modes[] = { "PERSPECTIVE", "ORTHOGONAL" };
   ImGui::Combo("Mode", &projection_mode, modes, IM_ARRAYSIZE(modes));
   if(projection_mode == 0){
     ImGui::DragFloat("FOV", &fovy, 0.1f, 1.0f, 180.0f);
-  } else {
-    ImGui::DragFloat("Width", &width, 0.1f, 1.0f, 1000.0f);
   }
-
-  ImGui::DragFloat("Near", &near, 1.0f, 0.1f, far);
-  ImGui::DragFloat("Far", &far, 1.0f, near, 10000.0f);
-
-  ImGui::End();
 }
 }

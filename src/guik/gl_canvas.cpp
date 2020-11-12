@@ -1,12 +1,14 @@
 #include <guik/gl_canvas.hpp>
 
 #include <imgui.h>
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <glk/path.hpp>
+#include <glk/colormap.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
@@ -41,6 +43,10 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
+
+  auto colormap_table = glk::colormap_table(glk::COLORMAP::TURBO);
+  colormap.reset(new glk::Texture1D(256, GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
 
   camera_control.reset(new guik::OrbitCameraControlXY());
   projection_control.reset(new guik::ProjectionControl(size));
@@ -81,6 +87,11 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
   return true;
 }
 
+void GLCanvas::set_colormap(glk::COLORMAP colormap_type) {
+  auto colormap_table = glk::colormap_table(colormap_type);
+  colormap.reset(new glk::Texture1D(256, GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
+}
+
 void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   texture_renderer->set_effect(effect);
 }
@@ -119,6 +130,9 @@ void GLCanvas::bind() {
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+  glEnable(GL_TEXTURE_1D);
+  glBindTexture(GL_TEXTURE_1D, colormap->id());
 }
 
 /**
@@ -126,8 +140,12 @@ void GLCanvas::bind() {
  *
  */
 void GLCanvas::unbind() {
+  glDisable(GL_TEXTURE_1D);
+  glBindTexture(GL_TEXTURE_1D, 0);
+
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
   glFlush();
 
   frame_buffer->unbind();

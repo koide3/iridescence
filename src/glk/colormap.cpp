@@ -377,6 +377,11 @@ const std::array<std::array<unsigned char, 3>, 256> spring_bytes = {
 const std::array<std::array<unsigned char, 3>, 256> colormap_tables[] = {turbo_bytes,    jet_bytes,    cividis_bytes, ocean_bytes,  spring_bytes, summer_bytes, autumn_bytes,     winter_bytes, geen_yellow_bytes,
                                                                          blue_red_bytes, pubugn_bytes, turbid_bytes,  pastel_bytes, helix_bytes,  phase_bytes,  vegetation_bytes, curl_bytes,   cool_warm_bytes};
 
+std::vector<const char*> colormap_names() {
+  std::vector<const char*> names = {"TURBO", "JET", "CIVIDIS", "OCEAN", "SPRING", "SUMMER", "AUTUMN", "WINTER", "GREAN_YELLOW", "BLUE_RED", "PUBUGN", "TURBID", "PASTEL", "HELIX", "PHASE", "VEGETATION", "CURL", "COOL_WARM"};
+  return names;
+}
+
 std::array<std::array<unsigned char, 3>, 256> colormap_table(COLORMAP type) {
   return colormap_tables[static_cast<int>(type)];
 }
