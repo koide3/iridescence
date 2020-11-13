@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D color_sampler;
 
 in vec2 texcoord;

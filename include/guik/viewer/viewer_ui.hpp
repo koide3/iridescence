@@ -22,11 +22,13 @@ private:
   guik::LightViewer* viewer;
 
   class DisplaySettingWindow;
+
   class DrawableFilterWindow;
   class DrawableEditorWindow;
   class CameraSettingWindow;
 
   std::unique_ptr<DisplaySettingWindow> display_setting_window;
+
   std::unique_ptr<DrawableFilterWindow> drawable_filter_window;
   std::unique_ptr<DrawableEditorWindow> drawable_editor_window;
   std::unique_ptr<CameraSettingWindow> camera_setting_window;

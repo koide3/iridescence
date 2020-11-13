@@ -9,14 +9,14 @@ namespace glk {
 
 class Texture {
 public:
-  Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type) : width(size[0]), height(size[1]) {
+  Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, void* pixels = nullptr) : width(size[0]), height(size[1]) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
@@ -29,6 +29,20 @@ public:
   }
   Eigen::Vector2i size() const {
     return Eigen::Vector2i(width, height);
+  }
+
+  void unbind() const {
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
+
+  void bind() const {
+    glBindTexture(GL_TEXTURE_2D, texture);
+  }
+
+  void bind(GLenum target) const {
+    glActiveTexture(target);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glActiveTexture(GL_TEXTURE0);
   }
 
   template<typename T>

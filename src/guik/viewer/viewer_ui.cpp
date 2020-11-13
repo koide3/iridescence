@@ -1,5 +1,9 @@
 #include <guik/viewer/viewer_ui.hpp>
 
+#include <glk/effects/plain_rendering.hpp>
+#include <glk/effects/screen_space_ambient_occlusion.hpp>
+#include <glk/effects/screen_space_lighting.hpp>
+
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
@@ -16,10 +20,11 @@ public:
     colormap_mode = static_cast<int>(glk::COLORMAP::TURBO);
     colormap_axis = 2;
     auto_range = false;
+
+    effect_mode = 0;
   }
 
-  ~DisplaySettingWindow() {
-  }
+  ~DisplaySettingWindow() {}
 
   void menu_item() {
     ImGui::MenuItem("Setting", nullptr, &show_window);
@@ -46,9 +51,9 @@ public:
 
     auto point_size = viewer->shader_setting().get<float>("point_size");
     if(!point_size) {
-      point_size = 1.0f;
+      point_size = 10.0f;
     }
-    if(ImGui::DragFloat("Point size", point_size.get_ptr(), 0.01f)) {
+    if(ImGui::DragFloat("Point size", point_size.get_ptr(), 0.1f)) {
       viewer->shader_setting().add("point_size", *point_size);
     }
 
@@ -69,7 +74,7 @@ public:
       axis[static_cast<int>(colormap_axis)] = 1.0f;
       Eigen::Vector2f range(std::numeric_limits<float>::max(), std::numeric_limits<float>::min());
 
-      for(const auto& drawable: viewer->drawables) {
+      for(const auto& drawable : viewer->drawables) {
         auto model_matrix = drawable.second.first->get<Eigen::Matrix4f>("model_matrix");
         if(!model_matrix) {
           continue;
@@ -81,6 +86,18 @@ public:
       }
 
       viewer->shader_setting().add("z_range", (range + Eigen::Vector2f(-1.0f, 1.0f)).eval());
+    }
+
+    ImGui::Separator();
+    std::vector<const char*> effect_modes = {"PLAIN", "SSAO", "SS_LIGHT"};
+    if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
+      if(effect_modes[effect_mode] == std::string("PLAIN")) {
+        viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
+      } else if(effect_modes[effect_mode] == "SSAO") {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>());
+      } else if(effect_modes[effect_mode] == "SS_LIGHT") {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
+      }
     }
 
     ImGui::End();
@@ -95,6 +112,8 @@ private:
   int colormap_axis;
 
   bool auto_range;
+
+  int effect_mode;
 };
 
 /**

@@ -104,6 +104,7 @@ void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
   this->size = size;
   projection_control->set_size(size);
+  texture_renderer->set_size(size);
   frame_buffer.reset(new glk::FrameBuffer(size, 2));
 }
 
@@ -156,7 +157,11 @@ void GLCanvas::unbind() {
  *
  */
 void GLCanvas::render_to_screen(int color_buffer_id) {
-  texture_renderer->draw(frame_buffer->color(color_buffer_id), frame_buffer->depth());
+  glk::TextureRendererInput::Ptr input(new glk::TextureRendererInput());
+  input->set("view_matrix", camera_control->view_matrix());
+  input->set("projection_matrix", projection_control->projection_matrix());
+
+  texture_renderer->draw(frame_buffer->color(color_buffer_id), frame_buffer->depth(), input);
 }
 
 /**

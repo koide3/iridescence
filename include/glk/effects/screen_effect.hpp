@@ -4,25 +4,19 @@
 #include <glk/texture.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>
+#include <glk/texture_renderer.hpp>
 
 namespace glk {
 
+class TextureRenderer;
+
 class ScreenEffect {
 public:
-  enum PASS_TYPE { ONE, TWO };
-
   ScreenEffect() {}
   virtual ~ScreenEffect() {}
 
-  virtual PASS_TYPE pass() const {
-    return ONE;
-  }
-
-  virtual void use(const glk::Texture& color_texture, const glk::Texture& depth_texture, const glk::FrameBuffer* first_pass_result = nullptr, PASS_TYPE pass = ONE) {
-    shader().use();
-  }
-
-  virtual glk::GLSLShader& shader(PASS_TYPE pass = ONE) = 0;
+  virtual void set_size(const Eigen::Vector2i& size) {}
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) = 0;
 };
 
 }  // namespace glk

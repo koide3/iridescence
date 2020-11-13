@@ -1,6 +1,7 @@
 #ifndef GLK_COLORMAP_HPP
 #define GLK_COLORMAP_HPP
 
+#include <vector>
 #include <Eigen/Core>
 
 namespace glk {
@@ -14,6 +15,7 @@ Eigen::Vector4f colormap_categoricalf(COLORMAP type, int x, int num_categories);
 
 std::vector<const char*> colormap_names();
 std::array<std::array<unsigned char, 3>, 256> colormap_table(COLORMAP type);
+
 }  // namespace glk
 
 #endif

@@ -1,5 +1,6 @@
 #include <glk/colormap.hpp>
 
+#include <vector>
 #include <iostream>
 
 namespace glk{

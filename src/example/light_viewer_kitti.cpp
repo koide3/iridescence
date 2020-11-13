@@ -14,6 +14,7 @@
 #include <glk/pointcloud_buffer_pcl.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
+#include <guik/recent_files.hpp>
 
 class KittiLoader {
 public:
@@ -68,10 +69,12 @@ private:
 
 int main(int argc, char** argv) {
   // "/your/kitti/path/sequences/00/velodyne"
-  std::string kitti_path = pfd::select_folder("Select KITTI directory that contains *.bin").result();
+  guik::RecentFiles recent_files("kitti_directory");
+  std::string kitti_path = pfd::select_folder("Select KITTI directory that contains *.bin", recent_files.most_recent()).result();
   if(kitti_path.empty()) {
     return 0;
   }
+  recent_files.push(kitti_path);
 
   KittiLoader kitti(kitti_path);
 
