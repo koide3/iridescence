@@ -33,5 +33,5 @@ void main() {
 
   float ambient = 0.4;
 
-  final_color = (diffuse + specular + ambient) * frag_occlusion * light_color * frag_color;
+  final_color = (diffuse + specular + ambient) * (1 - frag_occlusion * 2.0) * light_color * frag_color;
 }

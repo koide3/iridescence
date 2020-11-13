@@ -1,8 +1,9 @@
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/plain_rendering.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
-#include <glk/effects/screen_scape_attribute_estimation.hpp>
+#include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
+#include <glk/effects/screen_space_iridecent_lighting.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
 
@@ -12,17 +13,23 @@ int main(int argc, char** argv) {
 
   int effect = 0;
   viewer->register_ui_callback("effect_ui", [&]() {
-    std::vector<const char*> effects = {"PLAIN", "SSAO", "SS_LIGHTING"};
+    std::vector<const char*> effects = {"PLAIN", "NAIVE_SSAO", "SSAO", "SSLI", "IRIDESCENT"};
     if(ImGui::Combo("Effect", &effect, effects.data(), effects.size())) {
       switch(effect) {
         case 0:
           viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
           break;
         case 1:
-          viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>());
+          viewer->set_screen_effect(std::make_shared<glk::NaiveScreenSpaceAmbientOcclusion>());
           break;
         case 2:
+          viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
+          break;
+        case 3:
           viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
+          break;
+        case 4:
+          viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescentLighting>(viewer->canvas_size()));
           break;
       }
     }

@@ -1,8 +1,10 @@
 #include <guik/viewer/viewer_ui.hpp>
 
 #include <glk/effects/plain_rendering.hpp>
+#include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
+#include <glk/effects/screen_space_iridecent_lighting.hpp>
 
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
@@ -89,14 +91,18 @@ public:
     }
 
     ImGui::Separator();
-    std::vector<const char*> effect_modes = {"PLAIN", "SSAO", "SS_LIGHT"};
+    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "SSAO", "SSLI", "IRIDESCENT"};
     if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
       if(effect_modes[effect_mode] == std::string("PLAIN")) {
         viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
+      } else if(effect_modes[effect_mode] == "NAIVE_SSAO") {
+        viewer->set_screen_effect(std::make_shared<glk::NaiveScreenSpaceAmbientOcclusion>());
       } else if(effect_modes[effect_mode] == "SSAO") {
-        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>());
-      } else if(effect_modes[effect_mode] == "SS_LIGHT") {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
+      } else if(effect_modes[effect_mode] == "SSLI") {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
+      } else if(effect_modes[effect_mode] == "IRIDESCENT") {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescentLighting>(viewer->canvas_size()));
       }
     }
 

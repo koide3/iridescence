@@ -1,5 +1,5 @@
-#ifndef GLK_SCREEN_SPACE_LIGHTING_HPP
-#define GLK_SCREEN_SPACE_LIGHTING_HPP
+#ifndef GLK_SCREEN_SPACE_IRIDESCENT_LIGHTING_HPP
+#define GLK_SCREEN_SPACE_IRIDESCENT_LIGHTING_HPP
 
 #include <random>
 #include <iostream>
@@ -11,16 +11,16 @@
 
 namespace glk {
 
-class ScreenSpaceLighting : public ScreenEffect {
+class ScreenSpaceIridescentLighting : public ScreenEffect {
 public:
-  ScreenSpaceLighting(const Eigen::Vector2i& size) {
+  ScreenSpaceIridescentLighting(const Eigen::Vector2i& size) {
     ssae.reset(new ScreenSpaceAttributeEstimation(size));
 
-    if(!lighting_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssli.frag")) {
+    if(!lighting_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/iridescent.frag")) {
       return;
     }
   }
-  virtual ~ScreenSpaceLighting() override {}
+  virtual ~ScreenSpaceIridescentLighting() override {}
 
   virtual void set_size(const Eigen::Vector2i& size) override {
     ssae->set_size(size);

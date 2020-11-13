@@ -29,6 +29,7 @@ void main() {
   float depth = texture(depth_sampler, texcoord).x * 2.0 - 1.0;
   if(depth > 1.0 - 1e-5) {
     frag_occlusion = 0.0;
+    frag_color = vec4(1.0);
     return;
   }
 

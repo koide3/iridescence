@@ -13,7 +13,6 @@
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
 #include <glk/effects/plain_rendering.hpp>
-#include <glk/effects/screen_space_ambient_occlusion.hpp>
 
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>

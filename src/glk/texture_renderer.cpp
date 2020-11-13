@@ -3,7 +3,6 @@
 #include <iostream>
 #include <glk/path.hpp>
 #include <glk/effects/plain_rendering.hpp>
-#include <glk/effects/screen_space_ambient_occlusion.hpp>
 
 namespace glk {
 

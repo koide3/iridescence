@@ -125,7 +125,7 @@ public:
   }
 
   const glk::Texture& occlusion() const {
-    return bilateral_y_buffer->color();
+    return bilateral_y_buffer->color(0);
   }
 
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override {
@@ -202,6 +202,9 @@ public:
     occlusion_shader.set_uniform("normal_sampler", 2);
     occlusion_shader.set_uniform("randomization_sampler", 3);
 
+    occlusion_shader.set_uniform("projection_view_matrix", projection_view_matrix);
+    occlusion_shader.set_uniform("randomization_coord_scale", randomization_coord_scale);
+
     occlusion_buffer->bind();
     depth_texture.bind(GL_TEXTURE0);
     position_buffer->color().bind(GL_TEXTURE1);
@@ -218,7 +221,7 @@ public:
 
     // filter in x-axis
     bilateral_x_buffer->bind();
-    occlusion_buffer->color(1).bind(GL_TEXTURE0);
+    occlusion_buffer->color(0).bind(GL_TEXTURE0);
     position_buffer->color(0).bind(GL_TEXTURE1);
     renderer.draw_plain(bilateral_shader);
     bilateral_x_buffer->unbind();
