@@ -7,7 +7,7 @@ uniform vec2 inv_frame_size;
 
 in vec2 texcoord;
 
-layout (location=0) out vec3 frag_normal;
+layout(location = 0) out vec3 frag_normal;
 
 void main() {
   if(texture(depth_sampler, texcoord).x > 1.0 - 1e-5) {
@@ -17,8 +17,8 @@ void main() {
   vec4 position = texture(position_sampler, texcoord);
 
   mat3 cov = mat3(0.0);
-  for(int i=-1; i<=1; i++) {
-    for(int j=-1; j<=1; j++) {
+  for(int i = -1; i <= 1; i++) {
+    for(int j = -1; j <= 1; j++) {
       vec2 coord = texcoord + vec2(i, j) * inv_frame_size;
       vec3 p = texture(position_sampler, coord).xyz;
       vec3 d = position.xyz - p;
@@ -30,7 +30,7 @@ void main() {
 
   vec3 pt2view = view_point - position.xyz;
   vec3 normal = normalize(pt2view);
-  for(int i=0; i<3; i++) {
+  for(int i = 0; i < 3; i++) {
     normal = normalize(inv_cov * normal);
   }
 

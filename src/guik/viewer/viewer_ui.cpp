@@ -29,7 +29,7 @@ public:
   ~DisplaySettingWindow() {}
 
   void menu_item() {
-    ImGui::MenuItem("Setting", nullptr, &show_window);
+    ImGui::MenuItem("Shader Setting", nullptr, &show_window);
   }
 
   void draw_ui() {
@@ -91,17 +91,19 @@ public:
     }
 
     ImGui::Separator();
-    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "SSAO", "SSLI", "IRIDESCENT"};
+    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "IRIDESCENT"};
     if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
       if(effect_modes[effect_mode] == std::string("PLAIN")) {
         viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
-      } else if(effect_modes[effect_mode] == "NAIVE_SSAO") {
+      } else if(effect_modes[effect_mode] == std::string("NAIVE_SSAO")) {
         viewer->set_screen_effect(std::make_shared<glk::NaiveScreenSpaceAmbientOcclusion>());
-      } else if(effect_modes[effect_mode] == "SSAO") {
+      } else if(effect_modes[effect_mode] == std::string("NORMAL")) {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAttributeEstimation>(viewer->canvas_size(), glk::ScreenSpaceAttributeEstimation::BufferType::NORMAL));
+      } else if(effect_modes[effect_mode] == std::string("SSAO")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
-      } else if(effect_modes[effect_mode] == "SSLI") {
+      } else if(effect_modes[effect_mode] == std::string("SSLI")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
-      } else if(effect_modes[effect_mode] == "IRIDESCENT") {
+      } else if(effect_modes[effect_mode] == std::string("IRIDESCENT")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescentLighting>(viewer->canvas_size()));
       }
     }
@@ -443,6 +445,9 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
 
   if(ImGui::BeginMenu("Display")) {
     display_setting_window->menu_item();
+    if(ImGui::MenuItem("Show Info Window")) {
+      viewer->show_info_window();
+    }
     ImGui::EndMenu();
   }
 

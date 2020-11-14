@@ -11,7 +11,18 @@ namespace glk {
 
 class ScreenSpaceAttributeEstimation: public ScreenEffect {
 public:
-  ScreenSpaceAttributeEstimation(const Eigen::Vector2i& size) {
+  enum class BufferType {
+    NONE,
+    POSITION,
+    SMOOTHED_POSITION_X,
+    SMOOTHED_POSITION,
+    NORMAL,
+    SSAO,
+    SMOOTHED_SSAO_X,
+    SMOOTHED_SSAO
+  };
+
+  ScreenSpaceAttributeEstimation(const Eigen::Vector2i& size, BufferType rendering_type = BufferType::NONE) {
     if(!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
       return;
     }
@@ -34,6 +45,7 @@ public:
 
     set_size(size);
     smooth_normal = true;
+    this->rendering_type = rendering_type;
 
     // set AO random vectors
     std::mt19937 mt;
@@ -114,6 +126,14 @@ public:
 
     bilateral_y_buffer.reset(new glk::FrameBuffer(size, 0, false));
     bilateral_y_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);
+  }
+
+  void set_smooth_normal(bool smooth_normal) {
+    this->smooth_normal = smooth_normal;
+  }
+
+  void set_rendering_buffer(BufferType buffer_type) {
+    this->rendering_type = buffer_type;
   }
 
   const glk::Texture& position() const {
@@ -236,12 +256,30 @@ public:
     renderer.draw_plain(bilateral_shader);
     bilateral_y_buffer->unbind();
 
+    if(rendering_type != BufferType::NONE) {
+      const glk::FrameBuffer* buffers[] = {
+        position_buffer.get(),
+        position_smoothing_x_buffer.get(),
+        position_smoothing_y_buffer.get(),
+        normal_buffer.get(),
+        occlusion_buffer.get(),
+        bilateral_x_buffer.get(),
+        bilateral_y_buffer.get()
+      };
+      const auto buffer = buffers[static_cast<int>(rendering_type) - 1];
+      buffer->color().bind();
+
+      texture_shader.use();
+      renderer.draw_plain(texture_shader);
+    }
+
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
   }
 
 private:
   bool smooth_normal;
+  BufferType rendering_type;
 
   glk::GLSLShader texture_shader;
   glk::GLSLShader pos_shader;
@@ -259,7 +297,7 @@ private:
   std::unique_ptr<glk::FrameBuffer> occlusion_buffer;
   std::unique_ptr<glk::FrameBuffer> bilateral_x_buffer;
   std::unique_ptr<glk::FrameBuffer> bilateral_y_buffer;
-};
+      };
 
 }  // namespace glk
 
