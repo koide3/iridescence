@@ -6,7 +6,7 @@ uniform sampler2D occlusion_sampler;
 
 in vec2 texcoord;
 
-layout (location=0) out vec4 final_color;
+layout(location = 0) out vec4 final_color;
 
 void main() {
   vec4 frag_color = texture(color_sampler, texcoord);
@@ -19,5 +19,5 @@ void main() {
     return;
   }
 
-  final_color = frag_color * (1 - frag_occlusion);
+  final_color = frag_color * (1 - frag_occlusion * 2.0);
 }

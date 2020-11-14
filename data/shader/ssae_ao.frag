@@ -4,7 +4,7 @@ uniform sampler2D position_sampler;
 uniform sampler2D normal_sampler;
 uniform sampler2D randomization_sampler;
 
-const int num_samples = 8;
+const int num_samples = 16;
 
 uniform float ao_radius;
 uniform vec3 random_vectors[num_samples];
@@ -13,8 +13,8 @@ uniform vec2 randomization_coord_scale;
 
 in vec2 texcoord;
 
-layout (location=0) out float frag_occlusion;
-layout (location=1) out vec4 frag_color;
+layout(location = 0) out float frag_occlusion;
+layout(location = 1) out vec4 frag_color;
 
 vec2 uv2tex(vec2 uv) {
   return 0.5 * uv + 0.5;
@@ -38,7 +38,7 @@ void main() {
   vec3 noise = normalize(texture(randomization_sampler, texcoord * randomization_coord_scale).xyz);
 
   float occluded = 0.0;
-  for(int i=0; i<num_samples; i++) {
+  for(int i = 0; i < num_samples; i++) {
     vec3 v = reflect(random_vectors[i], noise);
     if(dot(v, normal) < 0.0) {
       v = -v;

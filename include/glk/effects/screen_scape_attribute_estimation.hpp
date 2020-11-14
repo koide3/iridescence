@@ -70,7 +70,7 @@ public:
 
     std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> randomization(128 * 128);
     for(auto& vec : randomization) {
-      vec = sample_random_vector();
+      vec = sample_random_vector().normalized();
     }
     randomization_texture.reset(new glk::Texture(Eigen::Vector2i(128, 128), GL_RGB32F, GL_RGB, GL_FLOAT, randomization.data()));
     randomization_texture->bind();
