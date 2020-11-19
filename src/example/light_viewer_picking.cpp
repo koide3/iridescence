@@ -4,12 +4,13 @@
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
+  viewer->enable_info_buffer();
 
   for(int x = -5; x <= 5; x++) {
     for(int y = -5; y <= 5; y++) {
       Eigen::Vector4f color((x + 5) / 10.0f, (y + 5) / 10.0f, 1.0, 1.0f);
       Eigen::Affine3f model_matrix = Eigen::Translation3f(x, y, 0.0f) * Eigen::UniformScaling<float>(0.5f) * Eigen::Isometry3f::Identity();
-      viewer->update_drawable("cube_" + std::to_string(x) + "_" + std::to_string(y), glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(color, model_matrix.matrix()));
+      viewer->update_drawable("cube_" + std::to_string(x) + "_" + std::to_string(y), glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(color, model_matrix.matrix()).add("info_values", Eigen::Vector4i(x, y, 0, 0)));
     }
   }
 
@@ -21,18 +22,23 @@ int main(int argc, char** argv) {
 
     auto mouse_pos = ImGui::GetMousePos();
     if(ImGui::IsMouseClicked(1)) {
-      // get the depth of the clicked position
-      float depth = viewer->pick_depth(Eigen::Vector2i(mouse_pos.x, mouse_pos.y));
-      if(depth >= 1.0f || depth <= 0.0f) {
+      Eigen::Vector4i info = viewer->pick_info(Eigen::Vector2i(mouse_pos.x, mouse_pos.y));
+      std::cout << "info:" << info.transpose() << std::endl;
+
+      if(info[3] == -1) {
         return;
       }
 
-      // 3D coordinate of the clicked position
+      // get the depth and 3d coordinate of the clicked position
+      float depth = viewer->pick_depth(Eigen::Vector2i(mouse_pos.x, mouse_pos.y));
       Eigen::Vector3f pos = viewer->unproject(Eigen::Vector2i(mouse_pos.x, mouse_pos.y), depth);
+      std::cout << "depth:" << depth << " pos:" << pos.transpose() << std::endl;
 
-      // put a red cube on the clicked pos
-      Eigen::Affine3f model_matrix = Eigen::Translation3f(pos.array().round()) * Eigen::UniformScaling<float>(0.75f) * Eigen::Isometry3f::Identity();
-      viewer->update_drawable("clicked_pos", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f), model_matrix.matrix()));
+      // change the color of the picked cube
+      auto cube = viewer->find_drawable("cube_" + std::to_string(info[0]) + "_" + std::to_string(info[1]));
+      if(cube.first) {
+        cube.first->add("color_mode", 1).add("material_color", Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
+      }
     }
   });
 

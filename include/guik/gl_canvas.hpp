@@ -23,6 +23,8 @@ public:
   void set_size(const Eigen::Vector2i& size);
   void set_colormap(glk::COLORMAP colormap_type);
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  void enable_info_buffer();
+
   void mouse_control();
 
   void bind();
@@ -38,6 +40,7 @@ public:
 
 public:
   Eigen::Vector2i size;
+  bool info_buffer_enabled;
   std::unique_ptr<glk::GLSLShader> shader;
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::TextureRenderer> texture_renderer;

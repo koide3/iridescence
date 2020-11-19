@@ -19,7 +19,6 @@ in vec3 vert_position;
 in vec4 vert_color;
 
 out vec4 frag_color;
-out vec3 frag_world_position;
 
 vec4 rainbow(vec3 position) {
     float p = (dot(position, colormap_axis) - z_range[0]) / (z_range[1] - z_range[0]);
@@ -28,7 +27,7 @@ vec4 rainbow(vec3 position) {
 
 void main() {
     vec4 world_position = model_matrix * vec4(vert_position, 1.0);
-    frag_world_position = world_position.xyz;
+    vec3 frag_world_position = world_position.xyz;
     gl_Position = projection_matrix * view_matrix * world_position;
 
     if(color_mode == 0) {

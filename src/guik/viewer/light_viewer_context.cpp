@@ -89,6 +89,10 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
   canvas->set_effect(effect);
 }
 
+void LightViewerContext::enable_info_buffer() {
+  canvas->enable_info_buffer();
+}
+
 void LightViewerContext::clear_drawables() {
   drawables.clear();
 }
@@ -151,6 +155,10 @@ void LightViewerContext::set_camera_control(const std::shared_ptr<CameraControl>
 
 void LightViewerContext::set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control) {
   canvas->projection_control = projection_control;
+}
+
+Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
+  return canvas->pick_info(p, window);
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {

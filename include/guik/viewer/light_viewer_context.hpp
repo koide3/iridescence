@@ -34,6 +34,7 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  void enable_info_buffer();
 
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
@@ -61,6 +62,7 @@ public:
     return canvas->projection_control->projection_matrix();
   }
 
+  Eigen::Vector4i pick_info(const Eigen::Vector2i& p, int window = 2) const;
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
   Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
 

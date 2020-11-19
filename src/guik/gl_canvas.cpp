@@ -25,7 +25,7 @@ namespace guik {
  * @param size
  */
 GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size) {
-  frame_buffer.reset(new glk::FrameBuffer(size, 3));
+  frame_buffer.reset(new glk::FrameBuffer(size, 1));
   shader.reset(new glk::GLSLShader());
   if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
@@ -50,6 +50,8 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
   camera_control.reset(new guik::OrbitCameraControlXY());
   projection_control.reset(new guik::ProjectionControl(size));
   texture_renderer.reset(new glk::TextureRenderer());
+
+  info_buffer_enabled = false;
 }
 
 /**
@@ -95,6 +97,15 @@ void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   texture_renderer->set_effect(effect);
 }
 
+void GLCanvas::enable_info_buffer() {
+  info_buffer_enabled = true;
+  frame_buffer->add_color_buffer(GL_RGBA32I, GL_RGBA_INTEGER, GL_INT);
+
+  shader->use();
+  shader->set_uniform("info_enabled", true);
+  shader->set_uniform("info_values", Eigen::Vector4f(-1, -1, -1, -1));
+}
+
 /**
  * @brief Set the Size object
  *
@@ -116,17 +127,20 @@ void GLCanvas::bind() {
   glDisable(GL_SCISSOR_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // GLint clear_color[] = {-1, -1, -1, -1};
-  // glClearTexImage(frame_buffer->color(1).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
-
-  shader->use();
-
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
   Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
 
+  shader->use();
   shader->set_uniform("view_matrix", view_matrix);
   shader->set_uniform("inv_view_matrix", view_matrix.inverse().eval());
   shader->set_uniform("projection_matrix", projection_matrix);
+  shader->set_uniform("info_enabled", info_buffer_enabled);
+
+  if(info_buffer_enabled) {
+    GLint clear_color[] = {-1, -1, -1, -1};
+    glClearTexImage(frame_buffer->color(1).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
+    shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
+  }
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -198,6 +212,11 @@ void GLCanvas::mouse_control() {
  * @return Eigen::Vector4i
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
+  if(!info_buffer_enabled) {
+    std::cerr << "warning: info buffer has not been enabled!!" << std::endl;
+    return Eigen::Vector4i::Constant(-1);
+  }
+
   if(p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
     return Eigen::Vector4i(-1, -1, -1, -1);
   }
@@ -218,7 +237,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
     int index = ((size[1] - p[1]) * size[0] + p_[0]) * 4;
     Eigen::Vector4i info = Eigen::Map<Eigen::Vector4i>(&pixels[index]);
 
-    if(info[3] >= 0) {
+    if((info.array() != -1).any() >= 0) {
       return info;
     }
   }
