@@ -20,7 +20,7 @@ public:
       return;
     }
 
-    add_light(Eigen::Vector3f(0.0f, 0.0f, 200.0f), Eigen::Vector4f(0.9f, 0.9f, 1.0f, 1.0f));
+    add_light(Eigen::Vector3f(-10.0f, -10.0f, 200.0f), Eigen::Vector4f(0.9f, 0.9f, 1.0f, 1.0f));
   }
   virtual ~ScreenSpaceLighting() override {}
 
@@ -29,6 +29,11 @@ public:
   }
 
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
+    while(i < light_pos.size() - 1) {
+      light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+      light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
+    }
+
     light_updated = true;
     light_pos[i] = pos;
     light_color[i] = color;

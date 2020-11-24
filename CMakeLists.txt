@@ -11,6 +11,7 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
 find_package(PCL)
+find_package(G2O)
 
 find_package(catkin COMPONENTS roslib)
 
@@ -27,7 +28,7 @@ if(built_in_ros)
   # check if the package is built in a catkin workspace
   catkin_package(
     INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui iridescent ${catkin_LIBRARIES}
+    LIBRARIES dl glfw gl_imgui iridescent iridescent_ext ${catkin_LIBRARIES}
     #  CATKIN_DEPENDS roscpp rospy
     DEPENDS roslib
   )
@@ -48,6 +49,7 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${G2O_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -115,7 +117,17 @@ target_link_libraries(iridescent
   pthread
   ${PCL_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${G2O_LIBRARIES}
   ${catkin_LIBRARIES}
+)
+
+set(ext_src_files src/glk/ext/graph/factor_graph.cpp)
+if(G2O_FOUND)
+  set(ext_src_files ${ext_src_files} src/glk/ext/graph/factor_graph_g2o.cpp)
+endif()
+
+add_library(iridescent_ext
+  ${ext_src_files}
 )
 
 # copy shader files
