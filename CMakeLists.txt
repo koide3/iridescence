@@ -28,7 +28,7 @@ if(built_in_ros)
   # check if the package is built in a catkin workspace
   catkin_package(
     INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui iridescent iridescent_ext ${catkin_LIBRARIES}
+    LIBRARIES dl glfw gl_imgui iridescent ${catkin_LIBRARIES}
     #  CATKIN_DEPENDS roscpp rospy
     DEPENDS roslib
   )
@@ -61,7 +61,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ## Build ##
 ###########
 
-add_library(gl_imgui
+add_library(gl_imgui SHARED
   thirdparty/gl3w/gl3w.c
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -85,7 +85,7 @@ if(built_in_ros)
   set(path_src path_ros.cpp)
 endif()
 
-add_library(iridescent
+add_library(iridescent SHARED
   src/glk/${path_src}
   src/glk/mesh.cpp
   src/glk/lines.cpp
@@ -126,8 +126,12 @@ if(G2O_FOUND)
   set(ext_src_files ${ext_src_files} src/glk/ext/graph/factor_graph_g2o.cpp)
 endif()
 
-add_library(iridescent_ext
+add_library(iridescent_ext SHARED
   ${ext_src_files}
+)
+target_link_libraries(iridescent_ext
+  iridescent
+  ${G2O_LIBRARIES}
 )
 
 # copy shader files
