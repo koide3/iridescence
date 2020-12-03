@@ -11,7 +11,7 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
 find_package(PCL)
-find_package(G2O)
+# find_package(G2O)
 
 find_package(catkin COMPONENTS roslib)
 
@@ -49,7 +49,6 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
-  ${G2O_INCLUDE_DIR}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -117,22 +116,21 @@ target_link_libraries(iridescent
   pthread
   ${PCL_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${G2O_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 
-set(ext_src_files src/glk/ext/graph/factor_graph.cpp)
-if(G2O_FOUND)
-  set(ext_src_files ${ext_src_files} src/glk/ext/graph/factor_graph_g2o.cpp)
-endif()
-
-add_library(iridescent_ext SHARED
-  ${ext_src_files}
-)
-target_link_libraries(iridescent_ext
-  iridescent
-  ${G2O_LIBRARIES}
-)
+# set(ext_src_files src/glk/ext/graph/factor_graph.cpp)
+# if(G2O_FOUND)
+#   set(ext_src_files ${ext_src_files} src/glk/ext/graph/factor_graph_g2o.cpp)
+# endif()
+#
+# add_library(iridescent_ext SHARED
+#   ${ext_src_files}
+# )
+# target_link_libraries(iridescent_ext
+#   iridescent
+#   ${G2O_LIBRARIES}
+# )
 
 # copy shader files
 file(COPY data DESTINATION .)
