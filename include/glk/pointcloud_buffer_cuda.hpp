@@ -7,7 +7,7 @@
 
 namespace glk {
 
-static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(void* src_cuda_ptr, int stride, int num_points) {
+static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const void* src_cuda_ptr, int stride, int num_points) {
   auto buffer = std::make_shared<PointCloudBuffer>(stride, num_points);
 
   const auto error_check = [](cudaError_t error) {
@@ -33,7 +33,6 @@ static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(void* src_cud
 
   return buffer;
 }
-
 }
 
 #endif

@@ -341,7 +341,7 @@ private:
   bool show_window;
 
   std::vector<char> search_pattern;
-  std::pair<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> selected_drawable;
+  std::pair<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> selected_drawable;
   std::unique_ptr<ModelControl> drawable_control;
 };
 

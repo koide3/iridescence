@@ -107,12 +107,12 @@ void LightViewerContext::clear_drawables(const std::function<bool(const std::str
   }
 }
 
-std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> LightViewerContext::find_drawable(const std::string& name) {
+std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> LightViewerContext::find_drawable(const std::string& name) {
   auto found = drawables.find(name);
   if(found != drawables.end()) {
     return found->second;
   }
-  return std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>();
+  return std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>();
 }
 
 void LightViewerContext::remove_drawable(const std::string& name) {
@@ -122,7 +122,7 @@ void LightViewerContext::remove_drawable(const std::string& name) {
   }
 }
 
-void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
+void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
 

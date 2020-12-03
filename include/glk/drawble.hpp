@@ -12,6 +12,7 @@ namespace glk {
 class Drawable {
 public:
   using Ptr = std::shared_ptr<Drawable>;
+  using ConstPtr = std::shared_ptr<const Drawable>;
 
   virtual ~Drawable() {}
 

@@ -39,9 +39,9 @@ public:
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
 
-  std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> find_drawable(const std::string& name);
+  std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> find_drawable(const std::string& name);
   void remove_drawable(const std::string& name);
-  void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
+  void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
   void clear_drawable_filters();
   void add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter);
@@ -74,7 +74,7 @@ protected:
   bool draw_xy_grid;
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
-  std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;
+  std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> drawables;
 };
 }  // namespace guik
 
