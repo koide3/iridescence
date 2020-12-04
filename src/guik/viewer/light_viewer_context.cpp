@@ -2,6 +2,10 @@
 
 #include <glk/primitives/primitives.hpp>
 
+#include <guik/camera/orbit_camera_control_xy.hpp>
+#include <guik/camera/orbit_camera_control_xz.hpp>
+#include <guik/camera/topdown_camera_control.hpp>
+
 namespace guik {
 
 LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
@@ -155,6 +159,18 @@ void LightViewerContext::set_camera_control(const std::shared_ptr<CameraControl>
 
 void LightViewerContext::set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control) {
   canvas->projection_control = projection_control;
+}
+
+void LightViewerContext::use_orbit_camera_control() {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>();
+}
+
+void LightViewerContext::use_orbit_camera_control_xz() {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>();
+}
+
+void LightViewerContext::use_topdown_camera_control() {
+  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>();
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

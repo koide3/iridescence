@@ -52,6 +52,10 @@ public:
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
+  void use_orbit_camera_control();
+  void use_orbit_camera_control_xz();
+  void use_topdown_camera_control();
+
   Eigen::Vector2i canvas_size() const {
     return canvas->size;
   }
