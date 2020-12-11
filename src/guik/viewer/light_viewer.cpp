@@ -57,6 +57,25 @@ void LightViewer::draw_ui() {
     viewer_ui.reset(new ViewerUI(this));
   }
 
+  bool decrease_point_size = ImGui::GetIO().KeysDown[GLFW_KEY_MINUS];
+  bool increase_point_size = ImGui::GetIO().KeyShift && ImGui::GetIO().KeysDown[GLFW_KEY_SEMICOLON];
+  if(decrease_point_size || increase_point_size) {
+    auto point_size = global_shader_setting.get<float>("point_size");
+    if(!point_size) {
+      point_size = 10.0f;
+    }
+
+    if(decrease_point_size) {
+      *point_size = point_size.get() * 0.9f;
+    } else {
+      *point_size = point_size.get() * 1.2f;
+    }
+
+    *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
+
+    global_shader_setting.add("point_size", *point_size);
+  }
+
   if(info_window) {
     if(!info_window->draw_ui()) {
       info_window.reset();
@@ -113,6 +132,9 @@ void LightViewer::append_text(const std::string& text) {
 }
 
 void LightViewer::clear() {
+  invoke_requests_mutex.lock();
+  invoke_requests.clear();
+  invoke_requests_mutex.unlock();
   ui_callbacks.clear();
   clear_drawables();
 }

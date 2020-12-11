@@ -15,6 +15,12 @@ OrbitCameraControlXZ::OrbitCameraControlXZ() : OrbitCameraControlXY() {
   phi = 0.0f;
 }
 
+OrbitCameraControlXZ::OrbitCameraControlXZ(double distance, double theta, double phi) : OrbitCameraControlXY() {
+  this->distance = distance;
+  this->theta = theta;
+  this->phi = phi;
+}
+
 OrbitCameraControlXZ::~OrbitCameraControlXZ() {}
 
 void OrbitCameraControlXZ::drag(const Eigen::Vector2i& p, int button) {

@@ -161,16 +161,20 @@ void LightViewerContext::set_projection_control(const std::shared_ptr<Projection
   canvas->projection_control = projection_control;
 }
 
-void LightViewerContext::use_orbit_camera_control() {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>();
+void LightViewerContext::reset_center() {
+  canvas->camera_control->reset_center();
 }
 
-void LightViewerContext::use_orbit_camera_control_xz() {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>();
+void LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>(distance, theta, phi);
 }
 
-void LightViewerContext::use_topdown_camera_control() {
-  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>();
+void LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>(distance, theta, phi);
+}
+
+void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
+  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>(distance, theta);
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

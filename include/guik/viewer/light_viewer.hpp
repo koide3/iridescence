@@ -16,10 +16,15 @@ namespace guik {
 
 class LightViewer : public guik::Application, public guik::LightViewerContext {
 public:
-  static LightViewer* instance() {
+  static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1)) {
     if(!inst) {
+      Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
       inst = new LightViewer();
-      inst->init(Eigen::Vector2i(1920, 1080), "#version 330");
+      inst->init(init_size, "#version 330");
+    } else {
+      if((size.array() > 0).all() && inst->window_size() != size) {
+        inst->resize(size);
+      }
     }
 
     return inst;

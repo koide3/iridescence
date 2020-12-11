@@ -74,7 +74,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   return true;
 }
 
-Eigen::Vector2i Application::framebuffer_size() {
+Eigen::Vector2i Application::framebuffer_size() const {
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
   return Eigen::Vector2i(width, height);
@@ -82,6 +82,20 @@ Eigen::Vector2i Application::framebuffer_size() {
 
 void Application::framebuffer_size_callback(const Eigen::Vector2i& size) {
   std::cout << "FB:" << size.transpose() << std::endl;
+}
+
+bool Application::ok() const {
+  return !glfwWindowShouldClose(window);
+}
+
+Eigen::Vector2i Application::window_size() const {
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+  return Eigen::Vector2i(width, height);
+}
+
+void Application::resize(const Eigen::Vector2i& size) {
+  glfwSetWindowSize(window, size[0], size[1]);
 }
 
 void Application::spin() {
