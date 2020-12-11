@@ -27,7 +27,7 @@ message(STATUS "built_in_ros:${built_in_ros}")
 if(built_in_ros)
   # check if the package is built in a catkin workspace
   catkin_package(
-    INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
+    INCLUDE_DIRS include thirdparty/imgui thirdparty/ImGuizmo thirdparty/gl3w thirdparty/portable-file-dialogs
     LIBRARIES dl glfw gl_imgui iridescent ${catkin_LIBRARIES}
     #  CATKIN_DEPENDS roscpp rospy
     DEPENDS roslib
