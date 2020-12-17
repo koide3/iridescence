@@ -92,6 +92,7 @@ add_library(iridescent SHARED
   src/glk/pointcloud_buffer.cpp
   src/glk/pointnormals_buffer.cpp
   src/glk/point_correspondences.cpp
+  src/glk/normal_distributions.cpp
   src/glk/colormap.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
