@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>iridescent</name>
+  <name>iridescence</name>
   <version>0.0.0</version>
   <description>A point cloud viewer for rapid prototyping of 3D algorithms</description>
 

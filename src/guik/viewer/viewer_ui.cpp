@@ -91,7 +91,7 @@ public:
     }
 
     ImGui::Separator();
-    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "IRIDESCENT"};
+    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "IRIDESCENCE"};
     if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
       if(effect_modes[effect_mode] == std::string("PLAIN")) {
         viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
@@ -103,8 +103,8 @@ public:
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
       } else if(effect_modes[effect_mode] == std::string("SSLI")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
-      } else if(effect_modes[effect_mode] == std::string("IRIDESCENT")) {
-        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescentLighting>(viewer->canvas_size()));
+      } else if(effect_modes[effect_mode] == std::string("IRIDESCENCE")) {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescenceLighting>(viewer->canvas_size()));
       }
     }
 
