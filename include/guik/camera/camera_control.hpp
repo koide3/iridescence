@@ -12,6 +12,8 @@ class CameraControl {
 public:
   virtual ~CameraControl() {}
 
+  virtual void reset_center() {}
+
   virtual void lookat(const Eigen::Vector3f& pt) {}
 
   virtual void mouse(const Eigen::Vector2i& p, int button, bool down) = 0;

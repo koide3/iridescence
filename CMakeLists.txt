@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(iridescent)
+project(iridescence)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -11,6 +11,7 @@ find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
 find_package(PCL)
+# find_package(G2O)
 
 find_package(catkin COMPONENTS roslib)
 
@@ -26,8 +27,8 @@ message(STATUS "built_in_ros:${built_in_ros}")
 if(built_in_ros)
   # check if the package is built in a catkin workspace
   catkin_package(
-    INCLUDE_DIRS include thirdparty/imgui thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui iridescent ${catkin_LIBRARIES}
+    INCLUDE_DIRS include thirdparty/imgui thirdparty/ImGuizmo thirdparty/gl3w thirdparty/portable-file-dialogs
+    LIBRARIES dl glfw gl_imgui iridescence ${catkin_LIBRARIES}
     #  CATKIN_DEPENDS roscpp rospy
     DEPENDS roslib
   )
@@ -59,7 +60,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ## Build ##
 ###########
 
-add_library(gl_imgui
+add_library(gl_imgui SHARED
   thirdparty/gl3w/gl3w.c
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -83,7 +84,7 @@ if(built_in_ros)
   set(path_src path_ros.cpp)
 endif()
 
-add_library(iridescent
+add_library(iridescence SHARED
   src/glk/${path_src}
   src/glk/mesh.cpp
   src/glk/lines.cpp
@@ -91,6 +92,7 @@ add_library(iridescent
   src/glk/pointcloud_buffer.cpp
   src/glk/pointnormals_buffer.cpp
   src/glk/point_correspondences.cpp
+  src/glk/normal_distributions.cpp
   src/glk/colormap.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
@@ -107,8 +109,10 @@ add_library(iridescent
   src/guik/camera/projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
+  src/guik/viewer/viewer_ui.cpp
+  src/guik/viewer/info_window.cpp
 )
-target_link_libraries(iridescent
+target_link_libraries(iridescence
   gl_imgui
   pthread
   ${PCL_LIBRARIES}
@@ -135,6 +139,6 @@ foreach(example_src IN LISTS example_sources)
     ${example_src}
   )
   target_link_libraries(${example_name}
-    iridescent
+    iridescence
   )
 endforeach()

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <glk/path.hpp>
 #include <glk/effects/plain_rendering.hpp>
-#include <glk/effects/screen_space_ambient_occlusion.hpp>
 
 namespace glk {
 
@@ -32,57 +31,25 @@ TextureRenderer::~TextureRenderer() {
   glDeleteBuffers(1, &vbo);
 }
 
-void TextureRenderer::draw(const glk::Texture& color_texture, const glk::Texture& depth_texture) {
-  if(effect->pass() == ScreenEffect::ONE) {
-    one_pass(color_texture, depth_texture);
-  } else {
-    two_pass(color_texture, depth_texture);
-  }
+void TextureRenderer::set_size(const Eigen::Vector2i& size) {
+  effect->set_size(size);
 }
 
-void TextureRenderer::one_pass(const glk::Texture& color_texture, const glk::Texture& depth_texture) {
-  glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, color_texture.id());
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, depth_texture.id());
-  glActiveTexture(GL_TEXTURE0);
+void TextureRenderer::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
+  this->effect = effect;
+}
 
-  effect->use(color_texture, depth_texture);
-  GLint position_loc = effect->shader().attrib("vert_position");
+void TextureRenderer::draw(const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
+  effect->draw(*this, color_texture, depth_texture, input);
+}
 
+void TextureRenderer::draw_plain(glk::GLSLShader& shader) const {
+  GLint position_loc = shader.attrib("vert_position");
   glBindVertexArray(vao);
   glEnableVertexAttribArray(position_loc);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glDisable(GL_TEXTURE_2D);
-}
-
-void TextureRenderer::two_pass(const glk::Texture& color_texture, const glk::Texture& depth_texture) {
-  if(!frame_buffer || frame_buffer->color(0).size() != color_texture.size()) {
-    frame_buffer.reset(new glk::FrameBuffer(color_texture.size()));
-    frame_buffer->add_color_buffer(GL_R32F, GL_RED, GL_FLOAT);
-  }
-
-  frame_buffer->bind();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glEnable(GL_TEXTURE_2D);
-
-  glBindVertexArray(vao);
-  effect->use(color_texture, depth_texture, nullptr, glk::ScreenEffect::ONE);
-  glEnableVertexAttribArray(effect->shader(glk::ScreenEffect::ONE).attrib("vert_position"));
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  frame_buffer->unbind();
-
-  effect->use(color_texture, depth_texture, frame_buffer.get(), glk::ScreenEffect::TWO);
-  glEnableVertexAttribArray(effect->shader(glk::ScreenEffect::TWO).attrib("vert_position"));
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glDisable(GL_TEXTURE_2D);
 }
 
 }  // namespace glk

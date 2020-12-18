@@ -15,8 +15,16 @@ public:
   }
   virtual ~PlainRendering() {}
 
-  virtual glk::GLSLShader& shader(PASS_TYPE pass) override {
-    return plain_shader;
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override {
+    plain_shader.use();
+
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, color_texture.id());
+
+    renderer.draw_plain(plain_shader);
+
+    glDisable(GL_TEXTURE_2D);
   }
 
 private:

@@ -2,12 +2,15 @@
 #define GLK_POINTCLOUD_BUFFER_CUDA_HPP
 
 #include <iostream>
+#include <Eigen/Core>
+
 #include <cuda_gl_interop.h>
+#include <thrust/device_vector.h>
 #include <glk/pointcloud_buffer.hpp>
 
 namespace glk {
 
-static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(void* src_cuda_ptr, int stride, int num_points) {
+static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const void* src_cuda_ptr, int stride, int num_points) {
   auto buffer = std::make_shared<PointCloudBuffer>(stride, num_points);
 
   const auto error_check = [](cudaError_t error) {
@@ -34,6 +37,9 @@ static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(void* src_cud
   return buffer;
 }
 
+static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const thrust::device_vector<Eigen::Vector3f>& points) {
+  return create_point_cloud_buffer(thrust::raw_pointer_cast(points.data()), sizeof(Eigen::Vector3f), points.size());
+}
 }
 
 #endif

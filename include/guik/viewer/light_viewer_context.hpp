@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include <glk/drawble.hpp>
+#include <glk/colormap.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/projection_control.hpp>
@@ -31,14 +32,16 @@ public:
 
   void lookat(const Eigen::Vector3f& pt);
   void set_draw_xy_grid(bool draw_xy_grid);
+  void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  void enable_info_buffer();
 
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
 
-  std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> find_drawable(const std::string& name);
+  std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> find_drawable(const std::string& name);
   void remove_drawable(const std::string& name);
-  void update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
+  void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
   void clear_drawable_filters();
   void add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter);
@@ -48,6 +51,11 @@ public:
   const std::shared_ptr<ProjectionControl>& get_projection_control() const;
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
+
+  void reset_center();
+  void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
+  void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
+  void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
 
   Eigen::Vector2i canvas_size() const {
     return canvas->size;
@@ -59,6 +67,7 @@ public:
     return canvas->projection_control->projection_matrix();
   }
 
+  Eigen::Vector4i pick_info(const Eigen::Vector2i& p, int window = 2) const;
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
   Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
 
@@ -70,7 +79,7 @@ protected:
   bool draw_xy_grid;
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
-  std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>> drawables;
+  std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> drawables;
 };
 }  // namespace guik
 

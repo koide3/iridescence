@@ -11,8 +11,8 @@ RUN mkdir -p /root/catkin_ws/src
 WORKDIR /root/catkin_ws/src
 RUN /bin/bash -c '. /opt/ros/melodic/setup.bash; catkin_init_workspace'
 
-COPY . /root/catkin_ws/src/iridescent/
-WORKDIR /root/catkin_ws/src/iridescent
+COPY . /root/catkin_ws/src/iridescence/
+WORKDIR /root/catkin_ws/src/iridescence
 RUN git submodule init && git submodule update
 
 WORKDIR /root/catkin_ws

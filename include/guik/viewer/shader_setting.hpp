@@ -56,11 +56,12 @@ public:
     params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity());
   }
 
-  ShaderSetting(int color_mode, const Eigen::Matrix4f& model_matrix) {
+  template<typename Transform>
+  ShaderSetting(int color_mode, const Transform& model_matrix) {
     params.resize(3);
     params[0] = std::make_shared<ShaderParameter<int>>("color_mode", color_mode);
     params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", model_matrix);
+    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", model_matrix.matrix());
   }
   virtual ~ShaderSetting() {}
 
@@ -105,11 +106,17 @@ public:
   std::vector<ShaderParameterInterface::Ptr> params;
 };
 
+template<>
+inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::Isometry3f& value) {
+  return add<Eigen::Matrix4f>(name, value.matrix());
+}
+
 struct Rainbow : public ShaderSetting {
 public:
   Rainbow() : ShaderSetting(0) {}
 
-  Rainbow(const Eigen::Matrix4f& matrix) : ShaderSetting(0, matrix) {}
+  template<typename Transform>
+  Rainbow(const Transform& matrix) : ShaderSetting(0, matrix) {}
 
   virtual ~Rainbow() override {}
 };
@@ -121,7 +128,8 @@ public:
     params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
   }
 
-  FlatColor(const Eigen::Vector4f& color, const Eigen::Matrix4f& matrix) : ShaderSetting(1, matrix) {
+  template<typename Transform>
+  FlatColor(const Eigen::Vector4f& color, const Transform& matrix) : ShaderSetting(1, matrix) {
     params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
   }
 
@@ -132,7 +140,8 @@ struct VertexColor : public ShaderSetting {
 public:
   VertexColor() : ShaderSetting(2) {}
 
-  VertexColor(const Eigen::Matrix4f& matrix) : ShaderSetting(2, matrix) {}
+  template<typename Transform>
+  VertexColor(const Transform& matrix) : ShaderSetting(2, matrix) {}
 
   virtual ~VertexColor() override {}
 };

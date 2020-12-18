@@ -16,6 +16,14 @@ public:
     this->size = size;
   }
 
+  int get_projection_mode() const {
+    return projection_mode;
+  }
+
+  void set_projection_mode(int mode) {
+    projection_mode = mode;
+  }
+
   float get_fov() const {
     return fovy;
   }
@@ -24,10 +32,7 @@ public:
     fovy = fov;
   }
 
-  void set_depth_range(const Eigen::Vector2f& range) {
-    this->near = range[0];
-    this->far = range[1];
-  }
+  void set_depth_range(const Eigen::Vector2f& range);
 
   Eigen::Matrix4f projection_matrix() const;
 

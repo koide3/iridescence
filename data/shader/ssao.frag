@@ -1,25 +1,23 @@
 #version 330
 uniform sampler2D color_sampler;
-uniform sampler2D depth_sampler;
-
-uniform vec3 random_vectors[512];
+uniform sampler2D position_sampler;
+uniform sampler2D normal_sampler;
+uniform sampler2D occlusion_sampler;
 
 in vec2 texcoord;
 
-out vec4 color;
+layout(location = 0) out vec4 final_color;
 
 void main() {
-  int occluded = 0;
-  int num_samples = 512;
+  vec4 frag_color = texture(color_sampler, texcoord);
+  vec4 frag_position = texture(position_sampler, texcoord);
+  vec3 frag_normal = normalize(texture(normal_sampler, texcoord).xyz);
+  float frag_occlusion = texture(occlusion_sampler, texcoord).x;
 
-  // lazy SSAO implementation
-  float depth = texture(depth_sampler, texcoord).x;
-  for(int i = 0; i < num_samples; i++) {
-    vec3 v = random_vectors[i] * (1 - depth);
-    float d = texture(depth_sampler, texcoord + v.xy).x;
-    occluded += d < depth - v.z ? 1 : 0;
+  if(frag_position.w > 1.0 - 1e-5) {
+    final_color = frag_color;
+    return;
   }
 
-  float w = 1.0 - occluded / float(num_samples);
-  color = w * texture(color_sampler, texcoord);
+  final_color = frag_color * (1 - frag_occlusion * 2.0);
 }

@@ -23,8 +23,24 @@ public:
     return Primitives::instance()->create_primitive(type);
   }
 
-  static std::shared_ptr<glk::Drawable> primitive_ptr(PrimitiveType type) {
+  static glk::Drawable::ConstPtr primitive_ptr(PrimitiveType type) {
     return Primitives::instance()->create_primitive_ptr(type);
+  }
+
+  static glk::Drawable::ConstPtr sphere() {
+    return primitive_ptr(SPHERE);
+  }
+
+  static glk::Drawable::ConstPtr cube() {
+    return primitive_ptr(CUBE);
+  }
+
+  static glk::Drawable::ConstPtr cone() {
+    return primitive_ptr(CONE);
+  }
+
+  static glk::Drawable::ConstPtr coordinate_system() {
+    return primitive_ptr(COORDINATE_SYSTEM);
   }
 
 private:

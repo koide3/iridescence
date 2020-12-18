@@ -2,6 +2,10 @@
 
 #include <glk/primitives/primitives.hpp>
 
+#include <guik/camera/orbit_camera_control_xy.hpp>
+#include <guik/camera/orbit_camera_control_xz.hpp>
+#include <guik/camera/topdown_camera_control.hpp>
+
 namespace guik {
 
 LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
@@ -81,8 +85,16 @@ void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   this->draw_xy_grid = draw_xy_grid;
 }
 
+void LightViewerContext::set_colormap(glk::COLORMAP colormap) {
+  canvas->set_colormap(colormap);
+}
+
 void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   canvas->set_effect(effect);
+}
+
+void LightViewerContext::enable_info_buffer() {
+  canvas->enable_info_buffer();
 }
 
 void LightViewerContext::clear_drawables() {
@@ -99,12 +111,12 @@ void LightViewerContext::clear_drawables(const std::function<bool(const std::str
   }
 }
 
-std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr> LightViewerContext::find_drawable(const std::string& name) {
+std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> LightViewerContext::find_drawable(const std::string& name) {
   auto found = drawables.find(name);
   if(found != drawables.end()) {
     return found->second;
   }
-  return std::pair<ShaderSetting::Ptr, glk::Drawable::Ptr>();
+  return std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>();
 }
 
 void LightViewerContext::remove_drawable(const std::string& name) {
@@ -114,7 +126,7 @@ void LightViewerContext::remove_drawable(const std::string& name) {
   }
 }
 
-void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::Ptr& drawable, const ShaderSetting& shader_setting) {
+void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
 
@@ -147,6 +159,26 @@ void LightViewerContext::set_camera_control(const std::shared_ptr<CameraControl>
 
 void LightViewerContext::set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control) {
   canvas->projection_control = projection_control;
+}
+
+void LightViewerContext::reset_center() {
+  canvas->camera_control->reset_center();
+}
+
+void LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>(distance, theta, phi);
+}
+
+void LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
+  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>(distance, theta, phi);
+}
+
+void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
+  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>(distance, theta);
+}
+
+Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
+  return canvas->pick_info(p, window);
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {

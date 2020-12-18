@@ -8,12 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY . /root/iridescent
-WORKDIR /root/iridescent
-RUN rm -rf /root/iridescent/build
+COPY . /root/iridescence
+WORKDIR /root/iridescence
+RUN rm -rf /root/iridescence/build
 RUN git submodule init && git submodule update
 
-WORKDIR /root/iridescent/build
+WORKDIR /root/iridescence/build
 RUN cmake .. && make -j$(nproc)
 
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}

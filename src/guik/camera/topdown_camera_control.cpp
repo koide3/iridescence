@@ -6,16 +6,23 @@
 
 namespace guik {
 
-TopDownCameraControl::TopDownCameraControl() {
+TopDownCameraControl::TopDownCameraControl() : TopDownCameraControl(80.0, 0.0) {}
+
+TopDownCameraControl::TopDownCameraControl(double distance, double theta) {
   center.setZero();
   center_offset.setZero();
-  distance = 80.0f;
-  theta = 0.0f;
+  this->distance = distance;
+  this->theta = theta;
 
   left_button_down = false;
   middle_button_down = false;
 }
+
 TopDownCameraControl::~TopDownCameraControl() {}
+
+void TopDownCameraControl::reset_center() {
+  center.setZero();
+}
 
 void TopDownCameraControl::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;

@@ -11,7 +11,7 @@ namespace glk {
 
 class FrameBuffer {
 public:
-  FrameBuffer(const Eigen::Vector2i& size, int num_color_buffers = 1);
+  FrameBuffer(const Eigen::Vector2i& size, int num_color_buffers = 1, bool use_depth=true);
 
   ~FrameBuffer();
 

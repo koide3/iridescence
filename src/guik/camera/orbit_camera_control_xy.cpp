@@ -10,12 +10,24 @@
 
 namespace guik {
 
-OrbitCameraControlXY::OrbitCameraControlXY() : center_offset(0.0f, 0.0f, 0.0f), center(0.0f, 0.0f, 0.0f), distance(80.0f), theta(0.0f), phi(-60.0f * M_PI / 180.0f) {
+OrbitCameraControlXY::OrbitCameraControlXY() : OrbitCameraControlXY(80.0, 0.0, -60.0f * M_PI / 180.0f) {}
+
+OrbitCameraControlXY::OrbitCameraControlXY(double distance, double theta, double phi) {
+  center_offset.setZero();
+  center.setZero();
+  this->distance = distance;
+  this->theta = theta;
+  this->phi = phi;
+
   left_button_down = false;
   middle_button_down = false;
 }
 
 OrbitCameraControlXY::~OrbitCameraControlXY() {}
+
+void OrbitCameraControlXY::reset_center() {
+  center.setZero();
+}
 
 void OrbitCameraControlXY::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;

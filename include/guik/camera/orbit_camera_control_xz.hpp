@@ -10,6 +10,8 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   OrbitCameraControlXZ();
+  OrbitCameraControlXZ(double distance, double theta, double phi);
+
   virtual ~OrbitCameraControlXZ() override;
 
   virtual void drag(const Eigen::Vector2i& p, int button) override;

@@ -10,8 +10,10 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   OrbitCameraControlXY();
+  OrbitCameraControlXY(double theta, double phi, double distance);
   virtual ~OrbitCameraControlXY() override;
 
+  virtual void reset_center() override;
   virtual void lookat(const Eigen::Vector3f& pt) override;
   virtual void mouse(const Eigen::Vector2i& p, int button, bool down) override;
   virtual void drag(const Eigen::Vector2i& p, int button) override;

@@ -16,7 +16,7 @@ void set_data_path(const std::string& path) {
 std::string get_data_path() {
   if(data_path.empty()) {
     data_path = "./data";
-    // data_path = ros::package::getPath("iridescent") + "/data";
+    // data_path = ros::package::getPath("iridescence") + "/data";
   }
 
   return data_path;
