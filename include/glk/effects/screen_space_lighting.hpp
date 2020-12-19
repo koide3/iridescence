@@ -1,98 +1,49 @@
 #ifndef GLK_SCREEN_SPACE_LIGHTING_HPP
 #define GLK_SCREEN_SPACE_LIGHTING_HPP
 
-#include <random>
-#include <iostream>
-#include <glk/path.hpp>
-#include <glk/frame_buffer.hpp>
 #include <glk/effects/screen_effect.hpp>
-
-#include <glk/effects/screen_scape_attribute_estimation.hpp>
 
 namespace glk {
 
+class ScreenSpaceAttributeEstimation;
+
 class ScreenSpaceLighting : public ScreenEffect {
 public:
-  ScreenSpaceLighting(const Eigen::Vector2i& size) {
-    ssae.reset(new ScreenSpaceAttributeEstimation(size));
+  enum class DIFFUSE_MODEL { ZERO, ONE, LAMBERT, DISNEY, NORMALIZED_DISNEY, OREN_NAYAR };
+  enum class SPECULAR_MODEL { ZERO, PHONG, BLINN_PHONG, COOK_TORRANCE };
+  enum class OCCLUSION_MODEL { ZERO, AMBIENT_OCCLUSION };
 
-    if(!lighting_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssli.frag")) {
-      return;
-    }
+  ScreenSpaceLighting(const Eigen::Vector2i& size);
+  virtual ~ScreenSpaceLighting() override;
 
-    add_light(Eigen::Vector3f(-10.0f, -10.0f, 200.0f), Eigen::Vector4f(0.9f, 0.9f, 1.0f, 1.0f));
-  }
-  virtual ~ScreenSpaceLighting() override {}
+  void set_diffuse_model(DIFFUSE_MODEL model);
+  void set_specular_model(SPECULAR_MODEL model);
+  void set_occlusion_model(OCCLUSION_MODEL model);
 
-  int num_lights() const {
-    return light_pos.size();
-  }
+  void set_albedo(float albedo);
+  void set_roughness(float roughness);
 
-  void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
-    while(i < light_pos.size() - 1) {
-      light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
-      light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
-    }
+  int num_lights() const;
+  void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
+  void add_light(const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
 
-    light_updated = true;
-    light_pos[i] = pos;
-    light_color[i] = color;
-  }
+  virtual void set_size(const Eigen::Vector2i& size) override;
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override;
 
-  void add_light(const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
-    light_updated = true;
-    light_pos.push_back(pos);
-    light_color.push_back(color);
-  }
-
-  virtual void set_size(const Eigen::Vector2i& size) override {
-    ssae->set_size(size);
-  }
-
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override {
-    ssae->draw(renderer, color_texture, depth_texture, input);
-
-    auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
-    if(!view_matrix) {
-      std::cerr << "view and projection matrices must be set" << std::endl;
-      return;
-    }
-    Eigen::Vector3f view_point = view_matrix->inverse().block<3, 1>(0, 3);
-
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST);
-
-    lighting_shader.use();
-    lighting_shader.set_uniform("color_sampler", 0);
-    lighting_shader.set_uniform("position_sampler", 1);
-    lighting_shader.set_uniform("normal_sampler", 2);
-    lighting_shader.set_uniform("occlusion_sampler", 3);
-
-    lighting_shader.set_uniform("view_point", view_point);
-    lighting_shader.set_uniform("material_shininess", 10.0f);
-    lighting_shader.set_uniform("ambient_light_color", Eigen::Vector4f(0.1f, 0.1f, 0.1f, 0.0f));
-
-    if(light_updated) {
-      lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
-      lighting_shader.set_uniform("light_pos", light_pos);
-      lighting_shader.set_uniform("light_color", light_color);
-    }
-
-    color_texture.bind(GL_TEXTURE0);
-    ssae->position().bind(GL_TEXTURE1);
-    ssae->normal().bind(GL_TEXTURE2);
-    ssae->occlusion().bind(GL_TEXTURE3);
-
-    renderer.draw_plain(lighting_shader);
-
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
-  }
+private:
+  bool load_shader();
 
 private:
   std::unique_ptr<glk::ScreenSpaceAttributeEstimation> ssae;
 
   glk::GLSLShader lighting_shader;
+
+  DIFFUSE_MODEL diffuse_model;
+  SPECULAR_MODEL specular_model;
+  OCCLUSION_MODEL occlusion_model;
+
+  float albedo;
+  float roughness;
 
   bool light_updated;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;

@@ -3,7 +3,7 @@
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
-#include <glk/effects/screen_space_iridecent_lighting.hpp>
+#include <glk/effects/screen_space_iridecence_lighting.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
 

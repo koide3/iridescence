@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
       }
 
       ImGui::SameLine();
-      ImGui::Text(filename.c_str());
+      ImGui::Text("%s", filename.c_str());
     }
   });
 

@@ -99,6 +99,12 @@ add_library(iridescence SHARED
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
   src/glk/loaders/ply_loader.cpp
+  src/glk/effects/plain_rendering.cpp
+  src/glk/effects/screen_space_lighting.cpp
+  src/glk/effects/screen_space_iridescence_lighting.cpp
+  src/glk/effects/screen_space_ambient_occlusion.cpp
+  src/glk/effects/screen_space_attribute_estimation.cpp
+  src/glk/effects/naive_screen_space_ambient_occlusion.cpp
   src/guik/gl_canvas.cpp
   src/guik/model_control.cpp
   src/guik/imgui_application.cpp

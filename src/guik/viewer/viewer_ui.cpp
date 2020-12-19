@@ -4,7 +4,7 @@
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
-#include <glk/effects/screen_space_iridecent_lighting.hpp>
+#include <glk/effects/screen_space_iridecence_lighting.hpp>
 
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
@@ -175,7 +175,7 @@ public:
       ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
       ImGui::BeginChild("filtered_list", ImVec2(ImGui::GetWindowContentRegionWidth(), std::min<int>(120, filtered.size() * 20)), false, window_flags);
       for(const auto& name : filtered) {
-        ImGui::Text(name.c_str());
+        ImGui::Text("%s", name.c_str());
       }
       ImGui::EndChild();
     }
@@ -287,7 +287,7 @@ public:
         }
 
         ImGui::SameLine();
-        ImGui::Text(candidate.c_str());
+        ImGui::Text("%s", candidate.c_str());
       }
       ImGui::EndChild();
     }
