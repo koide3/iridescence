@@ -4,8 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get install -y --no-install-recommends wget nano build-essential cmake git \
-  libeigen3-dev libboost-all-dev \
-  libglm-dev libglfw3-dev \
+  libpng-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 

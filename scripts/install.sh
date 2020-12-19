@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo apt install libglm-dev libglfw3-dev
+sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev
