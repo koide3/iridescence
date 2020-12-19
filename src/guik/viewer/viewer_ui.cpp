@@ -4,7 +4,7 @@
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
-#include <glk/effects/screen_space_iridecence_lighting.hpp>
+#include <glk/effects/screen_scape_attribute_estimation.hpp>
 
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
@@ -91,7 +91,7 @@ public:
     }
 
     ImGui::Separator();
-    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "IRIDESCENCE"};
+    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI"};
     if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
       if(effect_modes[effect_mode] == std::string("PLAIN")) {
         viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
@@ -103,8 +103,6 @@ public:
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
       } else if(effect_modes[effect_mode] == std::string("SSLI")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
-      } else if(effect_modes[effect_mode] == std::string("IRIDESCENCE")) {
-        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescenceLighting>(viewer->canvas_size()));
       }
     }
 
@@ -345,7 +343,6 @@ private:
   std::unique_ptr<ModelControl> drawable_control;
 };
 
-
 /**
  * CameraSettingWindow
  */
@@ -407,8 +404,7 @@ LightViewer::ViewerUI::ViewerUI(guik::LightViewer* viewer) : viewer(viewer) {
  * ViewerUI::ViewerUI
  */
 
-LightViewer::ViewerUI::~ViewerUI() {
-}
+LightViewer::ViewerUI::~ViewerUI() {}
 
 /**
  * ViewerUI::draw_ui
@@ -467,6 +463,4 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
   return hide_menu;
 }
 
-
-
-}
+}  // namespace guik

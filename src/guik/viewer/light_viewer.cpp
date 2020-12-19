@@ -92,7 +92,7 @@ void LightViewer::draw_ui() {
     ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     for(int i = std::max<int>(0, texts_.size() - 32); i < texts_.size(); i++) {
       const auto& text = texts_[i];
-      ImGui::Text(text.c_str());
+      ImGui::Text("%s", text.c_str());
     }
 
     if(ImGui::Button("clear")) {
@@ -101,7 +101,7 @@ void LightViewer::draw_ui() {
     ImGui::End();
   }
 
-  for(const auto& callback: ui_callbacks) {
+  for(const auto& callback : ui_callbacks) {
     callback.second();
   }
 
@@ -110,7 +110,7 @@ void LightViewer::draw_ui() {
     canvas->mouse_control();
   }
 
-  for(const auto& context: sub_contexts) {
+  for(const auto& context : sub_contexts) {
     context.second->draw_gl();
     context.second->draw_ui();
   }

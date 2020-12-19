@@ -7,11 +7,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
+# find_package(PCL)
+find_package(PNG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
-
-find_package(PCL)
-# find_package(G2O)
 
 find_package(catkin COMPONENTS roslib)
 
@@ -45,6 +44,7 @@ include_directories(
   thirdparty/ImGuizmo
   thirdparty/portable-file-dialogs
   thirdparty/gl3w
+  ${PNG_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
@@ -94,14 +94,15 @@ add_library(iridescence SHARED
   src/glk/point_correspondences.cpp
   src/glk/normal_distributions.cpp
   src/glk/colormap.cpp
+  src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
-  src/glk/loaders/ply_loader.cpp
+  src/glk/io/ply_loader.cpp
+  src/glk/io/png_loader.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_lighting.cpp
-  src/glk/effects/screen_space_iridescence_lighting.cpp
   src/glk/effects/screen_space_ambient_occlusion.cpp
   src/glk/effects/screen_space_attribute_estimation.cpp
   src/glk/effects/naive_screen_space_ambient_occlusion.cpp
@@ -122,6 +123,7 @@ target_link_libraries(iridescence
   gl_imgui
   pthread
   ${PCL_LIBRARIES}
+  ${PNG_LIBRARIES}
   ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )

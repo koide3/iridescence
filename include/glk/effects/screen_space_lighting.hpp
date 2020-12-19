@@ -12,6 +12,7 @@ public:
   enum class DIFFUSE_MODEL { ZERO, ONE, LAMBERT, DISNEY, NORMALIZED_DISNEY, OREN_NAYAR };
   enum class SPECULAR_MODEL { ZERO, PHONG, BLINN_PHONG, COOK_TORRANCE };
   enum class OCCLUSION_MODEL { ZERO, AMBIENT_OCCLUSION };
+  enum class IRIDESCENCE_MODEL { ZERO, IRIDESCENCE1, IRIDESCENCE2, IRIDESCENCE3 };
 
   ScreenSpaceLighting(const Eigen::Vector2i& size);
   virtual ~ScreenSpaceLighting() override;
@@ -19,6 +20,7 @@ public:
   void set_diffuse_model(DIFFUSE_MODEL model);
   void set_specular_model(SPECULAR_MODEL model);
   void set_occlusion_model(OCCLUSION_MODEL model);
+  void set_iridescence_model(IRIDESCENCE_MODEL model);
 
   void set_albedo(float albedo);
   void set_roughness(float roughness);
@@ -35,12 +37,14 @@ private:
 
 private:
   std::unique_ptr<glk::ScreenSpaceAttributeEstimation> ssae;
+  std::unique_ptr<glk::Texture> iridescence_texture;
 
   glk::GLSLShader lighting_shader;
 
   DIFFUSE_MODEL diffuse_model;
   SPECULAR_MODEL specular_model;
   OCCLUSION_MODEL occlusion_model;
+  IRIDESCENCE_MODEL iridescence_model;
 
   float albedo;
   float roughness;

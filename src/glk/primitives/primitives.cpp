@@ -11,7 +11,7 @@
 #include <glk/primitives/cone.hpp>
 #include <glk/primitives/icosahedron.hpp>
 #include <glk/primitives/coordinate_system.hpp>
-#include <glk/loaders/ply_loader.hpp>
+#include <glk/io/ply_loader.hpp>
 
 namespace glk {
 
@@ -26,15 +26,13 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
         std::cerr << "error : unknown primitive type " << type << std::endl;
         break;
       case ICOSAHEDRON:
-      case WIRE_ICOSAHEDRON:
-      {
+      case WIRE_ICOSAHEDRON: {
         glk::Icosahedron icosahedron;
         glk::Flatize flat(icosahedron.vertices, icosahedron.indices);
         meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
       } break;
       case SPHERE:
-      case WIRE_SPHERE:
-      {
+      case WIRE_SPHERE: {
         glk::Icosahedron icosahedron;
         icosahedron.subdivide();
         icosahedron.subdivide();
@@ -42,15 +40,13 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
         meshes[type].reset(new glk::Mesh(icosahedron.vertices, icosahedron.normals, icosahedron.indices, wireframe));
       } break;
       case CUBE:
-      case WIRE_CUBE:
-      {
+      case WIRE_CUBE: {
         glk::Cube cube;
         glk::Flatize flat(cube.vertices, cube.indices);
         meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
       } break;
       case CONE:
-      case WIRE_CONE:
-      {
+      case WIRE_CONE: {
         glk::Cone cone;
         glk::Flatize flat(cone.vertices, cone.indices);
         meshes[type].reset(new glk::Mesh(flat.vertices, flat.normals, flat.indices, wireframe));
@@ -60,8 +56,7 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
         meshes[type].reset(new glk::Lines(0.01f, grid.vertices));
       } break;
       case BUNNY:
-      case WIRE_BUNNY:
-      {
+      case WIRE_BUNNY: {
         glk::PLYLoader ply(get_data_path() + "/models/bunny.ply");
         meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices, wireframe));
       } break;
@@ -77,9 +72,7 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
 
 class PrimitiveWrapper : public glk::Drawable {
 public:
-  PrimitiveWrapper(const glk::Drawable& primitive)
-  : primitive(primitive)
-  {}
+  PrimitiveWrapper(const glk::Drawable& primitive) : primitive(primitive) {}
 
   virtual void draw(glk::GLSLShader& shader) const {
     primitive.draw(shader);

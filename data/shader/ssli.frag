@@ -6,6 +6,7 @@ uniform sampler2D color_sampler;
 uniform sampler2D position_sampler;
 uniform sampler2D normal_sampler;
 uniform sampler2D occlusion_sampler;
+uniform sampler2D iridescence_sampler;
 
 uniform vec3 view_point;
 
@@ -25,6 +26,7 @@ layout(location = 0) out vec4 final_color;
 float diffuse_brdf(float albedo, float roughness, vec3 N, vec3 L, vec3 V);
 float specular_brdf(float albedo, float roughness, vec3 N, vec3 L, vec3 V);
 float occlusion(float frag_occlusion);
+vec4 iridescence(vec3 N, vec3 L, vec3 V);
 
 vec4 lighting(int i, vec3 frag_position, vec3 frag_normal, vec3 view_point) {
   vec3 N = frag_normal;
@@ -34,7 +36,8 @@ vec4 lighting(int i, vec3 frag_position, vec3 frag_normal, vec3 view_point) {
   float diffuse = clamp(diffuse_brdf(albedo, roughness, N, L, V), 0.0, 1.0);
   float specular = clamp(specular_brdf(albedo, roughness, N, L, V), 0.0, 1.0);
 
-  return clamp(dot(N, L), 0.0, 1.0) * (diffuse + specular) * light_color[i];
+  float cosine = clamp(dot(N, L), 0.0, 1.0);
+  return cosine * (diffuse + specular) * light_color[i] * iridescence(N, L, V);
 }
 
 void main() {

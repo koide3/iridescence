@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glk/path.hpp>
 #include <glk/frame_buffer.hpp>
+#include <glk/io/png_loader.hpp>
 #include <glk/effects/screen_effect.hpp>
 
 #include <glk/effects/screen_space_lighting.hpp>
@@ -12,9 +13,16 @@ namespace glk {
 ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
   ssae.reset(new ScreenSpaceAttributeEstimation(size));
 
-  diffuse_model = DIFFUSE_MODEL::LAMBERT;
-  specular_model = SPECULAR_MODEL::PHONG;
-  occlusion_model = OCCLUSION_MODEL::ZERO;
+  PNGLoader png;
+  if(!png.load(get_data_path() + "/texture/iridescence1.png")) {
+    return;
+  }
+  iridescence_texture.reset(new glk::Texture(png.size(), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, png.bytes.data()));
+
+  diffuse_model = DIFFUSE_MODEL::OREN_NAYAR;
+  specular_model = SPECULAR_MODEL::COOK_TORRANCE;
+  occlusion_model = OCCLUSION_MODEL::AMBIENT_OCCLUSION;
+  iridescence_model = IRIDESCENCE_MODEL::IRIDESCENCE1;
 
   if(!load_shader()) {
     return;
@@ -41,6 +49,11 @@ void ScreenSpaceLighting::set_specular_model(SPECULAR_MODEL model) {
 
 void ScreenSpaceLighting::set_occlusion_model(OCCLUSION_MODEL model) {
   occlusion_model = model;
+  load_shader();
+}
+
+void ScreenSpaceLighting::set_iridescence_model(IRIDESCENCE_MODEL model) {
+  iridescence_model = model;
   load_shader();
 }
 
@@ -97,6 +110,30 @@ bool ScreenSpaceLighting::load_shader() {
       break;
   }
 
+  std::string iridescence_texture_path;
+  switch(iridescence_model) {
+    case IRIDESCENCE_MODEL::IRIDESCENCE1:
+      iridescence_texture_path = get_data_path() + "/texture/iridescence1.png";
+      break;
+    case IRIDESCENCE_MODEL::IRIDESCENCE2:
+      iridescence_texture_path = get_data_path() + "/texture/iridescence2.png";
+      break;
+    case IRIDESCENCE_MODEL::IRIDESCENCE3:
+      iridescence_texture_path = get_data_path() + "/texture/iridescence3.png";
+      break;
+  }
+
+  if(iridescence_model == IRIDESCENCE_MODEL::ZERO) {
+    fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence_zero.frag");
+  } else {
+    PNGLoader png;
+    if(!png.load(iridescence_texture_path)) {
+      return false;
+    }
+    fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence.frag");
+    iridescence_texture.reset(new glk::Texture(png.size(), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, png.bytes.data()));
+  }
+
   return lighting_shader.init(vertex_shaders, fragment_shaders);
 }
 
@@ -151,6 +188,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
   lighting_shader.set_uniform("position_sampler", 1);
   lighting_shader.set_uniform("normal_sampler", 2);
   lighting_shader.set_uniform("occlusion_sampler", 3);
+  lighting_shader.set_uniform("iridescence_sampler", 4);
 
   lighting_shader.set_uniform("view_point", view_point);
 
@@ -167,6 +205,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
   ssae->position().bind(GL_TEXTURE1);
   ssae->normal().bind(GL_TEXTURE2);
   ssae->occlusion().bind(GL_TEXTURE3);
+  iridescence_texture->bind(GL_TEXTURE4);
 
   renderer.draw_plain(lighting_shader);
 

@@ -3,7 +3,7 @@
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
-#include <glk/effects/screen_space_iridecence_lighting.hpp>
+#include <glk/effects/screen_scape_attribute_estimation.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
 
@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
   int effect = 0;
   viewer->register_ui_callback("effect_ui", [&]() {
-    std::vector<const char*> effects = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "IRIDESCENCE"};
+    std::vector<const char*> effects = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI"};
     if(ImGui::Combo("Effect", &effect, effects.data(), effects.size())) {
       switch(effect) {
         case 0:
@@ -30,9 +30,6 @@ int main(int argc, char** argv) {
           break;
         case 4:
           viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
-          break;
-        case 5:
-          viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceIridescenceLighting>(viewer->canvas_size()));
           break;
       }
     }
