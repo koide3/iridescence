@@ -1,6 +1,8 @@
 #ifndef GLK_SCREEN_EFFECT_HPP
 #define GLK_SCREEN_EFFECT_HPP
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <glk/texture.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/frame_buffer.hpp>

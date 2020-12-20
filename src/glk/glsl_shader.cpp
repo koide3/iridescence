@@ -13,21 +13,50 @@
 
 namespace glk {
 
+GLSLShader::GLSLShader() {
+  shader_program = 0;
+}
+
+GLSLShader::~GLSLShader() {
+  if(shader_program) {
+    glDeleteProgram(shader_program);
+  }
+}
+
 bool GLSLShader::init(const std::string& shader_path) {
   return init(shader_path + ".vert", shader_path + ".frag");
 }
 
 bool GLSLShader::init(const std::string& vertex_shader_path, const std::string& fragment_shader_path) {
-  GLuint vertex_shader = read_shader_from_file(vertex_shader_path, GL_VERTEX_SHADER);
-  GLuint fragment_shader = read_shader_from_file(fragment_shader_path, GL_FRAGMENT_SHADER);
+  std::vector<std::string> vertex_shader_paths = { vertex_shader_path };
+  std::vector<std::string> fragment_shader_paths = { fragment_shader_path };
+  return init(vertex_shader_paths, fragment_shader_paths);
+}
+
+bool GLSLShader::init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths) {
+  if(shader_program) {
+    glUseProgram(0);
+    glDeleteShader(shader_program);
+    attrib_cache.clear();
+    uniform_cache.clear();
+  }
 
   shader_program = glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-  glLinkProgram(shader_program);
 
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
+  std::vector<GLuint> shaders;
+  for(const auto& vertex_shader_path : vertex_shader_paths) {
+    GLuint vertex_shader = read_shader_from_file(vertex_shader_path, GL_VERTEX_SHADER);
+    glAttachShader(shader_program, vertex_shader);
+    glDeleteShader(vertex_shader);
+  }
+
+  for(const auto& fragment_shader_path : fragment_shader_paths) {
+    GLuint fragment_shader = read_shader_from_file(fragment_shader_path, GL_FRAGMENT_SHADER);
+    glAttachShader(shader_program, fragment_shader);
+    glDeleteShader(fragment_shader);
+  }
+
+  glLinkProgram(shader_program);
 
   GLint result = GL_FALSE;
   int info_log_length;
@@ -78,14 +107,17 @@ GLint GLSLShader::uniform(const std::string& name) {
 
 GLuint GLSLShader::read_shader_from_file(const std::string& filename, GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
+
+  std::stringstream sst;
+
   std::ifstream ifs(filename);
   if (!ifs) {
     std::cerr << "error: failed to open " << filename << std::endl;
     return GL_FALSE;
   }
 
-  std::stringstream sst;
   sst << ifs.rdbuf();
+
   std::string source = sst.str();
 
   GLint result = GL_FALSE;

@@ -13,13 +13,16 @@ namespace glk {
 
 class GLSLShader {
 public:
-  GLSLShader() {}
+  GLSLShader();
+  ~GLSLShader();
 
   bool init(const std::string& shader_path);
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+  bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
 
   GLuint id() const { return shader_program; }
   void use() const { glUseProgram(shader_program); }
+  void unuse() const { glUseProgram(0); }
 
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
