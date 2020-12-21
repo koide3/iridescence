@@ -1,6 +1,6 @@
 sudo: required
 language: generic
-dist: xenial
+dist: focal
 
 services:
   - docker
