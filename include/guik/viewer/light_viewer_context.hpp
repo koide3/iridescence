@@ -22,6 +22,7 @@ public:
   void draw_gl();
 
   bool init_canvas(const Eigen::Vector2i& size);
+  void set_size(const Eigen::Vector2i& size);
 
   guik::ShaderSetting& shader_setting() {
     return global_shader_setting;

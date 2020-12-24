@@ -112,6 +112,8 @@ bool ScreenSpaceLighting::load_shader() {
 
   std::string iridescence_texture_path;
   switch(iridescence_model) {
+    case IRIDESCENCE_MODEL::ZERO:
+      break;
     case IRIDESCENCE_MODEL::IRIDESCENCE1:
       iridescence_texture_path = get_data_path() + "/texture/iridescence1.png";
       break;

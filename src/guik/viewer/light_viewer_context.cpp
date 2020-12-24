@@ -25,6 +25,10 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
   return true;
 }
 
+void LightViewerContext::set_size(const Eigen::Vector2i& size) {
+  canvas->set_size(size);
+}
+
 void LightViewerContext::draw_ui() {
   ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -166,15 +170,15 @@ void LightViewerContext::reset_center() {
 }
 
 void LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>(distance, theta, phi);
+  canvas->camera_control.reset(new guik::OrbitCameraControlXY(distance, theta, phi));
 }
 
 void LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>(distance, theta, phi);
+  canvas->camera_control.reset(new guik::OrbitCameraControlXZ(distance, theta, phi));
 }
 
 void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
-  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>(distance, theta);
+  canvas->camera_control.reset(new guik::TopDownCameraControl(distance, theta));
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

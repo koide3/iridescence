@@ -237,7 +237,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
     int index = ((size[1] - p[1]) * size[0] + p_[0]) * 4;
     Eigen::Vector4i info = Eigen::Map<Eigen::Vector4i>(&pixels[index]);
 
-    if((info.array() != -1).any() >= 0) {
+    if((info.array() != -1).any()) {
       return info;
     }
   }

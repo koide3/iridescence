@@ -67,7 +67,7 @@ void ModelControl::draw_ui() {
   sst << "trans:" << pose.translation().transpose() << "\n"
       << "quat :" << Eigen::Quaternionf(pose.rotation()).coeffs().transpose() << "\n"
       << "scale:" << pose.linear().colwise().norm() << std::endl;
-  ImGui::Text(sst.str().c_str());
+  ImGui::Text("%s", sst.str().c_str());
 
   ImGui::End();
 }

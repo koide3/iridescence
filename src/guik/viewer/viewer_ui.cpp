@@ -369,13 +369,13 @@ public:
     std::vector<const char*> view_modes = {"Orbit(XY)", "Orbit(XZ)", "TOPDOWN"};
     if(ImGui::Combo("View mode", &view_mode, view_modes.data(), view_modes.size())) {
       if(view_modes[view_mode] == std::string("Orbit(XY)")) {
-        viewer->set_camera_control(std::make_shared<OrbitCameraControlXY>());
+        viewer->set_camera_control(std::shared_ptr<OrbitCameraControlXY>(new OrbitCameraControlXY()));
       }
       if(view_modes[view_mode] == std::string("Orbit(XZ)")) {
-        viewer->set_camera_control(std::make_shared<OrbitCameraControlXZ>());
+        viewer->set_camera_control(std::shared_ptr<OrbitCameraControlXZ>(new OrbitCameraControlXZ()));
       }
       if(view_modes[view_mode] == std::string("TOPDOWN")) {
-        viewer->set_camera_control(std::make_shared<TopDownCameraControl>());
+        viewer->set_camera_control(std::shared_ptr<TopDownCameraControl>(new TopDownCameraControl()));
       }
     }
 

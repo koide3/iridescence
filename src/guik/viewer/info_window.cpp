@@ -40,7 +40,7 @@ bool LightViewer::InfoWindow::draw_ui() {
       async_cpu_info = std::async(std::launch::async, [this]() { return get_cpu_info(); });
     }
 
-    ImGui::Text(cpu_info.c_str());
+    ImGui::Text("%s", cpu_info.c_str());
   }
 
   if(show_gpu_info) {
@@ -50,7 +50,7 @@ bool LightViewer::InfoWindow::draw_ui() {
       async_gpu_info = std::async(std::launch::async, [this]() { return get_gpu_info(); });
     }
 
-    ImGui::Text(gpu_info.c_str());
+    ImGui::Text("%s", gpu_info.c_str());
   }
 
   ImGui::End();

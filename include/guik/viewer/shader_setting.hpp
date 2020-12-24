@@ -44,24 +44,24 @@ public:
 
   ShaderSetting() {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", 1);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity());
+    params[0].reset(new ShaderParameter<int>("color_mode", 1));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", Eigen::Matrix4f::Identity()));
   }
 
   ShaderSetting(int color_mode) {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", color_mode);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity());
+    params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", Eigen::Matrix4f::Identity()));
   }
 
   template<typename Transform>
   ShaderSetting(int color_mode, const Transform& model_matrix) {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", color_mode);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", model_matrix.matrix());
+    params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", model_matrix.matrix()));
   }
   virtual ~ShaderSetting() {}
 
@@ -69,12 +69,12 @@ public:
   ShaderSetting& add(const std::string& name, const T& value) {
     for(int i=0; i<params.size(); i++) {
       if(params[i]->name == name) {
-        params[i] = std::make_shared<ShaderParameter<T>>(name, value);
+        params[i].reset(new ShaderParameter<T>(name, value));
         return *this;
       }
     }
 
-    params.push_back(std::make_shared<ShaderParameter<T>>(name, value));
+    params.push_back(std::shared_ptr<ShaderParameter<T>>(new ShaderParameter<T>(name, value)));
     return *this;
   }
 
@@ -125,12 +125,12 @@ public:
 struct FlatColor : public ShaderSetting {
 public:
   FlatColor(const Eigen::Vector4f& color) : ShaderSetting(1) {
-    params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
   }
 
   template<typename Transform>
   FlatColor(const Eigen::Vector4f& color, const Transform& matrix) : ShaderSetting(1, matrix) {
-    params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
   }
 
   virtual ~FlatColor() override {}

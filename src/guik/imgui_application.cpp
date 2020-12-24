@@ -94,32 +94,20 @@ Eigen::Vector2i Application::window_size() const {
   return Eigen::Vector2i(width, height);
 }
 
+void Application::show_window() {
+  glfwShowWindow(window);
+}
+
+void Application::hide_window() {
+  glfwHideWindow(window);
+}
+
 void Application::resize(const Eigen::Vector2i& size) {
   glfwSetWindowSize(window, size[0], size[1]);
 }
 
 void Application::spin() {
-  while (!glfwWindowShouldClose(window)) {
-    glfwPollEvents();
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    ImGuizmo::BeginFrame();
-
-    draw_ui();
-
-    ImGui::Render();
-
-    int display_w, display_h;
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
-    glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    draw_gl();
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    glfwSwapBuffers(window);
+  while(spin_once()) {
   }
 }
 
