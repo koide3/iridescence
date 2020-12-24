@@ -112,6 +112,10 @@ void Application::spin() {
 }
 
 bool Application::spin_once() {
+  if(!glfwGetWindowAttrib(window, GLFW_VISIBLE)) {
+    return !glfwWindowShouldClose(window);
+  }
+
   glfwPollEvents();
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
