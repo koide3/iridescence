@@ -35,10 +35,8 @@ int main(int argc, char** argv) {
     }
   });
 
-  viewer->update_drawable("floor", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow((Eigen::Scaling<float>(25.0f, 25.0f, 0.1f) * Eigen::Isometry3f::Identity()).matrix()));
-
-  Eigen::Matrix4f transform = (Eigen::Translation3f(0.0f, 0.0f, -0.5f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("bunny", glk::Primitives::primitive_ptr(glk::Primitives::BUNNY), guik::Rainbow(transform));
+  viewer->update_drawable("floor", glk::Primitives::cube(), guik::Rainbow(Eigen::Scaling<float>(25.0f, 25.0f, 0.1f)));
+  viewer->update_drawable("bunny", glk::Primitives::bunny(), guik::Rainbow(Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f)));
 
   viewer->spin();
   return 0;

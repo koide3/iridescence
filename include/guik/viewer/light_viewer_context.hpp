@@ -23,6 +23,7 @@ public:
 
   bool init_canvas(const Eigen::Vector2i& size);
   void set_size(const Eigen::Vector2i& size);
+  void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver);
 
   guik::ShaderSetting& shader_setting() {
     return global_shader_setting;

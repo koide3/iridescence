@@ -2,6 +2,7 @@
 
 #include <glk/primitives/primitives.hpp>
 
+#include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
@@ -27,6 +28,17 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
 
 void LightViewerContext::set_size(const Eigen::Vector2i& size) {
   canvas->set_size(size);
+}
+
+void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond) {
+  int x = pos[0];
+  int y = pos[1];
+
+  guik::LightViewer::instance()->invoke([=] {
+    ImGui::SetNextWindowPos(ImVec2(x, y), cond);
+    ImGui::Begin(context_name.c_str());
+    ImGui::End();
+  });
 }
 
 void LightViewerContext::draw_ui() {

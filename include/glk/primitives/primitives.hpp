@@ -7,13 +7,15 @@ namespace glk {
 
 class Primitives {
 private:
-  Primitives() { meshes.resize(NUM_PRIMITIVES, nullptr); }
+  Primitives() {
+    meshes.resize(NUM_PRIMITIVES, nullptr);
+  }
 
 public:
   enum PrimitiveType { ICOSAHEDRON = 0, SPHERE, CUBE, CONE, GRID, COORDINATE_SYSTEM, BUNNY, WIRE_ICOSAHEDRON, WIRE_SPHERE, WIRE_CUBE, WIRE_CONE, WIRE_BUNNY, NUM_PRIMITIVES };
 
-  static Primitives *instance() {
-    if (instance_ == nullptr) {
+  static Primitives* instance() {
+    if(instance_ == nullptr) {
       instance_ = new Primitives();
     }
     return instance_;
@@ -25,6 +27,10 @@ public:
 
   static glk::Drawable::ConstPtr primitive_ptr(PrimitiveType type) {
     return Primitives::instance()->create_primitive_ptr(type);
+  }
+
+  static glk::Drawable::ConstPtr icosahedron() {
+    return primitive_ptr(ICOSAHEDRON);
   }
 
   static glk::Drawable::ConstPtr sphere() {
@@ -43,12 +49,16 @@ public:
     return primitive_ptr(COORDINATE_SYSTEM);
   }
 
+  static glk::Drawable::ConstPtr bunny() {
+    return primitive_ptr(BUNNY);
+  }
+
 private:
   const glk::Drawable& create_primitive(PrimitiveType type);
   std::shared_ptr<glk::Drawable> create_primitive_ptr(PrimitiveType type);
 
 private:
-  static Primitives *instance_;
+  static Primitives* instance_;
 
   std::vector<std::shared_ptr<glk::Drawable>> meshes;
 };

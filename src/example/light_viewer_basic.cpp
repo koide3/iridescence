@@ -4,9 +4,9 @@
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
 
-  float scale = 1.0f;
+  float time = 0.0f;
   viewer->register_ui_callback("ui", [&]() {
-    ImGui::DragFloat("Scale", &scale, 0.01f, 0.01f, 10.0f);
+    ImGui::DragFloat("Time", &time, 0.01f);
 
     if(ImGui::Button("Close")) {
       viewer->close();
@@ -14,8 +14,8 @@ int main(int argc, char** argv) {
   });
 
   while(viewer->spin_once()) {
-    Eigen::Matrix4f transform = (Eigen::AngleAxisf(ImGui::GetTime(), Eigen::Vector3f::UnitZ()) * Eigen::UniformScaling<float>(scale) * Eigen::Isometry3f::Identity()).matrix();
-    viewer->update_drawable("cube", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::Rainbow(transform));
+    Eigen::AngleAxisf transform(time, Eigen::Vector3f::UnitZ());
+    viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow(transform));
   }
 
   return 0;

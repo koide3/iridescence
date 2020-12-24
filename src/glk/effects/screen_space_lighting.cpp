@@ -28,7 +28,7 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
     return;
   }
 
-  add_light(Eigen::Vector3f(-10.0f, -10.0f, 200.0f), Eigen::Vector4f(0.9f, 0.9f, 1.0f, 1.0f));
+  add_light(Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f));
 
   lighting_shader.use();
   lighting_shader.set_uniform("albedo", 1.0f);
