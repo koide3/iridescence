@@ -12,9 +12,11 @@
 namespace guik {
 
 struct ColorMode {
-  static const int RAINBOW = 0;
-  static const int FLAT_COLOR = 1;
-  static const int VERTEX_COLOR = 2;
+  enum MODE {
+    RAINBOW = 0,
+    FLAT_COLOR = 1,
+    VERTEX_COLOR = 2
+  };
 };
 
 struct ShaderParameterInterface {
