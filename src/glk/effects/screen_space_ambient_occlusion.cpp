@@ -22,8 +22,12 @@ void ScreenSpaceAmbientOcclusion::set_size(const Eigen::Vector2i& size) {
   ssae->set_size(size);
 }
 
-void ScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
-  ssae->draw(renderer, color_texture, depth_texture, input);
+void ScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+  ssae->draw(renderer, color_texture, depth_texture, input, frame_buffer);
+
+  if(frame_buffer) {
+    frame_buffer->bind();
+  }
 
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
@@ -43,6 +47,10 @@ void ScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const gl
 
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
+
+  if(frame_buffer) {
+    frame_buffer->unbind();
+  }
 }
 
 }  // namespace glk

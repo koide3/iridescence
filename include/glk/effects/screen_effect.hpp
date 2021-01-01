@@ -18,7 +18,7 @@ public:
   virtual ~ScreenEffect() {}
 
   virtual void set_size(const Eigen::Vector2i& size) {}
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) = 0;
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) = 0;
 };
 
 }  // namespace glk

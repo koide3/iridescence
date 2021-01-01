@@ -24,7 +24,7 @@ namespace guik {
  *
  * @param size
  */
-GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size) {
+GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
   frame_buffer.reset(new glk::FrameBuffer(size, 1));
   shader.reset(new glk::GLSLShader());
   if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
@@ -49,6 +49,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
 
   camera_control.reset(new guik::OrbitCameraControlXY());
   projection_control.reset(new guik::ProjectionControl(size));
+
   texture_renderer.reset(new glk::TextureRenderer());
 
   info_buffer_enabled = false;
@@ -94,7 +95,10 @@ void GLCanvas::set_colormap(glk::COLORMAP colormap_type) {
 }
 
 void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
-  texture_renderer->set_effect(effect);
+  screen_effect = effect;
+  if(!screen_effect_buffer) {
+    screen_effect_buffer.reset(new glk::FrameBuffer(size, 1, false));
+  }
 }
 
 void GLCanvas::enable_info_buffer() {
@@ -113,9 +117,23 @@ void GLCanvas::enable_info_buffer() {
  */
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
   this->size = size;
+
   projection_control->set_size(size);
-  texture_renderer->set_size(size);
   frame_buffer.reset(new glk::FrameBuffer(size, 2));
+
+  if(screen_effect) {
+    screen_effect->set_size(size);
+    screen_effect_buffer.reset(new glk::FrameBuffer(size, 1, false));
+  }
+}
+
+/**
+ * @brief Set the background color
+ *
+ * @param color
+ */
+void GLCanvas::set_clear_color(const Eigen::Vector4f& color) {
+  clear_color = color;
 }
 
 /**
@@ -125,6 +143,7 @@ void GLCanvas::set_size(const Eigen::Vector2i& size) {
 void GLCanvas::bind() {
   frame_buffer->bind();
   glDisable(GL_SCISSOR_TEST);
+  glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
@@ -163,6 +182,23 @@ void GLCanvas::unbind() {
   glFlush();
 
   frame_buffer->unbind();
+
+  if(screen_effect) {
+    glk::TextureRendererInput::Ptr input(new glk::TextureRendererInput());
+    input->set("view_matrix", camera_control->view_matrix());
+    input->set("projection_matrix", projection_control->projection_matrix());
+    screen_effect->draw(*texture_renderer.get(), frame_buffer->color(), frame_buffer->depth(), input, screen_effect_buffer.get());
+
+    frame_buffer->bind();
+    glDisable(GL_SCISSOR_TEST);
+    glDepthMask(GL_FALSE);
+
+    texture_renderer->draw(screen_effect_buffer->color());
+
+    glDepthMask(GL_TRUE);
+    glEnable(GL_SCISSOR_TEST);
+    frame_buffer->unbind();
+  }
 }
 
 /**
@@ -170,11 +206,7 @@ void GLCanvas::unbind() {
  *
  */
 void GLCanvas::render_to_screen(int color_buffer_id) {
-  glk::TextureRendererInput::Ptr input(new glk::TextureRendererInput());
-  input->set("view_matrix", camera_control->view_matrix());
-  input->set("projection_matrix", projection_control->projection_matrix());
-
-  texture_renderer->draw(frame_buffer->color(color_buffer_id), frame_buffer->depth(), input);
+  texture_renderer->draw(frame_buffer->color(color_buffer_id));
 }
 
 /**

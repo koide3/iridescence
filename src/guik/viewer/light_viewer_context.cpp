@@ -30,6 +30,10 @@ void LightViewerContext::set_size(const Eigen::Vector2i& size) {
   canvas->set_size(size);
 }
 
+void LightViewerContext::set_clear_color(const Eigen::Vector4f& color) {
+  canvas->set_clear_color(color);
+}
+
 void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond) {
   int x = pos[0];
   int y = pos[1];

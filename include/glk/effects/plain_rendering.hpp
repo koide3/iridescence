@@ -10,7 +10,8 @@ public:
   PlainRendering();
   virtual ~PlainRendering();
 
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override ;
+  void draw(const TextureRenderer& renderer, const glk::Texture& color_texture);
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
 
 private:
   glk::GLSLShader plain_shader;
