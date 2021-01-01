@@ -205,6 +205,45 @@ void GLCanvas::unbind() {
  * @brief
  *
  */
+void GLCanvas::bind_second() {
+  frame_buffer->bind();
+  glDisable(GL_SCISSOR_TEST);
+
+  shader->use();
+  if(info_buffer_enabled) {
+    shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
+  }
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+  glEnable(GL_TEXTURE_1D);
+  glBindTexture(GL_TEXTURE_1D, colormap->id());
+}
+
+/**
+ * @brief
+ *
+ */
+void GLCanvas::unbind_second() {
+  glDisable(GL_TEXTURE_1D);
+  glBindTexture(GL_TEXTURE_1D, 0);
+
+  glDisable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+  glFlush();
+
+  frame_buffer->unbind();
+}
+
+/**
+ * @brief
+ *
+ */
 void GLCanvas::render_to_screen(int color_buffer_id) {
   texture_renderer->draw(frame_buffer->color(color_buffer_id));
 }

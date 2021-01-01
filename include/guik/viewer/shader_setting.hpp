@@ -12,11 +12,7 @@
 namespace guik {
 
 struct ColorMode {
-  enum MODE {
-    RAINBOW = 0,
-    FLAT_COLOR = 1,
-    VERTEX_COLOR = 2
-  };
+  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2 };
 };
 
 struct ShaderParameterInterface {
@@ -51,14 +47,14 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<ShaderSetting>;
 
-  ShaderSetting() {
+  ShaderSetting() : transparent(false) {
     params.resize(3);
     params[0].reset(new ShaderParameter<int>("color_mode", ColorMode::FLAT_COLOR));
     params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
     params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", Eigen::Matrix4f::Identity()));
   }
 
-  ShaderSetting(int color_mode) {
+  ShaderSetting(int color_mode) : transparent(false) {
     params.resize(3);
     params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
     params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
@@ -66,13 +62,18 @@ public:
   }
 
   template<typename Transform>
-  ShaderSetting(int color_mode, const Transform& transform) {
+  ShaderSetting(int color_mode, const Transform& transform) : transparent(false) {
     params.resize(3);
     params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
     params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
     params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", (transform * Eigen::Isometry3f::Identity()).matrix()));
   }
   virtual ~ShaderSetting() {}
+
+  ShaderSetting& make_transparent() {
+    transparent = true;
+    return *this;
+  }
 
   template<typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
@@ -112,6 +113,7 @@ public:
   }
 
 public:
+  bool transparent;
   std::vector<ShaderParameterInterface::Ptr> params;
 };
 

@@ -61,17 +61,7 @@ void LightViewerContext::draw_ui() {
 }
 
 void LightViewerContext::draw_gl() {
-  canvas->bind();
-
-  global_shader_setting.set(*canvas->shader);
-
-  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
-  canvas->shader->set_uniform("color_mode", 1);
-  if(draw_xy_grid) {
-    canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
-    glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
-  }
-
+  std::vector<std::pair<guik::ShaderSetting::Ptr, glk::Drawable::ConstPtr>> active_drawables;
   for(const auto& itr : drawables) {
     bool draw = true;
     for(const auto& filter : drawable_filters) {
@@ -81,20 +71,55 @@ void LightViewerContext::draw_gl() {
       }
     }
 
-    if(!draw) {
-      continue;
-    }
-
-    const auto& shader_setting = itr.second.first;
-    shader_setting->set(*canvas->shader);
-
     const auto& drawable = itr.second.second;
-    if(drawable) {
-      drawable->draw(*canvas->shader);
+    if(draw && drawable) {
+      active_drawables.push_back(itr.second);
+    }
+  }
+
+  canvas->bind();
+
+  global_shader_setting.set(*canvas->shader);
+  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+  canvas->shader->set_uniform("color_mode", 1);
+  if(draw_xy_grid) {
+    canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
+    glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
+  }
+
+  bool transparent_exists = false;
+  for(const auto& drawable : active_drawables) {
+    if(!drawable.first->transparent) {
+      drawable.first->set(*canvas->shader);
+      drawable.second->draw(*canvas->shader);
+    } else {
+      transparent_exists = true;
     }
   }
 
   canvas->unbind();
+
+  if(transparent_exists) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    canvas->bind_second();
+
+    global_shader_setting.set(*canvas->shader);
+    canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+    canvas->shader->set_uniform("color_mode", 1);
+
+    for(const auto& drawable : active_drawables) {
+      if(drawable.first->transparent) {
+        drawable.first->set(*canvas->shader);
+        drawable.second->draw(*canvas->shader);
+      }
+    }
+
+    canvas->unbind_second();
+
+    glDisable(GL_CULL_FACE);
+  }
 }
 
 void LightViewerContext::lookat(const Eigen::Vector3f& pt) {

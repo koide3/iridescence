@@ -34,6 +34,9 @@ public:
   void bind();
   void unbind();
 
+  void bind_second();
+  void unbind_second();
+
   void render_to_screen(int color_buffer_id = 0);
 
   Eigen::Vector4i pick_info(const Eigen::Vector2i& p, int window = 2) const;
