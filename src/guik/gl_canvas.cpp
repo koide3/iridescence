@@ -96,6 +96,7 @@ void GLCanvas::set_colormap(glk::COLORMAP colormap_type) {
 
 void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   screen_effect = effect;
+  screen_effect->set_size(size);
   if(!screen_effect_buffer) {
     screen_effect_buffer.reset(new glk::FrameBuffer(size, 1, false));
   }
