@@ -15,9 +15,14 @@ public:
 
   virtual void reset_center() override;
   virtual void lookat(const Eigen::Vector3f& pt) override;
+
   virtual void mouse(const Eigen::Vector2i& p, int button, bool down) override;
   virtual void drag(const Eigen::Vector2i& p, int button) override;
   virtual void scroll(const Eigen::Vector2f& rel) override;
+
+  virtual void updown(int p) override;
+  virtual void arrow(const Eigen::Vector2i& p) override;
+
   virtual Eigen::Vector2f depth_range() const override;
 
   virtual Eigen::Quaternionf rotation() const;
@@ -37,6 +42,6 @@ protected:
   bool middle_button_down;
 };
 
-}
+}  // namespace guik
 
 #endif

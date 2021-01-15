@@ -1,5 +1,8 @@
 #include <guik/gl_canvas.hpp>
 
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+
 #include <imgui.h>
 #include <iostream>
 
@@ -268,6 +271,34 @@ void GLCanvas::mouse_control() {
     }
     if(ImGui::IsMouseDragging(i)) {
       camera_control->drag(p, i);
+    }
+
+    if(io.KeyCtrl) {
+      Eigen::Vector2i arrow(0, 0);
+      if(io.KeysDown[GLFW_KEY_LEFT]) {
+        arrow[0] = 1;
+      } else if(io.KeysDown[GLFW_KEY_RIGHT]) {
+        arrow[0] = -1;
+      }
+
+      if(io.KeysDown[GLFW_KEY_UP]) {
+        arrow[1] = 1;
+      } else if(io.KeysDown[GLFW_KEY_DOWN]) {
+        arrow[1] = -1;
+      }
+
+      if(!arrow.isZero()) {
+        camera_control->arrow(arrow);
+      }
+
+      int updown = 0;
+      if(io.KeysDown[GLFW_KEY_PAGE_UP]) {
+        updown = 1;
+      } else if(io.KeysDown[GLFW_KEY_PAGE_DOWN]) {
+        updown = -1;
+      }
+
+      camera_control->updown(updown);
     }
 
     camera_control->scroll(Eigen::Vector2f(io.MouseWheel, io.MouseWheelH));
