@@ -1,19 +1,21 @@
 #include <glk/pointnormals_buffer.hpp>
 
+#include <iostream>
+
 namespace glk {
 
-#ifdef GLK_USE_PCL
-PointNormalsBuffer::PointNormalsBuffer(const pcl::PointCloud<pcl::PointNormal>::ConstPtr& cloud, double normal_length) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> lines(cloud->size() * 2);
+PointNormalsBuffer::PointNormalsBuffer(const float* vertices, size_t vertex_stride, const float* normals, size_t normal_stride, int num_points, double normal_length) {
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> lines(num_points * 2);
 
-  for(int i = 0; i < cloud->size(); i++) {
-    lines[i * 2] = cloud->at(i).getVector3fMap();
-    lines[i * 2 + 1] = cloud->at(i).getVector3fMap() + cloud->at(i).getNormalVector3fMap() * normal_length;
+  for(int i = 0; i < num_points; i++) {
+    lines[i * 2] = Eigen::Map<const Eigen::Vector3f>(vertices + i * vertex_stride / sizeof(float));
+    lines[i * 2 + 1] = lines[i * 2] + Eigen::Map<const Eigen::Vector3f>(normals + i * normal_stride / sizeof(float)) * normal_length;
   }
 
   normal_lines.reset(new ThinLines(lines));
 }
-#endif
+
+PointNormalsBuffer::PointNormalsBuffer(const Points& vertices, const Points& normals, double normal_length) : PointNormalsBuffer(vertices[0].data(), sizeof(Eigen::Vector3f), normals[0].data(), sizeof(Eigen::Vector3f), vertices.size(), normal_length) {}
 
 PointNormalsBuffer::~PointNormalsBuffer() {}
 

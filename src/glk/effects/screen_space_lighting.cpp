@@ -28,7 +28,7 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
     return;
   }
 
-  add_light(Eigen::Vector3f(-10.0f, -10.0f, 200.0f), Eigen::Vector4f(0.9f, 0.9f, 1.0f, 1.0f));
+  add_light(Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f));
 
   lighting_shader.use();
   lighting_shader.set_uniform("albedo", 1.0f);
@@ -112,6 +112,8 @@ bool ScreenSpaceLighting::load_shader() {
 
   std::string iridescence_texture_path;
   switch(iridescence_model) {
+    case IRIDESCENCE_MODEL::ZERO:
+      break;
     case IRIDESCENCE_MODEL::IRIDESCENCE1:
       iridescence_texture_path = get_data_path() + "/texture/iridescence1.png";
       break;
@@ -170,8 +172,12 @@ void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
   ssae->set_size(size);
 }
 
-void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
+void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
   ssae->draw(renderer, color_texture, depth_texture, input);
+
+  if(frame_buffer) {
+    frame_buffer->bind();
+  }
 
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   if(!view_matrix) {
@@ -211,6 +217,10 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
+
+  if(frame_buffer) {
+    frame_buffer->unbind();
+  }
 }
 
 }  // namespace glk

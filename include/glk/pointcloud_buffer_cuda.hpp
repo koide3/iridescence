@@ -15,8 +15,8 @@ static std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const void* s
 
   const auto error_check = [](cudaError_t error) {
     if(error != cudaSuccess) {
-      std::cerr << "error : " << cudaGetErrorName(error) << std::endl;
-      std::cerr << "      : " << cudaGetErrorString(error) << std::endl;
+      // std::cerr << "error : " << cudaGetErrorName(error) << std::endl;
+      // std::cerr << "      : " << cudaGetErrorString(error) << std::endl;
     }
   };
 

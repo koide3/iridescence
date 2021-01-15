@@ -7,7 +7,7 @@
 namespace glk {
 
 TextureRenderer::TextureRenderer() {
-  effect = std::make_shared<PlainRendering>();
+  plain_effect = std::make_shared<PlainRendering>();
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices = {Eigen::Vector3f(-1.0f, -1.0f, 0.0f), Eigen::Vector3f(1.0f, -1.0f, 0.0f), Eigen::Vector3f(-1.0f, 1.0f, 0.0f), Eigen::Vector3f(1.0f, 1.0f, 0.0f)};
 
@@ -31,16 +31,8 @@ TextureRenderer::~TextureRenderer() {
   glDeleteBuffers(1, &vbo);
 }
 
-void TextureRenderer::set_size(const Eigen::Vector2i& size) {
-  effect->set_size(size);
-}
-
-void TextureRenderer::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
-  this->effect = effect;
-}
-
-void TextureRenderer::draw(const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
-  effect->draw(*this, color_texture, depth_texture, input);
+void TextureRenderer::draw(const glk::Texture& color_texture) {
+  plain_effect->draw(*this, color_texture);
 }
 
 void TextureRenderer::draw_plain(glk::GLSLShader& shader) const {

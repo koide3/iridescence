@@ -32,6 +32,7 @@ void main() {
 
     if(color_mode == 0) {
         frag_color = rainbow(frag_world_position);
+        frag_color.a = material_color.a;
     } else if(color_mode == 1) {
         frag_color = material_color;
     } else if(color_mode == 2) {

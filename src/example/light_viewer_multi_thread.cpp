@@ -9,14 +9,14 @@ void run() {
 
   for(int i = 0; i < 500; i++) {
     std::vector<float> points(128 * 3);
-    for(int i = 0; i < points.size(); i++) {
-      points[i] = std::uniform_real_distribution<>(-10.0, 10.0)(mt);
+    for(auto& value : points) {
+      value = std::uniform_real_distribution<>(-10.0, 10.0)(mt);
     }
 
-    // the following line doesn't work because GL objects must be creaded in the GUI thread
+    // the following code doesn't work because GL objects must be creaded in the GUI thread
     // auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.size() / 3);
 
-    // request to invoke a task in the GUI thread
+    // request to invoke the task in the GUI thread
     guik::LightViewer::instance()->invoke([=] {
       auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.size() / 3);
       guik::LightViewer::instance()->update_drawable("cloud_" + std::to_string(i), cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random() * 2.0f).add("point_scale", 3.0f));

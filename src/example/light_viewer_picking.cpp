@@ -9,8 +9,8 @@ int main(int argc, char** argv) {
   for(int x = -5; x <= 5; x++) {
     for(int y = -5; y <= 5; y++) {
       Eigen::Vector4f color((x + 5) / 10.0f, (y + 5) / 10.0f, 1.0, 1.0f);
-      Eigen::Affine3f model_matrix = Eigen::Translation3f(x, y, 0.0f) * Eigen::UniformScaling<float>(0.5f) * Eigen::Isometry3f::Identity();
-      viewer->update_drawable("cube_" + std::to_string(x) + "_" + std::to_string(y), glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(color, model_matrix.matrix()).add("info_values", Eigen::Vector4i(x, y, 0, 0)));
+      auto transform = Eigen::Translation3f(x, y, 0.0f) * Eigen::UniformScaling<float>(0.5f);
+      viewer->update_drawable("cube_" + std::to_string(x) + "_" + std::to_string(y), glk::Primitives::cube(), guik::FlatColor(color, transform).add("info_values", Eigen::Vector4i(x, y, 0, 0)));
     }
   }
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
       // change the color of the picked cube
       auto cube = viewer->find_drawable("cube_" + std::to_string(info[0]) + "_" + std::to_string(info[1]));
       if(cube.first) {
-        cube.first->add("color_mode", 1).add("material_color", Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
+        cube.first->add("color_mode", guik::ColorMode::FLAT_COLOR).add("material_color", Eigen::Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
       }
     }
   });

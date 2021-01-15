@@ -2,6 +2,7 @@
 
 #include <glk/primitives/primitives.hpp>
 
+#include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
@@ -25,6 +26,25 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
   return true;
 }
 
+void LightViewerContext::set_size(const Eigen::Vector2i& size) {
+  canvas->set_size(size);
+}
+
+void LightViewerContext::set_clear_color(const Eigen::Vector4f& color) {
+  canvas->set_clear_color(color);
+}
+
+void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond) {
+  int x = pos[0];
+  int y = pos[1];
+
+  guik::LightViewer::instance()->invoke([=] {
+    ImGui::SetNextWindowPos(ImVec2(x, y), cond);
+    ImGui::Begin(context_name.c_str());
+    ImGui::End();
+  });
+}
+
 void LightViewerContext::draw_ui() {
   ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -41,17 +61,7 @@ void LightViewerContext::draw_ui() {
 }
 
 void LightViewerContext::draw_gl() {
-  canvas->bind();
-
-  global_shader_setting.set(*canvas->shader);
-
-  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
-  canvas->shader->set_uniform("color_mode", 1);
-  if(draw_xy_grid) {
-    canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
-    glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
-  }
-
+  std::vector<std::pair<guik::ShaderSetting::Ptr, glk::Drawable::ConstPtr>> active_drawables;
   for(const auto& itr : drawables) {
     bool draw = true;
     for(const auto& filter : drawable_filters) {
@@ -61,20 +71,55 @@ void LightViewerContext::draw_gl() {
       }
     }
 
-    if(!draw) {
-      continue;
-    }
-
-    const auto& shader_setting = itr.second.first;
-    shader_setting->set(*canvas->shader);
-
     const auto& drawable = itr.second.second;
-    if(drawable) {
-      drawable->draw(*canvas->shader);
+    if(draw && drawable) {
+      active_drawables.push_back(itr.second);
+    }
+  }
+
+  canvas->bind();
+
+  global_shader_setting.set(*canvas->shader);
+  canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+  canvas->shader->set_uniform("color_mode", 1);
+  if(draw_xy_grid) {
+    canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
+    glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
+  }
+
+  bool transparent_exists = false;
+  for(const auto& drawable : active_drawables) {
+    if(!drawable.first->transparent) {
+      drawable.first->set(*canvas->shader);
+      drawable.second->draw(*canvas->shader);
+    } else {
+      transparent_exists = true;
     }
   }
 
   canvas->unbind();
+
+  if(transparent_exists) {
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    canvas->bind_second();
+
+    global_shader_setting.set(*canvas->shader);
+    canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
+    canvas->shader->set_uniform("color_mode", 1);
+
+    for(const auto& drawable : active_drawables) {
+      if(drawable.first->transparent) {
+        drawable.first->set(*canvas->shader);
+        drawable.second->draw(*canvas->shader);
+      }
+    }
+
+    canvas->unbind_second();
+
+    glDisable(GL_CULL_FACE);
+  }
 }
 
 void LightViewerContext::lookat(const Eigen::Vector3f& pt) {
@@ -166,15 +211,15 @@ void LightViewerContext::reset_center() {
 }
 
 void LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXY>(distance, theta, phi);
+  canvas->camera_control.reset(new guik::OrbitCameraControlXY(distance, theta, phi));
 }
 
 void LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
-  canvas->camera_control = std::make_shared<guik::OrbitCameraControlXZ>(distance, theta, phi);
+  canvas->camera_control.reset(new guik::OrbitCameraControlXZ(distance, theta, phi));
 }
 
 void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
-  canvas->camera_control = std::make_shared<guik::TopDownCameraControl>(distance, theta);
+  canvas->camera_control.reset(new guik::TopDownCameraControl(distance, theta));
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

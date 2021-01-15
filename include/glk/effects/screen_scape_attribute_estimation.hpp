@@ -22,7 +22,7 @@ public:
   const glk::Texture& normal() const;
   const glk::Texture& occlusion() const;
 
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override;
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
 
 private:
   bool smooth_normal;

@@ -35,10 +35,11 @@ bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version) {
 }
 
 void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
-  if(!LightViewerContext::init_canvas(size)) {
-    std::cerr << "error: failed to resize the canvas!!" << std::endl;
-    close();
-  }
+  // if(!LightViewerContext::init_canvas(size)) {
+  //  std::cerr << "error: failed to resize the canvas!!" << std::endl;
+  //  close();
+  // }
+  LightViewerContext::set_size(size);
 }
 
 void LightViewer::draw_ui() {

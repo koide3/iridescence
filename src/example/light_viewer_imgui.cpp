@@ -27,14 +27,16 @@ int main(int argc, char** argv) {
   // control model matrix with guik::ModelControl
   guik::ModelControl model_control("model control window");
   viewer->register_ui_callback("model_control_ui", [&]() {
+    ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
     model_control.draw_ui();
     model_control.draw_gizmo(0, 0, viewer->canvas_size().x(), viewer->canvas_size().y(), viewer->view_matrix(), viewer->projection_matrix());
-    viewer->update_drawable("coord", glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(model_control.model_matrix()));
+    viewer->update_drawable("coord", glk::Primitives::coordinate_system(), guik::VertexColor(model_control.model_matrix()));
   });
 
   // control model matrix with your own GUI
   Eigen::Affine3f my_transform = Eigen::Translation3f(1.0f, 1.0f, 1.0f) * Eigen::Affine3f::Identity();
   viewer->register_ui_callback("my_model_control_ui", [&]() {
+    ImGui::SetNextWindowPos(ImVec2(50, 250), ImGuiCond_FirstUseEver);
     ImGui::Begin("my model control window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if(ImGui::Button("+X")) {
       my_transform = Eigen::Translation3f(1.0f, 0.0f, 0.0f) * my_transform;
@@ -49,12 +51,13 @@ int main(int argc, char** argv) {
     }
     ImGui::End();
 
-    viewer->update_drawable("my_coord", glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(my_transform.matrix()));
+    viewer->update_drawable("my_coord", glk::Primitives::coordinate_system(), guik::VertexColor(my_transform));
   });
 
   // create sub viewer
   auto sub_viewer = viewer->sub_viewer("sub viewer", Eigen::Vector2i(512, 512));
-  sub_viewer->update_drawable("icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON), guik::Rainbow());
+  sub_viewer->set_pos(Eigen::Vector2i(50, 450), ImGuiCond_FirstUseEver);
+  sub_viewer->update_drawable("icosahedron", glk::Primitives::icosahedron(), guik::Rainbow());
 
   // create another sub viewer with GLCanvas for low-level control
   guik::GLCanvas canvas(Eigen::Vector2i(512, 512));
@@ -62,10 +65,11 @@ int main(int argc, char** argv) {
     // rendering (this can be done outside of this callback)
     canvas.bind();
     guik::Rainbow().set(*canvas.shader);
-    glk::Primitives::primitive_ptr(glk::Primitives::ICOSAHEDRON)->draw(*canvas.shader);
+    glk::Primitives::icosahedron()->draw(*canvas.shader);
     canvas.unbind();
 
     // show the image rendered on canvas's frame buffer
+    ImGui::SetNextWindowPos(ImVec2(1300, 450), ImGuiCond_FirstUseEver);
     ImGui::Begin("your sub window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGuiWindowFlags child_window_flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;

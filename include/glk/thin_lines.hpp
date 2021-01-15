@@ -18,6 +18,7 @@ namespace glk {
 class ThinLines : public Drawable {
 public:
   ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors);
   virtual ~ThinLines() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;
@@ -31,6 +32,7 @@ private:
 
   GLuint vao;  // vertex array object
   GLuint vbo;  // vertices
+  GLuint cbo;  // colors
 };
 }  // namespace glk
 

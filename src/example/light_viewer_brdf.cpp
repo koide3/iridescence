@@ -8,8 +8,6 @@
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
-  viewer->show_info_window();
-
   auto effect = std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size());
   viewer->set_screen_effect(effect);
 
@@ -26,7 +24,7 @@ int main(int argc, char** argv) {
   effect->set_occlusion_model(static_cast<glk::ScreenSpaceLighting::OCCLUSION_MODEL>(occlusion_model));
   effect->set_iridescence_model(static_cast<glk::ScreenSpaceLighting::IRIDESCENCE_MODEL>(iridescence_model));
 
-  float roughness = 0.5f;
+  float roughness = 0.1f;
   float albedo = 1.0f;
   effect->set_albedo(albedo);
   effect->set_roughness(roughness);
@@ -55,7 +53,7 @@ int main(int argc, char** argv) {
       effect->set_iridescence_model(static_cast<glk::ScreenSpaceLighting::IRIDESCENCE_MODEL>(iridescence_model));
     }
 
-    if(ImGui::DragFloat("roughness", &roughness, 0.01f, 0.0f, 10.0f)) {
+    if(ImGui::DragFloat("roughness", &roughness, 0.01f, 0.01f, 10.0f)) {
       effect->set_roughness(roughness);
     }
     if(ImGui::DragFloat("albedo", &albedo, 0.01f, 0.0f, 10.0f)) {
@@ -80,9 +78,8 @@ int main(int argc, char** argv) {
     }
   });
 
-  viewer->update_drawable("floor", glk::Primitives::primitive_ptr(glk::Primitives::CUBE), guik::FlatColor(Eigen::Vector4f::Ones(), (Eigen::Scaling<float>(25.0f, 25.0f, 0.1f) * Eigen::Isometry3f::Identity()).matrix()));
-  Eigen::Matrix4f transform = (Eigen::Translation3f(0.0f, 0.0f, -0.5f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f) * Eigen::Isometry3f::Identity()).matrix();
-  viewer->update_drawable("bunny", glk::Primitives::primitive_ptr(glk::Primitives::BUNNY), guik::FlatColor(Eigen::Vector4f::Ones(), transform));
+  viewer->update_drawable("floor", glk::Primitives::cube(), guik::FlatColor(Eigen::Vector4f::Ones(), Eigen::Scaling<float>(25.0f, 25.0f, 0.1f)));
+  viewer->update_drawable("bunny", glk::Primitives::bunny(), guik::FlatColor(Eigen::Vector4f::Ones(), Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f)));
 
   double t = 0.0;
   while(viewer->spin_once()) {

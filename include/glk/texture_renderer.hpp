@@ -13,7 +13,7 @@
 
 namespace glk {
 
-class ScreenEffect;
+class PlainRendering;
 
 /**
  * @brief TextureRenderer
@@ -24,17 +24,14 @@ public:
   TextureRenderer();
   ~TextureRenderer();
 
-  void set_size(const Eigen::Vector2i& size);
-  void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
-
-  void draw(const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input=nullptr);
+  void draw(const glk::Texture& color_texture);
   void draw_plain(glk::GLSLShader& shader) const;
 
 private:
   GLuint vao;
   GLuint vbo;
 
-  std::shared_ptr<glk::ScreenEffect> effect;
+  std::shared_ptr<glk::PlainRendering> plain_effect;
 };
 
 }  // namespace glk

@@ -29,9 +29,13 @@ NaiveScreenSpaceAmbientOcclusion::NaiveScreenSpaceAmbientOcclusion() {
   ssao_shader.set_uniform("random_vectors", random_vectors);
 }
 
-NaiveScreenSpaceAmbientOcclusion::~NaiveScreenSpaceAmbientOcclusion(){}
+NaiveScreenSpaceAmbientOcclusion::~NaiveScreenSpaceAmbientOcclusion() {}
 
-void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
+void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+  if(frame_buffer) {
+    frame_buffer->bind();
+  }
+
   ssao_shader.use();
   ssao_shader.set_uniform("color_sampler", 0);
   ssao_shader.set_uniform("depth_sampler", 1);
@@ -56,7 +60,10 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   renderer.draw_plain(ssao_shader);
 
   glDisable(GL_TEXTURE_2D);
-}
 
+  if(frame_buffer) {
+    frame_buffer->unbind();
+  }
+}
 
 }  // namespace glk

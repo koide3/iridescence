@@ -30,7 +30,7 @@ public:
   void add_light(const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) override;
+  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
 
 private:
   bool load_shader();

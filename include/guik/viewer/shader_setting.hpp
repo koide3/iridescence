@@ -11,13 +11,18 @@
 
 namespace guik {
 
+struct ColorMode {
+  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2 };
+};
+
 struct ShaderParameterInterface {
 public:
   using Ptr = std::shared_ptr<ShaderParameterInterface>;
-  ShaderParameterInterface(const std::string& name) : name (name) {}
+  ShaderParameterInterface(const std::string& name) : name(name) {}
   virtual ~ShaderParameterInterface() {}
 
   virtual void set(glk::GLSLShader& shader) const = 0;
+
 public:
   std::string name;
 };
@@ -42,45 +47,50 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<ShaderSetting>;
 
-  ShaderSetting() {
+  ShaderSetting() : transparent(false) {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", 1);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity());
+    params[0].reset(new ShaderParameter<int>("color_mode", ColorMode::FLAT_COLOR));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", Eigen::Matrix4f::Identity()));
   }
 
-  ShaderSetting(int color_mode) {
+  ShaderSetting(int color_mode) : transparent(false) {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", color_mode);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity());
+    params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", Eigen::Matrix4f::Identity()));
   }
 
   template<typename Transform>
-  ShaderSetting(int color_mode, const Transform& model_matrix) {
+  ShaderSetting(int color_mode, const Transform& transform) : transparent(false) {
     params.resize(3);
-    params[0] = std::make_shared<ShaderParameter<int>>("color_mode", color_mode);
-    params[1] = std::make_shared<ShaderParameter<float>>("point_scale", 1.0f);
-    params[2] = std::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", model_matrix.matrix());
+    params[0].reset(new ShaderParameter<int>("color_mode", color_mode));
+    params[1].reset(new ShaderParameter<float>("point_scale", 1.0f));
+    params[2].reset(new ShaderParameter<Eigen::Matrix4f>("model_matrix", (transform * Eigen::Isometry3f::Identity()).matrix()));
   }
   virtual ~ShaderSetting() {}
 
+  ShaderSetting& make_transparent() {
+    transparent = true;
+    return *this;
+  }
+
   template<typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
-    for(int i=0; i<params.size(); i++) {
+    for(int i = 0; i < params.size(); i++) {
       if(params[i]->name == name) {
-        params[i] = std::make_shared<ShaderParameter<T>>(name, value);
+        params[i].reset(new ShaderParameter<T>(name, value));
         return *this;
       }
     }
 
-    params.push_back(std::make_shared<ShaderParameter<T>>(name, value));
+    params.push_back(std::shared_ptr<ShaderParameter<T>>(new ShaderParameter<T>(name, value)));
     return *this;
   }
 
   template<typename T>
   boost::optional<T> get(const std::string& name) {
-    for(const auto& param :params) {
+    for(const auto& param : params) {
       if(param->name != name) {
         continue;
       }
@@ -97,12 +107,13 @@ public:
   }
 
   void set(glk::GLSLShader& shader) const {
-    for(const auto& param: params) {
+    for(const auto& param : params) {
       param->set(shader);
     }
   }
 
 public:
+  bool transparent;
   std::vector<ShaderParameterInterface::Ptr> params;
 };
 
@@ -113,24 +124,23 @@ inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::I
 
 struct Rainbow : public ShaderSetting {
 public:
-  Rainbow() : ShaderSetting(0) {}
+  Rainbow() : ShaderSetting(ColorMode::RAINBOW) {}
 
   template<typename Transform>
-  Rainbow(const Transform& matrix) : ShaderSetting(0, matrix) {}
+  Rainbow(const Transform& transform) : ShaderSetting(ColorMode::RAINBOW, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~Rainbow() override {}
 };
 
-
 struct FlatColor : public ShaderSetting {
 public:
-  FlatColor(const Eigen::Vector4f& color) : ShaderSetting(1) {
-    params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+  FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
   }
 
   template<typename Transform>
-  FlatColor(const Eigen::Vector4f& color, const Transform& matrix) : ShaderSetting(1, matrix) {
-    params.push_back(std::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+  FlatColor(const Eigen::Vector4f& color, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
   }
 
   virtual ~FlatColor() override {}
@@ -138,10 +148,10 @@ public:
 
 struct VertexColor : public ShaderSetting {
 public:
-  VertexColor() : ShaderSetting(2) {}
+  VertexColor() : ShaderSetting(ColorMode::VERTEX_COLOR) {}
 
   template<typename Transform>
-  VertexColor(const Transform& matrix) : ShaderSetting(2, matrix) {}
+  VertexColor(const Transform& transform) : ShaderSetting(ColorMode::VERTEX_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~VertexColor() override {}
 };

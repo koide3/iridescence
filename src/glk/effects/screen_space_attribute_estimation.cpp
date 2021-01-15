@@ -134,7 +134,7 @@ const glk::Texture& ScreenSpaceAttributeEstimation::occlusion() const {
   return bilateral_y_buffer->color(0);
 }
 
-void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input) {
+void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
 
@@ -243,12 +243,20 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
   bilateral_y_buffer->unbind();
 
   if(rendering_type != BufferType::NONE) {
+    if(frame_buffer) {
+      frame_buffer->bind();
+    }
+
     const glk::FrameBuffer* buffers[] = {position_buffer.get(), position_smoothing_x_buffer.get(), position_smoothing_y_buffer.get(), normal_buffer.get(), occlusion_buffer.get(), bilateral_x_buffer.get(), bilateral_y_buffer.get()};
     const auto buffer = buffers[static_cast<int>(rendering_type) - 1];
     buffer->color().bind();
 
     texture_shader.use();
     renderer.draw_plain(texture_shader);
+
+    if(frame_buffer) {
+      frame_buffer->unbind();
+    }
   }
 
   glDisable(GL_TEXTURE_2D);
