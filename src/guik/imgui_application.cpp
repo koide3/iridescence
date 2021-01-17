@@ -102,6 +102,10 @@ void Application::hide_window() {
   glfwHideWindow(window);
 }
 
+void Application::full_screen() {
+  glfwMaximizeWindow(window);
+}
+
 void Application::resize(const Eigen::Vector2i& size) {
   glfwSetWindowSize(window, size[0], size[1]);
 }
