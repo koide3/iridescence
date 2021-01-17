@@ -92,26 +92,26 @@ ScreenSpaceAttributeEstimation::~ScreenSpaceAttributeEstimation() {}
 
 void ScreenSpaceAttributeEstimation::set_size(const Eigen::Vector2i& size) {
   position_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  position_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);  // position
+  position_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT);  // position
 
   position_smoothing_x_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  position_smoothing_x_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);
+  position_smoothing_x_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT);
 
   position_smoothing_y_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  position_smoothing_y_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);
+  position_smoothing_y_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT);
 
   normal_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  normal_buffer->add_color_buffer(GL_RGB32F, GL_RGB, GL_FLOAT);
+  normal_buffer->add_color_buffer(0, GL_RGB32F, GL_RGB, GL_FLOAT);
 
   occlusion_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  occlusion_buffer->add_color_buffer(GL_R32F, GL_RGB, GL_FLOAT);
-  occlusion_buffer->add_color_buffer(GL_RGB32F, GL_RGB, GL_FLOAT);
+  occlusion_buffer->add_color_buffer(0, GL_R32F, GL_RGB, GL_FLOAT);
+  occlusion_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT);
 
   bilateral_x_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  bilateral_x_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);
+  bilateral_x_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT);
 
   bilateral_y_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  bilateral_y_buffer->add_color_buffer(GL_RGBA32F, GL_RGB, GL_FLOAT);
+  bilateral_y_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT);
 }
 
 void ScreenSpaceAttributeEstimation::set_smooth_normal(bool smooth_normal) {

@@ -20,12 +20,24 @@ public:
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
 
-  GLuint id() const { return shader_program; }
-  void use() const { glUseProgram(shader_program); }
-  void unuse() const { glUseProgram(0); }
+  GLuint id() const {
+    return shader_program;
+  }
+  void use() const {
+    glUseProgram(shader_program);
+  }
+  void unuse() const {
+    glUseProgram(0);
+  }
 
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
+
+  int get_uniformi(const std::string& name) {
+    int value;
+    glGetUniformiv(shader_program, uniform(name), &value);
+    return value;
+  }
 
   float get_uniformf(const std::string& name) {
     float value;
@@ -45,19 +57,43 @@ public:
     return mat;
   }
 
-  void set_uniform(const std::string& name, int value) { glUniform1i(uniform(name), value); }
-  void set_uniform(const std::string& name, float value) { glUniform1f(uniform(name), value); }
-  void set_uniform(const std::string& name, const Eigen::Vector2f& vector) { glUniform2fv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Vector3f& vector) { glUniform3fv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Vector4f& vector) { glUniform4fv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Vector2i& vector) { glUniform4iv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Vector3i& vector) { glUniform3iv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Vector4i& vector) { glUniform4iv(uniform(name), 1, vector.data()); }
-  void set_uniform(const std::string& name, const Eigen::Matrix4f& matrix) { glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data()); }
+  void set_uniform(const std::string& name, int value) {
+    glUniform1i(uniform(name), value);
+  }
+  void set_uniform(const std::string& name, float value) {
+    glUniform1f(uniform(name), value);
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector2f& vector) {
+    glUniform2fv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector3f& vector) {
+    glUniform3fv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector4f& vector) {
+    glUniform4fv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector2i& vector) {
+    glUniform4iv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector3i& vector) {
+    glUniform3iv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Vector4i& vector) {
+    glUniform4iv(uniform(name), 1, vector.data());
+  }
+  void set_uniform(const std::string& name, const Eigen::Matrix4f& matrix) {
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
+  }
 
-  void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>& vectors) { glUniform2fv(uniform(name), vectors.size(), vectors[0].data()); }
-  void set_uniform(const std::string& name, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vectors) { glUniform3fv(uniform(name), vectors.size(), vectors[0].data()); }
-  void set_uniform(const std::string& name, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& vectors) { glUniform4fv(uniform(name), vectors.size(), vectors[0].data()); }
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>& vectors) {
+    glUniform2fv(uniform(name), vectors.size(), vectors[0].data());
+  }
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vectors) {
+    glUniform3fv(uniform(name), vectors.size(), vectors[0].data());
+  }
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& vectors) {
+    glUniform4fv(uniform(name), vectors.size(), vectors[0].data());
+  }
 
   void set_uniform(const std::string& name, const Eigen::Matrix4d& matrix_) {
     Eigen::Matrix4f matrix = matrix_.cast<float>();

@@ -37,6 +37,10 @@ PointCloudBuffer::~PointCloudBuffer() {
   glDeleteBuffers(1, &vbo);
 }
 
+void PointCloudBuffer::add_normals(const float* data, int stride, int num_points) {
+  add_buffer("vert_normal", 3, data, stride, num_points);
+}
+
 void PointCloudBuffer::add_color(const float* data, int stride, int num_points) {
   add_buffer("vert_color", 4, data, stride, num_points);
 }

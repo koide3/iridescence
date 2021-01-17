@@ -138,8 +138,28 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
   canvas->set_effect(effect);
 }
 
+void LightViewerContext::enable_normal_buffer() {
+  canvas->enable_normal_buffer();
+}
+
 void LightViewerContext::enable_info_buffer() {
   canvas->enable_info_buffer();
+}
+
+bool LightViewerContext::normal_buffer_enabled() const {
+  return canvas->normal_buffer_enabled();
+}
+
+bool LightViewerContext::info_buffer_enabled() const {
+  return canvas->info_buffer_enabled();
+}
+
+const glk::Texture& LightViewerContext::normal_buffer() const {
+  return canvas->normal_buffer();
+}
+
+const glk::Texture& LightViewerContext::info_buffer() const {
+  return canvas->info_buffer();
 }
 
 void LightViewerContext::clear_drawables() {

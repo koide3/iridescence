@@ -37,7 +37,15 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+
+  void enable_normal_buffer();
   void enable_info_buffer();
+
+  bool normal_buffer_enabled() const;
+  bool info_buffer_enabled() const;
+
+  const glk::Texture& normal_buffer() const;
+  const glk::Texture& info_buffer() const;
 
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);

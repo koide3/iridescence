@@ -47,15 +47,18 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
+  shader->set_uniform("colormap_sampler", 0);
+  shader->set_uniform("texture_sampler", 1);
+
   auto colormap_table = glk::colormap_table(glk::COLORMAP::TURBO);
-  colormap.reset(new glk::Texture1D(256, GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
+  colormap.reset(new glk::Texture(Eigen::Vector2i(256, 1), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
 
   camera_control.reset(new guik::OrbitCameraControlXY());
   projection_control.reset(new guik::ProjectionControl(size));
 
   texture_renderer.reset(new glk::TextureRenderer());
 
-  info_buffer_enabled = false;
+  normal_buffer_id = info_buffer_id = 0;
 }
 
 /**
@@ -88,13 +91,17 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
+
+  shader->set_uniform("colormap_sampler", 0);
+  shader->set_uniform("texture_sampler", 1);
 
   return true;
 }
 
 void GLCanvas::set_colormap(glk::COLORMAP colormap_type) {
   auto colormap_table = glk::colormap_table(colormap_type);
-  colormap.reset(new glk::Texture1D(256, GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
+  colormap.reset(new glk::Texture(Eigen::Vector2i(256, 1), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
 }
 
 void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
@@ -104,13 +111,30 @@ void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   }
 }
 
-void GLCanvas::enable_info_buffer() {
-  info_buffer_enabled = true;
-  frame_buffer->add_color_buffer(GL_RGBA32I, GL_RGBA_INTEGER, GL_INT);
+void GLCanvas::enable_normal_buffer() {
+  normal_buffer_id = frame_buffer->num_color_buffers();
+  frame_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT);
+}
 
-  shader->use();
-  shader->set_uniform("info_enabled", true);
-  shader->set_uniform("info_values", Eigen::Vector4f(-1, -1, -1, -1));
+void GLCanvas::enable_info_buffer() {
+  info_buffer_id = frame_buffer->num_color_buffers();
+  frame_buffer->add_color_buffer(1, GL_RGBA32I, GL_RGBA_INTEGER, GL_INT);
+}
+
+bool GLCanvas::normal_buffer_enabled() const {
+  return normal_buffer_id > 0;
+}
+
+bool GLCanvas::info_buffer_enabled() const {
+  return info_buffer_id > 0;
+}
+
+const glk::Texture& GLCanvas::normal_buffer() const {
+  return frame_buffer->color(normal_buffer_id);
+}
+
+const glk::Texture& GLCanvas::info_buffer() const {
+  return frame_buffer->color(info_buffer_id);
 }
 
 /**
@@ -156,19 +180,28 @@ void GLCanvas::bind() {
   shader->set_uniform("view_matrix", view_matrix);
   shader->set_uniform("inv_view_matrix", view_matrix.inverse().eval());
   shader->set_uniform("projection_matrix", projection_matrix);
-  shader->set_uniform("info_enabled", info_buffer_enabled);
+  shader->set_uniform("info_enabled", info_buffer_id > 0);
+  shader->set_uniform("normal_enabled", normal_buffer_id > 0);
 
-  if(info_buffer_enabled) {
+  shader->set_uniform("colormap_sampler", 0);
+  shader->set_uniform("texture_sampler", 1);
+
+  if(normal_buffer_id) {
+    GLfloat clear_color[] = {0.0f, 0.0f, 0.0f};
+    glClearTexImage(frame_buffer->color(normal_buffer_id).id(), 0, GL_RGB, GL_FLOAT, clear_color);
+  }
+
+  if(info_buffer_id) {
     GLint clear_color[] = {-1, -1, -1, -1};
-    glClearTexImage(frame_buffer->color(1).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
+    glClearTexImage(frame_buffer->color(info_buffer_id).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
     shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
   }
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_1D);
-  glBindTexture(GL_TEXTURE_1D, colormap->id());
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
 /**
@@ -176,8 +209,8 @@ void GLCanvas::bind() {
  *
  */
 void GLCanvas::unbind() {
-  glDisable(GL_TEXTURE_1D);
-  glBindTexture(GL_TEXTURE_1D, 0);
+  glDisable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -213,7 +246,7 @@ void GLCanvas::bind_second() {
   glDisable(GL_SCISSOR_TEST);
 
   shader->use();
-  if(info_buffer_enabled) {
+  if(info_buffer_id) {
     shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
   }
 
@@ -222,8 +255,8 @@ void GLCanvas::bind_second() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_1D);
-  glBindTexture(GL_TEXTURE_1D, colormap->id());
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
 /**
@@ -231,8 +264,8 @@ void GLCanvas::bind_second() {
  *
  */
 void GLCanvas::unbind_second() {
-  glDisable(GL_TEXTURE_1D);
-  glBindTexture(GL_TEXTURE_1D, 0);
+  glDisable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_BLEND);
   glDisable(GL_DEPTH_TEST);
@@ -314,7 +347,7 @@ void GLCanvas::mouse_control() {
  * @return Eigen::Vector4i
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
-  if(!info_buffer_enabled) {
+  if(!info_buffer_id) {
     std::cerr << "warning: info buffer has not been enabled!!" << std::endl;
     return Eigen::Vector4i::Constant(-1);
   }
@@ -323,7 +356,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
     return Eigen::Vector4i(-1, -1, -1, -1);
   }
 
-  std::vector<int> pixels = frame_buffer->color(1).read_pixels<int>(GL_RGBA_INTEGER, GL_INT);
+  std::vector<int> pixels = frame_buffer->color(info_buffer_id).read_pixels<int>(GL_RGBA_INTEGER, GL_INT);
 
   std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
 

@@ -9,7 +9,7 @@ namespace glk {
 
 class Texture {
 public:
-  Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, void* pixels = nullptr);
+  Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels = nullptr);
   ~Texture();
 
   GLuint id() const;
@@ -18,6 +18,7 @@ public:
   void bind() const;
   void bind(GLenum target) const;
   void unbind() const;
+  void unbind(GLenum target) const;
 
   template<typename T>
   std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE) const;
@@ -30,7 +31,7 @@ private:
 
 class Texture1D {
 public:
-  Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, void* pixels = nullptr);
+  Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, const void* pixels = nullptr);
   ~Texture1D();
 
   GLuint id() const;

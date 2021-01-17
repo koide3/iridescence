@@ -12,7 +12,7 @@
 namespace guik {
 
 struct ColorMode {
-  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2 };
+  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2, TEXTURE_COLOR = 3 };
 };
 
 struct ShaderParameterInterface {
@@ -154,6 +154,16 @@ public:
   VertexColor(const Transform& transform) : ShaderSetting(ColorMode::VERTEX_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~VertexColor() override {}
+};
+
+struct TextureColor : public ShaderSetting {
+public:
+  TextureColor() : ShaderSetting(ColorMode::TEXTURE_COLOR) {}
+
+  template<typename Transform>
+  TextureColor(const Transform& transform) : ShaderSetting(ColorMode::TEXTURE_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
+
+  virtual ~TextureColor() override {}
 };
 
 }  // namespace guik
