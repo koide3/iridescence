@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-# find_package(PCL)
+find_package(PCL)
 find_package(PNG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)

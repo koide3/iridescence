@@ -85,6 +85,9 @@ public:
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
   }
 
+  void set_uniform(const std::string& name, const std::vector<float>& vectors) {
+    glUniform1fv(uniform(name), vectors.size(), vectors.data());
+  }
   void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>>& vectors) {
     glUniform2fv(uniform(name), vectors.size(), vectors[0].data());
   }

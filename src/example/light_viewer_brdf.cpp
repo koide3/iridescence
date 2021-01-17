@@ -87,12 +87,11 @@ int main(int argc, char** argv) {
     for(int i = 0; i < num_lights; i++) {
       double theta = t + i * 2.0 * M_PI / num_lights;
       Eigen::Vector3f light_pos(10.0 * std::cos(theta), 10.0 * std::sin(theta), 2.0f);
-      effect->set_light(i, light_pos, light_colors[i]);
+      effect->set_light(i, light_pos, light_colors[i], Eigen::Vector2f(0.0f, 0.001f), 100.0f);
 
       Eigen::Affine3f model_matrix = Eigen::Translation3f(light_pos) * Eigen::UniformScaling<float>(0.25f) * Eigen::Isometry3f::Identity();
       viewer->update_drawable("light_" + std::to_string(i), glk::Primitives::sphere(), guik::FlatColor(light_colors[i], model_matrix));
     }
-    ImGui::GetTime();
   }
   return 0;
 }

@@ -4,15 +4,17 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <pcl/registration/gicp.h>
+#include <pcl/registration/icp.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/approximate_voxel_grid.h>
+#include <pcl/features/normal_3d_omp.h>
 
 #include <portable-file-dialogs.h>
 
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/pointcloud_buffer_pcl.hpp>
 #include <glk/primitives/primitives.hpp>
+#include <glk/effects/screen_space_lighting.hpp>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/recent_files.hpp>
 
@@ -67,6 +69,28 @@ private:
   std::string dataset_path;
 };
 
+pcl::PointCloud<pcl::PointNormal>::Ptr preprocess(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud_) {
+  auto cloud = pcl::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+  pcl::copyPointCloud(*cloud_, *cloud);
+
+  // downsampling filter
+  float downsample_resolution = 0.5f;
+  pcl::ApproximateVoxelGrid<pcl::PointNormal> voxelgrid;
+  voxelgrid.setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
+  voxelgrid.setInputCloud(cloud);
+
+  auto filtered = pcl::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+  voxelgrid.filter(*filtered);
+
+  // normal estimation
+  pcl::NormalEstimationOMP<pcl::PointNormal, pcl::PointNormal> nest;
+  nest.setKSearch(15);
+  nest.setInputCloud(filtered);
+  nest.compute(*filtered);
+
+  return filtered;
+}
+
 int main(int argc, char** argv) {
   // "/your/kitti/path/sequences/00/velodyne"
   guik::RecentFiles recent_files("kitti_directory");
@@ -78,77 +102,51 @@ int main(int argc, char** argv) {
 
   KittiLoader kitti(kitti_path);
 
-  // downsampling filter
-  float downsample_resolution = 1.0f;
-  pcl::ApproximateVoxelGrid<pcl::PointXYZ> voxelgrid;
-  voxelgrid.setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
-
   // registration method
-  pcl::GeneralizedIterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> gicp;
-  gicp.setMaxCorrespondenceDistance(1.0);
+  pcl::IterativeClosestPointWithNormals<pcl::PointNormal, pcl::PointNormal> icp;
+  icp.setMaxCorrespondenceDistance(2.0);
 
   // set initial frame as target
-  voxelgrid.setInputCloud(kitti.cloud(0));
-  auto target = boost::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-  voxelgrid.filter(*target);
-  gicp.setInputTarget(target);
-
-  Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
+  auto target = preprocess(kitti.cloud(0));
+  icp.setInputTarget(target);
 
   // viewer setting
   auto viewer = guik::LightViewer::instance();
+  viewer->enable_normal_buffer();
 
-  bool step_execution = false;
-  viewer->register_ui_callback("registration config", [&]() {
-    if(ImGui::Button("clear map")) {
-      viewer->clear_drawables([](const std::string& name) { return name.find("frame_") != std::string::npos; });
-    }
+  auto effect = std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size());
+  viewer->set_screen_effect(effect);
 
-    ImGui::SameLine();
-    if(ImGui::Button("clear all")) {
-      viewer->clear_drawables();
-    }
+  viewer->register_ui_callback("normal_texture", [&] { ImGui::Image((void*)effect->normal().id(), ImVec2(1920 / 4, 1080 / 4), ImVec2(0, 1), ImVec2(1, 0)); });
 
-    if(ImGui::DragFloat("downsample resolution", &downsample_resolution, 0.05f, 0.1f, 2.0f)) {
-      voxelgrid.setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
-    }
-  });
-
+  Eigen::Isometry3f pose = Eigen::Isometry3f::Identity();
   for(int i = 1; i < kitti.size() && !viewer->closed(); i++) {
-    // set the current frame as source
-    voxelgrid.setInputCloud(kitti.cloud(i));
-    auto source = boost::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-    voxelgrid.filter(*source);
-    gicp.setInputSource(source);
+    effect->set_light(0, Eigen::Vector3f::Zero(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.01f), 20.0f);
+    if((i % 5) == 0) {
+      effect->set_light(effect->num_lights(), pose.translation(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.1f), 20.0f);
+    }
 
-    auto aligned = boost::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-    gicp.align(*aligned);
+    // set the current frame as source
+    auto source = preprocess(kitti.cloud(i));
+    icp.setInputSource(source);
+
+    auto aligned = boost::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+    icp.align(*aligned);
 
     // accumulate pose
-    pose = pose * gicp.getFinalTransformation().cast<double>();
-    gicp.setInputTarget(gicp.getInputSource());
+    pose = pose * icp.getFinalTransformation();
+    icp.setInputTarget(icp.getInputSource());
 
-    viewer->append_text((boost::format("%d : %.3f s : %d pts   fitness_score %.3f") % i % ImGui::GetTime() % source->size() % gicp.getFitnessScore()).str());
+    viewer->append_text((boost::format("%d : %.3f s : %d pts   fitness_score %.3f") % i % ImGui::GetTime() % source->size() % icp.getFitnessScore()).str());
 
-    auto cloud_buffer = glk::create_point_cloud_buffer(*kitti.cloud(i));
+    auto cloud_buffer = glk::create_point_cloud_buffer(*source);
     viewer->update_drawable("current_frame", cloud_buffer, guik::FlatColor(Eigen::Vector4f(1.0f, 0.5f, 0.0f, 1.0f), pose.cast<float>().matrix()).add("point_scale", 3.0f));
     viewer->update_drawable("frame_" + std::to_string(i), cloud_buffer, guik::Rainbow(pose.cast<float>().matrix()));
     viewer->update_drawable("coord_" + std::to_string(i), glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(pose.cast<float>().cast<float>().matrix()));
     viewer->lookat(pose.translation().cast<float>());
 
-    // step execution
-    bool step_clicked = false;
-    viewer->register_ui_callback("step execution config", [&]() {
-      ImGui::Checkbox("##step", &step_execution);
-
-      ImGui::SameLine();
-      if(ImGui::Button("step execution")) {
-        step_execution = true;
-        step_clicked = true;
-      }
-    });
-
-    while(viewer->spin_once() && step_execution && !step_clicked) {
+    if(!viewer->spin_once()) {
+      break;
     }
   }
 

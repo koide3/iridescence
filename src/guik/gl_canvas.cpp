@@ -224,6 +224,11 @@ void GLCanvas::unbind() {
     glk::TextureRendererInput::Ptr input(new glk::TextureRendererInput());
     input->set("view_matrix", camera_control->view_matrix());
     input->set("projection_matrix", projection_control->projection_matrix());
+
+    if(normal_buffer_id) {
+      input->set("normal_texture", normal_buffer().id());
+    }
+
     screen_effect->draw(*texture_renderer.get(), frame_buffer->color(), frame_buffer->depth(), input, screen_effect_buffer.get());
 
     frame_buffer->bind();

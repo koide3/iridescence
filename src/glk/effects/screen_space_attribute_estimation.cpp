@@ -72,6 +72,7 @@ ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vect
   normal_shader.use();
   normal_shader.set_uniform("depth_sampler", 0);
   normal_shader.set_uniform("position_sampler", 1);
+  normal_shader.set_uniform("normal_sampler", 2);
 
   occlusion_shader.use();
   occlusion_shader.set_uniform("depth_sampler", 0);
@@ -196,6 +197,16 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
   } else {
     position_buffer->color().bind(GL_TEXTURE1);
   }
+
+  glActiveTexture(GL_TEXTURE2);
+  auto normal_texture = input->get<GLuint>("normal_texture");
+  if(normal_texture) {
+    glBindTexture(GL_TEXTURE_2D, *normal_texture);
+  } else {
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
+  glActiveTexture(GL_TEXTURE0);
+
   renderer.draw_plain(normal_shader);
   normal_buffer->unbind();
 
