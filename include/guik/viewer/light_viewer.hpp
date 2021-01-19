@@ -30,14 +30,15 @@ public:
     return inst;
   }
 
-  void clear();
-  void clear_text();
-  void append_text(const std::string& text);
-
   bool spin_until_click();
-  void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+  virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
   void invoke(const std::function<void()>& func);
+
+  virtual void clear() override;
+  virtual void clear_text() override;
+  virtual void append_text(const std::string& text) override;
+
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
   void show_viewer_ui();

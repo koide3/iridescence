@@ -21,7 +21,7 @@ public:
   Eigen::Vector2i window_size() const;
   virtual void show_window();
   virtual void hide_window();
-  virtual void full_screen();
+  virtual void maximize_window();
   virtual void resize(const Eigen::Vector2i& size);
 
   Eigen::Vector2i framebuffer_size() const;

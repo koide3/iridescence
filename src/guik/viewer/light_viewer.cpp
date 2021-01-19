@@ -67,9 +67,9 @@ void LightViewer::draw_ui() {
     }
 
     if(decrease_point_size) {
-      *point_size = point_size.get() * 0.9f;
+      *point_size = point_size.get() - ImGui::GetIO().DeltaTime * 10.0f;
     } else {
-      *point_size = point_size.get() * 1.2f;
+      *point_size = point_size.get() + ImGui::GetIO().DeltaTime * 10.0f;
     }
 
     *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
@@ -89,7 +89,7 @@ void LightViewer::draw_ui() {
     std::vector<std::string>(texts.begin(), texts.end()).swap(texts_);
   }
 
-  if(!texts.empty()) {
+  if(!texts_.empty()) {
     ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
     for(int i = std::max<int>(0, texts_.size() - 32); i < texts_.size(); i++) {
       const auto& text = texts_[i];
@@ -102,7 +102,8 @@ void LightViewer::draw_ui() {
     ImGui::End();
   }
 
-  for(const auto& callback : ui_callbacks) {
+  std::unordered_map<std::string, std::function<void()>> callbacks = ui_callbacks;
+  for(const auto callback : callbacks) {
     callback.second();
   }
 
@@ -122,6 +123,16 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 }
 
+void LightViewer::clear() {
+  clear_text();
+  invoke_requests_mutex.lock();
+  invoke_requests.clear();
+  invoke_requests_mutex.unlock();
+  ui_callbacks.clear();
+  sub_contexts.clear();
+  clear_drawables();
+}
+
 void LightViewer::clear_text() {
   std::lock_guard<std::mutex> lock(texts_mutex);
   texts.clear();
@@ -130,14 +141,6 @@ void LightViewer::clear_text() {
 void LightViewer::append_text(const std::string& text) {
   std::lock_guard<std::mutex> lock(texts_mutex);
   texts.push_back(text);
-}
-
-void LightViewer::clear() {
-  invoke_requests_mutex.lock();
-  invoke_requests.clear();
-  invoke_requests_mutex.unlock();
-  ui_callbacks.clear();
-  clear_drawables();
 }
 
 bool LightViewer::spin_until_click() {

@@ -102,7 +102,7 @@ void Application::hide_window() {
   glfwHideWindow(window);
 }
 
-void Application::full_screen() {
+void Application::maximize_window() {
   glfwMaximizeWindow(window);
 }
 

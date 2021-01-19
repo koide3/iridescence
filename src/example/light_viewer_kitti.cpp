@@ -70,7 +70,7 @@ private:
 };
 
 pcl::PointCloud<pcl::PointNormal>::Ptr preprocess(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud_) {
-  auto cloud = pcl::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+  pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
   pcl::copyPointCloud(*cloud_, *cloud);
 
   // downsampling filter
@@ -79,7 +79,7 @@ pcl::PointCloud<pcl::PointNormal>::Ptr preprocess(pcl::PointCloud<pcl::PointXYZ>
   voxelgrid.setLeafSize(downsample_resolution, downsample_resolution, downsample_resolution);
   voxelgrid.setInputCloud(cloud);
 
-  auto filtered = pcl::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+  pcl::PointCloud<pcl::PointNormal>::Ptr filtered(new pcl::PointCloud<pcl::PointNormal>());
   voxelgrid.filter(*filtered);
 
   // normal estimation
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     auto source = preprocess(kitti.cloud(i));
     icp.setInputSource(source);
 
-    auto aligned = boost::make_shared<pcl::PointCloud<pcl::PointNormal>>();
+    pcl::PointCloud<pcl::PointNormal>::Ptr aligned(new pcl::PointCloud<pcl::PointNormal>);
     icp.align(*aligned);
 
     // accumulate pose

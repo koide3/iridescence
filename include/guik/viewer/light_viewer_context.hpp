@@ -1,6 +1,8 @@
 #ifndef GUIK_LIGHT_VIEWER_CONTEXT_HPP
 #define GUIK_LIGHT_VIEWER_CONTEXT_HPP
 
+#include <mutex>
+#include <deque>
 #include <memory>
 #include <unordered_map>
 
@@ -25,6 +27,11 @@ public:
   void set_size(const Eigen::Vector2i& size);
   void set_clear_color(const Eigen::Vector4f& color);
   void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver);
+
+  virtual void clear();
+  virtual void clear_text();
+  virtual void append_text(const std::string& text);
+  virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
   guik::ShaderSetting& shader_setting() {
     return global_shader_setting;
@@ -91,6 +98,10 @@ protected:
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> drawables;
+
+  std::mutex sub_texts_mutex;
+  std::deque<std::string> sub_texts;
+  std::unordered_map<std::string, std::function<void()>> sub_ui_callbacks;
 };
 }  // namespace guik
 
