@@ -134,8 +134,18 @@ public:
 
 struct FlatColor : public ShaderSetting {
 public:
+  FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR)
+  {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
+  }
+
   FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
     params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
+  }
+
+  template<typename Transform>
+  FlatColor(float r, float g, float b, float a, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
   }
 
   template<typename Transform>

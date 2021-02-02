@@ -12,6 +12,7 @@
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/projection_control.hpp>
 #include <guik/viewer/shader_setting.hpp>
+#include <guik/viewer/anonymous.hpp>
 
 namespace guik {
 
