@@ -36,6 +36,7 @@ public:
   }
 
   void draw(glk::GLSLShader& shader) const override {
+    shader.set_uniform("color_mode", guik::ColorMode::VERTEX_COLOR);
     shader.set_uniform("point_scale", 30.0f);
 
     GLint position_loc = shader.attrib("vert_position");
@@ -68,7 +69,7 @@ private:
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
-  viewer->update_drawable("points", std::make_shared<CustomDrawable>(), guik::VertexColor());
+  viewer->update_drawable("points", std::make_shared<CustomDrawable>());
   viewer->spin();
   return 0;
 }

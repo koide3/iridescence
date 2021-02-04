@@ -91,6 +91,29 @@ pcl::PointCloud<pcl::PointNormal>::Ptr preprocess(pcl::PointCloud<pcl::PointXYZ>
   return filtered;
 }
 
+pcl::PointCloud<pcl::PointNormal>::Ptr fake_normal(pcl::PointCloud<pcl::PointNormal>::ConstPtr normals, pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud) {
+  pcl::search::KdTree<pcl::PointNormal> tree;
+  tree.setInputCloud(normals);
+
+  pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
+  cloud_with_normals->resize(cloud->size());
+
+#pragma omp parallel for
+  for(int i = 0; i < cloud->size(); i++) {
+    pcl::PointNormal pt;
+    pt.getVector4fMap() = cloud->at(i).getVector4fMap();
+
+    std::vector<int> k_indices(1);
+    std::vector<float> sq_dists(1);
+    tree.nearestKSearch(pt, 1, k_indices, sq_dists);
+
+    pt.getNormalVector4fMap() = normals->at(k_indices[0]).getNormalVector4fMap();
+    cloud_with_normals->at(i) = pt;
+  }
+
+  return cloud_with_normals;
+}
+
 int main(int argc, char** argv) {
   // "/your/kitti/path/sequences/00/velodyne"
   guik::RecentFiles recent_files("kitti_directory");
@@ -121,14 +144,16 @@ int main(int argc, char** argv) {
 
   Eigen::Isometry3f pose = Eigen::Isometry3f::Identity();
   for(int i = 1; i < kitti.size() && !viewer->closed(); i++) {
-    effect->set_light(0, Eigen::Vector3f::Zero(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.01f), 20.0f);
+    effect->set_light(0, pose.translation() + Eigen::Vector3f::UnitZ(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.001f), 20.0f);
     if((i % 5) == 0) {
-      effect->set_light(effect->num_lights(), pose.translation(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.1f), 20.0f);
+      effect->set_light(effect->num_lights(), pose.translation() + Eigen::Vector3f::UnitZ(), Eigen::Vector4f::Ones(), Eigen::Vector2f(0.0f, 0.01f), 20.0f);
     }
 
     // set the current frame as source
-    auto source = preprocess(kitti.cloud(i));
-    icp.setInputSource(source);
+    auto source = kitti.cloud(i);
+    auto downsampled = preprocess(source);
+    auto source_with_normals = fake_normal(downsampled, source);
+    icp.setInputSource(downsampled);
 
     pcl::PointCloud<pcl::PointNormal>::Ptr aligned(new pcl::PointCloud<pcl::PointNormal>);
     icp.align(*aligned);
@@ -137,13 +162,13 @@ int main(int argc, char** argv) {
     pose = pose * icp.getFinalTransformation();
     icp.setInputTarget(icp.getInputSource());
 
-    viewer->append_text((boost::format("%d : %.3f s : %d pts   fitness_score %.3f") % i % ImGui::GetTime() % source->size() % icp.getFitnessScore()).str());
+    viewer->append_text((boost::format("%d : %.3f s : %d pts   fitness_score %.3f") % i % ImGui::GetTime() % downsampled->size() % icp.getFitnessScore()).str());
 
-    auto cloud_buffer = glk::create_point_cloud_buffer(*source);
-    viewer->update_drawable("current_frame", cloud_buffer, guik::FlatColor(Eigen::Vector4f(1.0f, 0.5f, 0.0f, 1.0f), pose.cast<float>().matrix()).add("point_scale", 3.0f));
-    viewer->update_drawable("frame_" + std::to_string(i), cloud_buffer, guik::Rainbow(pose.cast<float>().matrix()));
-    viewer->update_drawable("coord_" + std::to_string(i), glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(pose.cast<float>().cast<float>().matrix()));
-    viewer->lookat(pose.translation().cast<float>());
+    auto cloud_buffer = glk::create_point_cloud_buffer(*source_with_normals);
+    viewer->update_drawable("current_frame", cloud_buffer, guik::FlatColor(1.0f, 0.5f, 0.0f, 1.0f, pose).add("point_scale", 3.0f));
+    viewer->update_drawable("frame_" + std::to_string(i), cloud_buffer, guik::Rainbow(pose));
+    viewer->update_drawable("coord_" + std::to_string(i), glk::Primitives::primitive_ptr(glk::Primitives::COORDINATE_SYSTEM), guik::VertexColor(pose));
+    viewer->lookat(pose.translation());
 
     if(!viewer->spin_once()) {
       break;

@@ -140,7 +140,7 @@ file(GLOB example_sources "src/example/*.cpp")
 foreach(example_src IN LISTS example_sources)
   get_filename_component(example_name ${example_src} NAME_WE)
 
-  if(${example_name} STREQUAL "light_viewer_pointcloud" OR ${example_name} STREQUAL "light_viewer_kitti")
+  if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
     if(NOT PCL_FOUND)
       continue()
     endif()

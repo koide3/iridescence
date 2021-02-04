@@ -29,7 +29,9 @@ int main(int argc, char** argv) {
           viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
           break;
         case 4:
-          viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
+          auto effect = std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size());
+          effect->set_light(0, Eigen::Vector3f(-1.0f, -1.0f, 10.0f), Eigen::Vector4f::Constant(1.6f));
+          viewer->set_screen_effect(effect);
           break;
       }
     }

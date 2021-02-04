@@ -21,19 +21,12 @@ public:
   int num_color_buffers() const;
   void add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type);
 
-  Eigen::Vector2i size() const {
-    return Eigen::Vector2i(width, height);
-  }
+  Eigen::Vector2i size() const;
+  void set_size(const Eigen::Vector2i& size);
 
-  const Texture& color() const {
-    return *color_buffers[0];
-  }
-  const Texture& color(int i) const {
-    return *color_buffers[i];
-  }
-  const Texture& depth() const {
-    return *depth_buffer;
-  }
+  const Texture& color() const;
+  const Texture& color(int i) const;
+  const Texture& depth() const;
 
 private:
   int width;

@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
   viewer->register_ui_callback("model_control_ui", [&]() {
     ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
     model_control.draw_ui();
+    // Note: gizmo must not be drawn twice on one rendering frame
     model_control.draw_gizmo(0, 0, viewer->canvas_size().x(), viewer->canvas_size().y(), viewer->view_matrix(), viewer->projection_matrix());
     viewer->update_drawable("coord", glk::Primitives::coordinate_system(), guik::VertexColor(model_control.model_matrix()));
   });

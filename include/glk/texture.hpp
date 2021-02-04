@@ -14,6 +14,7 @@ public:
 
   GLuint id() const;
   Eigen::Vector2i size() const;
+  void set_size(const Eigen::Vector2i& size);
 
   void bind() const;
   void bind(GLenum target) const;
@@ -26,6 +27,11 @@ public:
 private:
   int width;
   int height;
+
+  GLuint internal_format;
+  GLuint format;
+  GLuint type;
+
   GLuint texture;
 };
 

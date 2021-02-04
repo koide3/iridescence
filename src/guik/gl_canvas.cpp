@@ -17,6 +17,7 @@
 #include <glk/texture_renderer.hpp>
 #include <glk/effects/plain_rendering.hpp>
 
+#include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 
@@ -144,14 +145,18 @@ const glk::Texture& GLCanvas::info_buffer() const {
  * @param size
  */
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
+  std::cout << "set_size:" << size.transpose() << std::endl;
   this->size = size;
 
   projection_control->set_size(size);
-  frame_buffer.reset(new glk::FrameBuffer(size, 2));
+  frame_buffer->set_size(size);
 
   if(screen_effect) {
     screen_effect->set_size(size);
-    screen_effect_buffer.reset(new glk::FrameBuffer(size, 1, false));
+  }
+
+  if(screen_effect_buffer) {
+    screen_effect_buffer->set_size(size);
   }
 }
 
@@ -232,6 +237,7 @@ void GLCanvas::unbind() {
     screen_effect->draw(*texture_renderer.get(), frame_buffer->color(), frame_buffer->depth(), input, screen_effect_buffer.get());
 
     frame_buffer->bind();
+    glEnable(GL_TEXTURE_2D);
     glDisable(GL_SCISSOR_TEST);
     glDepthMask(GL_FALSE);
 
@@ -239,6 +245,7 @@ void GLCanvas::unbind() {
 
     glDepthMask(GL_TRUE);
     glEnable(GL_SCISSOR_TEST);
+    glDisable(GL_TEXTURE_2D);
     frame_buffer->unbind();
   }
 }
@@ -287,7 +294,11 @@ void GLCanvas::unbind_second() {
  *
  */
 void GLCanvas::render_to_screen(int color_buffer_id) {
+  glDisable(GL_SCISSOR_TEST);
+  glDisable(GL_DEPTH_TEST);
   texture_renderer->draw(frame_buffer->color(color_buffer_id));
+  glEnable(GL_SCISSOR_TEST);
+  glEnable(GL_DEPTH_TEST);
 }
 
 /**

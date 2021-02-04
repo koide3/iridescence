@@ -4,7 +4,6 @@
 #include <Eigen/Core>
 
 #include <glk/texture.hpp>
-#include <iostream>
 
 namespace glk {
 
@@ -35,6 +34,22 @@ FrameBuffer::~FrameBuffer() {
   glDeleteFramebuffers(1, &frame_buffer);
 }
 
+void FrameBuffer::set_size(const Eigen::Vector2i& size) {
+  width = size[0];
+  height = size[1];
+
+  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+  for(int i = 0; i < color_buffers.size(); i++) {
+    color_buffers[i]->set_size(size);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachments[i], GL_TEXTURE_2D, color_buffers[i]->id(), 0);
+  }
+  if(depth_buffer) {
+    depth_buffer->set_size(size);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->id(), 0);
+  }
+}
+
 void FrameBuffer::bind() {
   glGetIntegerv(GL_VIEWPORT, viewport);
   glViewport(0, 0, width, height);
@@ -45,6 +60,20 @@ void FrameBuffer::bind() {
 void FrameBuffer::unbind() const {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+}
+
+Eigen::Vector2i FrameBuffer::size() const {
+  return Eigen::Vector2i(width, height);
+}
+
+const Texture& FrameBuffer::color() const {
+  return *color_buffers[0];
+}
+const Texture& FrameBuffer::color(int i) const {
+  return *color_buffers[i];
+}
+const Texture& FrameBuffer::depth() const {
+  return *depth_buffer;
 }
 
 int FrameBuffer::num_color_buffers() const {
