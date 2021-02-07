@@ -101,8 +101,8 @@ add_library(iridescence SHARED
   src/glk/frame_buffer.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
-  src/glk/io/ply_loader.cpp
-  src/glk/io/png_loader.cpp
+  src/glk/io/ply_io.cpp
+  src/glk/io/png_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_lighting.cpp
   src/glk/effects/screen_space_ambient_occlusion.cpp

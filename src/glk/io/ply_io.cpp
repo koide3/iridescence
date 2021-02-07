@@ -1,4 +1,4 @@
-#include <glk/io/ply_loader.hpp>
+#include <glk/io/ply_io.hpp>
 
 #include <vector>
 #include <fstream>

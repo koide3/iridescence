@@ -34,6 +34,7 @@ public:
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
   void invoke(const std::function<void()>& func);
+  void invoke_after_rendering(const std::function<void()>& func);
 
   virtual void clear() override;
   virtual void clear_text() override;
@@ -71,6 +72,9 @@ private:
 
   std::mutex invoke_requests_mutex;
   std::deque<std::function<void()>> invoke_requests;
+
+  std::mutex post_render_invoke_requests_mutex;
+  std::deque<std::function<void()>> post_render_invoke_requests;
 };
 
 }  // namespace guik

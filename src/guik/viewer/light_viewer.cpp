@@ -8,6 +8,7 @@
 #include <future>
 #include <boost/format.hpp>
 
+#include <glk/io/png_io.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/viewer_ui.hpp>
@@ -50,6 +51,7 @@ void LightViewer::draw_ui() {
   }
   lock.unlock();
 
+  // viewer UI
   if(viewer_ui) {
     if(!viewer_ui->draw_ui()) {
       viewer_ui.reset();
@@ -58,6 +60,7 @@ void LightViewer::draw_ui() {
     viewer_ui.reset(new ViewerUI(this));
   }
 
+  // point scale
   bool decrease_point_size = ImGui::GetIO().KeysDown[GLFW_KEY_MINUS];
   bool increase_point_size = ImGui::GetIO().KeyShift && ImGui::GetIO().KeysDown[GLFW_KEY_SEMICOLON];
   if(decrease_point_size || increase_point_size) {
@@ -75,6 +78,32 @@ void LightViewer::draw_ui() {
     *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
 
     global_shader_setting.add("point_size", *point_size);
+  }
+
+  // screen shot
+  if(ImGui::GetIO().KeysDown[GLFW_KEY_J]) {
+    invoke_after_rendering([this] {
+      auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+      std::vector<unsigned char> flipped(bytes.size(), 255);
+
+      Eigen::Vector2i size = canvas->frame_buffer->color().size();
+      for(int y = 0; y < size[1]; y++) {
+        int y_ = size[1] - y - 1;
+        for(int x = 0; x < size[0]; x++) {
+          for(int k = 0; k < 3; k++) {
+            flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
+          }
+        }
+      }
+
+      double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
+      std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
+      if(glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
+        std::cout << "screen shot saved:" << filename << std::endl;
+      } else {
+        std::cout << "failed to save screen shot" << std::endl;
+      }
+    });
   }
 
   if(info_window) {
@@ -121,6 +150,13 @@ void LightViewer::draw_ui() {
 void LightViewer::draw_gl() {
   LightViewerContext::draw_gl();
   canvas->render_to_screen();
+
+  std::unique_lock<std::mutex> lock(post_render_invoke_requests_mutex);
+  while(!post_render_invoke_requests.empty()) {
+    post_render_invoke_requests.front()();
+    post_render_invoke_requests.pop_front();
+  }
+  lock.unlock();
 }
 
 void LightViewer::clear() {
@@ -128,6 +164,9 @@ void LightViewer::clear() {
   invoke_requests_mutex.lock();
   invoke_requests.clear();
   invoke_requests_mutex.unlock();
+  post_render_invoke_requests_mutex.lock();
+  post_render_invoke_requests.clear();
+  post_render_invoke_requests_mutex.unlock();
   ui_callbacks.clear();
   sub_contexts.clear();
   clear_drawables();
@@ -183,6 +222,11 @@ void LightViewer::show_info_window() {
 void LightViewer::invoke(const std::function<void()>& func) {
   std::lock_guard<std::mutex> lock(invoke_requests_mutex);
   invoke_requests.push_back(func);
+}
+
+void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
+  std::lock_guard<std::mutex> lock(post_render_invoke_requests_mutex);
+  post_render_invoke_requests.push_back(func);
 }
 
 std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size_) {

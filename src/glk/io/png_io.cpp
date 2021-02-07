@@ -1,33 +1,12 @@
-#include <glk/io/png_loader.hpp>
+#include <glk/io/png_io.hpp>
 
 #include <iostream>
 #include <libpng/png.h>
 
 namespace glk {
 
-PNGLoader::PNGLoader() {}
-
-PNGLoader::~PNGLoader() {}
-
-bool PNGLoader::load(const std::string& filename) {
-  width = height = 0;
-
-  FILE* fp = fopen(filename.c_str(), "rb");
-  if(fp == nullptr) {
-    std::cerr << "failed to open " << filename << std::endl;
-    return false;
-  }
-
-  if(!load(fp)) {
-    std::cerr << "failed to load " << filename << std::endl;
-    return false;
-  }
-
-  fclose(fp);
-  return true;
-}
-
-bool PNGLoader::load(FILE* fp) {
+namespace {
+bool load_png(FILE* fp, int& width, int& height, std::vector<unsigned char>& bytes) {
   png_colorp palette;
 
   png_byte sig_bytes[8];
@@ -118,4 +97,66 @@ bool PNGLoader::load(FILE* fp) {
 
   return true;
 }
+}  // namespace
+
+bool load_png(const std::string& filename, int& width, int& height, std::vector<unsigned char>& bytes) {
+  FILE* fp = fopen(filename.c_str(), "rb");
+  if(fp == nullptr) {
+    std::cerr << "failed to open " << filename << std::endl;
+    return false;
+  }
+
+  if(!load_png(fp, width, height, bytes)) {
+    std::cerr << "failed to load " << filename << std::endl;
+    fclose(fp);
+    return false;
+  }
+
+  fclose(fp);
+  return true;
+}
+
+bool save_png(const std::string& filename, int width, int height, const std::vector<unsigned char>& bytes) {
+  FILE* fp = fopen(filename.c_str(), "wb");
+  if(fp == nullptr) {
+    std::cerr << "failed to open " << filename << std::endl;
+    return false;
+  }
+
+  png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+  if(png == nullptr) {
+    std::cerr << "failed to create png write struct" << std::endl;
+    return false;
+  }
+
+  png_infop info = png_create_info_struct(png);
+  if(info == nullptr) {
+    std::cerr << "failed to create png info struct" << std::endl;
+    return false;
+  }
+
+  if(setjmp(png_jmpbuf(png))) {
+    std::cerr << "failed to setjmp" << std::endl;
+    return false;
+  }
+
+  png_init_io(png, fp);
+
+  png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+  png_write_info(png, info);
+
+  std::vector<png_bytep> rows(height);
+  for(int y = 0; y < height; y++) {
+    rows[y] = (png_bytep)(bytes.data() + (y * width * 4));
+  }
+
+  png_write_image(png, rows.data());
+  png_write_end(png, nullptr);
+
+  png_destroy_write_struct(&png, &info);
+
+  fclose(fp);
+  return true;
+}
+
 }  // namespace glk

@@ -1,9 +1,10 @@
 #include <glk/path.hpp>
 #include <glk/texture.hpp>
-#include <glk/io/png_loader.hpp>
+#include <glk/io/png_io.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
 
+#include <glk/io/png_io.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
