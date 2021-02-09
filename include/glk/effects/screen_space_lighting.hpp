@@ -14,7 +14,7 @@ public:
   enum class OCCLUSION_MODEL { ZERO, AMBIENT_OCCLUSION };
   enum class IRIDESCENCE_MODEL { ZERO, IRIDESCENCE1, IRIDESCENCE2, IRIDESCENCE3 };
 
-  ScreenSpaceLighting(const Eigen::Vector2i& size);
+  ScreenSpaceLighting(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080));
   virtual ~ScreenSpaceLighting() override;
 
   const glk::Texture& position() const;

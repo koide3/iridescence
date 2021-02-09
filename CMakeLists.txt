@@ -134,7 +134,13 @@ target_link_libraries(iridescence
 )
 
 add_subdirectory(thirdparty/pybind11)
-pybind11_add_module(pyridescence src/python/main.cpp)
+pybind11_add_module(pyridescence
+  src/python/main.cpp
+  src/python/glk.cpp
+  src/python/guik.cpp
+  src/python/pfd.cpp
+  src/python/imgui.cpp
+)
 target_link_libraries(pyridescence
   iridescence
 )
