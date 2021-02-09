@@ -34,6 +34,7 @@ void define_guik(py::module_& m) {
     .def("add", &guik::ShaderSetting::add<float>)
     .def("add", &guik::ShaderSetting::add<Eigen::Vector2f>)
     .def("add", &guik::ShaderSetting::add<Eigen::Matrix4f>)
+    .def("addi", &guik::ShaderSetting::add<Eigen::Vector4i>)
     .def("make_transparent", &guik::ShaderSetting::make_transparent);
 
   py::class_<guik::Rainbow, guik::ShaderSetting, std::shared_ptr<guik::Rainbow>>(guik_, "Rainbow")
@@ -131,5 +132,9 @@ void define_guik(py::module_& m) {
     .def("use_orbit_camera_control", &guik::LightViewer::use_orbit_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::LightViewer::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
     .def("use_topdown_camera_control", &guik::LightViewer::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+
+    .def("pick_info", &guik::LightViewer::pick_info, "", py::arg("p"), py::arg("window") = 2)
+    .def("pick_depth", &guik::LightViewer::pick_depth, "", py::arg("p"), py::arg("window") = 2)
+    .def("unproject", &guik::LightViewer::unproject, "", py::arg("p"), py::arg("depth"))
     ;
 }
