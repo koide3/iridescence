@@ -33,7 +33,8 @@ class CMakeBuild(build_ext):
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
-        cfg = "Debug" if self.debug else "Release"
+        # cfg = "Debug" if self.debug else "Release"
+        cfg = "Release"
 
         # CMake lets you override the generator - we need to check this.
         # Can be set with Conda-Build, for example.
@@ -57,7 +58,8 @@ class CMakeBuild(build_ext):
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
             if not cmake_generator:
-                cmake_args += ["-GNinja"]
+                pass
+                # cmake_args += ["-GNinja"]
 
         else:
             # Single config generators are handled "normally"
