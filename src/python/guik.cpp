@@ -71,7 +71,7 @@ void define_guik(py::module_& m) {
       );
 
   py::class_<guik::ModelControl>(guik_, "ModelControl")
-    .def(py::init<std::string, Eigen::Matrix4f>(), "")
+    .def(py::init<std::string, Eigen::Matrix4f>(), "", py::arg("label") = "model_control", py::arg("model_matrix") = Eigen::Matrix4f::Identity())
     .def("draw_ui", &guik::ModelControl::draw_ui, "")
     .def("draw_gizmo_ui", &guik::ModelControl::draw_gizmo_ui, "")
     .def("draw_gizmo", [](guik::ModelControl& control) {
@@ -83,7 +83,7 @@ void define_guik(py::module_& m) {
 
   // methods
   guik_.def("anon", &guik::anon, "");
-
+  
   // LightViewerContext
   py::class_<guik::LightViewerContext, std::shared_ptr<guik::LightViewerContext>>(guik_, "LightViewerContext")
     .def("clear", &guik::LightViewerContext::clear)

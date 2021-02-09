@@ -17,10 +17,18 @@ viewer.update_drawable('cloud', cloud_buffer, guik.Rainbow().add('point_scale', 
 viewer.update_drawable('icosahedron', glk.primitives.icosahedron(), guik.FlatColor(1.0, 0.5, 0.0, 0.5, scale=2.0))
 
 time = 0.0
+text = 'test'
+model_control = guik.ModelControl('model_control')
 def callback():
   imgui.begin('ui', None, imgui.WindowFlags_AlwaysAutoResize)
 
+  model_control.draw_gizmo_ui()
+  model_control.draw_gizmo()
+  setting, drawable = viewer.find_drawable('icosahedron')
+  setting.add('model_matrix', model_control.model_matrix())
+
   global time
+  imgui.separator()
   updated, time = imgui.drag_float('time', time, 0.1)
   if updated:
     viewer.append_text('time:%.3f' % time)
@@ -28,7 +36,12 @@ def callback():
     matrix = numpy.identity(4)
     matrix[:3, :3] = scipy.spatial.transform.Rotation.from_rotvec([0, 0, time]).as_matrix()
     setting.add('model_matrix', matrix)
-  
+
+  global text
+  imgui.separator()
+  _, text = imgui.input_text('text', text)
+
+  imgui.separator()
   if imgui.button('close'):
     exit(0)
 
