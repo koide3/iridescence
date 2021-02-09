@@ -12,7 +12,7 @@
 namespace guik {
 
 struct ColorMode {
-  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2 };
+  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2, TEXTURE_COLOR = 3 };
 };
 
 struct ShaderParameterInterface {
@@ -134,8 +134,18 @@ public:
 
 struct FlatColor : public ShaderSetting {
 public:
+  FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR)
+  {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
+  }
+
   FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
     params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
+  }
+
+  template<typename Transform>
+  FlatColor(float r, float g, float b, float a, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
+    params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
   }
 
   template<typename Transform>
@@ -154,6 +164,16 @@ public:
   VertexColor(const Transform& transform) : ShaderSetting(ColorMode::VERTEX_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~VertexColor() override {}
+};
+
+struct TextureColor : public ShaderSetting {
+public:
+  TextureColor() : ShaderSetting(ColorMode::TEXTURE_COLOR) {}
+
+  template<typename Transform>
+  TextureColor(const Transform& transform) : ShaderSetting(ColorMode::TEXTURE_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
+
+  virtual ~TextureColor() override {}
 };
 
 }  // namespace guik

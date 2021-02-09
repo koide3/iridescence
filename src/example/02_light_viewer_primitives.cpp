@@ -25,11 +25,11 @@ int main(int argc, char** argv) {
   viewer->add_drawable_filter("line_filter", [&](const std::string& drawable_name) { return draw_lines || drawable_name.find("line") == std::string::npos; });
 
   // thin lines (GL_LINES)
-  viewer->update_drawable("thin_lines", std::make_shared<glk::ThinLines>(line_vertices), guik::FlatColor(Eigen::Vector4f(0.0f, 1.0f, 0.0f, 1.0f)));
+  viewer->update_drawable("thin_lines", std::make_shared<glk::ThinLines>(line_vertices), guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f));
 
   // lines with thickness
   Eigen::Affine3f transform = Eigen::Translation3f(0.0f, 2.0f, 0.0f) * Eigen::Isometry3f::Identity();
-  viewer->update_drawable("lines", std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors), guik::FlatColor(Eigen::Vector4f(0.0f, 1.0f, 0.0f, 1.0f), transform));
+  viewer->update_drawable("lines", std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors), guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f, transform));
 
   // colored lines
   transform = Eigen::Translation3f(0.0f, 4.0f, 0.0f) * Eigen::Isometry3f::Identity();
@@ -84,6 +84,26 @@ int main(int argc, char** argv) {
 
   transform = Eigen::Translation3f(5.0f, 12.0f, 1.0f) * Eigen::Isometry3f::Identity();
   viewer->update_drawable("wire_cone", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CONE), guik::Rainbow(transform));
+
+  // transparent
+  bool draw_transparent = true;
+  viewer->register_ui_callback("transparent_rendering_setting", [&] { ImGui::Checkbox("transparent", &draw_transparent); });
+  viewer->add_drawable_filter("transparent_filter", [&](const std::string& drawable_name) { return draw_transparent || drawable_name.find("trans_") == std::string::npos; });
+
+  transform = Eigen::Translation3f(-5.0f, 15.0f, 1.0f) * Eigen::UniformScaling<float>(0.5f);
+  viewer->update_drawable("trans_icosahedron", glk::Primitives::icosahedron(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
+
+  transform = Eigen::Translation3f(-2.5f, 15.0f, 1.0f) * Eigen::Isometry3f::Identity();
+  viewer->update_drawable("trans_sphere", glk::Primitives::sphere(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
+
+  transform = Eigen::Translation3f(0.0f, 15.0f, 0.0f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f);
+  viewer->update_drawable("trans_bunny", glk::Primitives::bunny(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
+
+  transform = Eigen::Translation3f(2.5f, 15.0f, 1.0f) * Eigen::Isometry3f::Identity();
+  viewer->update_drawable("trans_cube", glk::Primitives::cube(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
+
+  transform = Eigen::Translation3f(5.0f, 15.0f, 1.0f) * Eigen::Isometry3f::Identity();
+  viewer->update_drawable("trans_cone", glk::Primitives::cone(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
 
   viewer->spin();
 

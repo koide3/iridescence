@@ -2,7 +2,7 @@
 #include <iostream>
 #include <glk/path.hpp>
 #include <glk/frame_buffer.hpp>
-#include <glk/io/png_loader.hpp>
+#include <glk/io/png_io.hpp>
 #include <glk/effects/screen_effect.hpp>
 
 #include <glk/effects/screen_space_lighting.hpp>
@@ -13,11 +13,13 @@ namespace glk {
 ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
   ssae.reset(new ScreenSpaceAttributeEstimation(size));
 
-  PNGLoader png;
-  if(!png.load(get_data_path() + "/texture/iridescence1.png")) {
+  int width, height;
+  std::vector<unsigned char> bytes;
+
+  if(!load_png(get_data_path() + "/texture/iridescence1.png", width, height, bytes)) {
     return;
   }
-  iridescence_texture.reset(new glk::Texture(png.size(), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, png.bytes.data()));
+  iridescence_texture.reset(new glk::Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, bytes.data()));
 
   diffuse_model = DIFFUSE_MODEL::OREN_NAYAR;
   specular_model = SPECULAR_MODEL::COOK_TORRANCE;
@@ -28,7 +30,10 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
     return;
   }
 
-  add_light(Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f));
+  set_light(0, Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f), Eigen::Vector2f(0.0f, 0.0f), 100.0f);
+
+  albedo = 1.0f;
+  roughness = 0.2f;
 
   lighting_shader.use();
   lighting_shader.set_uniform("albedo", 1.0f);
@@ -36,6 +41,18 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
   lighting_shader.set_uniform("ambient_light_color", Eigen::Vector4f::Zero().eval());
 }
 ScreenSpaceLighting::~ScreenSpaceLighting() {}
+
+const glk::Texture& ScreenSpaceLighting::position() const {
+  return ssae->position();
+}
+
+const glk::Texture& ScreenSpaceLighting::normal() const {
+  return ssae->normal();
+}
+
+const glk::Texture& ScreenSpaceLighting::occlusion() const {
+  return ssae->occlusion();
+}
 
 void ScreenSpaceLighting::set_diffuse_model(DIFFUSE_MODEL model) {
   diffuse_model = model;
@@ -128,12 +145,14 @@ bool ScreenSpaceLighting::load_shader() {
   if(iridescence_model == IRIDESCENCE_MODEL::ZERO) {
     fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence_zero.frag");
   } else {
-    PNGLoader png;
-    if(!png.load(iridescence_texture_path)) {
+    int width, height;
+    std::vector<unsigned char> bytes;
+
+    if(!load_png(iridescence_texture_path, width, height, bytes)) {
       return false;
     }
     fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence.frag");
-    iridescence_texture.reset(new glk::Texture(png.size(), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, png.bytes.data()));
+    iridescence_texture.reset(new glk::Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, bytes.data()));
   }
 
   return lighting_shader.init(vertex_shaders, fragment_shaders);
@@ -152,20 +171,23 @@ int ScreenSpaceLighting::num_lights() const {
 }
 
 void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
-  while(i > light_pos.size() - 1) {
+  set_light(i, pos, color, Eigen::Vector2f::Zero(), 1e6f);
+}
+
+void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range) {
+  light_updated = true;
+
+  while(i >= light_pos.size()) {
+    light_range.push_back(1000.0f);
+    light_attenation.push_back(Eigen::Vector2f(0.0f, 0.0f));
     light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
   }
 
-  light_updated = true;
+  light_range[i] = max_range;
+  light_attenation[i] = attenuation;
   light_pos[i] = pos;
   light_color[i] = color;
-}
-
-void ScreenSpaceLighting::add_light(const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
-  light_updated = true;
-  light_pos.push_back(pos);
-  light_color.push_back(color);
 }
 
 void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
@@ -203,6 +225,8 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   if(light_updated) {
     lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
+    lighting_shader.set_uniform("light_range", light_range);
+    lighting_shader.set_uniform("light_attenuation", light_attenation);
     lighting_shader.set_uniform("light_pos", light_pos);
     lighting_shader.set_uniform("light_color", light_color);
   }

@@ -11,10 +11,11 @@ FrameBuffer::FrameBuffer(const Eigen::Vector2i& size, int num_color_buffers, boo
   glGenFramebuffers(1, &frame_buffer);
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
-  GLenum color_attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
+  GLenum attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
   for(int i = 0; i < num_color_buffers; i++) {
+    color_attachments.push_back(attachments[i]);
     color_buffers.push_back(std::make_shared<Texture>(size, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE));
-    glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachments[i], GL_TEXTURE_2D, color_buffers[i]->id(), 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i], GL_TEXTURE_2D, color_buffers[i]->id(), 0);
   }
 
   if(use_depth) {
@@ -23,7 +24,7 @@ FrameBuffer::FrameBuffer(const Eigen::Vector2i& size, int num_color_buffers, boo
   }
 
   if(num_color_buffers) {
-    glDrawBuffers(num_color_buffers, color_attachments);
+    glDrawBuffers(num_color_buffers, color_attachments.data());
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -33,10 +34,27 @@ FrameBuffer::~FrameBuffer() {
   glDeleteFramebuffers(1, &frame_buffer);
 }
 
+void FrameBuffer::set_size(const Eigen::Vector2i& size) {
+  width = size[0];
+  height = size[1];
+
+  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
+  for(int i = 0; i < color_buffers.size(); i++) {
+    color_buffers[i]->set_size(size);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, color_attachments[i], GL_TEXTURE_2D, color_buffers[i]->id(), 0);
+  }
+  if(depth_buffer) {
+    depth_buffer->set_size(size);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->id(), 0);
+  }
+}
+
 void FrameBuffer::bind() {
   glGetIntegerv(GL_VIEWPORT, viewport);
   glViewport(0, 0, width, height);
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+  glDrawBuffers(color_attachments.size(), color_attachments.data());
 }
 
 void FrameBuffer::unbind() const {
@@ -44,15 +62,37 @@ void FrameBuffer::unbind() const {
   glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
-void FrameBuffer::add_color_buffer(GLuint internal_format, GLuint format, GLuint type) {
+Eigen::Vector2i FrameBuffer::size() const {
+  return Eigen::Vector2i(width, height);
+}
+
+const Texture& FrameBuffer::color() const {
+  return *color_buffers[0];
+}
+const Texture& FrameBuffer::color(int i) const {
+  return *color_buffers[i];
+}
+const Texture& FrameBuffer::depth() const {
+  return *depth_buffer;
+}
+
+int FrameBuffer::num_color_buffers() const {
+  return color_buffers.size();
+}
+
+void FrameBuffer::add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type) {
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
+  while(color_attachments.size() <= layout) {
+    color_attachments.push_back(GL_NONE);
+  }
+
+  GLenum attachment = GL_COLOR_ATTACHMENT0 + layout;
+  color_attachments[layout] = attachment;
   color_buffers.push_back(std::make_shared<Texture>(Eigen::Vector2i(width, height), internal_format, format, type));
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + color_buffers.size() - 1, GL_TEXTURE_2D, color_buffers.back()->id(), 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, color_buffers.back()->id(), 0);
 
-  GLenum color_attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
-  glDrawBuffers(color_buffers.size(), color_attachments);
-
+  glDrawBuffers(color_attachments.size(), color_attachments.data());
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

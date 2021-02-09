@@ -27,7 +27,15 @@ public:
   void set_clear_color(const Eigen::Vector4f& color);
   void set_colormap(glk::COLORMAP colormap_type);
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+
+  void enable_normal_buffer();
   void enable_info_buffer();
+
+  bool normal_buffer_enabled() const;
+  bool info_buffer_enabled() const;
+
+  const glk::Texture& normal_buffer() const;
+  const glk::Texture& info_buffer() const;
 
   void mouse_control();
 
@@ -48,14 +56,17 @@ public:
 public:
   Eigen::Vector2i size;
   Eigen::Vector4f clear_color;
-  bool info_buffer_enabled;
+
+  int normal_buffer_id;
+  int info_buffer_id;
+
   std::unique_ptr<glk::GLSLShader> shader;
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::FrameBuffer> screen_effect_buffer;
   std::shared_ptr<glk::ScreenEffect> screen_effect;
   std::unique_ptr<glk::TextureRenderer> texture_renderer;
 
-  std::unique_ptr<glk::Texture1D> colormap;
+  std::unique_ptr<glk::Texture> colormap;
   std::shared_ptr<guik::CameraControl> camera_control;
   std::shared_ptr<guik::ProjectionControl> projection_control;
 };

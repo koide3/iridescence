@@ -1,3 +1,4 @@
+#include <iostream>
 #include <glk/path.hpp>
 #include <glk/effects/screen_effect.hpp>
 #include <glk/effects/plain_rendering.hpp>

@@ -2,7 +2,7 @@
 
 namespace glk {
 
-Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, void* pixels) : width(size[0]), height(size[1]) {
+Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels) : width(size[0]), height(size[1]), internal_format(internal_format), format(format), type(type) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, pixels);
@@ -25,6 +25,22 @@ Eigen::Vector2i Texture::size() const {
   return Eigen::Vector2i(width, height);
 }
 
+void Texture::set_size(const Eigen::Vector2i& size) {
+  width = size[0];
+  height = size[1];
+
+  glDeleteTextures(1, &texture);
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::unbind() const {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -36,6 +52,12 @@ void Texture::bind() const {
 void Texture::bind(GLenum target) const {
   glActiveTexture(target);
   glBindTexture(GL_TEXTURE_2D, texture);
+  glActiveTexture(GL_TEXTURE0);
+}
+
+void Texture::unbind(GLenum target) const {
+  glActiveTexture(target);
+  glBindTexture(GL_TEXTURE_2D, 0);
   glActiveTexture(GL_TEXTURE0);
 }
 
@@ -52,7 +74,7 @@ template std::vector<int> Texture::read_pixels(GLuint format, GLuint type) const
 template std::vector<unsigned int> Texture::read_pixels(GLuint format, GLuint type) const;
 template std::vector<float> Texture::read_pixels(GLuint format, GLuint type) const;
 
-Texture1D::Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, void* pixels) : width(width) {
+Texture1D::Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, const void* pixels) : width(width) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_1D, texture);
   glTexImage1D(GL_TEXTURE_1D, 0, internal_format, width, 0, format, type, pixels);

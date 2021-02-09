@@ -102,7 +102,7 @@ void Application::hide_window() {
   glfwHideWindow(window);
 }
 
-void Application::full_screen() {
+void Application::maximize_window() {
   glfwMaximizeWindow(window);
 }
 
@@ -158,7 +158,7 @@ void Application::begin_gl() {
   int display_w, display_h;
   glfwGetFramebufferSize(window, &display_w, &display_h);
   glViewport(0, 0, display_w, display_h);
-  glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+  glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

@@ -17,6 +17,10 @@ public:
   ScreenSpaceLighting(const Eigen::Vector2i& size);
   virtual ~ScreenSpaceLighting() override;
 
+  const glk::Texture& position() const;
+  const glk::Texture& normal() const;
+  const glk::Texture& occlusion() const;
+
   void set_diffuse_model(DIFFUSE_MODEL model);
   void set_specular_model(SPECULAR_MODEL model);
   void set_occlusion_model(OCCLUSION_MODEL model);
@@ -27,7 +31,7 @@ public:
 
   int num_lights() const;
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
-  void add_light(const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
+  void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
@@ -50,6 +54,8 @@ private:
   float roughness;
 
   bool light_updated;
+  std::vector<float> light_range;
+  std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenation;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_color;
 };

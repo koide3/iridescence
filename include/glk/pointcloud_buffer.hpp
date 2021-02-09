@@ -25,8 +25,9 @@ public:
   PointCloudBuffer(const float* data, int stride, int num_points);
   virtual ~PointCloudBuffer() override;
 
+  void add_normals(const float* data, int stride, int num_points);
   void add_color(const float* data, int stride, int num_points);
-  void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points);
+  void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale=1.0f);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
   virtual void draw(glk::GLSLShader& shader) const override;

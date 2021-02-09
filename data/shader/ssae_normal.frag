@@ -1,6 +1,7 @@
 #version 330
 uniform sampler2D depth_sampler;
 uniform sampler2D position_sampler;
+uniform sampler2D normal_sampler;
 
 uniform vec3 view_point;
 uniform vec2 inv_frame_size;
@@ -11,6 +12,12 @@ layout(location = 0) out vec3 frag_normal;
 
 void main() {
   if(texture(depth_sampler, texcoord).x > 1.0 - 1e-5) {
+    return;
+  }
+
+  vec3 pix_normal = texture(normal_sampler, texcoord).xyz;
+  if(length(pix_normal) > 0.5) {
+    frag_normal = pix_normal;
     return;
   }
 

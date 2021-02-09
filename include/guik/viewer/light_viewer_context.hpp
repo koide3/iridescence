@@ -1,6 +1,8 @@
 #ifndef GUIK_LIGHT_VIEWER_CONTEXT_HPP
 #define GUIK_LIGHT_VIEWER_CONTEXT_HPP
 
+#include <mutex>
+#include <deque>
 #include <memory>
 #include <unordered_map>
 
@@ -10,6 +12,7 @@
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/projection_control.hpp>
 #include <guik/viewer/shader_setting.hpp>
+#include <guik/viewer/anonymous.hpp>
 
 namespace guik {
 
@@ -26,6 +29,11 @@ public:
   void set_clear_color(const Eigen::Vector4f& color);
   void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver);
 
+  virtual void clear();
+  virtual void clear_text();
+  virtual void append_text(const std::string& text);
+  virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+
   guik::ShaderSetting& shader_setting() {
     return global_shader_setting;
   }
@@ -37,7 +45,15 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+
+  void enable_normal_buffer();
   void enable_info_buffer();
+
+  bool normal_buffer_enabled() const;
+  bool info_buffer_enabled() const;
+
+  const glk::Texture& normal_buffer() const;
+  const glk::Texture& info_buffer() const;
 
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
@@ -83,6 +99,10 @@ protected:
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> drawables;
+
+  std::mutex sub_texts_mutex;
+  std::deque<std::string> sub_texts;
+  std::unordered_map<std::string, std::function<void()>> sub_ui_callbacks;
 };
 }  // namespace guik
 

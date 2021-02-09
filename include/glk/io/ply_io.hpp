@@ -1,5 +1,5 @@
-#ifndef GLK_PLY_LOADER_HPP
-#define GLK_PLY_LOADER_HPP
+#ifndef GLK_PLY_IO_HPP
+#define GLK_PLY_IO_HPP
 
 #include <vector>
 #include <Eigen/Core>

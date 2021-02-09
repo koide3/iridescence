@@ -45,11 +45,41 @@ void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond) {
   });
 }
 
+void LightViewerContext::clear() {
+  sub_ui_callbacks.clear();
+  drawable_filters.clear();
+  drawables.clear();
+
+  std::lock_guard<std::mutex> lock(sub_texts_mutex);
+  sub_texts.clear();
+}
+
+void LightViewerContext::clear_text() {
+  std::lock_guard<std::mutex> lock(sub_texts_mutex);
+  sub_texts.clear();
+}
+
+void LightViewerContext::append_text(const std::string& text) {
+  std::lock_guard<std::mutex> lock(sub_texts_mutex);
+  sub_texts.push_back(text);
+}
+
+void LightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
+  if(!callback) {
+    sub_ui_callbacks.erase(name);
+    return;
+  }
+
+  sub_ui_callbacks[name] = callback;
+}
+
 void LightViewerContext::draw_ui() {
-  ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+  ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
   ImGui::BeginChild("canvas", ImVec2(canvas->size[0], canvas->size[1]), false, flags);
+  ImVec2 sub_window_pos = ImGui::GetWindowPos();
+
   if(ImGui::IsWindowFocused()) {
     canvas->mouse_control();
   }
@@ -57,7 +87,32 @@ void LightViewerContext::draw_ui() {
   ImGui::Image((void*)canvas->frame_buffer->color().id(), ImVec2(canvas->size[0], canvas->size[1]), ImVec2(0, 1), ImVec2(1, 0));
   ImGui::EndChild();
 
+  for(const auto& callback : sub_ui_callbacks) {
+    callback.second();
+  }
+
   ImGui::End();
+
+  std::vector<std::string> texts_;
+  {
+    std::lock_guard<std::mutex> texts_lock(sub_texts_mutex);
+    std::vector<std::string>(sub_texts.begin(), sub_texts.end()).swap(texts_);
+  }
+
+  if(!texts_.empty()) {
+    std::string window_name = "sub_texts_" + context_name;
+    ImGui::SetNextWindowPos(ImVec2(sub_window_pos.x + 5, sub_window_pos.y + 5), ImGuiCond_Always);
+    ImGui::Begin(window_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    for(int i = std::max<int>(0, texts_.size() - 28); i < texts_.size(); i++) {
+      const auto& text = texts_[i];
+      ImGui::Text("%s", text.c_str());
+    }
+
+    if(ImGui::Button("clear")) {
+      clear_text();
+    }
+    ImGui::End();
+  }
 }
 
 void LightViewerContext::draw_gl() {
@@ -138,8 +193,28 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
   canvas->set_effect(effect);
 }
 
+void LightViewerContext::enable_normal_buffer() {
+  canvas->enable_normal_buffer();
+}
+
 void LightViewerContext::enable_info_buffer() {
   canvas->enable_info_buffer();
+}
+
+bool LightViewerContext::normal_buffer_enabled() const {
+  return canvas->normal_buffer_enabled();
+}
+
+bool LightViewerContext::info_buffer_enabled() const {
+  return canvas->info_buffer_enabled();
+}
+
+const glk::Texture& LightViewerContext::normal_buffer() const {
+  return canvas->normal_buffer();
+}
+
+const glk::Texture& LightViewerContext::info_buffer() const {
+  return canvas->info_buffer();
 }
 
 void LightViewerContext::clear_drawables() {

@@ -28,8 +28,8 @@ bool GLSLShader::init(const std::string& shader_path) {
 }
 
 bool GLSLShader::init(const std::string& vertex_shader_path, const std::string& fragment_shader_path) {
-  std::vector<std::string> vertex_shader_paths = { vertex_shader_path };
-  std::vector<std::string> fragment_shader_paths = { fragment_shader_path };
+  std::vector<std::string> vertex_shader_paths = {vertex_shader_path};
+  std::vector<std::string> fragment_shader_paths = {fragment_shader_path};
   return init(vertex_shader_paths, fragment_shader_paths);
 }
 
@@ -77,12 +77,12 @@ bool GLSLShader::init(const std::vector<std::string>& vertex_shader_paths, const
 
 GLint GLSLShader::attrib(const std::string& name) {
   auto found = attrib_cache.find(name);
-  if (found != attrib_cache.end()) {
+  if(found != attrib_cache.end()) {
     return found->second;
   }
 
   GLint id = glGetAttribLocation(shader_program, name.c_str());
-  if (id == -1) {
+  if(id == -1) {
     std::cerr << "warning : attrib " << name << " not found" << std::endl;
   }
 
@@ -92,12 +92,12 @@ GLint GLSLShader::attrib(const std::string& name) {
 
 GLint GLSLShader::uniform(const std::string& name) {
   auto found = uniform_cache.find(name);
-  if (found != uniform_cache.end()) {
+  if(found != uniform_cache.end()) {
     return found->second;
   }
 
   GLint id = glGetUniformLocation(shader_program, name.c_str());
-  if (id == -1) {
+  if(id == -1) {
     std::cerr << "warning : uniform " << name << " not found" << std::endl;
   }
 
@@ -111,7 +111,7 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, GLuint sha
   std::stringstream sst;
 
   std::ifstream ifs(filename);
-  if (!ifs) {
+  if(!ifs) {
     std::cerr << "error: failed to open " << filename << std::endl;
     return GL_FALSE;
   }
@@ -133,7 +133,7 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, GLuint sha
   std::vector<char> error_message(info_log_length);
   glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
 
-  if (result != GL_TRUE) {
+  if(result != GL_TRUE) {
     std::cerr << "error : failed to compile shader " << filename << std::endl;
     std::cerr << std::string(error_message.begin(), error_message.end()) << std::endl;
   }

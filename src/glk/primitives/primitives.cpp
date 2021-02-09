@@ -11,7 +11,7 @@
 #include <glk/primitives/cone.hpp>
 #include <glk/primitives/icosahedron.hpp>
 #include <glk/primitives/coordinate_system.hpp>
-#include <glk/io/ply_loader.hpp>
+#include <glk/io/ply_io.hpp>
 
 namespace glk {
 

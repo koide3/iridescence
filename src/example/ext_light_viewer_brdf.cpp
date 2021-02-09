@@ -1,17 +1,20 @@
 #include <glk/path.hpp>
 #include <glk/texture.hpp>
-#include <glk/io/png_loader.hpp>
+#include <glk/io/png_io.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
 
+#include <glk/io/png_io.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
+  viewer->enable_normal_buffer();
+
   auto effect = std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size());
   viewer->set_screen_effect(effect);
 
-  std::vector<const char*> diffuse_models = {"ZERO", "ONE", "LAMBERT", "DISNEY", "NORMALIZED_DISNEY", "OPEN_NAYAR"};
+  std::vector<const char*> diffuse_models = {"ZERO", "ONE", "LAMBERT", "DISNEY", "NORMALIZED_DISNEY", "OREN_NAYAR"};
   std::vector<const char*> specular_models = {"ZERO", "PHONG", "BLINN_PHONG", "COOK_TORRANCE"};
   std::vector<const char*> occlusion_models = {"ZERO", "AMBIENT_OCCLUSION"};
   std::vector<const char*> iridescence_models = {"ZERO", "IRIDESCENCE1", "IRIDESCENCE2", "IRIDESCENCE3"};
@@ -73,7 +76,7 @@ int main(int argc, char** argv) {
     ImGui::SameLine();
     if(ImGui::Button("flat")) {
       for(int i = 0; i < num_lights; i++) {
-        light_colors[i] = Eigen::Vector4f::Ones() * 0.8f;
+        light_colors[i].setConstant(0.8f);
       }
     }
   });
@@ -87,12 +90,13 @@ int main(int argc, char** argv) {
     for(int i = 0; i < num_lights; i++) {
       double theta = t + i * 2.0 * M_PI / num_lights;
       Eigen::Vector3f light_pos(10.0 * std::cos(theta), 10.0 * std::sin(theta), 2.0f);
-      effect->set_light(i, light_pos, light_colors[i]);
+      Eigen::Vector2f attenuation(0.0f, 0.001f);
+      float max_distance = 100.0f;
+      effect->set_light(i, light_pos, light_colors[i], attenuation, max_distance);
 
       Eigen::Affine3f model_matrix = Eigen::Translation3f(light_pos) * Eigen::UniformScaling<float>(0.25f) * Eigen::Isometry3f::Identity();
       viewer->update_drawable("light_" + std::to_string(i), glk::Primitives::sphere(), guik::FlatColor(light_colors[i], model_matrix));
     }
-    ImGui::GetTime();
   }
   return 0;
 }

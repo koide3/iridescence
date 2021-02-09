@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-# find_package(PCL)
+find_package(PCL)
 find_package(PNG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
@@ -90,6 +90,7 @@ add_library(iridescence SHARED
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
   src/glk/trajectory.cpp
+  src/glk/gridmap.cpp
   src/glk/pointcloud_buffer.cpp
   src/glk/pointnormals_buffer.cpp
   src/glk/point_correspondences.cpp
@@ -100,8 +101,8 @@ add_library(iridescence SHARED
   src/glk/frame_buffer.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
-  src/glk/io/ply_loader.cpp
-  src/glk/io/png_loader.cpp
+  src/glk/io/ply_io.cpp
+  src/glk/io/png_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_lighting.cpp
   src/glk/effects/screen_space_ambient_occlusion.cpp
@@ -119,6 +120,7 @@ add_library(iridescence SHARED
   src/guik/viewer/light_viewer_context.cpp
   src/guik/viewer/viewer_ui.cpp
   src/guik/viewer/info_window.cpp
+  src/guik/viewer/anonymous.cpp
 )
 target_link_libraries(iridescence
   gl_imgui
@@ -138,7 +140,7 @@ file(GLOB example_sources "src/example/*.cpp")
 foreach(example_src IN LISTS example_sources)
   get_filename_component(example_name ${example_src} NAME_WE)
 
-  if(${example_name} STREQUAL "light_viewer_pointcloud" OR ${example_name} STREQUAL "light_viewer_kitti")
+  if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
     if(NOT PCL_FOUND)
       continue()
     endif()

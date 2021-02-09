@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
         // viewer->update_drawable(results[0], cloud_buffer, guik::Rainbow());
 
         // with some transformation and bigger points
-        // viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random(), Eigen::Matrix4f::Identity()).add("point_scale", 5.0f));
+        // viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random(), Eigen::Translation3f(1.0f, 1.0f, 1.0f)).add("point_scale", 5.0f));
 
         // with point color
         // std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(cloud->size());

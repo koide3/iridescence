@@ -1,6 +1,5 @@
 #include <glk/texture_renderer.hpp>
 
-#include <iostream>
 #include <glk/path.hpp>
 #include <glk/effects/plain_rendering.hpp>
 

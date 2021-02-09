@@ -23,6 +23,7 @@ struct TextureRendererInput {
   boost::optional<T> get(const std::string& name) const;
 
 private:
+  std::unordered_map<std::string, unsigned int> params_int;
   std::unordered_map<std::string, std::array<float, 16>> params_16f;
 };
 
@@ -41,6 +42,20 @@ inline boost::optional<Eigen::Matrix4f> TextureRendererInput::get(const std::str
   return Eigen::Map<const Eigen::Matrix4f>(found->second.data()).eval();
 }
 
+template<>
+inline void TextureRendererInput::set(const std::string& name, const unsigned int& value) {
+  params_int[name] = value;
 }
+
+template<>
+inline boost::optional<unsigned int> TextureRendererInput::get(const std::string& name) const {
+  auto found = params_int.find(name);
+  if(found == params_int.end()) {
+    return boost::none;
+  }
+
+  return found->second;
+}
+}  // namespace glk
 
 #endif
