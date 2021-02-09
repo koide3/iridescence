@@ -3,6 +3,9 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 
+#include <boost/filesystem.hpp>
+
+#include <glk/path.hpp>
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
@@ -11,6 +14,19 @@
 
 namespace py = pybind11;
 
+std::shared_ptr<guik::LightViewer> instance() {
+  static bool is_first = true;
+  if(is_first) {
+    py::gil_scoped_acquire acquire;
+    py::object pyridescence = py::module::import("pyridescence");
+    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+
+    glk::set_data_path(path.parent_path().string() + "/data");
+    is_first = false;
+  }
+
+  return guik::LightViewer::instance();
+}
 
 PYBIND11_MODULE(pyridescence, m) {
   // modules
@@ -25,12 +41,13 @@ PYBIND11_MODULE(pyridescence, m) {
     .def("make_transparent", &guik::ShaderSetting::make_transparent);
 
   // glk methods
+  glk_.def("set_data_path", &glk::set_data_path, "");
   glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& x) -> glk::Drawable::Ptr { return std::make_shared<glk::PointCloudBuffer>(x.data(), sizeof(float) * 3, x.rows()); } );
 
   // primitives
-  primitives_.def("sphere", [] { guik::LightViewer::instance(); return glk::Primitives::sphere(); });
-  primitives_.def("cube", [] { guik::LightViewer::instance(); return glk::Primitives::cube(); });
-  primitives_.def("coordinate_system", [] { guik::LightViewer::instance(); return glk::Primitives::coordinate_system(); });
+  primitives_.def("sphere", [] { instance(); return glk::Primitives::sphere(); });
+  primitives_.def("cube", [] { instance(); return glk::Primitives::cube(); });
+  primitives_.def("coordinate_system", [] { instance(); return glk::Primitives::coordinate_system(); });
 
   // guik methods
   guik_.def("Rainbow", []() -> guik::ShaderSetting::Ptr { return std::make_shared<guik::Rainbow>(); });
@@ -57,7 +74,7 @@ PYBIND11_MODULE(pyridescence, m) {
 
   // LightViewer
   py::class_<guik::LightViewer, guik::LightViewerContext, std::shared_ptr<guik::LightViewer>>(guik_, "LightViewer")
-    .def_static("instance", [] { return guik::LightViewer::instance(); })
+    .def_static("instance", [] { return instance(); })
     .def("sub_viewer", [] (guik::LightViewer& viewer, const std::string& name) { return viewer.sub_viewer(name); })
     .def("sub_viewer", [] (guik::LightViewer& viewer, const std::string& name, const std::tuple<int, int>& size) { return viewer.sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size))); })
 
@@ -89,7 +106,15 @@ PYBIND11_MODULE(pyridescence, m) {
 
   // imgui
   py::module_ imgui_ = m.def_submodule("imgui", "");
-  imgui_.def("begin", [] (const std::string& name) { return ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize); });
+  imgui_.attr("WindowFlags_None") = py::int_(static_cast<int>(ImGuiWindowFlags_None));
+  imgui_.attr("WindowFlags_NoTitleBar") = py::int_(static_cast<int>(ImGuiWindowFlags_NoTitleBar));
+  imgui_.attr("WindowFlags_NoResize") = py::int_(static_cast<int>(ImGuiWindowFlags_NoResize));
+  imgui_.attr("WindowFlags_NoMove") = py::int_(static_cast<int>(ImGuiWindowFlags_NoMove));
+  imgui_.attr("WindowFlags_NoScrollbar") = py::int_(static_cast<int>(ImGuiWindowFlags_NoScrollbar));
+  imgui_.attr("WindowFlags_AlwaysAutoResize") = py::int_(static_cast<int>(ImGuiWindowFlags_AlwaysAutoResize));
+  imgui_.attr("WindowFlags_NoBackground") = py::int_(static_cast<int>(ImGuiWindowFlags_NoBackground));
+
+  imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
 
   imgui_.def("text", [](const std::string& text) { ImGui::Text("%s", text.c_str()); });
