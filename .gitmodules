@@ -7,3 +7,6 @@
 [submodule "thirdparty/ImGuizmo"]
 	path = thirdparty/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "thirdparty/pybind11"]
+	path = thirdparty/pybind11
+	url = https://github.com/pybind/pybind11

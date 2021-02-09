@@ -9,7 +9,8 @@
                 "include/**",
                 "thirdparty/imgui/**",
                 "thirdparty/portable-file-dialogs/**",
-                "/usr/include/**"
+                "/usr/include/**",
+                "${workspaceFolder}/thirdparty/pybind11/include"
             ],
             "name": "gcc",
             "intelliSenseMode": "gcc-x64",

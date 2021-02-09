@@ -16,7 +16,7 @@
 
 namespace guik {
 
-LightViewer* LightViewer::inst = nullptr;
+std::shared_ptr<LightViewer> LightViewer::inst;
 
 LightViewer::LightViewer() : Application(), LightViewerContext("main") {}
 

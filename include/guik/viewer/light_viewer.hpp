@@ -16,10 +16,13 @@ namespace guik {
 
 class LightViewer : public guik::Application, public guik::LightViewerContext {
 public:
-  static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1)) {
+  LightViewer();
+  virtual ~LightViewer();
+
+  static std::shared_ptr<LightViewer> instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1)) {
     if(!inst) {
       Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
-      inst = new LightViewer();
+      inst.reset(new LightViewer());
       inst->init(init_size, "#version 330");
     } else {
       if((size.array() > 0).all() && inst->window_size() != size) {
@@ -49,9 +52,6 @@ private:
   class ViewerUI;
   class InfoWindow;
 
-  LightViewer();
-  virtual ~LightViewer();
-
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version) override;
   virtual void framebuffer_size_callback(const Eigen::Vector2i& size) override;
 
@@ -59,7 +59,7 @@ private:
   virtual void draw_gl() override;
 
 private:
-  static LightViewer* inst;
+  static std::shared_ptr<LightViewer> inst;
 
   std::unique_ptr<ViewerUI> viewer_ui;
   std::unique_ptr<InfoWindow> info_window;
