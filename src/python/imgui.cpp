@@ -10,6 +10,8 @@ namespace py = pybind11;
 void define_imgui(py::module_& m) {
     // imgui
   py::module_ imgui_ = m.def_submodule("imgui", "");
+
+  // enums
   imgui_.attr("WindowFlags_None") = py::int_(static_cast<int>(ImGuiWindowFlags_None));
   imgui_.attr("WindowFlags_NoTitleBar") = py::int_(static_cast<int>(ImGuiWindowFlags_NoTitleBar));
   imgui_.attr("WindowFlags_NoResize") = py::int_(static_cast<int>(ImGuiWindowFlags_NoResize));
@@ -23,6 +25,7 @@ void define_imgui(py::module_& m) {
   imgui_.attr("Cond_FirstUserEver") = py::int_(static_cast<int>(ImGuiCond_FirstUseEver));
   imgui_.attr("Cond_Appearing") = py::int_(static_cast<int>(ImGuiCond_Appearing));
 
+  // functions
   imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
 
@@ -51,4 +54,37 @@ void define_imgui(py::module_& m) {
     { return std::make_tuple(ImGui::DragFloat(label.c_str(), &v, v_speed, v_min, v_max, format.c_str(), power), v); }, "",
     py::arg("label"), py::arg("v"), py::arg("v_speed") = 1.0f, py::arg("v_min") = 0.0f, py::arg("v_max") = 0.0f, py::arg("format") = "%.3f", py::arg("power") = 1.0f
   );
+
+  // IO
+  py::class_<ImGuiIO>(imgui_, "IO")
+    .def_readonly("want_capture_keyboard", &ImGuiIO::WantCaptureKeyboard)
+    .def_readonly("want_capture_mouse", &ImGuiIO::WantCaptureMouse)
+    .def_readonly("framerate", &ImGuiIO::Framerate)
+    .def_readonly("delta_time", &ImGuiIO::DeltaTime)
+
+
+    .def_property_readonly("mouse_pos", [] (const ImGuiIO& io) {
+      return py::array(2, &io.MousePos.x);
+    })
+    .def_property_readonly("mouse_down", [] (const ImGuiIO& io) {
+      return py::array(5, io.MouseDown);
+    })
+
+    .def_readonly("mouse_wheel", &ImGuiIO::MouseWheel)
+    .def_readonly("mouse_wheel_h", &ImGuiIO::MouseWheelH)
+    .def_readonly("key_ctrl", &ImGuiIO::KeyCtrl)
+    .def_readonly("key_shift", &ImGuiIO::KeyShift)
+    .def_readonly("key_alt", &ImGuiIO::KeyAlt)
+    .def_readonly("key_super", &ImGuiIO::KeySuper)
+    .def_property_readonly("keys_down", [] (const ImGuiIO& io) {
+      return py::array(512, io.KeysDown);
+    })
+    .def_property_readonly("nav_inputs", [] (const ImGuiIO& io) {
+      return py::array(ImGuiNavInput_COUNT, io.NavInputs);
+    })
+  ;
+
+  imgui_.def("get_io", [] { return ImGui::GetIO(); });
+  imgui_.def("is_mouse_clicked", &ImGui::IsMouseClicked, "", py::arg("button") = 0, py::arg("repeat") = false);
+  imgui_.def("get_mouse_pos", [] { auto pos = ImGui::GetMousePos(); return Eigen::Vector2f(pos[0], pos[1]); });
 }

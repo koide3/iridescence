@@ -22,6 +22,12 @@ model_control = guik.ModelControl('model_control')
 def callback():
   imgui.begin('ui', None, imgui.WindowFlags_AlwaysAutoResize)
 
+  io = imgui.get_io()
+  if not io.want_capture_mouse:
+    if imgui.is_mouse_clicked(0):
+      print('clicked')
+    mouse_pos = imgui.get_mouse_pos()
+
   model_control.draw_gizmo_ui()
   model_control.draw_gizmo()
   setting, drawable = viewer.find_drawable('icosahedron')
