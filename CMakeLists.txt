@@ -133,18 +133,21 @@ target_link_libraries(iridescence
   ${catkin_LIBRARIES}
 )
 
-add_subdirectory(thirdparty/pybind11)
-pybind11_add_module(pyridescence
-  src/python/main.cpp
-  src/python/glk.cpp
-  src/python/guik.cpp
-  src/python/pfd.cpp
-  src/python/imgui.cpp
-)
-target_link_libraries(pyridescence
-  iridescence
-)
-# target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
+if(BUILD_PYTHON_BINDINGS)
+  add_subdirectory(thirdparty/pybind11)
+  pybind11_add_module(pyridescence
+    src/python/main.cpp
+    src/python/glk.cpp
+    src/python/guik.cpp
+    src/python/pfd.cpp
+    src/python/imgui.cpp
+  )
+  target_link_libraries(pyridescence
+    iridescence
+  )
+  file(COPY src/example/light_viewer.py DESTINATION .)
+  # target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
+endif()
 
 # copy shader files
 file(COPY data DESTINATION .)

@@ -12,7 +12,6 @@
 
 namespace py = pybind11;
 
-
 std::shared_ptr<guik::LightViewer> instance() {
   static bool is_first = true;
   if(is_first) {
@@ -33,19 +32,43 @@ void define_guik(py::module_& m) {
   // classess
   py::class_<guik::ShaderSetting, std::shared_ptr<guik::ShaderSetting>>(guik_, "ShaderSetting")
     .def("add", &guik::ShaderSetting::add<float>)
+    .def("add", &guik::ShaderSetting::add<Eigen::Vector2f>)
+    .def("add", &guik::ShaderSetting::add<Eigen::Matrix4f>)
     .def("make_transparent", &guik::ShaderSetting::make_transparent);
 
   py::class_<guik::Rainbow, guik::ShaderSetting, std::shared_ptr<guik::Rainbow>>(guik_, "Rainbow")
     .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>());
+    .def(py::init<Eigen::Matrix4f>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::Rainbow(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
 
   py::class_<guik::VertexColor, guik::ShaderSetting, std::shared_ptr<guik::VertexColor>>(guik_, "VertexColor")
     .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>());
+    .def(py::init<Eigen::Matrix4f>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::VertexColor(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
 
   py::class_<guik::FlatColor, guik::ShaderSetting, std::shared_ptr<guik::FlatColor>>(guik_, "FlatColor")
     .def(py::init<float, float, float, float>())
-    .def(py::init<float, float, float, float, Eigen::Matrix4f>());
+    .def(py::init<float, float, float, float, Eigen::Matrix4f>())
+    .def(py::init([] (float r, float g, float b, float a, float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::FlatColor(r, g, b, a, mat);
+        }), "", py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"),
+                py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
 
   py::class_<guik::ModelControl>(guik_, "ModelControl")
     .def(py::init<std::string, Eigen::Matrix4f>(), "")
@@ -68,6 +91,7 @@ void define_guik(py::module_& m) {
     .def("append_text", &guik::LightViewerContext::append_text)
     .def("remove_drawable", &guik::LightViewerContext::remove_drawable)
     .def("update_drawable", &guik::LightViewerContext::update_drawable)
+    .def("find_drawable", &guik::LightViewerContext::find_drawable)
     .def("reset_center", &guik::LightViewerContext::reset_center)
     .def("lookat", &guik::LightViewerContext::lookat)
     .def("set_draw_xy_grid", &guik::LightViewerContext::set_draw_xy_grid, "")
@@ -97,6 +121,7 @@ void define_guik(py::module_& m) {
 
     .def("remove_drawable", &guik::LightViewer::remove_drawable)
     .def("update_drawable", &guik::LightViewer::update_drawable)
+    .def("find_drawable", &guik::LightViewer::find_drawable)
     .def("reset_center", &guik::LightViewer::reset_center)
     .def("lookat", &guik::LightViewer::lookat)
     .def("set_draw_xy_grid", &guik::LightViewer::set_draw_xy_grid, "")

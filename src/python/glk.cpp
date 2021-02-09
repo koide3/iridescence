@@ -70,6 +70,9 @@ void define_glk(py::module_& m) {
   // primitives
   primitives_.def("sphere", [] { return glk::Primitives::sphere(); });
   primitives_.def("cube", [] { return glk::Primitives::cube(); });
+  primitives_.def("cone", [] { return glk::Primitives::cone(); });
+  primitives_.def("icosahedron", [] { return glk::Primitives::icosahedron(); });
+  primitives_.def("bunny", [] { return glk::Primitives::bunny(); });
   primitives_.def("coordinate_system", [] { return glk::Primitives::coordinate_system(); });
 
 }
