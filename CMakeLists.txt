@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(iridescence)
 
+option(BUILD_PYTHON_BINDINGS "Build python bindings" ON)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -130,6 +132,22 @@ target_link_libraries(iridescence
   ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )
+
+if(BUILD_PYTHON_BINDINGS)
+  add_subdirectory(thirdparty/pybind11)
+  pybind11_add_module(pyridescence
+    src/python/main.cpp
+    src/python/glk.cpp
+    src/python/guik.cpp
+    src/python/pfd.cpp
+    src/python/imgui.cpp
+  )
+  target_link_libraries(pyridescence
+    iridescence
+  )
+  file(COPY src/example/light_viewer.py DESTINATION .)
+  # target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
+endif()
 
 # copy shader files
 file(COPY data DESTINATION .)

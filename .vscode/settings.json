@@ -4,6 +4,8 @@
     "/opt/ros/melodic/lib/python2.7/dist-packages"
   ],
   "files.associations": {
+    "*.cuh": "cpp",
+    "*.cu": "cpp",
     "cctype": "cpp",
     "clocale": "cpp",
     "cmath": "cpp",
@@ -74,7 +76,12 @@
     "string_view": "cpp",
     "dense": "cpp",
     "core": "cpp",
-    "geometry": "cpp"
+    "geometry": "cpp",
+    "bit": "cpp",
+    "codecvt": "cpp",
+    "forward_list": "cpp",
+    "shared_mutex": "cpp",
+    "variant": "cpp"
   },
   "editor.tabSize": 2,
   "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, ColumnLimit: 256, AccessModifierOffset: -2, SortIncludes: false}"

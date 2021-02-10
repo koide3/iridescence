@@ -24,7 +24,7 @@ public:
   std::string fullpath(size_t i) const;
   std::string filename(size_t i) const;
 
-private:
+public:
   void read();
   void write();
 

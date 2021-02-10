@@ -71,6 +71,8 @@ std::string RecentFiles::filename(size_t i) const {
 void RecentFiles::read() {
   updated = false;
   std::string ini_path = "/tmp/tmp_recent_files.ini";
+
+  std::cout << tag << std::endl;
   try {
     using namespace boost::property_tree;
     ptree pt;

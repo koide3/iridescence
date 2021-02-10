@@ -41,7 +41,6 @@ public:
     return global_shader_setting;
   }
 
-  void lookat(const Eigen::Vector3f& pt);
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
@@ -72,6 +71,7 @@ public:
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
   void reset_center();
+  void lookat(const Eigen::Vector3f& pt);
   void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);

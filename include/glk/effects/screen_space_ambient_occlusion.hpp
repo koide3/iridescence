@@ -9,7 +9,7 @@ class ScreenSpaceAttributeEstimation;
 
 class ScreenSpaceAmbientOcclusion : public ScreenEffect {
 public:
-  ScreenSpaceAmbientOcclusion(const Eigen::Vector2i& size);
+  ScreenSpaceAmbientOcclusion(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080));
   virtual ~ScreenSpaceAmbientOcclusion() override;
 
   virtual void set_size(const Eigen::Vector2i& size) override;
