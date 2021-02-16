@@ -110,6 +110,7 @@ void define_guik(py::module_& m) {
     .def("sub_viewer", [] (guik::LightViewer& viewer, const std::string& name) { return viewer.sub_viewer(name); })
     .def("sub_viewer", [] (guik::LightViewer& viewer, const std::string& name, const std::tuple<int, int>& size) { return viewer.sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size))); })
 
+    .def("close", &guik::LightViewer::close, "")
     .def("spin", &guik::LightViewer::spin, "")
     .def("spin_once", &guik::LightViewer::spin_once, "")
     .def("spin_until_click", &guik::LightViewer::spin_until_click, "")

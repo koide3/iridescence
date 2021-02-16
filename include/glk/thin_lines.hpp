@@ -17,8 +17,10 @@ namespace glk {
  */
 class ThinLines : public Drawable {
 public:
-  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices);
-  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors);
+  ThinLines(const float* vertices, int num_vertices, bool line_strip=false);
+  ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip=false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip=false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip=false);
   virtual ~ThinLines() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;
@@ -30,6 +32,7 @@ private:
 private:
   int num_vertices;
 
+  GLenum mode; // line mode (GL_LINES/GL_LINE_STRIP)
   GLuint vao;  // vertex array object
   GLuint vbo;  // vertices
   GLuint cbo;  // colors
