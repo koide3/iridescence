@@ -3,3 +3,5 @@ imgui.ini
 build/*
 dist/*
 pyridescence*/*
+
+*.swp

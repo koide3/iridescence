@@ -81,7 +81,8 @@
     "codecvt": "cpp",
     "forward_list": "cpp",
     "shared_mutex": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "*.ipp": "cpp"
   },
   "editor.tabSize": 2,
   "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, ColumnLimit: 256, AccessModifierOffset: -2, SortIncludes: false}"

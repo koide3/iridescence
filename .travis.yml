@@ -5,20 +5,36 @@ dist: focal
 services:
   - docker
 
+cache:
+  directories:
+    - docker_cache
+
+before_install:
+  - docker load -i docker_cache/images.tar || true
+
+before_cache:
+  - docker save -o docker_cache/images.tar $(docker images -a -q)
+
 matrix:
   include:
-    - name: "bionic"
+    - name: bionic
       env: DIST=bionic
-    - name: "bionic_llvm"
+    - name: bionic_llvm
       env: DIST=bionic_llvm
-    - name: "focal"
+    - name: focal
       env: DIST=focal
-    - name: "focal_llvm"
+    - name: focal_llvm
       env: DIST=focal_llvm
-    - name: "melodic"
+    - name: melodic
       env: DIST=melodic
-    - name: "noetic"
+    - name: noetic
       env: DIST=noetic
 
 script:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -f docker/$DIST/Dockerfile .
+
+env:
+  global:
+  - secure: LVoWtyr6PQd/vSsejDWOUrgEK/0tTctdFw6D2vr4cjJD5kY+1Rjh4Usvj7thnK0bmXwCG9A4ranhwBWp9qYn6IO5oXfRDJCb9K8fM1EeLzdiMNoBP6zD0ibQh/OjJZIeYXUFclxJOeJGgd0GVGpvUyXPMd3a+zSekLxwmRgmP6S2TwRjCNoB8BqdOwNU5xt31HM9eMEvuVLg4UOL0zvM9ZWwJ3baKdeV3ywfZNFD0QE9Pow4tBAiH9oa7RhutYVbx38Xzyjutx9ZkJoVcRb2UVGdeqAJnzjnhloNY+OOKKl6xdlwtFQqujAN/R7/PRllnBgGrvtu1/ybweM24ZO8we6vX0yK2/yJ/pcQi7Bgr3dOKlyFqLNo0oLSkv3IkD3UxDk994ybiwDbIDRnuomfoKRkIK1q3sU17nlvTLeFF0oNqMtz1l5Q20elbdoZKQknGNe6YEzW5GxbTO21SVLlhJcTLScLOA0aUbgB1uVrl1u26/TIPJlrUuKwCE3k4MCieoZqYqXiTVCdFb8aEtp5SfXj3H6rc96KcFWml6kGYc70ANqolgnWML3w/Ix+6leQrPQJftQxU1aTcjvkDlRTpa19PsOc/h4HvBvjrKsuT3U88jLSlSj6ZdE9r5LFxqgCH5h079ukG0CKuvB8KnpXfJYoOkGeS8H8mjeqLsLT1jA=
+  - secure: CSn2GmDodtV49pvpTxc6ZFZWDKURxdHpwtqFyEpuLxd2qZI9iixCyIjmWEMi+rGT5Wngjxg62XAVa0R0tAXecz8qP/6l4gp/6Mh9tIfxB90m4nbLsrMFOhjYdXrpRLuh4iE7D319g3wCaTC5rEMPT8PgCGEaaPf99iOJYspTwvS6U4FhnDWGuTsB5VOx8VCYDOoXOtJZCD7EG64MdYvV1COZjEFwabzOcmgOXpUgkWeBFXKHiquzVt8uTNBHBbY6DNYxetb9io2zht8ZaS9hLx7NIpzqwgxT+Szecd/Dadg82+MOl4THX+wBF/hVAV1IkXUzE5fqsKug7ax94oBozWLOpKQu26cLLQyggKmsiFsYlZIATeR6NxMZPntpUrkNqQLQOW8cvWtFOFrKRzQsk816K1tyH7fabJ3wnRH4akohZgtBni+vqMmEwYd7T3lPAkC5yw+mBDlbFCo+yCGaIPUAyyCNb5bZY7uuSsr/QFBkP8pAIzvoor3xX7L0mEsu/X9bSW8VzDUzG3J4HGPGmXhgsJLpwAc1ZezUHlobiwtjS6HLSbLe0pexmK21ooMYBz4FbL9KlfWbWbntSd3sadzEWxXTH7F5s5EK9+GjtgU+8Ijy2d470KvE+CbZThpjur3tkQTG0817Iqw/PjjCpqlJCCBgOxYuxFNjBzvXc8c=
