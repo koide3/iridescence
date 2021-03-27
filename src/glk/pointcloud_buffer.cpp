@@ -29,12 +29,38 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
 }
 
+PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points) : PointCloudBuffer(points.data(), sizeof(Eigen::Vector3f), points.cols()) {}
+
+PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points) : PointCloudBuffer(points.cast<float>().eval()) {}
+
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points) : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<float, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
+
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points) : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<double, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
+
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);
   for(const auto& aux : aux_buffers) {
     glDeleteBuffers(1, &aux.buffer);
   }
   glDeleteBuffers(1, &vbo);
+}
+
+void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) {
+  add_normals(normals[0].data(), sizeof(Eigen::Vector3f), normals.size());
+}
+
+void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) {
+  add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+}
+
+void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) {
+  add_intensity(colormap, intensities.data(), sizeof(float), intensities.size(), scale);
+}
+
+void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale) {
+  std::vector<float> intensities_(intensities.size());
+  std::copy(intensities.begin(), intensities.end(), intensities_.begin());
+  add_intensity(colormap, intensities_, scale);
 }
 
 void PointCloudBuffer::add_normals(const float* data, int stride, int num_points) {

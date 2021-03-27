@@ -23,7 +23,19 @@ public:
 
   PointCloudBuffer(int stride, int num_points);
   PointCloudBuffer(const float* data, int stride, int num_points);
+
+  // Eigen utility constructors
+  PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points);
+  PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points);
+  PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points);
+  PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points);
+
   virtual ~PointCloudBuffer() override;
+
+  void add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals);
+  void add_color(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors);
+  void add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale = 1.0f);
+  void add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale = 1.0f);
 
   void add_normals(const float* data, int stride, int num_points);
   void add_color(const float* data, int stride, int num_points);
