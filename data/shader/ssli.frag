@@ -14,6 +14,7 @@ uniform float albedo;
 uniform float roughness;
 
 uniform int num_lights;
+uniform int light_directional[max_num_lights];
 uniform float light_range[max_num_lights];
 uniform vec2 light_attenuation[max_num_lights];
 uniform vec3 light_pos[max_num_lights];
@@ -31,11 +32,16 @@ float occlusion(float frag_occlusion);
 vec4 iridescence(vec3 N, vec3 L, vec3 V);
 
 vec4 lighting(int i, vec3 frag_position, vec3 frag_normal, vec3 view_point) {
-  vec3 light_vec = light_pos[i] - frag_position;
-  float distance = length(light_vec);
+  vec3 light_vec = -light_pos[i];
+  float distance = 0.0;
 
-  if(distance > light_range[i]) {
-    return vec4(0.0);
+  if(light_directional[i] == 0) {
+    light_vec = light_pos[i] - frag_position;
+    distance = length(light_vec);
+
+    if(distance > light_range[i]) {
+      return vec4(0.0);
+    }
   }
 
   vec3 N = frag_normal;

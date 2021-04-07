@@ -229,16 +229,16 @@ void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
   post_render_invoke_requests.push_back(func);
 }
 
-std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size_) {
-  Eigen::Vector2i canvas_size = canvas_size_;
-  if(canvas_size[0] <= 0 || canvas_size[1] <= 1) {
-    canvas_size = Eigen::Vector2i(512, 512);
-  }
-
+std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   auto found = sub_contexts.find(context_name);
   if(found == sub_contexts.end()) {
+    Eigen::Vector2i init_canvas_size = canvas_size;
+    if(canvas_size[0] <= 0 || canvas_size[1] <= 0) {
+      init_canvas_size = Eigen::Vector2i(512, 512);
+    }
+
     std::shared_ptr<LightViewerContext> context(new LightViewerContext(context_name));
-    if(!context->init_canvas(canvas_size)) {
+    if(!context->init_canvas(init_canvas_size)) {
       std::cerr << "error: failed to create sub viewer context!!" << std::endl;
       return nullptr;
     }
@@ -247,7 +247,7 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
     return context;
   }
 
-  if(found->second->canvas_size() != canvas_size) {
+  if((canvas_size.array() > 0).all() && found->second->canvas_size() != canvas_size) {
     if(!found->second->init_canvas(canvas_size)) {
       std::cerr << "error: failed to resize the canvas of " << context_name << "!!" << std::endl;
       close();

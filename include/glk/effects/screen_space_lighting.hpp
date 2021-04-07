@@ -32,6 +32,7 @@ public:
   int num_lights() const;
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range);
+  void set_directional_light(int i, const Eigen::Vector3f& direction, const Eigen::Vector4f& color);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
@@ -54,6 +55,7 @@ private:
   float roughness;
 
   bool light_updated;
+  std::vector<int> light_directional;
   std::vector<float> light_range;
   std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenation;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;
