@@ -8,7 +8,11 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <glk/console_colors.hpp>
+
 namespace guik {
+
+using namespace glk::console;
 
 RecentFiles::RecentFiles() : tag("general"), max_history(5) {
   read();
@@ -116,7 +120,7 @@ void RecentFiles::write() {
     pt.put(tag, sst.str());
     write_ini(ini_path, pt);
   } catch(std::exception e) {
-    std::cerr << "warning: failed to save recent files to " << ini_path << std::endl;
+    std::cerr << bold_yellow << "warning: failed to save recent files to " << ini_path << reset << std::endl;
   }
 }
 

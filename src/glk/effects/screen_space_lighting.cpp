@@ -1,6 +1,7 @@
 #include <random>
 #include <iostream>
 #include <glk/path.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/io/png_io.hpp>
 #include <glk/effects/screen_effect.hpp>
@@ -215,6 +216,8 @@ void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
 }
 
 void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+  using namespace glk::console;
+
   ssae->draw(renderer, color_texture, depth_texture, input);
 
   if(frame_buffer) {
@@ -223,7 +226,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   if(!view_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
   Eigen::Vector3f view_point = view_matrix->inverse().block<3, 1>(0, 3);

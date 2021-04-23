@@ -5,6 +5,7 @@
 #include <glk/mesh.hpp>
 #include <glk/lines.hpp>
 #include <glk/mesh_utils.hpp>
+#include <glk/console_colors.hpp>
 
 #include <glk/primitives/grid.hpp>
 #include <glk/primitives/cube.hpp>
@@ -15,6 +16,8 @@
 
 namespace glk {
 
+using namespace glk::console;
+
 Primitives* Primitives::instance_ = nullptr;
 
 const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
@@ -23,7 +26,7 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
 
     switch(type) {
       default:
-        std::cerr << "error : unknown primitive type " << type << std::endl;
+        std::cerr << bold_red << "error : unknown primitive type " << type << reset << std::endl;
         break;
       case ICOSAHEDRON:
       case WIRE_ICOSAHEDRON: {

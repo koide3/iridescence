@@ -6,13 +6,16 @@
 #include <Eigen/Core>
 
 #include <glk/mesh_utils.hpp>
+#include <glk/console_colors.hpp>
 
 namespace glk {
+
+using namespace glk::console;
 
 PLYLoader::PLYLoader(const std::string &filename) {
   std::ifstream ifs(filename);
   if(!ifs) {
-    std::cerr << "error: failed to open " << filename << std::endl;
+    std::cerr << bold_red << "error: failed to open " << filename << reset << std::endl;
     return;
   }
 
@@ -67,7 +70,7 @@ PLYLoader::PLYLoader(const std::string &filename) {
     sst >> faces >> indices[i * 3 + 2] >> indices[i * 3 + 1] >> indices[i * 3];
 
     if(faces != 3) {
-      std::cerr << "error : only faces with three vertices are supported!!" << std::endl;
+      std::cerr << bold_red << "error : only faces with three vertices are supported!!" << reset << std::endl;
     }
   }
 

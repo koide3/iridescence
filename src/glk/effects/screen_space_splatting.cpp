@@ -6,51 +6,62 @@
 #include <glk/query.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/console_colors.hpp>
 
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 namespace glk {
 
+using namespace glk::console;
+
 ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   k_neighbors = 10;
   initial_estimation_grid_size = 32;
+  num_iterations = 1;
+
+  query.reset(new glk::Query());
 
   if(!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
-    return;
+    abort();
   }
 
   if(!position_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_pos.frag")) {
-    return;
+    abort();
   }
 
   if(!white_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
-    return;
+    abort();
   }
 
   if(!increment_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
-    return;
+    abort();
   }
 
   if(!point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.geom", GL_GEOMETRY_SHADER) ||
      !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.vert", GL_VERTEX_SHADER) ||
      !point_extraction_shader.add_feedback_varying("vert_out") || !point_extraction_shader.link_program()) {
-    return;
+    abort();
   }
 
   if(!initial_radius_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/initial_radius.frag")) {
     abort();
-    return;
   }
 
   if(!distribution_shader.init(get_data_path() + "/shader/splat/distribution")) {
     abort();
-    return;
   }
 
   if(!gathering_shader.init(get_data_path() + "/shader/splat/gathering")) {
     abort();
-    return;
+  }
+
+  if(!bounds_update_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/update_bounds.frag")) {
+    abort();
+  }
+
+  if(!debug_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/debug.frag")) {
+    abort();
   }
 
   point_extraction_shader.use();
@@ -71,7 +82,17 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   gathering_shader.set_uniform("feedback_radius_sampler", 1);
   gathering_shader.set_uniform("radius_bounds_sampler", 2);
 
-  query.reset(new glk::Query());
+  bounds_update_shader.use();
+  bounds_update_shader.set_uniform("neighbor_counts_sampler", 0);
+  bounds_update_shader.set_uniform("radius_bounds_sampler", 1);
+  bounds_update_shader.set_uniform("k_neighbors", k_neighbors);
+
+  debug_shader.use();
+  debug_shader.set_uniform("sampler0", 0);
+  debug_shader.set_uniform("sampler1", 1);
+  debug_shader.set_uniform("sampler2", 2);
+
+  glUseProgram(0);
 
   set_size(size);
 }
@@ -140,7 +161,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   const auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   const auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
   if(!view_matrix || !projection_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
 
@@ -198,7 +219,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   initial_radius_shader.use();
   initial_radius_shader.set_uniform("inv_screen_size", inv_screen_size);
   initial_radius_shader.set_uniform("inv_projection_matrix", inv_projection_matrix);
-  initial_estimation_buffer->color(0).bind();  // num points grid
+  initial_estimation_buffer->color().bind();  // num points grid
 
   radius_buffer_ping->bind();
   glClearBufferfv(GL_COLOR, 0, black);  // radius
@@ -207,40 +228,93 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
   radius_buffer_ping->unbind();
 
-  initial_estimation_buffer->color(0).unbind();
+  initial_estimation_buffer->color().unbind();
   initial_radius_shader.unuse();
 
-  // distribution
-  distribution_shader.use();
-  distribution_shader.set_uniform("screen_size", screen_size);
-  distribution_shader.set_uniform("inv_screen_size", inv_screen_size);
-  distribution_shader.set_uniform("view_matrix", *view_matrix);
-  distribution_shader.set_uniform("projection_matrix", *projection_matrix);
+  // ping pong
+  for(int i = 0; i < num_iterations; i++) {
+    auto& radius_buffer_front = i % 2 == 0 ? radius_buffer_ping : radius_buffer_pong;
+    auto& radius_buffer_back = i % 2 == 0 ? radius_buffer_pong : radius_buffer_ping;
 
-  position_buffer->color(0).bind(GL_TEXTURE0);     // position
-  radius_buffer_ping->color(0).bind(GL_TEXTURE1);  // radius
+    // distribution
+    distribution_shader.use();
+    distribution_shader.set_uniform("screen_size", screen_size);
+    distribution_shader.set_uniform("inv_screen_size", inv_screen_size);
+    distribution_shader.set_uniform("view_matrix", *view_matrix);
+    distribution_shader.set_uniform("projection_matrix", *projection_matrix);
 
-  feedback_radius_buffer->bind();
-  glClearBufferfv(GL_COLOR, 0, black);
+    position_buffer->color().bind(GL_TEXTURE0);      // position
+    radius_buffer_front->color().bind(GL_TEXTURE1);  // radius
 
-  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-  glEnable(GL_BLEND);
-  glBlendEquation(GL_MAX);
-  glBlendFunc(GL_ONE, GL_ONE);
+    feedback_radius_buffer->bind();
+    glClearBufferfv(GL_COLOR, 0, black);
 
-  points_on_screen->draw(distribution_shader);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_MAX);
+    glBlendFunc(GL_ONE, GL_ONE);
 
-  glBlendEquation(GL_FUNC_ADD);
-  glDisable(GL_BLEND);
-  glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    points_on_screen->draw(distribution_shader);
 
-  feedback_radius_buffer->unbind();
-  distribution_shader.unuse();
+    glBlendEquation(GL_FUNC_ADD);
+    glDisable(GL_BLEND);
+    glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  // gathering
+    feedback_radius_buffer->unbind();
+
+    position_buffer->color().unbind(GL_TEXTURE0);      // position
+    radius_buffer_front->color().unbind(GL_TEXTURE1);  // radius
+
+    distribution_shader.unuse();
+
+    // gathering
+    gathering_shader.use();
+    gathering_shader.set_uniform("inv_screen_size", inv_screen_size);
+
+    position_buffer->color().bind(GL_TEXTURE0);
+    feedback_radius_buffer->color().bind(GL_TEXTURE1);
+    radius_buffer_front->color().bind(GL_TEXTURE2);
+
+    neighbor_counts_buffer->bind();
+    glClearBufferfv(GL_COLOR, 0, black);
+
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    points_on_screen->draw(gathering_shader);
+
+    glDisable(GL_BLEND);
+    glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+    neighbor_counts_buffer->unbind();
+
+    position_buffer->color().unbind(GL_TEXTURE0);
+    feedback_radius_buffer->color().unbind(GL_TEXTURE1);
+    radius_buffer_front->color().unbind(GL_TEXTURE2);
+
+    gathering_shader.unuse();
+
+    // update radius bounds
+    bounds_update_shader.use();
+    neighbor_counts_buffer->color().bind(GL_TEXTURE0);
+    radius_buffer_front->color().bind(GL_TEXTURE1);
+
+    radius_buffer_back->bind();
+    glClearBufferfv(GL_COLOR, 0, black);
+
+    points_on_screen->draw(bounds_update_shader);
+
+    radius_buffer_back->unbind();
+
+    radius_buffer_front->color().unbind(GL_TEXTURE1);
+    neighbor_counts_buffer->color().unbind(GL_TEXTURE0);
+    bounds_update_shader.unuse();
+  }
 
   /*
-  std::vector<float> r = vertex_info_buffer->color(0).read_pixels<float>(GL_RED, GL_FLOAT, 1);
+  std::vector<float> r = vertex_info_buffer->color().read_pixels<float>(GL_RED, GL_FLOAT, 1);
   std::cout << "---" << std::endl;
   int count = 0;
   for(int i = 0; i < r.size(); i++) {
@@ -257,28 +331,42 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   */
 
   guik::LightViewer::instance()->register_ui_callback("buff", [this] {
-    ImGui::Image((void*)initial_estimation_buffer->color(0).id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::Image((void*)feedback_radius_buffer->color(0).id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Begin("textures", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::Text("iter:%d", num_iterations);
+    if(ImGui::Button("dec")) {
+      num_iterations--;
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("inc")) {
+      num_iterations++;
+    }
+
+    ImGui::Image((void*)initial_estimation_buffer->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Image((void*)radius_buffer_pong->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+
+    ImGui::End();
   });
 
-  // put white
+  // render to screen
   if(frame_buffer) {
-    frame_buffer->bind();
+    debug_shader.use();
+    radius_buffer_ping->color().bind(GL_TEXTURE0);
+    radius_buffer_pong->color().bind(GL_TEXTURE1);
+    neighbor_counts_buffer->color().bind(GL_TEXTURE2);
 
-    GLfloat black[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    frame_buffer->bind();
     glClearBufferfv(GL_COLOR, 0, black);
 
-    white_shader.use();
-
-    // points_on_screen->bind();
-
-    points_on_screen->draw(white_shader);
-
-    // points_on_screen->unbind();
-
-    white_shader.unuse();
+    renderer.draw_plain(debug_shader);
+    // points_on_screen->draw(white_shader);
 
     frame_buffer->unbind();
+
+    radius_buffer_ping->color().unbind(GL_TEXTURE0);
+    radius_buffer_pong->color().unbind(GL_TEXTURE1);
+    neighbor_counts_buffer->color().unbind(GL_TEXTURE2);
+    debug_shader.unuse();
   }
 
   glDisable(GL_TEXTURE_2D);

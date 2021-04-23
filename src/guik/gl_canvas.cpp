@@ -16,12 +16,15 @@
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
 #include <glk/effects/plain_rendering.hpp>
+#include <glk/console_colors.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 
 namespace guik {
+
+using namespace glk::console;
 
 /**
  * @brief Construct a new GLCanvas object
@@ -145,7 +148,6 @@ const glk::Texture& GLCanvas::info_buffer() const {
  * @param size
  */
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
-  std::cout << "set_size:" << size.transpose() << std::endl;
   this->size = size;
 
   projection_control->set_size(size);
@@ -365,7 +367,7 @@ void GLCanvas::mouse_control() {
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
   if(!info_buffer_id) {
-    std::cerr << "warning: info buffer has not been enabled!!" << std::endl;
+    std::cerr << bold_yellow << "warning: info buffer has not been enabled!!" << reset << std::endl;
     return Eigen::Vector4i::Constant(-1);
   }
 

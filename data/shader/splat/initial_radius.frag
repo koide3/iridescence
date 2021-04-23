@@ -26,5 +26,6 @@ void main() {
   vec2 r_world = abs(unproj.xy / unproj.w);
 
   radius_bounds.x = 0.0;
-  radius_bounds.y = max(r_world.x, r_world.y);
+  // radius_bounds.y = max(r_world.x, r_world.y) * 2.0;
+  radius_bounds.y = max(max(r_world.x, r_world.y) * 2.0, 0.1);
 }

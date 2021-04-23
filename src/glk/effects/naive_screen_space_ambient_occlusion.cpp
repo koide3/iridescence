@@ -1,6 +1,7 @@
 #include <random>
 #include <iostream>
 #include <glk/path.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/effects/screen_effect.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 
@@ -43,7 +44,8 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
   if(!view_matrix || !projection_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    using namespace glk::console;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
   Eigen::Matrix4f projection_view_matrix = (*projection_matrix) * (*view_matrix);

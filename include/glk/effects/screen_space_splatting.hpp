@@ -27,6 +27,8 @@ private:
   std::unique_ptr<glk::TransformFeedback> points_on_screen;
   std::unique_ptr<glk::Query> query;
 
+  glk::GLSLShader debug_shader;
+
   // initial radius estimation
   int k_neighbors;
   int initial_estimation_grid_size;
@@ -37,11 +39,14 @@ private:
   glk::GLSLShader initial_radius_shader;
   glk::GLSLShader distribution_shader;
   glk::GLSLShader gathering_shader;
+  glk::GLSLShader bounds_update_shader;
 
   std::unique_ptr<glk::FrameBuffer> radius_buffer_ping;
   std::unique_ptr<glk::FrameBuffer> radius_buffer_pong;
   std::unique_ptr<glk::FrameBuffer> neighbor_counts_buffer;
   std::unique_ptr<glk::FrameBuffer> feedback_radius_buffer;
+
+  int num_iterations;
 };
 
 }  // namespace glk
