@@ -76,11 +76,23 @@ const Texture& FrameBuffer::depth() const {
   return *depth_buffer;
 }
 
+Texture& FrameBuffer::color() {
+  return *color_buffers[0];
+}
+
+Texture& FrameBuffer::color(int i) {
+  return *color_buffers[i];
+}
+
+Texture& FrameBuffer::depth() {
+  return *depth_buffer;
+}
+
 int FrameBuffer::num_color_buffers() const {
   return color_buffers.size();
 }
 
-void FrameBuffer::add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type) {
+glk::Texture& FrameBuffer::add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type) {
   glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
   while(color_attachments.size() <= layout) {
@@ -94,6 +106,8 @@ void FrameBuffer::add_color_buffer(int layout, GLuint internal_format, GLuint fo
 
   glDrawBuffers(color_attachments.size(), color_attachments.data());
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  return *color_buffers.back();
 }
 
 }  // namespace glk

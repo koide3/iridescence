@@ -16,6 +16,13 @@ public:
   GLSLShader();
   ~GLSLShader();
 
+  bool attach_source(const std::string& filename, GLuint shader_type);
+  bool attach_source(const std::vector<std::string>& filenames, GLuint shader_type);
+
+  bool add_feedback_varying(const std::string& name);
+
+  bool link_program();
+
   bool init(const std::string& shader_path);
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
@@ -110,6 +117,9 @@ private:
   GLuint read_shader_from_file(const std::string& filename, GLuint shader_type);
 
 private:
+  std::vector<GLuint> shaders;
+  std::vector<std::string> feedback_varyings;
+
   GLuint shader_program;
   std::unordered_map<std::string, GLint> attrib_cache;
   std::unordered_map<std::string, GLint> uniform_cache;

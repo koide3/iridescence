@@ -43,7 +43,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
     return false;
   }
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
