@@ -12,6 +12,20 @@ void main() {
   vec4 values1 = texture(sampler1, texcoord);
   vec4 values2 = texture(sampler2, texcoord);
 
+  if(values2.w < 0.1) {
+    discard;
+  }
+
+  if(values2.w < 9.5) {
+    color = vec4(0.0, 0.0, 1.0, 1.0);
+  } else if (values2.w < 10.5) {
+    color = vec4(0.0, 1.0, 0.0, 1.0);
+  } else {
+    color = vec4(1.0, 0.0, 0.0, 1.0);
+  }
+
+  return;
+
   if(values0.y < 1e-3) {
     discard;
   }

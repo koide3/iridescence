@@ -19,5 +19,5 @@ void main() {
     discard;
   }
 
-  feedback_radius = p1_radius_screen;
+  feedback_radius = p1_radius;
 }

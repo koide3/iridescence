@@ -19,7 +19,7 @@ using namespace glk::console;
 ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   k_neighbors = 10;
   initial_estimation_grid_size = 32;
-  num_iterations = 4;
+  num_iterations = 1;
 
   query.reset(new glk::Query());
 
@@ -70,7 +70,8 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   point_extraction_shader.set_uniform("depth_sampler", 0);
 
   initial_radius_shader.use();
-  initial_radius_shader.set_uniform("num_points_grid_sampler", 0);
+  initial_radius_shader.set_uniform("depth_sampler", 0);
+  initial_radius_shader.set_uniform("num_points_grid_sampler", 1);
 
   initial_radius_shader.set_uniform("grid_area", initial_estimation_grid_size * initial_estimation_grid_size);
   initial_radius_shader.set_uniform("k_neighbors", k_neighbors);
@@ -116,7 +117,7 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> sampling_points;
   for(int y = 0; y < size[1]; y += steps * subsample_steps) {
     for(int x = 0; x < size[0]; x += steps * subsample_steps) {
-      Eigen::Array3d pt = step_size * Eigen::Array3d(x, y, 0);
+      Eigen::Array3d pt = step_size * Eigen::Array3d(x, y, 0) + step_size * 0.5;
       sampling_points.push_back(pt.cast<float>());
     }
   }
@@ -235,7 +236,9 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   initial_radius_shader.use();
   initial_radius_shader.set_uniform("inv_screen_size", inv_screen_size);
   initial_radius_shader.set_uniform("inv_projection_matrix", inv_projection_matrix);
-  initial_estimation_buffer->color().bind();  // num points grid
+
+  depth_texture.bind(GL_TEXTURE0);                       // depth
+  initial_estimation_buffer->color().bind(GL_TEXTURE1);  // num points grid
 
   radius_buffer_ping->bind();
   glClearBufferfv(GL_COLOR, 0, black);  // radius
@@ -244,7 +247,8 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
   radius_buffer_ping->unbind();
 
-  initial_estimation_buffer->color().unbind();
+  depth_texture.unbind(GL_TEXTURE0);
+  initial_estimation_buffer->color().unbind(GL_TEXTURE1);
   initial_radius_shader.unuse();
 
   // radius ping pong
@@ -263,7 +267,10 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   distribution_shader.set_uniform("projection_matrix", *projection_matrix);
 
   gathering_shader.use();
+  gathering_shader.set_uniform("screen_size", screen_size);
   gathering_shader.set_uniform("inv_screen_size", inv_screen_size);
+  gathering_shader.set_uniform("view_matrix", *view_matrix);
+  gathering_shader.set_uniform("projection_matrix", *projection_matrix);
 
   for(int i = 0; i < num_iterations; i++) {
     prof.add("***");
@@ -372,7 +379,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   // render to screen
   if(frame_buffer) {
     debug_shader.use();
-    radius_buffer_ping->color().bind(GL_TEXTURE0);
+    feedback_radius_buffer->color().bind(GL_TEXTURE0);
     radius_buffer_pong->color().bind(GL_TEXTURE1);
     neighbor_counts_buffer->color().bind(GL_TEXTURE2);
 
@@ -384,7 +391,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
     frame_buffer->unbind();
 
-    radius_buffer_ping->color().unbind(GL_TEXTURE0);
+    feedback_radius_buffer->color().unbind(GL_TEXTURE0);
     radius_buffer_pong->color().unbind(GL_TEXTURE1);
     neighbor_counts_buffer->color().unbind(GL_TEXTURE2);
     debug_shader.unuse();

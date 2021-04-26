@@ -17,12 +17,15 @@ void main() {
   vec3 p1_pos = texture(position_sampler, p1_texcoord).xyz;
   vec2 p1_radius_bounds = texture(radius_bounds_sampler, p1_texcoord).xy;
 
+  float dist = length(p1_pos - p2_pos);
+  if(dist > p1_radius_bounds.y) {
+    discard;
+  }
+
   float l = p1_radius_bounds.x;
   float h = p1_radius_bounds.y;
-  float w = (h - l) * 0.25;
+  float w = (h - l) / 4;
 
   vec4 check_radii = vec4(l + w, l + 2 * w, l + 3 * w, h);
-  float dist = length(p1_pos - p2_pos);
-
   neighbor_counts = vec4(lessThan(vec4(dist), check_radii));
 }

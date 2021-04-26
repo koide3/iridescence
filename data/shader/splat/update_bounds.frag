@@ -21,9 +21,9 @@ void main() {
 
   if(num_neighbors.w < k_neighbors) {
     float alpha = sqrt(float(k_neighbors) / max(1, num_neighbors.w));
-    alpha = clamp(alpha, 0.0, 2.0);
+    // alpha = clamp(alpha, 1.0, 10.0);
     updated_radius_bounds.x = current_radius_bounds.x;
-    updated_radius_bounds.y = alpha * current_radius_bounds.y;
+    updated_radius_bounds.y = min(alpha * current_radius_bounds.y, 1.0);
     return;
   }
 

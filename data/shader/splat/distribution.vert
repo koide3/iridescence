@@ -28,6 +28,6 @@ void main() {
 
   vec2 screen_pos = vert_position.xy * 2.0 - vec2(1.0);
   gl_Position = vec4(screen_pos, vert_position.z, 1.0);
-  gl_PointSize = ceil(p1_radius_screen);
+  gl_PointSize = ceil(p1_radius_screen) + 1;
   // gl_PointSize = min(p1_radius_screen * 1.5, 128);
 }
