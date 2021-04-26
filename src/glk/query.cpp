@@ -22,7 +22,7 @@ void Query::end() {
 template<>
 int Query::get() const {
   int result;
-  glGetQueryObjectiv(1, GL_QUERY_RESULT, &result);
+  glGetQueryObjectiv(query, GL_QUERY_RESULT, &result);
   return result;
 }
 

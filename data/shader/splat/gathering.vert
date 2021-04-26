@@ -1,8 +1,8 @@
 #version 330
 
 uniform sampler2D position_sampler;
-uniform sampler2D feedback_radius_sampler;
 uniform sampler2D radius_bounds_sampler;
+uniform sampler2D feedback_radius_sampler;
 
 uniform vec2 inv_screen_size;
 
@@ -16,5 +16,6 @@ void main() {
 
   vec2 screen_pos = vert_position.xy * 2.0 - vec2(1.0);
   gl_Position = vec4(screen_pos, vert_position.z, 1.0);
-  gl_PointSize = feedback_radius;
+  gl_PointSize = ceil(feedback_radius);
+  // gl_PointSize = min(feedback_radius, 64);
 }

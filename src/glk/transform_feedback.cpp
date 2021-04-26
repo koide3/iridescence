@@ -7,7 +7,7 @@ TransformFeedback::TransformFeedback(size_t buffer_size) {
 
   glGenBuffers(1, &tbo);
   glBindBuffer(GL_ARRAY_BUFFER, tbo);
-  glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_READ);
+  glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
   glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback);
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);

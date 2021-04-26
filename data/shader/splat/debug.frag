@@ -16,7 +16,7 @@ void main() {
     discard;
   }
 
-  if(abs(values2.w - 10) > 2.5) {
+  if(abs(values2.w - 10) > 1.5) {
     color = vec4(1.0, 0.0, 0.0, 1.0);
   } else {
     color = vec4(0.0, 1.0, 0.0, 1.0);

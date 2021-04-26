@@ -110,4 +110,19 @@ glk::Texture& FrameBuffer::add_color_buffer(int layout, GLuint internal_format, 
   return *color_buffers.back();
 }
 
+glk::Texture& FrameBuffer::add_depth_buffer(GLuint internal_format, GLuint format, GLuint type) {
+  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+  depth_buffer = std::make_shared<Texture>(Eigen::Vector2i(width, height), internal_format, format, type);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->id(), 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  return *depth_buffer;
+}
+
+void FrameBuffer::bind_ext_depth_buffer(const glk::Texture& depth_texture) {
+  glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_texture.id(), 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 }  // namespace glk

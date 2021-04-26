@@ -15,7 +15,7 @@ void main() {
   vec2 p2_texcoord = gl_FragCoord.xy * inv_screen_size;
   vec3 p2_pos = texture(position_sampler, p2_texcoord).xyz;
 
-  if(length(p2_pos) < 1e-3) {
+  if(length(p1_pos - p2_pos) > p1_radius) {
     discard;
   }
 

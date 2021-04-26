@@ -14,10 +14,6 @@ void main() {
   ivec4 num_neighbors = ivec4(texture(neighbor_counts_sampler, uvd.xy));
   vec2 current_radius_bounds = texture(radius_bounds_sampler, uvd.xy).xy;
 
-  if(num_neighbors.w == 0) {
-    discard;
-  }
-
   if(num_neighbors.w == k_neighbors) {
     updated_radius_bounds = current_radius_bounds;
     return;
@@ -25,7 +21,7 @@ void main() {
 
   if(num_neighbors.w < k_neighbors) {
     float alpha = sqrt(float(k_neighbors) / max(1, num_neighbors.w));
-    alpha = clamp(alpha, 1.0, 5.0);
+    alpha = clamp(alpha, 0.0, 2.0);
     updated_radius_bounds.x = current_radius_bounds.x;
     updated_radius_bounds.y = alpha * current_radius_bounds.y;
     return;
@@ -36,18 +32,18 @@ void main() {
   float w = (h - l) / 4;
   vec4 check_radii = vec4(l + w, l + 2 * w, l + 3 * w, h);
 
-  if(num_neighbors.x > k_neighbors) {
+  if(num_neighbors.x >= k_neighbors) {
     updated_radius_bounds.x = current_radius_bounds.x;
     updated_radius_bounds.y = check_radii.x;
     return;
   }
 
-  if(num_neighbors.y > k_neighbors) {
+  if(num_neighbors.y >= k_neighbors) {
     updated_radius_bounds = check_radii.xy;
     return;
   }
 
-  if(num_neighbors.z > k_neighbors) {
+  if(num_neighbors.z >= k_neighbors) {
     updated_radius_bounds = check_radii.yz;
     return;
   }
