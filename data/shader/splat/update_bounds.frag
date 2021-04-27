@@ -1,5 +1,7 @@
 #version 330
 
+const float max_radius = 0.5;
+
 uniform sampler2D neighbor_counts_sampler;
 uniform sampler2D radius_bounds_sampler;
 
@@ -23,7 +25,7 @@ void main() {
     float alpha = sqrt(float(k_neighbors) / max(1, num_neighbors.w));
     // alpha = clamp(alpha, 1.0, 10.0);
     updated_radius_bounds.x = current_radius_bounds.x;
-    updated_radius_bounds.y = min(alpha * current_radius_bounds.y, 1.0);
+    updated_radius_bounds.y = min(alpha * current_radius_bounds.y, max_radius);
     return;
   }
 

@@ -2,6 +2,7 @@
 
 uniform sampler2D position_sampler;
 uniform sampler2D radius_sampler;
+uniform sampler2D finalized_radius_sampler;
 
 uniform vec2 screen_size;
 uniform vec2 inv_screen_size;
@@ -16,6 +17,13 @@ out float p1_radius;
 out float p1_radius_screen;
 
 void main() {
+  float finalized_radius = texture(finalized_radius_sampler, vert_position.xy).x;
+  if(finalized_radius > 1e-3) {
+    gl_PointSize = 1.0;
+    gl_Position = vec4(0.0, 0.0, 10.0, 1.0);
+    return;
+  }
+
   p1_pos = texture(position_sampler, vert_position.xy).xyz;
   p1_radius = texture(radius_sampler, vert_position.xy).y;
 

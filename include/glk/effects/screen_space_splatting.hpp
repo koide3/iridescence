@@ -47,6 +47,11 @@ private:
   std::unique_ptr<glk::FrameBuffer> feedback_radius_buffer;
 
   int num_iterations;
+
+  // computed radius
+  glk::GLSLShader farthest_point_shader;
+  glk::GLSLShader radius_finalization_shader;
+  std::unique_ptr<glk::FrameBuffer> finalized_radius_buffer;
 };
 
 }  // namespace glk

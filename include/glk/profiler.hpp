@@ -40,7 +40,7 @@ public:
       double time_msec = result / 1e6;
       sum_time_msec += time_msec;
 
-      std::cout << boost::format(label_format) % labels[i] << ":" << boost::format("%.3f") % time_msec << "[msec]" << std::endl;
+      std::cout << boost::format(label_format) % labels[i] << boost::format(":%.3f[msec] (%.3f[msec])") % time_msec % sum_time_msec << std::endl;
     }
     std::cout << "***" << std::endl;
     std::cout << boost::format(label_format) % "total(approx):" << boost::format("%.3f") % sum_time_msec << "[msec]" << std::endl;

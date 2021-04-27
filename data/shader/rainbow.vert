@@ -67,5 +67,5 @@ void main() {
     vec3 ndc = gl_Position.xyz / gl_Position.w;
     float z_dist = 1.0 - ndc.z;
     gl_PointSize = point_scale * point_size * z_dist;
-    gl_PointSize = 1.0;
+    // gl_PointSize = 1.0;
 }

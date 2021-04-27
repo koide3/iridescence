@@ -19,7 +19,6 @@ vec3 unproject(vec2 uv, float depth) {
 void main() {
   vec2 texcoord = vert_out.xy;
   float depth = vert_out.z * 2.0 - 1.0;
-
   frag_position = vec4(unproject(tex2uv(texcoord), depth), depth);
   gl_FragDepth = 1.0;
   // gl_FragDepth = vert_out.z + 1e-3;

@@ -12,6 +12,9 @@ void main() {
   vec4 values1 = texture(sampler1, texcoord);
   vec4 values2 = texture(sampler2, texcoord);
 
+  color = values0 * 2.0;
+  return;
+
   if(values2.w < 0.1) {
     discard;
   }

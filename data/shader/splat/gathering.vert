@@ -18,6 +18,12 @@ void main() {
   p2_pos = texture(position_sampler, vert_position.xy).xyz;
   float feedback_radius_world = texture(feedback_radius_sampler, vert_position.xy).x;
 
+  if(feedback_radius_world < 1e-3) {
+    gl_Position = vec4(0.0, 0.0, 10.0, 1.0);
+    gl_PointSize = 1.0;
+    return;
+  }
+
   vec4 p2_pos_cam = view_matrix * vec4(p2_pos, 1.0);
   p2_pos_cam.xy = vec2(feedback_radius_world);
 

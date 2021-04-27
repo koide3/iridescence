@@ -58,7 +58,15 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
     abort();
   }
 
-  if(!bounds_update_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/update_bounds.frag")) {
+  if(!bounds_update_shader.init(get_data_path() + "/shader/splat/tex2screen_test_finalized.vert", get_data_path() + "/shader/splat/update_bounds.frag")) {
+    abort();
+  }
+
+  if(!farthest_point_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/farthest_point.frag")) {
+    abort();
+  }
+
+  if(!radius_finalization_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/finalize_radius.frag")) {
     abort();
   }
 
@@ -79,16 +87,24 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   distribution_shader.use();
   distribution_shader.set_uniform("position_sampler", 0);
   distribution_shader.set_uniform("radius_sampler", 1);
+  distribution_shader.set_uniform("finalized_radius_sampler", 2);
 
   gathering_shader.use();
   gathering_shader.set_uniform("position_sampler", 0);
   gathering_shader.set_uniform("radius_bounds_sampler", 1);
   gathering_shader.set_uniform("feedback_radius_sampler", 2);
+  gathering_shader.set_uniform("finalized_radius_sampler", 3);
 
   bounds_update_shader.use();
   bounds_update_shader.set_uniform("neighbor_counts_sampler", 0);
   bounds_update_shader.set_uniform("radius_bounds_sampler", 1);
+  bounds_update_shader.set_uniform("finalized_radius_sampler", 2);
   bounds_update_shader.set_uniform("k_neighbors", k_neighbors);
+
+  radius_finalization_shader.use();
+  radius_finalization_shader.set_uniform("neighbor_counts_sampler", 0);
+  radius_finalization_shader.set_uniform("radius_bounds_sampler", 1);
+  radius_finalization_shader.set_uniform("k_neighbors", k_neighbors);
 
   debug_shader.use();
   debug_shader.set_uniform("sampler0", 0);
@@ -131,6 +147,12 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
   int buffer_size = sizeof(Eigen::Vector3f) * max_num_points / 5;
   points_on_screen.reset(new glk::TransformFeedback(buffer_size));
 
+  // finalized radius buffer
+  finalized_radius_buffer.reset(new glk::FrameBuffer(size, 0, false));
+  finalized_radius_buffer->add_color_buffer(0, GL_R32F, GL_RED, GL_FLOAT).set_filer_mode(GL_NEAREST);
+  finalized_radius_buffer->add_depth_buffer(GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
+  // finalized_radius_buffer->bind_ext_depth_buffer(position_buffer->depth());
+
   // Low resolution buffer for initial radius estimation
   const Eigen::Vector2i initial_estimation_buffer_size = (size.cast<double>() / initial_estimation_grid_size).array().ceil().cast<int>();
   initial_estimation_buffer.reset(new glk::FrameBuffer(initial_estimation_buffer_size, 0, false));
@@ -151,7 +173,7 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
   // neighbor counts buffer
   neighbor_counts_buffer.reset(new glk::FrameBuffer(size, 0, false));
   neighbor_counts_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGBA, GL_FLOAT).set_filer_mode(GL_NEAREST);
-  neighbor_counts_buffer->bind_ext_depth_buffer(position_buffer->depth());
+  neighbor_counts_buffer->bind_ext_depth_buffer(finalized_radius_buffer->depth());
 
   // feedback radius
   feedback_radius_buffer.reset(new glk::FrameBuffer(size, 0, false));
@@ -272,6 +294,23 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   gathering_shader.set_uniform("view_matrix", *view_matrix);
   gathering_shader.set_uniform("projection_matrix", *projection_matrix);
 
+  // initialize finalized radius buffer
+  glDepthMask(GL_TRUE);
+  glDepthFunc(GL_ALWAYS);
+
+  finalized_radius_buffer->bind();
+  glClearBufferfv(GL_COLOR, 0, black);
+  glClearBufferfv(GL_DEPTH, 0, black);
+
+  farthest_point_shader.use();
+  points_on_screen->draw(farthest_point_shader);
+  farthest_point_shader.unuse();
+
+  finalized_radius_buffer->unbind();
+
+  glDepthFunc(GL_LEQUAL);
+  glDepthMask(GL_FALSE);
+
   for(int i = 0; i < num_iterations; i++) {
     prof.add("***");
     auto& radius_buffer_front = i % 2 == 0 ? radius_buffer_ping : radius_buffer_pong;
@@ -283,6 +322,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
     position_buffer->color().bind(GL_TEXTURE0);      // position
     radius_buffer_front->color().bind(GL_TEXTURE1);  // radius
+    finalized_radius_buffer->color().bind(GL_TEXTURE2);
 
     feedback_radius_buffer->bind();
     glClearBufferfv(GL_COLOR, 0, black);
@@ -292,11 +332,14 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
     feedback_radius_buffer->unbind();
 
+    finalized_radius_buffer->color().unbind(GL_TEXTURE2);
+
     // gathering
     prof.add("gathering_" + std::to_string(i));
     gathering_shader.use();
 
     feedback_radius_buffer->color().bind(GL_TEXTURE2);
+    finalized_radius_buffer->color().bind(GL_TEXTURE3);
 
     neighbor_counts_buffer->bind();
     glClearBufferfv(GL_COLOR, 0, black);
@@ -310,6 +353,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
     position_buffer->color().unbind(GL_TEXTURE0);
     radius_buffer_front->color().unbind(GL_TEXTURE1);
     feedback_radius_buffer->color().unbind(GL_TEXTURE2);
+    finalized_radius_buffer->color().unbind(GL_TEXTURE3);
 
     gathering_shader.unuse();
 
@@ -319,6 +363,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
     bounds_update_shader.use();
     neighbor_counts_buffer->color().bind(GL_TEXTURE0);
     radius_buffer_front->color().bind(GL_TEXTURE1);
+    finalized_radius_buffer->color().bind(GL_TEXTURE2);
 
     radius_buffer_back->bind();
     glClearBufferfv(GL_COLOR, 0, black);
@@ -327,9 +372,33 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
     radius_buffer_back->unbind();
 
+    finalized_radius_buffer->color().unbind(GL_TEXTURE2);
     radius_buffer_front->color().unbind(GL_TEXTURE1);
     neighbor_counts_buffer->color().unbind(GL_TEXTURE0);
     bounds_update_shader.unuse();
+
+    // finalize
+    prof.add("finalize");
+    radius_finalization_shader.use();
+    neighbor_counts_buffer->color().bind(GL_TEXTURE0);
+    radius_buffer_front->color().bind(GL_TEXTURE1);
+
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_ALWAYS);
+
+    finalized_radius_buffer->bind();
+
+    points_on_screen->draw(radius_finalization_shader);
+
+    finalized_radius_buffer->unbind();
+
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+
+    radius_buffer_front->color().unbind(GL_TEXTURE1);
+    neighbor_counts_buffer->color().unbind(GL_TEXTURE0);
+    radius_finalization_shader.unuse();
+
     glEnable(GL_BLEND);
   }
 
@@ -369,7 +438,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
       num_iterations++;
     }
 
-    ImGui::Image((void*)feedback_radius_buffer->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Image((void*)finalized_radius_buffer->depth().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::Image((void*)neighbor_counts_buffer->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::Image((void*)position_buffer->depth().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
 
@@ -379,7 +448,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   // render to screen
   if(frame_buffer) {
     debug_shader.use();
-    feedback_radius_buffer->color().bind(GL_TEXTURE0);
+    finalized_radius_buffer->color().bind(GL_TEXTURE0);
     radius_buffer_pong->color().bind(GL_TEXTURE1);
     neighbor_counts_buffer->color().bind(GL_TEXTURE2);
 
@@ -391,7 +460,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
     frame_buffer->unbind();
 
-    feedback_radius_buffer->color().unbind(GL_TEXTURE0);
+    finalized_radius_buffer->color().unbind(GL_TEXTURE0);
     radius_buffer_pong->color().unbind(GL_TEXTURE1);
     neighbor_counts_buffer->color().unbind(GL_TEXTURE2);
     debug_shader.unuse();
