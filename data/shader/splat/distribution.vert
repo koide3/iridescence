@@ -27,6 +27,14 @@ void main() {
   p1_pos = texture(position_sampler, vert_position.xy).xyz;
   p1_radius = texture(radius_sampler, vert_position.xy).y;
 
+  /*
+  if(p1_radius < 1e-3) {
+    gl_PointSize = 1.0;
+    gl_Position = vec4(0.0, 0.0, 10.0, 1.0);
+    return;
+  }
+  */
+
   vec4 p1_pos_cam = view_matrix * vec4(p1_pos, 1.0);
   p1_pos_cam.xy = vec2(p1_radius);
 

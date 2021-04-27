@@ -3,6 +3,7 @@ uniform bool normal_enabled;
 
 uniform float point_size;
 uniform float point_scale;
+uniform float point_size_offset;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
@@ -66,6 +67,5 @@ void main() {
 
     vec3 ndc = gl_Position.xyz / gl_Position.w;
     float z_dist = 1.0 - ndc.z;
-    gl_PointSize = point_scale * point_size * z_dist;
-    // gl_PointSize = 1.0;
+    gl_PointSize = point_scale * point_size * z_dist + point_size_offset;
 }

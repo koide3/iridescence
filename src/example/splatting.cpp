@@ -53,6 +53,8 @@ int main(int argc, char** argv) {
   viewer->show_info_window();
   viewer->set_draw_xy_grid(false);
   viewer->set_screen_effect(std::shared_ptr<glk::ScreenSpaceSplatting>(new glk::ScreenSpaceSplatting()));
+  viewer->shader_setting().add("point_size", 0.0f);
+  viewer->shader_setting().add("point_size_offset", 1.0f);
 
   load("/home/koide/dump");
 

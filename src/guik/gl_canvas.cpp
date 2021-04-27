@@ -43,6 +43,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
 
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
+  shader->set_uniform("point_size_offset", 0.0f);
 
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 
@@ -89,6 +90,7 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
+  shader->set_uniform("point_size_offset", 0.0f);
 
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 

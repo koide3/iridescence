@@ -8,6 +8,8 @@
 
 namespace glk {
 
+class Profiler;
+
 class ScreenSpaceSplatting : public ScreenEffect {
 public:
   ScreenSpaceSplatting(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080));
@@ -20,7 +22,7 @@ private:
   void extract_points_on_screen(const glk::Texture& depth_texture);
   void estimate_initial_radius(const glk::Texture& depth_texture);
   void estimate_knn_radius();
-  void estimate_gaussian();
+  void estimate_gaussian(Profiler& prof, const TextureRenderer& renderer);
 
 private:
   glk::GLSLShader texture_shader;
@@ -37,6 +39,7 @@ private:
 
   // initial radius estimation
   int k_neighbors;
+  int k_tolerance;
   int initial_estimation_grid_size;
   glk::GLSLShader increment_shader;
   std::unique_ptr<glk::FrameBuffer> initial_estimation_buffer;
@@ -59,9 +62,10 @@ private:
   std::unique_ptr<glk::FrameBuffer> finalized_radius_buffer;
 
   // gaussian estimation
-  glk::GLSLShader gaussian_distribution_shader;
   glk::GLSLShader gaussian_gathering_shader;
-  std::unique_ptr<glk::FrameBuffer> gaussian_buffer;
+  glk::GLSLShader gaussian_finalization_shader;
+  std::unique_ptr<glk::FrameBuffer> gaussian_accum_buffer;
+  std::unique_ptr<glk::FrameBuffer> gaussian_dists_buffer;
 };
 
 }  // namespace glk
