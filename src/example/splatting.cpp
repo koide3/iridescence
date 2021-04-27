@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance(Eigen::Vector2i(2560, 1440));
   viewer->show_info_window();
   viewer->set_draw_xy_grid(false);
-  viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceSplatting>());
+  viewer->set_screen_effect(std::shared_ptr<glk::ScreenSpaceSplatting>(new glk::ScreenSpaceSplatting()));
 
   load("/home/koide/dump");
 

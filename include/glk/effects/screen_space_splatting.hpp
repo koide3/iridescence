@@ -17,6 +17,12 @@ public:
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
 
 private:
+  void extract_points_on_screen(const glk::Texture& depth_texture);
+  void estimate_initial_radius(const glk::Texture& depth_texture);
+  void estimate_knn_radius();
+  void estimate_gaussian();
+
+private:
   glk::GLSLShader texture_shader;
   glk::GLSLShader position_shader;
   std::unique_ptr<glk::FrameBuffer> position_buffer;
@@ -36,6 +42,7 @@ private:
   std::unique_ptr<glk::FrameBuffer> initial_estimation_buffer;
 
   // knn estimation
+  int num_iterations;
   glk::GLSLShader initial_radius_shader;
   glk::GLSLShader distribution_shader;
   glk::GLSLShader gathering_shader;
@@ -46,12 +53,15 @@ private:
   std::unique_ptr<glk::FrameBuffer> neighbor_counts_buffer;
   std::unique_ptr<glk::FrameBuffer> feedback_radius_buffer;
 
-  int num_iterations;
-
   // computed radius
   glk::GLSLShader farthest_point_shader;
   glk::GLSLShader radius_finalization_shader;
   std::unique_ptr<glk::FrameBuffer> finalized_radius_buffer;
+
+  // gaussian estimation
+  glk::GLSLShader gaussian_distribution_shader;
+  glk::GLSLShader gaussian_gathering_shader;
+  std::unique_ptr<glk::FrameBuffer> gaussian_buffer;
 };
 
 }  // namespace glk
