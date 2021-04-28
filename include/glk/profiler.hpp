@@ -12,12 +12,20 @@ namespace glk {
 
 class Profiler {
 public:
-  Profiler(const std::string& prof_name, int max_num_queries = 16) : prof_name(prof_name) {
+  Profiler(const std::string& prof_name, bool enabled = true, int max_num_queries = 16)
+      : prof_name(prof_name), enabled(enabled) {
+    if(!enabled) {
+      return;
+    }
     queries.resize(max_num_queries);
     glGenQueries(max_num_queries, queries.data());
   }
 
   ~Profiler() {
+    if(!enabled) {
+      return;
+    }
+
     if(labels.empty()) {
       glDeleteQueries(queries.size(), queries.data());
       return;
@@ -49,6 +57,10 @@ public:
   }
 
   void add(const std::string& label) {
+    if(!enabled) {
+      return;
+    }
+
     int current = labels.size();
     if(current != 0) {
       glEndQuery(GL_TIME_ELAPSED);
@@ -65,7 +77,8 @@ public:
   }
 
 private:
-  std::string prof_name;
+  const std::string prof_name;
+  const bool enabled;
 
   std::vector<std::string> labels;
   std::vector<GLuint> queries;

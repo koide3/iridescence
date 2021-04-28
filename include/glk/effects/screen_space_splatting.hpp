@@ -18,11 +18,16 @@ public:
   virtual void set_size(const Eigen::Vector2i& size) override;
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
 
+  const glk::Texture& position() const;
+  const glk::Texture& normal() const;
+  const glk::Texture& color() const;
+
 private:
   void extract_points_on_screen(const glk::Texture& depth_texture);
   void estimate_initial_radius(const glk::Texture& depth_texture);
   void estimate_knn_radius();
   void estimate_gaussian(Profiler& prof, const TextureRenderer& renderer);
+  void render_splatting(Profiler& prof, const glk::Texture& color_texture);
 
 private:
   glk::GLSLShader texture_shader;
@@ -66,6 +71,15 @@ private:
   glk::GLSLShader gaussian_finalization_shader;
   std::unique_ptr<glk::FrameBuffer> gaussian_accum_buffer;
   std::unique_ptr<glk::FrameBuffer> gaussian_dists_buffer;
+
+  // splatting
+  glk::GLSLShader splatting_first_shader;
+  glk::GLSLShader splatting_second_shader;
+  std::unique_ptr<glk::FrameBuffer> splatting_buffer;
+
+  // final result
+  glk::GLSLShader splatting_finalization_shader;
+  std::unique_ptr<glk::FrameBuffer> result_buffer;
 };
 
 }  // namespace glk

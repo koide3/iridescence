@@ -1,5 +1,7 @@
 #include <guik/camera/projection_control.hpp>
 
+#include <iostream>
+
 #include <imgui.h>
 
 #include <glm/glm.hpp>

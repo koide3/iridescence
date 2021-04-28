@@ -17,7 +17,7 @@ namespace glk {
 using namespace glk::console;
 
 ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
-  k_neighbors = 10;
+  k_neighbors = 15;
   k_tolerance = 2;
   initial_estimation_grid_size = 32;
   num_iterations = 6;
@@ -75,12 +75,33 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
     abort();
   }
 
-  if(!gaussian_finalization_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/gaussian_finalization.frag")) {
+  if(!gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/tex2screen.vert", GL_VERTEX_SHADER) ||
+     !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/gaussian_finalization.frag", GL_FRAGMENT_SHADER) ||
+     !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/eigen.frag", GL_FRAGMENT_SHADER) ||
+     !gaussian_finalization_shader.link_program()) {
+    abort();
+  }
+
+  if(!splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
+     !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
+     !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat_first.frag", GL_FRAGMENT_SHADER) ||
+     !splatting_first_shader.link_program()) {
+    abort();
+  }
+
+  if(!splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
+     !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
+     !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat_second.frag", GL_FRAGMENT_SHADER) ||
+     !splatting_second_shader.link_program()) {
+    abort();
+  }
+
+  if(!splatting_finalization_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/finalize_splat.frag")) {
     abort();
   }
 
   if(!debug_shader.attach_source(get_data_path() + "/shader/texture.vert", GL_VERTEX_SHADER) || !debug_shader.attach_source(get_data_path() + "/shader/splat/debug.frag", GL_FRAGMENT_SHADER) ||
-     !debug_shader.attach_source(get_data_path() + "/shader/splat/eigen.frag", GL_FRAGMENT_SHADER) || !debug_shader.link_program()) {
+     !debug_shader.link_program()) {
     abort();
   }
 
@@ -121,12 +142,35 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
   gaussian_gathering_shader.set_uniform("feedback_radius_sampler", 2);
 
   gaussian_finalization_shader.use();
-  gaussian_finalization_shader.set_uniform("num_points_sampler", 0);
-  gaussian_finalization_shader.set_uniform("sum_points_sampler", 1);
-  gaussian_finalization_shader.set_uniform("sum_cross1_sampler", 2);
-  gaussian_finalization_shader.set_uniform("sum_cross2_sampler", 3);
+  gaussian_finalization_shader.set_uniform("radius_bounds_buffer", 0);
+  gaussian_finalization_shader.set_uniform("num_points_sampler", 1);
+  gaussian_finalization_shader.set_uniform("sum_points_sampler", 2);
+  gaussian_finalization_shader.set_uniform("sum_cross1_sampler", 3);
+  gaussian_finalization_shader.set_uniform("sum_cross2_sampler", 4);
   gaussian_finalization_shader.set_uniform("k_neighbors", k_neighbors);
   gaussian_finalization_shader.set_uniform("k_tolerance", k_tolerance);
+
+  splatting_first_shader.use();
+  splatting_first_shader.set_uniform("position_sampler", 0);
+  splatting_first_shader.set_uniform("radius_sampler", 1);
+  splatting_first_shader.set_uniform("normal_sampler", 2);
+  splatting_first_shader.set_uniform("minor_tangent_sampler", 3);
+  splatting_first_shader.set_uniform("major_tangent_sampler", 4);
+  splatting_first_shader.set_uniform("color_sampler", 5);
+
+  splatting_second_shader.use();
+  splatting_second_shader.set_uniform("position_sampler", 0);
+  splatting_second_shader.set_uniform("radius_sampler", 1);
+  splatting_second_shader.set_uniform("normal_sampler", 2);
+  splatting_second_shader.set_uniform("minor_tangent_sampler", 3);
+  splatting_second_shader.set_uniform("major_tangent_sampler", 4);
+  splatting_second_shader.set_uniform("color_sampler", 5);
+
+  splatting_finalization_shader.use();
+  splatting_finalization_shader.set_uniform("weight_sampler", 0);
+  splatting_finalization_shader.set_uniform("position_sampler", 1);
+  splatting_finalization_shader.set_uniform("normal_sampler", 2);
+  splatting_finalization_shader.set_uniform("color_sampler", 3);
 
   debug_shader.use();
   debug_shader.set_uniform("sampler0", 0);
@@ -205,7 +249,7 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
   // gaussian estimation
   // accumulation buffer
   gaussian_accum_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  gaussian_accum_buffer->add_color_buffer(0, GL_R32F, GL_RED, GL_FLOAT).set_filer_mode(GL_NEAREST);
+  gaussian_accum_buffer->add_color_buffer(0, GL_R32F, GL_RED, GL_FLOAT).set_filer_mode(GL_NEAREST);    //
   gaussian_accum_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // mean
   gaussian_accum_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // cov1
   gaussian_accum_buffer->add_color_buffer(3, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // cov2
@@ -213,11 +257,36 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
 
   // gaussian buffer
   gaussian_dists_buffer.reset(new glk::FrameBuffer(size, 0, false));
-  gaussian_dists_buffer->add_color_buffer(0, GL_R32F, GL_RED, GL_FLOAT).set_filer_mode(GL_NEAREST);
-  gaussian_dists_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // mean
-  gaussian_dists_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // cov1
-  gaussian_dists_buffer->add_color_buffer(3, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // cov2
+  gaussian_dists_buffer->add_color_buffer(0, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // length
+  gaussian_dists_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // normal
+  gaussian_dists_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // minor tangent
+  gaussian_dists_buffer->add_color_buffer(3, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // major tangent
   gaussian_dists_buffer->bind_ext_depth_buffer(position_buffer->depth());
+
+  // splatting buffer
+  splatting_buffer.reset(new glk::FrameBuffer(size, 0, true));
+  splatting_buffer->add_color_buffer(0, GL_R32F, GL_RED, GL_FLOAT).set_filer_mode(GL_NEAREST);    // weight
+  splatting_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // position
+  splatting_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // normal
+  splatting_buffer->add_color_buffer(3, GL_RGB32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);  // color
+
+  // result buffer
+  result_buffer.reset(new glk::FrameBuffer(size, 0, false));
+  result_buffer->add_color_buffer(0, GL_RGB32F, GL_RGBA, GL_FLOAT);  // color
+  result_buffer->add_color_buffer(1, GL_RGB32F, GL_RGB, GL_FLOAT);   // position
+  result_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT);   // normal
+}
+
+const glk::Texture& ScreenSpaceSplatting::position() const {
+  return result_buffer->color(0);
+}
+
+const glk::Texture& ScreenSpaceSplatting::normal() const {
+  return result_buffer->color(1);
+}
+
+const glk::Texture& ScreenSpaceSplatting::color() const {
+  return result_buffer->color(2);
 }
 
 /**
@@ -481,23 +550,83 @@ void ScreenSpaceSplatting::estimate_gaussian(Profiler& prof, const TextureRender
   glDisable(GL_BLEND);
   gaussian_finalization_shader.use();
 
-  gaussian_accum_buffer->color(0).bind(GL_TEXTURE0);
-  gaussian_accum_buffer->color(1).bind(GL_TEXTURE1);
-  gaussian_accum_buffer->color(2).bind(GL_TEXTURE2);
-  gaussian_accum_buffer->color(3).bind(GL_TEXTURE3);
+  finalized_radius_buffer->color().bind(GL_TEXTURE0);
+  gaussian_accum_buffer->color(0).bind(GL_TEXTURE1);
+  gaussian_accum_buffer->color(1).bind(GL_TEXTURE2);
+  gaussian_accum_buffer->color(2).bind(GL_TEXTURE3);
+  gaussian_accum_buffer->color(3).bind(GL_TEXTURE4);
 
-  renderer.draw_plain(gaussian_finalization_shader);
+  points_on_screen->draw(gaussian_finalization_shader);
 
-  gaussian_accum_buffer->color(0).unbind(GL_TEXTURE0);
-  gaussian_accum_buffer->color(1).unbind(GL_TEXTURE1);
-  gaussian_accum_buffer->color(2).unbind(GL_TEXTURE2);
-  gaussian_accum_buffer->color(3).unbind(GL_TEXTURE3);
+  finalized_radius_buffer->color().unbind(GL_TEXTURE0);
+  gaussian_accum_buffer->color(0).unbind(GL_TEXTURE1);
+  gaussian_accum_buffer->color(1).unbind(GL_TEXTURE2);
+  gaussian_accum_buffer->color(2).unbind(GL_TEXTURE3);
+  gaussian_accum_buffer->color(3).unbind(GL_TEXTURE4);
 
   gaussian_finalization_shader.unuse();
+
+  gaussian_dists_buffer->unbind();
 
   glDepthMask(GL_TRUE);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
   glDisable(GL_DEPTH_TEST);
+}
+
+/**
+ * Splatting
+ */
+void ScreenSpaceSplatting::render_splatting(Profiler& prof, const glk::Texture& color_texture) {
+  const GLfloat black[] = {0.0f, 0.0f, 0.0f, 0.0f};
+  const GLfloat white[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+  glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
+
+  splatting_buffer->bind();
+  glClearBufferfv(GL_COLOR, 0, black);
+  glClearBufferfv(GL_COLOR, 1, black);
+  glClearBufferfv(GL_COLOR, 2, black);
+  glClearBufferfv(GL_COLOR, 3, black);
+  glClearBufferfv(GL_DEPTH, 0, white);
+
+  position_buffer->color().bind(GL_TEXTURE0);
+  gaussian_dists_buffer->color(0).bind(GL_TEXTURE1);  // radii (normal, minor, major)
+  gaussian_dists_buffer->color(1).bind(GL_TEXTURE2);  // normal
+  gaussian_dists_buffer->color(2).bind(GL_TEXTURE3);  // minor_tangent
+  gaussian_dists_buffer->color(3).bind(GL_TEXTURE4);  // major_tangent
+  color_texture.bind(GL_TEXTURE5);
+
+  // visibility pass
+  splatting_first_shader.use();
+  points_on_screen->draw(splatting_first_shader);
+
+  // attribute pass
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendEquation(GL_FUNC_ADD);
+  splatting_second_shader.use();
+
+  points_on_screen->draw(splatting_first_shader);
+
+  splatting_second_shader.unuse();
+
+  position_buffer->color().unbind(GL_TEXTURE0);
+  gaussian_dists_buffer->color(0).unbind(GL_TEXTURE1);  // radii
+  gaussian_dists_buffer->color(1).unbind(GL_TEXTURE2);  // normal
+  gaussian_dists_buffer->color(2).unbind(GL_TEXTURE3);  // minor_tangent
+  gaussian_dists_buffer->color(3).unbind(GL_TEXTURE4);  // major_tangent
+  color_texture.unbind(GL_TEXTURE5);
+
+  splatting_buffer->unbind();
+
+  glDepthMask(GL_TRUE);
+  glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 }
 
 void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
@@ -518,6 +647,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   const Eigen::Vector2f screen_size = position_buffer->size().cast<float>();
   const Eigen::Vector2f inv_screen_size(1.0 / position_buffer->size()[0], 1.0 / position_buffer->size()[1]);
 
+  const Eigen::Vector3f view_point = view_matrix->inverse().block<3, 1>(0, 3);
   const Eigen::Matrix4f inv_projection_matrix = (*projection_matrix).inverse();
   const Eigen::Matrix4f projection_view_matrix = (*projection_matrix) * (*view_matrix);
   const Eigen::Matrix4f inv_projection_view_matrix = projection_view_matrix.inverse();
@@ -548,7 +678,22 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   gaussian_gathering_shader.set_uniform("view_matrix", *view_matrix);
   gaussian_gathering_shader.set_uniform("projection_matrix", *projection_matrix);
 
-  glk::Profiler prof("splat");
+  gaussian_finalization_shader.use();
+  gaussian_finalization_shader.set_uniform("view_point", view_point);
+
+  splatting_first_shader.use();
+  splatting_first_shader.set_uniform("pass_stage", 0);
+  splatting_first_shader.set_uniform("view_matrix", *view_matrix);
+  splatting_first_shader.set_uniform("projection_matrix", *projection_matrix);
+  splatting_first_shader.set_uniform("projection_view_matrix", projection_view_matrix);
+
+  splatting_second_shader.use();
+  splatting_second_shader.set_uniform("pass_stage", 1);
+  splatting_second_shader.set_uniform("view_matrix", *view_matrix);
+  splatting_second_shader.set_uniform("projection_matrix", *projection_matrix);
+  splatting_second_shader.set_uniform("projection_view_matrix", projection_view_matrix);
+
+  glk::Profiler prof("splat", false);
 
   // extract valid points with transform feedback and calc vertex positions
   prof.add("extract_points");
@@ -566,53 +711,60 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   prof.add("estimate gaussian");
   estimate_gaussian(prof, renderer);
 
+  prof.add("splatting");
+  render_splatting(prof, color_texture);
+
+  prof.add("finalization");
+  result_buffer->bind();
+  glEnable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  splatting_finalization_shader.use();
+
+  splatting_buffer->color(0).bind(GL_TEXTURE0);
+  splatting_buffer->color(1).bind(GL_TEXTURE1);
+  splatting_buffer->color(2).bind(GL_TEXTURE2);
+  splatting_buffer->color(3).bind(GL_TEXTURE3);
+
+  renderer.draw_plain(splatting_finalization_shader);
+
+  splatting_buffer->color(0).unbind(GL_TEXTURE0);
+  splatting_buffer->color(1).unbind(GL_TEXTURE1);
+  splatting_buffer->color(2).unbind(GL_TEXTURE2);
+  splatting_buffer->color(3).unbind(GL_TEXTURE3);
+
+  splatting_finalization_shader.unuse();
+
+  result_buffer->unbind();
+
   prof.add("done");
 
-  guik::LightViewer::instance()->register_ui_callback("buff", [this] {
-    ImGui::Begin("textures", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-    ImGui::Text("iter:%d", num_iterations);
-    if(ImGui::Button("dec")) {
-      num_iterations--;
-    }
-    ImGui::SameLine();
-    if(ImGui::Button("inc")) {
-      num_iterations++;
-    }
-
-    ImGui::Image((void*)finalized_radius_buffer->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::Image((void*)feedback_radius_buffer->color().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::Image((void*)position_buffer->depth().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
-
-    ImGui::End();
-  });
-
   // render to screen
+  /*
   if(frame_buffer) {
-    const GLfloat black[] = {0.0f, 0.0f, 0.0f, 0.0f};
-
-    debug_shader.use();
-    gaussian_dists_buffer->color(0).bind(GL_TEXTURE0);
-    gaussian_dists_buffer->color(1).bind(GL_TEXTURE1);
-    gaussian_dists_buffer->color(2).bind(GL_TEXTURE2);
-    gaussian_dists_buffer->color(3).bind(GL_TEXTURE3);
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
 
     frame_buffer->bind();
-    glClearBufferfv(GL_COLOR, 0, black);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    debug_shader.use();
+    result_buffer->color(0).bind(GL_TEXTURE0);
+    result_buffer->color(1).bind(GL_TEXTURE1);
+    result_buffer->color(2).bind(GL_TEXTURE2);
 
     renderer.draw_plain(debug_shader);
-    // points_on_screen->draw(white_shader);
+
+    result_buffer->color(0).unbind(GL_TEXTURE0);
+    result_buffer->color(1).unbind(GL_TEXTURE1);
+    result_buffer->color(2).unbind(GL_TEXTURE2);
+    debug_shader.unuse();
 
     frame_buffer->unbind();
-
-    gaussian_dists_buffer->color(0).unbind(GL_TEXTURE0);
-    gaussian_dists_buffer->color(1).unbind(GL_TEXTURE1);
-    gaussian_dists_buffer->color(2).unbind(GL_TEXTURE2);
-    gaussian_dists_buffer->color(3).unbind(GL_TEXTURE3);
-    debug_shader.unuse();
   }
+  */
 
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_DEPTH_TEST);
+
 }
 }  // namespace glk

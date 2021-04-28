@@ -7,12 +7,19 @@
 #include <glk/effects/screen_effect.hpp>
 
 #include <glk/effects/screen_space_lighting.hpp>
+#include <glk/effects/screen_space_splatting.hpp>
 #include <glk/effects/screen_scape_attribute_estimation.hpp>
+
+#include <guik/viewer/light_viewer.hpp>
 
 namespace glk {
 
-ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
-  ssae.reset(new ScreenSpaceAttributeEstimation(size));
+ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size, bool use_splatting) {
+  if(use_splatting) {
+    splatting.reset(new ScreenSpaceSplatting(size));
+  } else {
+    ssae.reset(new ScreenSpaceAttributeEstimation(size));
+  }
 
   int width, height;
   std::vector<unsigned char> bytes;
@@ -212,13 +219,24 @@ void ScreenSpaceLighting::set_directional_light(int i, const Eigen::Vector3f& di
 }
 
 void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
-  ssae->set_size(size);
+  if(splatting) {
+    splatting->set_size(size);
+  }
+
+  if(ssae) {
+    ssae->set_size(size);
+  }
 }
 
 void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
   using namespace glk::console;
 
-  ssae->draw(renderer, color_texture, depth_texture, input);
+  if(splatting) {
+    splatting->draw(renderer, color_texture, depth_texture, input);
+  }
+  if(ssae) {
+    ssae->draw(renderer, color_texture, depth_texture, input);
+  }
 
   if(frame_buffer) {
     frame_buffer->bind();
@@ -233,6 +251,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 
   lighting_shader.use();
   lighting_shader.set_uniform("color_sampler", 0);
@@ -255,16 +274,35 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
     lighting_shader.set_uniform("light_color", light_color);
   }
 
-  color_texture.bind(GL_TEXTURE0);
-  ssae->position().bind(GL_TEXTURE1);
-  ssae->normal().bind(GL_TEXTURE2);
-  ssae->occlusion().bind(GL_TEXTURE3);
+  if(splatting) {
+    splatting->color().bind(GL_TEXTURE0);
+    splatting->position().bind(GL_TEXTURE1);
+    splatting->normal().bind(GL_TEXTURE2);
+  } else {
+    color_texture.bind(GL_TEXTURE0);
+    ssae->position().bind(GL_TEXTURE1);
+    ssae->normal().bind(GL_TEXTURE2);
+    ssae->occlusion().bind(GL_TEXTURE3);
+  }
+
   iridescence_texture->bind(GL_TEXTURE4);
 
   renderer.draw_plain(lighting_shader);
 
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
+
+  guik::LightViewer::instance()->register_ui_callback("texture", [this] {
+    ImGui::Begin("texture", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    if(splatting) {
+      ImGui::Image((void*)splatting->normal().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    } else {
+      ImGui::Image((void*)ssae->normal().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    }
+
+    ImGui::End();
+  });
 
   if(frame_buffer) {
     frame_buffer->unbind();

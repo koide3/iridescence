@@ -62,10 +62,12 @@ void main() {
   vec3 frag_normal = normalize(texture(normal_sampler, texcoord).xyz);
   float frag_occlusion = texture(occlusion_sampler, texcoord).x;
 
+  /*
   if(frag_position.w > 1.0 - 1e-5) {
     final_color = frag_color;
     return;
   }
+  */
 
   vec4 color = vec4(0.0);
   for(int i = 0; i < num_lights; i++) {
