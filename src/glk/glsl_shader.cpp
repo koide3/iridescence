@@ -140,6 +140,56 @@ GLint GLSLShader::uniform(const std::string& name) {
   return id;
 }
 
+GLint GLSLShader::subroutine(GLenum shader_type, const std::string& name) {
+  auto found = subroutine_cache.find(name);
+  if(found != subroutine_cache.end()) {
+    return found->second;
+  }
+
+  GLint id = glGetSubroutineIndex(shader_program, shader_type, name.c_str());
+  if(id == -1) {
+    std::cerr << bold_yellow << "warning : subroutine " << name << " not found" << reset << std::endl;
+  }
+
+  subroutine_cache[name] = id;
+  return id;
+}
+
+GLint GLSLShader::subroutine_uniform(GLenum shader_type, const std::string& name) {
+  auto found = uniform_cache.find(name);
+  if(found != uniform_cache.end()) {
+    return found->second;
+  }
+
+  GLint id = glGetSubroutineUniformLocation(shader_program, shader_type, name.c_str());
+  if(id == -1) {
+    std::cerr << bold_yellow << "warning : subroutine uniform " << name << " not found" << reset << std::endl;
+  }
+
+  uniform_cache[name] = id;
+  return id;
+}
+
+void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func) {
+  GLint num_subroutines = 0;
+
+  glGetProgramStageiv(shader_program, shader_type, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS, &num_subroutines);
+
+  GLint index = subroutine_uniform(shader_type, loc);
+  GLint func_index = subroutine(shader_type, func);
+
+  std::vector<GLuint> indices(num_subroutines, 0);
+
+  if(index < 0 || index >= num_subroutines) {
+    std::cerr << bold_red << "error : subroutine index out of range!!" << reset << std::endl;
+    std::cerr << bold_red << "      : num_subroutines:" << num_subroutines << " subroutine_index:" << index << reset << std::endl;
+    return;
+  }
+
+  indices[index] = func_index;
+  glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
+}
+
 GLuint GLSLShader::read_shader_from_file(const std::string& filename, GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
 

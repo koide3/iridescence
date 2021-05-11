@@ -62,11 +62,21 @@ int main(int argc, char** argv) {
   viewer->shader_setting().add("point_size", 0.0f);
   viewer->shader_setting().add("point_size_offset", 1.0f);
 
+  Eigen::Matrix4f init_light_matrix = Eigen::Matrix4f::Identity();
+  init_light_matrix.block<3, 1>(0, 3) = Eigen::Vector3f(10.0f, 10.0f, 5.0f);
+
+  guik::ModelControl model_control("light_control", init_light_matrix);
+
   float roughness = 0.1f;
   effect->set_roughness(roughness);
 
-  viewer->register_ui_callback("roughness", [&] {
-    if(ImGui::DragFloat("roughness", &roughness, 0.001f, 0.001f, 2.0f)) {
+  viewer->register_ui_callback("light_pos", [&] {
+    model_control.draw_gizmo_ui();
+    model_control.draw_gizmo(0, 0, viewer->canvas_size()[0], viewer->canvas_size()[1], viewer->view_matrix(), viewer->projection_matrix());
+
+    effect->set_light(0, model_control.model_matrix().block<3, 1>(0, 3), Eigen::Vector4f::Ones() * 2.0f);
+
+    if(ImGui::DragFloat("roughness", &roughness, 0.01f, 0.01f, 2.0f)) {
       effect->set_roughness(roughness);
     }
   });
@@ -75,27 +85,6 @@ int main(int argc, char** argv) {
 
   load("/home/koide/dump");
 
-  const int num_lights = 8;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_colors(num_lights);
-  for(int i = 0; i < num_lights; i++) {
-    light_colors[i] = glk::colormap_categoricalf(glk::COLORMAP::TURBO, i, num_lights);
-  }
-
-  double t = 0.0;
-  while(viewer->spin_once()) {
-    t += ImGui::GetIO().DeltaTime;
-    for(int i = 0; i < num_lights; i++) {
-      double theta = t + i * 2.0 * M_PI / num_lights;
-      Eigen::Vector3f light_pos(15.0 * std::cos(theta), 15.0 * std::sin(theta), 0.0f);
-      light_pos += Eigen::Vector3f(20.0f, 22.0f, 3.0f);
-      Eigen::Vector2f attenuation(0.0f, 0.001f);
-      float max_distance = 200.0f;
-      effect->set_light(i, light_pos, light_colors[i], attenuation, max_distance);
-
-      Eigen::Affine3f model_matrix = Eigen::Translation3f(light_pos) * Eigen::UniformScaling<float>(0.25f) * Eigen::Isometry3f::Identity();
-      viewer->update_drawable("light_" + std::to_string(i), glk::Primitives::sphere(),
-                              guik::FlatColor(light_colors[i], model_matrix).make_transparent());
-    }
-  }
+  viewer->spin();
   return 0;
 }

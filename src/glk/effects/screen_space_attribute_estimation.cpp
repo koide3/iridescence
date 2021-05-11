@@ -139,7 +139,6 @@ const glk::Texture& ScreenSpaceAttributeEstimation::occlusion() const {
 void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
   using namespace glk::console;
 
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
 
   // position
@@ -273,7 +272,6 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
     }
   }
 
-  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
 }
 

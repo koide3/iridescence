@@ -249,7 +249,6 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
   }
   Eigen::Vector3f view_point = view_matrix->inverse().block<3, 1>(0, 3);
 
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
 
@@ -289,7 +288,6 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   renderer.draw_plain(lighting_shader);
 
-  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
 
   guik::LightViewer::instance()->register_ui_callback("texture", [this] {

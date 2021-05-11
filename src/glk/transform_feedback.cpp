@@ -2,12 +2,12 @@
 
 namespace glk {
 
-TransformFeedback::TransformFeedback(size_t buffer_size) {
+TransformFeedback::TransformFeedback(size_t buffer_size, GLenum usage) {
   glGenTransformFeedbacks(1, &feedback);
 
   glGenBuffers(1, &tbo);
   glBindBuffer(GL_ARRAY_BUFFER, tbo);
-  glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, usage);
 
   glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, feedback);
   glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
@@ -30,6 +30,12 @@ void TransformFeedback::bind() {
 
 void TransformFeedback::unbind() {
   glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+}
+
+void TransformFeedback::read_data(intptr_t offset, size_t size, void* data) {
+  glBindBuffer(GL_ARRAY_BUFFER, tbo);
+  glGetBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void TransformFeedback::draw(glk::GLSLShader& shader) const {

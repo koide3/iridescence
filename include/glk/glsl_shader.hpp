@@ -39,6 +39,8 @@ public:
 
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
+  GLint subroutine(GLenum shader_type, const std::string& name);
+  GLint subroutine_uniform(GLenum shader_type, const std::string& name);
 
   int get_uniformi(const std::string& name) {
     int value;
@@ -113,6 +115,8 @@ public:
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
   }
 
+  void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);
+
 private:
   GLuint read_shader_from_file(const std::string& filename, GLuint shader_type);
 
@@ -123,6 +127,7 @@ private:
   GLuint shader_program;
   std::unordered_map<std::string, GLint> attrib_cache;
   std::unordered_map<std::string, GLint> uniform_cache;
+  std::unordered_map<std::string, GLint> subroutine_cache;
 };
 
 }  // namespace glk

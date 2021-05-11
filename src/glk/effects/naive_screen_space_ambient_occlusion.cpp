@@ -52,7 +52,6 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   ssao_shader.set_uniform("projection_view_matrix", projection_view_matrix);
   ssao_shader.set_uniform("inv_projection_view_matrix", projection_view_matrix.inverse().eval());
 
-  glEnable(GL_TEXTURE_2D);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, color_texture.id());
   glActiveTexture(GL_TEXTURE1);
@@ -60,8 +59,6 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   glActiveTexture(GL_TEXTURE0);
 
   renderer.draw_plain(ssao_shader);
-
-  glDisable(GL_TEXTURE_2D);
 
   if(frame_buffer) {
     frame_buffer->unbind();

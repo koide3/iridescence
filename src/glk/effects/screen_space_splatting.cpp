@@ -488,7 +488,7 @@ void ScreenSpaceSplatting::estimate_knn_radius() {
 /**
  * @brief Estimate Gaussian distributions
  */
-void ScreenSpaceSplatting::estimate_gaussian(Profiler& prof, const TextureRenderer& renderer) {
+void ScreenSpaceSplatting::estimate_gaussian(GLProfiler& prof, const TextureRenderer& renderer) {
   const GLfloat black[] = {0.0f, 0.0f, 0.0f, 0.0f};
 
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -576,7 +576,7 @@ void ScreenSpaceSplatting::estimate_gaussian(Profiler& prof, const TextureRender
 /**
  * Splatting
  */
-void ScreenSpaceSplatting::render_splatting(Profiler& prof, const glk::Texture& color_texture) {
+void ScreenSpaceSplatting::render_splatting(GLProfiler& prof, const glk::Texture& color_texture) {
   const GLfloat black[] = {0.0f, 0.0f, 0.0f, 0.0f};
   const GLfloat white[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
@@ -630,7 +630,6 @@ void ScreenSpaceSplatting::render_splatting(Profiler& prof, const glk::Texture& 
 }
 
 void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
 
   color_texture.set_filer_mode(GL_NEAREST);
@@ -693,7 +692,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   splatting_second_shader.set_uniform("projection_matrix", *projection_matrix);
   splatting_second_shader.set_uniform("projection_view_matrix", projection_view_matrix);
 
-  glk::Profiler prof("splat", false);
+  glk::GLProfiler prof("splat", false);
 
   // extract valid points with transform feedback and calc vertex positions
   prof.add("extract_points");
@@ -716,7 +715,6 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
 
   prof.add("finalization");
   result_buffer->bind();
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT);
 

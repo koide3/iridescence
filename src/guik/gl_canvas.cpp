@@ -210,7 +210,6 @@ void GLCanvas::bind() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
@@ -219,7 +218,6 @@ void GLCanvas::bind() {
  *
  */
 void GLCanvas::unbind() {
-  glDisable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_DEPTH_TEST);
@@ -241,7 +239,6 @@ void GLCanvas::unbind() {
     screen_effect->draw(*texture_renderer.get(), frame_buffer->color(), frame_buffer->depth(), input, screen_effect_buffer.get());
 
     frame_buffer->bind();
-    glEnable(GL_TEXTURE_2D);
     glDisable(GL_SCISSOR_TEST);
     glDepthMask(GL_FALSE);
 
@@ -249,7 +246,6 @@ void GLCanvas::unbind() {
 
     glDepthMask(GL_TRUE);
     glEnable(GL_SCISSOR_TEST);
-    glDisable(GL_TEXTURE_2D);
     frame_buffer->unbind();
   }
 }
@@ -272,7 +268,6 @@ void GLCanvas::bind_second() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
@@ -281,7 +276,6 @@ void GLCanvas::bind_second() {
  *
  */
 void GLCanvas::unbind_second() {
-  glDisable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_BLEND);

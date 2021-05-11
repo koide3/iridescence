@@ -8,7 +8,7 @@
 
 namespace glk {
 
-class Profiler;
+class GLProfiler;
 
 class ScreenSpaceSplatting : public ScreenEffect {
 public:
@@ -26,8 +26,8 @@ private:
   void extract_points_on_screen(const glk::Texture& depth_texture);
   void estimate_initial_radius(const glk::Texture& depth_texture);
   void estimate_knn_radius();
-  void estimate_gaussian(Profiler& prof, const TextureRenderer& renderer);
-  void render_splatting(Profiler& prof, const glk::Texture& color_texture);
+  void estimate_gaussian(GLProfiler& prof, const TextureRenderer& renderer);
+  void render_splatting(GLProfiler& prof, const glk::Texture& color_texture);
 
 private:
   glk::GLSLShader texture_shader;

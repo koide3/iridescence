@@ -29,7 +29,6 @@ void ScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const gl
     frame_buffer->bind();
   }
 
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
 
   ssao_shader.use();
@@ -45,7 +44,6 @@ void ScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const gl
 
   renderer.draw_plain(ssao_shader);
 
-  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
 
   if(frame_buffer) {
