@@ -114,6 +114,7 @@ void Application::resize(const Eigen::Vector2i& size) {
 }
 
 void Application::spin() {
+  glfwSetWindowShouldClose(window, GLFW_FALSE);
   while(spin_once()) {
   }
 }
