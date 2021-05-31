@@ -1,17 +1,25 @@
 #include <random>
 #include <iostream>
 #include <glk/path.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/frame_buffer.hpp>
 #include <glk/io/png_io.hpp>
 #include <glk/effects/screen_effect.hpp>
 
 #include <glk/effects/screen_space_lighting.hpp>
+#include <glk/effects/screen_space_splatting.hpp>
 #include <glk/effects/screen_scape_attribute_estimation.hpp>
+
+#include <guik/viewer/light_viewer.hpp>
 
 namespace glk {
 
-ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
-  ssae.reset(new ScreenSpaceAttributeEstimation(size));
+ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size, bool use_splatting) {
+  if(use_splatting) {
+    splatting.reset(new ScreenSpaceSplatting(size));
+  } else {
+    ssae.reset(new ScreenSpaceAttributeEstimation(size));
+  }
 
   int width, height;
   std::vector<unsigned char> bytes;
@@ -30,7 +38,8 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
     return;
   }
 
-  set_light(0, Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f), Eigen::Vector2f(0.0f, 0.0f), 100.0f);
+  set_directional_light(0, Eigen::Vector3f(0.4f, 0.1f, -1.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f));
+  // set_light(0, Eigen::Vector3f(0.0f, 0.0f, 50.0f), Eigen::Vector4f(2.0f, 2.0f, 2.0f, 1.0f), Eigen::Vector2f(0.0f, 0.0f), 100.0f);
 
   albedo = 1.0f;
   roughness = 0.2f;
@@ -38,7 +47,7 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size) {
   lighting_shader.use();
   lighting_shader.set_uniform("albedo", 1.0f);
   lighting_shader.set_uniform("roughness", 0.2f);
-  lighting_shader.set_uniform("ambient_light_color", Eigen::Vector4f::Zero().eval());
+  lighting_shader.set_uniform("ambient_light_color", Eigen::Vector4f(0.1f, 0.1f, 0.1f, 1.0f));
 }
 ScreenSpaceLighting::~ScreenSpaceLighting() {}
 
@@ -178,24 +187,56 @@ void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eig
   light_updated = true;
 
   while(i >= light_pos.size()) {
+    light_directional.push_back(false);
     light_range.push_back(1000.0f);
     light_attenation.push_back(Eigen::Vector2f(0.0f, 0.0f));
     light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
   }
 
+  light_directional[i] = false;
   light_range[i] = max_range;
   light_attenation[i] = attenuation;
   light_pos[i] = pos;
   light_color[i] = color;
 }
 
+void ScreenSpaceLighting::set_directional_light(int i, const Eigen::Vector3f& direction, const Eigen::Vector4f& color) {
+  light_updated = true;
+
+  while(i >= light_pos.size()) {
+    light_directional.push_back(false);
+    light_range.push_back(1000.0f);
+    light_attenation.push_back(Eigen::Vector2f(0.0f, 0.0f));
+    light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
+    light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
+  }
+
+  light_directional[i] = true;
+  light_range[i] = 0.0f;
+  light_pos[i] = direction.normalized();
+  light_color[i] = color;
+}
+
 void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
-  ssae->set_size(size);
+  if(splatting) {
+    splatting->set_size(size);
+  }
+
+  if(ssae) {
+    ssae->set_size(size);
+  }
 }
 
 void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
-  ssae->draw(renderer, color_texture, depth_texture, input);
+  using namespace glk::console;
+
+  if(splatting) {
+    splatting->draw(renderer, color_texture, depth_texture, input);
+  }
+  if(ssae) {
+    ssae->draw(renderer, color_texture, depth_texture, input);
+  }
 
   if(frame_buffer) {
     frame_buffer->bind();
@@ -203,13 +244,13 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   if(!view_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
   Eigen::Vector3f view_point = view_matrix->inverse().block<3, 1>(0, 3);
 
-  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 
   lighting_shader.use();
   lighting_shader.set_uniform("color_sampler", 0);
@@ -225,22 +266,41 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   if(light_updated) {
     lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
+    lighting_shader.set_uniform("light_directional", light_directional);
     lighting_shader.set_uniform("light_range", light_range);
     lighting_shader.set_uniform("light_attenuation", light_attenation);
     lighting_shader.set_uniform("light_pos", light_pos);
     lighting_shader.set_uniform("light_color", light_color);
   }
 
-  color_texture.bind(GL_TEXTURE0);
-  ssae->position().bind(GL_TEXTURE1);
-  ssae->normal().bind(GL_TEXTURE2);
-  ssae->occlusion().bind(GL_TEXTURE3);
+  if(splatting) {
+    splatting->color().bind(GL_TEXTURE0);
+    splatting->position().bind(GL_TEXTURE1);
+    splatting->normal().bind(GL_TEXTURE2);
+  } else {
+    color_texture.bind(GL_TEXTURE0);
+    ssae->position().bind(GL_TEXTURE1);
+    ssae->normal().bind(GL_TEXTURE2);
+    ssae->occlusion().bind(GL_TEXTURE3);
+  }
+
   iridescence_texture->bind(GL_TEXTURE4);
 
   renderer.draw_plain(lighting_shader);
 
-  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
+
+  guik::LightViewer::instance()->register_ui_callback("texture", [this] {
+    ImGui::Begin("texture", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    if(splatting) {
+      ImGui::Image((void*)splatting->normal().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    } else {
+      ImGui::Image((void*)ssae->normal().id(), ImVec2(512, 512), ImVec2(0, 1), ImVec2(1, 0));
+    }
+
+    ImGui::End();
+  });
 
   if(frame_buffer) {
     frame_buffer->unbind();

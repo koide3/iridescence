@@ -4,6 +4,7 @@
 #include <Eigen/Geometry>
 #include <glk/path.hpp>
 #include <glk/frame_buffer.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/effects/screen_scape_attribute_estimation.hpp>
 
 namespace glk {
@@ -136,14 +137,15 @@ const glk::Texture& ScreenSpaceAttributeEstimation::occlusion() const {
 }
 
 void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
-  glEnable(GL_TEXTURE_2D);
+  using namespace glk::console;
+
   glDisable(GL_DEPTH_TEST);
 
   // position
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
   if(!view_matrix || !projection_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
   Eigen::Matrix4f projection_view_matrix = (*projection_matrix) * (*view_matrix);
@@ -270,7 +272,6 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
     }
   }
 
-  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
 }
 

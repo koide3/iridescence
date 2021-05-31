@@ -11,7 +11,11 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <glk/console_colors.hpp>
+
 namespace guik {
+
+using namespace glk::console;
 
 Application::Application() : window(nullptr) {}
 
@@ -35,15 +39,14 @@ void fb_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
-  glfwSetErrorCallback([](int err, const char* desc) {
-    std::cerr << "glfw error " << err << ": " << desc << std::endl;
-  });
+  glfwSetErrorCallback(
+      [](int err, const char* desc) { std::cerr << bold_red << "glfw error " << err << ": " << desc << reset << std::endl; });
   if (!glfwInit()) {
-    std::cerr << "failed to initialize GLFW" << std::endl;
+    std::cerr << bold_red << "failed to initialize GLFW" << reset << std::endl;
     return false;
   }
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
@@ -58,7 +61,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   glfwSwapInterval(0);
 
   if (gl3wInit()) {
-    std::cerr << "failed to initialize GL3W" << std::endl;
+    std::cerr << bold_red << "failed to initialize GL3W" << reset << std::endl;
     return false;
   }
 
@@ -111,6 +114,7 @@ void Application::resize(const Eigen::Vector2i& size) {
 }
 
 void Application::spin() {
+  glfwSetWindowShouldClose(window, GLFW_FALSE);
   while(spin_once()) {
   }
 }

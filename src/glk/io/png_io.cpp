@@ -2,8 +2,11 @@
 
 #include <iostream>
 #include <libpng/png.h>
+#include <glk/console_colors.hpp>
 
 namespace glk {
+
+using namespace glk::console;
 
 namespace {
 bool load_png(FILE* fp, int& width, int& height, std::vector<unsigned char>& bytes) {
@@ -37,7 +40,7 @@ bool load_png(FILE* fp, int& width, int& height, std::vector<unsigned char>& byt
   switch(png_get_color_type(png, info)) {
     case PNG_COLOR_TYPE_PALETTE:
       png_destroy_read_struct(&png, &info, nullptr);
-      std::cerr << "PNG_COLOR_TYPE_PALETTE not supported" << std::endl;
+      std::cerr << bold_red << "PNG_COLOR_TYPE_PALETTE not supported" << reset << std::endl;
       return false;
 
     case PNG_COLOR_TYPE_GRAY:
@@ -102,12 +105,12 @@ bool load_png(FILE* fp, int& width, int& height, std::vector<unsigned char>& byt
 bool load_png(const std::string& filename, int& width, int& height, std::vector<unsigned char>& bytes) {
   FILE* fp = fopen(filename.c_str(), "rb");
   if(fp == nullptr) {
-    std::cerr << "failed to open " << filename << std::endl;
+    std::cerr << bold_red << "failed to open " << filename << reset << std::endl;
     return false;
   }
 
   if(!load_png(fp, width, height, bytes)) {
-    std::cerr << "failed to load " << filename << std::endl;
+    std::cerr << bold_red << "failed to load " << filename << reset << std::endl;
     fclose(fp);
     return false;
   }
@@ -119,24 +122,24 @@ bool load_png(const std::string& filename, int& width, int& height, std::vector<
 bool save_png(const std::string& filename, int width, int height, const std::vector<unsigned char>& bytes) {
   FILE* fp = fopen(filename.c_str(), "wb");
   if(fp == nullptr) {
-    std::cerr << "failed to open " << filename << std::endl;
+    std::cerr << bold_red << "failed to open " << filename << reset << std::endl;
     return false;
   }
 
   png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
   if(png == nullptr) {
-    std::cerr << "failed to create png write struct" << std::endl;
+    std::cerr << bold_red << "failed to create png write struct" << reset << std::endl;
     return false;
   }
 
   png_infop info = png_create_info_struct(png);
   if(info == nullptr) {
-    std::cerr << "failed to create png info struct" << std::endl;
+    std::cerr << bold_red << "failed to create png info struct" << reset << std::endl;
     return false;
   }
 
   if(setjmp(png_jmpbuf(png))) {
-    std::cerr << "failed to setjmp" << std::endl;
+    std::cerr << bold_red << "failed to setjmp" << reset << std::endl;
     return false;
   }
 

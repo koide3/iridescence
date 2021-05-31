@@ -11,6 +11,7 @@
 #include <glk/io/png_io.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
+#include <glk/console_colors.hpp>
 #include <guik/viewer/viewer_ui.hpp>
 #include <guik/viewer/info_window.hpp>
 
@@ -229,17 +230,19 @@ void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
   post_render_invoke_requests.push_back(func);
 }
 
-std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size_) {
-  Eigen::Vector2i canvas_size = canvas_size_;
-  if(canvas_size[0] <= 0 || canvas_size[1] <= 1) {
-    canvas_size = Eigen::Vector2i(512, 512);
-  }
+std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
+  using namespace glk::console;
 
   auto found = sub_contexts.find(context_name);
   if(found == sub_contexts.end()) {
+    Eigen::Vector2i init_canvas_size = canvas_size;
+    if(canvas_size[0] <= 0 || canvas_size[1] <= 0) {
+      init_canvas_size = Eigen::Vector2i(512, 512);
+    }
+
     std::shared_ptr<LightViewerContext> context(new LightViewerContext(context_name));
-    if(!context->init_canvas(canvas_size)) {
-      std::cerr << "error: failed to create sub viewer context!!" << std::endl;
+    if(!context->init_canvas(init_canvas_size)) {
+      std::cerr << bold_red << "error: failed to create sub viewer context!!" << reset << std::endl;
       return nullptr;
     }
 
@@ -247,9 +250,9 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
     return context;
   }
 
-  if(found->second->canvas_size() != canvas_size) {
+  if((canvas_size.array() > 0).all() && found->second->canvas_size() != canvas_size) {
     if(!found->second->init_canvas(canvas_size)) {
-      std::cerr << "error: failed to resize the canvas of " << context_name << "!!" << std::endl;
+      std::cerr << bold_red << "error: failed to resize the canvas of " << context_name << "!!" << reset << std::endl;
       close();
     }
   }

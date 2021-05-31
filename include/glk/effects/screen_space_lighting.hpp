@@ -5,6 +5,7 @@
 
 namespace glk {
 
+class ScreenSpaceSplatting;
 class ScreenSpaceAttributeEstimation;
 
 class ScreenSpaceLighting : public ScreenEffect {
@@ -14,7 +15,7 @@ public:
   enum class OCCLUSION_MODEL { ZERO, AMBIENT_OCCLUSION };
   enum class IRIDESCENCE_MODEL { ZERO, IRIDESCENCE1, IRIDESCENCE2, IRIDESCENCE3 };
 
-  ScreenSpaceLighting(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080));
+  ScreenSpaceLighting(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080), bool use_splatting = false);
   virtual ~ScreenSpaceLighting() override;
 
   const glk::Texture& position() const;
@@ -32,6 +33,7 @@ public:
   int num_lights() const;
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range);
+  void set_directional_light(int i, const Eigen::Vector3f& direction, const Eigen::Vector4f& color);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
@@ -40,6 +42,7 @@ private:
   bool load_shader();
 
 private:
+  std::unique_ptr<glk::ScreenSpaceSplatting> splatting;
   std::unique_ptr<glk::ScreenSpaceAttributeEstimation> ssae;
   std::unique_ptr<glk::Texture> iridescence_texture;
 
@@ -54,6 +57,7 @@ private:
   float roughness;
 
   bool light_updated;
+  std::vector<int> light_directional;
   std::vector<float> light_range;
   std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenation;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;

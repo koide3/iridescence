@@ -16,12 +16,15 @@
 #include <glk/frame_buffer.hpp>
 #include <glk/texture_renderer.hpp>
 #include <glk/effects/plain_rendering.hpp>
+#include <glk/console_colors.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/camera_control.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 
 namespace guik {
+
+using namespace glk::console;
 
 /**
  * @brief Construct a new GLCanvas object
@@ -40,6 +43,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
 
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
+  shader->set_uniform("point_size_offset", 0.0f);
 
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 
@@ -86,6 +90,7 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
+  shader->set_uniform("point_size_offset", 0.0f);
 
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 
@@ -145,7 +150,6 @@ const glk::Texture& GLCanvas::info_buffer() const {
  * @param size
  */
 void GLCanvas::set_size(const Eigen::Vector2i& size) {
-  std::cout << "set_size:" << size.transpose() << std::endl;
   this->size = size;
 
   projection_control->set_size(size);
@@ -206,7 +210,6 @@ void GLCanvas::bind() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
@@ -215,7 +218,6 @@ void GLCanvas::bind() {
  *
  */
 void GLCanvas::unbind() {
-  glDisable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_DEPTH_TEST);
@@ -237,7 +239,6 @@ void GLCanvas::unbind() {
     screen_effect->draw(*texture_renderer.get(), frame_buffer->color(), frame_buffer->depth(), input, screen_effect_buffer.get());
 
     frame_buffer->bind();
-    glEnable(GL_TEXTURE_2D);
     glDisable(GL_SCISSOR_TEST);
     glDepthMask(GL_FALSE);
 
@@ -245,7 +246,6 @@ void GLCanvas::unbind() {
 
     glDepthMask(GL_TRUE);
     glEnable(GL_SCISSOR_TEST);
-    glDisable(GL_TEXTURE_2D);
     frame_buffer->unbind();
   }
 }
@@ -268,7 +268,6 @@ void GLCanvas::bind_second() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
-  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, colormap->id());
 }
 
@@ -277,7 +276,6 @@ void GLCanvas::bind_second() {
  *
  */
 void GLCanvas::unbind_second() {
-  glDisable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable(GL_BLEND);
@@ -365,7 +363,7 @@ void GLCanvas::mouse_control() {
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
   if(!info_buffer_id) {
-    std::cerr << "warning: info buffer has not been enabled!!" << std::endl;
+    std::cerr << bold_yellow << "warning: info buffer has not been enabled!!" << reset << std::endl;
     return Eigen::Vector4i::Constant(-1);
   }
 

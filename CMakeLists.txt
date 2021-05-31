@@ -101,11 +101,14 @@ add_library(iridescence SHARED
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
+  src/glk/query.cpp
+  src/glk/transform_feedback.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
   src/glk/io/ply_io.cpp
   src/glk/io/png_io.cpp
   src/glk/effects/plain_rendering.cpp
+  src/glk/effects/screen_space_splatting.cpp
   src/glk/effects/screen_space_lighting.cpp
   src/glk/effects/screen_space_ambient_occlusion.cpp
   src/glk/effects/screen_space_attribute_estimation.cpp

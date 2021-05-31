@@ -16,6 +16,13 @@ public:
   GLSLShader();
   ~GLSLShader();
 
+  bool attach_source(const std::string& filename, GLuint shader_type);
+  bool attach_source(const std::vector<std::string>& filenames, GLuint shader_type);
+
+  bool add_feedback_varying(const std::string& name);
+
+  bool link_program();
+
   bool init(const std::string& shader_path);
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
@@ -32,6 +39,8 @@ public:
 
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
+  GLint subroutine(GLenum shader_type, const std::string& name);
+  GLint subroutine_uniform(GLenum shader_type, const std::string& name);
 
   int get_uniformi(const std::string& name) {
     int value;
@@ -85,6 +94,9 @@ public:
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
   }
 
+  void set_uniform(const std::string& name, const std::vector<int>& vectors) {
+    glUniform1iv(uniform(name), vectors.size(), vectors.data());
+  }
   void set_uniform(const std::string& name, const std::vector<float>& vectors) {
     glUniform1fv(uniform(name), vectors.size(), vectors.data());
   }
@@ -103,13 +115,19 @@ public:
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, matrix.data());
   }
 
+  void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);
+
 private:
   GLuint read_shader_from_file(const std::string& filename, GLuint shader_type);
 
 private:
+  std::vector<GLuint> shaders;
+  std::vector<std::string> feedback_varyings;
+
   GLuint shader_program;
   std::unordered_map<std::string, GLint> attrib_cache;
   std::unordered_map<std::string, GLint> uniform_cache;
+  std::unordered_map<std::string, GLint> subroutine_cache;
 };
 
 }  // namespace glk

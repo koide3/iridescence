@@ -1,6 +1,7 @@
 #include <random>
 #include <iostream>
 #include <glk/path.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/effects/screen_effect.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 
@@ -43,14 +44,14 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
   if(!view_matrix || !projection_matrix) {
-    std::cerr << "view and projection matrices must be set" << std::endl;
+    using namespace glk::console;
+    std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
   Eigen::Matrix4f projection_view_matrix = (*projection_matrix) * (*view_matrix);
   ssao_shader.set_uniform("projection_view_matrix", projection_view_matrix);
   ssao_shader.set_uniform("inv_projection_view_matrix", projection_view_matrix.inverse().eval());
 
-  glEnable(GL_TEXTURE_2D);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, color_texture.id());
   glActiveTexture(GL_TEXTURE1);
@@ -58,8 +59,6 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
   glActiveTexture(GL_TEXTURE0);
 
   renderer.draw_plain(ssao_shader);
-
-  glDisable(GL_TEXTURE_2D);
 
   if(frame_buffer) {
     frame_buffer->unbind();

@@ -21,8 +21,12 @@ public:
   void unbind() const;
   void unbind(GLenum target) const;
 
+  // They are semantically const but not logically const
+  const Texture& set_filer_mode(GLenum mode) const;
+  const Texture& set_clamp_mode(GLenum mode) const;
+
   template<typename T>
-  std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE) const;
+  std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE, int num_elements = 4) const;
 
 private:
   int width;
@@ -31,6 +35,8 @@ private:
   GLuint internal_format;
   GLuint format;
   GLuint type;
+
+  GLuint filter_mode;
 
   GLuint texture;
 };

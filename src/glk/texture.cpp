@@ -61,18 +61,36 @@ void Texture::unbind(GLenum target) const {
   glActiveTexture(GL_TEXTURE0);
 }
 
+const Texture& Texture::set_filer_mode(GLenum mode) const {
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mode);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mode);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  return *this;
+}
+
+const Texture& Texture::set_clamp_mode(GLenum mode) const {
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mode);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mode);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  return *this;
+}
+
 template<typename T>
-std::vector<T> Texture::read_pixels(GLuint format, GLuint type) const {
-  std::vector<T> pixels(width * height * 4);
+std::vector<T> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const {
+  std::vector<T> pixels(width * height * num_elements);
   glBindTexture(GL_TEXTURE_2D, texture);
   glGetTexImage(GL_TEXTURE_2D, 0, format, type, pixels.data());
+  glBindTexture(GL_TEXTURE_2D, 0);
   return pixels;
 }
 
-template std::vector<unsigned char> Texture::read_pixels(GLuint format, GLuint type) const;
-template std::vector<int> Texture::read_pixels(GLuint format, GLuint type) const;
-template std::vector<unsigned int> Texture::read_pixels(GLuint format, GLuint type) const;
-template std::vector<float> Texture::read_pixels(GLuint format, GLuint type) const;
+template std::vector<unsigned char> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const;
+template std::vector<int> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const;
+template std::vector<unsigned int> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const;
+template std::vector<uint16_t> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const;
+template std::vector<float> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const;
 
 Texture1D::Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, const void* pixels) : width(width) {
   glGenTextures(1, &texture);

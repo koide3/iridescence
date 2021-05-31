@@ -19,7 +19,10 @@ public:
   void unbind() const;
 
   int num_color_buffers() const;
-  void add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type);
+  glk::Texture& add_color_buffer(int layout, GLuint internal_format, GLuint format, GLuint type);
+  glk::Texture& add_depth_buffer(GLuint internal_format = GL_DEPTH_COMPONENT32F, GLuint format = GL_DEPTH_COMPONENT, GLuint type = GL_FLOAT);
+
+  void bind_ext_depth_buffer(const glk::Texture& depth_texture);
 
   Eigen::Vector2i size() const;
   void set_size(const Eigen::Vector2i& size);
@@ -27,6 +30,10 @@ public:
   const Texture& color() const;
   const Texture& color(int i) const;
   const Texture& depth() const;
+
+  Texture& color();
+  Texture& color(int i);
+  Texture& depth();
 
 private:
   int width;
