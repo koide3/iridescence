@@ -161,7 +161,16 @@ void define_glk(py::module_& m) {
 
  // methods
   glk_.def("set_data_path", &glk::set_data_path, "");
-  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& x) -> glk::Drawable::Ptr { return std::make_shared<glk::PointCloudBuffer>(x.data(), sizeof(float) * 3, x.rows()); } );
+  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> glk::Drawable::Ptr
+    {
+      auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.rows());
+      if(colors.rows() == points.rows()) {
+        cloud_buffer->add_color(colors.data(), sizeof(Eigen::Vector4f), colors.rows());
+      }
+      return cloud_buffer;
+    }, "",
+    py::arg("points"), py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>()
+  );
 
   // primitives
   primitives_.def("sphere", [] { return glk::Primitives::sphere(); });
