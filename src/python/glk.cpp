@@ -161,7 +161,30 @@ void define_glk(py::module_& m) {
 
  // methods
   glk_.def("set_data_path", &glk::set_data_path, "");
-  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& x) -> glk::Drawable::Ptr { return std::make_shared<glk::PointCloudBuffer>(x.data(), sizeof(float) * 3, x.rows()); } );
+  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> glk::Drawable::Ptr
+    {
+      auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.rows());
+      if(colors.rows() == points.rows()) {
+        cloud_buffer->add_color(colors.data(), sizeof(Eigen::Vector4f), colors.rows());
+      }
+      return cloud_buffer;
+    }, "",
+    py::arg("points"), py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>()
+  );
+
+  // colormaps
+    py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
+    .value("TURBO", glk::COLORMAP::TURBO)
+    .value("JET", glk::COLORMAP::JET)
+    .value("CIVIDIS", glk::COLORMAP::CIVIDIS)
+    .value("OCEAN", glk::COLORMAP::OCEAN)
+    .value("SPRING", glk::COLORMAP::SPRING)
+    .export_values();
+
+  glk_.def("colormap", &glk::colormap);
+  glk_.def("colormapf", &glk::colormapf);
+  glk_.def("colormap_categorical", &glk::colormap_categorical);
+  glk_.def("colormap_categoricalf", &glk::colormap_categoricalf);
 
   // primitives
   primitives_.def("sphere", [] { return glk::Primitives::sphere(); });

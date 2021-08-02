@@ -1,5 +1,6 @@
 imgui.ini
 
+.vscode/*
 build/*
 dist/*
 pyridescence*/*
