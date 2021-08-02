@@ -172,6 +172,20 @@ void define_glk(py::module_& m) {
     py::arg("points"), py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>()
   );
 
+  // colormaps
+    py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
+    .value("TURBO", glk::COLORMAP::TURBO)
+    .value("JET", glk::COLORMAP::JET)
+    .value("CIVIDIS", glk::COLORMAP::CIVIDIS)
+    .value("OCEAN", glk::COLORMAP::OCEAN)
+    .value("SPRING", glk::COLORMAP::SPRING)
+    .export_values();
+
+  glk_.def("colormap", &glk::colormap);
+  glk_.def("colormapf", &glk::colormapf);
+  glk_.def("colormap_categorical", &glk::colormap_categorical);
+  glk_.def("colormap_categoricalf", &glk::colormap_categoricalf);
+
   // primitives
   primitives_.def("sphere", [] { return glk::Primitives::sphere(); });
   primitives_.def("cube", [] { return glk::Primitives::cube(); });
