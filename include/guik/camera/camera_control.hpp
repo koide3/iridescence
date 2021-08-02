@@ -2,6 +2,7 @@
 #define GLK_CAMERA_CONTROL_HPP
 
 #include <memory>
+#include <iostream>
 #include <GL/gl3w.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -28,7 +29,15 @@ public:
   }
 
   virtual Eigen::Matrix4f view_matrix() const = 0;
+
+  // io
+  virtual std::string name() const = 0;
+  virtual void load(std::istream& ist) = 0;
+  virtual void save(std::ostream& ost) const = 0;
 };
+
+std::istream& operator>> (std::istream& ist, CameraControl& cam);
+std::ostream& operator<< (std::ostream& ost, const CameraControl& cam);
 
 }  // namespace guik
 

@@ -1,14 +1,20 @@
 #include <guik/viewer/viewer_ui.hpp>
 
+#include <fstream>
+
+#include <glk/path.hpp>
 #include <glk/effects/plain_rendering.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_ambient_occlusion.hpp>
 #include <glk/effects/screen_space_lighting.hpp>
 #include <glk/effects/screen_scape_attribute_estimation.hpp>
 
+#include <guik/recent_files.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
+
+#include <portable-file-dialogs.h>
 
 namespace guik {
 
@@ -357,6 +363,14 @@ public:
 
   void menu_item() {
     ImGui::MenuItem("Setting", nullptr, &show_window);
+
+    if(ImGui::MenuItem("Save Camera")) {
+      save_camera();
+    }
+
+    if(ImGui::MenuItem("Load Camera")) {
+      load_camera();
+    }
   }
 
   void draw_ui() {
@@ -382,6 +396,72 @@ public:
     viewer->get_projection_control()->draw_ui();
 
     ImGui::End();
+  }
+
+  void save_camera() {
+    guik::RecentFiles recent_files("camera_setting_filename");
+    std::string default_path = recent_files.empty() ? "/tmp/camera.config" : recent_files.most_recent();
+    std::string filename = pfd::save_file("select the destination path", default_path).result();
+
+    if(filename.empty()) {
+      return;
+    }
+    recent_files.push(filename);
+
+    std::ofstream ofs(filename);
+    auto projection = viewer->get_projection_control();
+    ofs << "ProjectionControl: " << projection->name() << std::endl;
+    ofs << (*projection) << std::endl;
+
+    auto view = viewer->get_camera_control();
+    ofs << "CameraControl: " << view->name() << std::endl;
+    ofs << (*view) << std::endl;
+  }
+
+  void load_camera() {
+    guik::RecentFiles recent_files("camera_setting_filename");
+    std::string default_path = recent_files.empty() ? "/tmp/camera.config" : recent_files.most_recent();
+    auto filenames = pfd::open_file("select the camera config file", default_path).result();
+
+    if(filenames.empty()) {
+      return;
+    }
+    recent_files.push(filenames.front());
+
+    std::ifstream ifs(filenames.front());
+
+    // load projection setting
+    std::shared_ptr<guik::ProjectionControl> proj(new guik::ProjectionControl(viewer->canvas_size()));
+    ifs >> (*proj);
+    viewer->set_projection_control(proj);
+
+    std::string line;
+    while(!ifs.eof() && std::getline(ifs, line)) {
+      if(line.find("CameraControl") == std::string::npos) {
+        continue;
+      }
+
+      std::stringstream sst(line);
+      std::string token, type;
+      sst >> token >> type;
+
+      std::shared_ptr<guik::CameraControl> camera_control;
+      if(type == "OrbitCameraControlXY") {
+        camera_control.reset(new guik::OrbitCameraControlXY());
+      } else if (type == "OrbitCameraControlXZ") {
+        camera_control.reset(new guik::OrbitCameraControlXZ());
+      } else if (type == "TopDownCameraControl") {
+        camera_control.reset(new guik::TopDownCameraControl());
+      }
+
+      if(camera_control == nullptr) {
+        std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
+        break;
+      }
+
+      ifs >> (*camera_control);
+      viewer->set_camera_control(camera_control);
+    }
   }
 
 private:

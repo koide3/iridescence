@@ -102,4 +102,21 @@ Eigen::Matrix4f OrbitCameraControlXY::view_matrix() const {
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat)).eval();
 }
 
+void OrbitCameraControlXY::load(std::istream& ist) {
+  std::string token;
+  ist >> token >> center_offset[0] >> center_offset[1] >> center_offset[2];
+  ist >> token >> center[0] >> center[1] >> center[2];
+  ist >> token >> distance;
+  ist >> token >> theta;
+  ist >> token >> phi;
+}
+
+void OrbitCameraControlXY::save(std::ostream& ost) const {
+  ost << "center_offset: " << center_offset.transpose() << std::endl;
+  ost << "center: " << center.transpose() << std::endl;
+  ost << "distance: " << distance << std::endl;
+  ost << "theta: " << theta << std::endl;
+  ost << "phi: " << phi << std::endl;
+}
+
 }  // namespace guik

@@ -53,4 +53,48 @@ void ProjectionControl::draw_ui() {
     ImGui::DragFloat("FOV", &fovy, 0.1f, 1.0f, 180.0f);
   }
 }
+
+std::string ProjectionControl::name() const {
+  const char* modes[] = { "PERSPECTIVE", "ORTHOGONAL" };
+  return modes[projection_mode];
+}
+
+void ProjectionControl::load(std::istream& ist) {
+  std::string token, mode;
+  ist >> token >> mode;
+
+  if(mode == "ORTHOGONAL") {
+    projection_mode = 1;
+  } else {
+    projection_mode = 0;
+  }
+
+  std::cout << token << std::endl;
+  ist >> token >> fovy;
+  std::cout << token << std::endl;
+  ist >> token >> width;
+  std::cout << token << std::endl;
+  ist >> token >> near;
+  std::cout << token << std::endl;
+  ist >> token >> far;
+  std::cout << token << std::endl;
+}
+
+void ProjectionControl::save(std::ostream& ost) const {
+  ost << "fovy: " << fovy << std::endl;
+  ost << "width: " << width << std::endl;
+  ost << "near: " << near << std::endl;
+  ost << "far: " << far << std::endl;
+}
+
+std::istream& operator>> (std::istream& ist, ProjectionControl& cam) {
+  cam.load(ist);
+  return ist;
+}
+
+std::ostream& operator<< (std::ostream& ost, const ProjectionControl& cam) {
+  cam.save(ost);
+  return ost;
+}
+
 }
