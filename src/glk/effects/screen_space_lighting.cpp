@@ -290,6 +290,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
   glEnable(GL_DEPTH_TEST);
 
+  /*
   guik::LightViewer::instance()->register_ui_callback("texture", [this] {
     ImGui::Begin("texture", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -301,6 +302,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
 
     ImGui::End();
   });
+  */
 
   if(frame_buffer) {
     frame_buffer->unbind();
