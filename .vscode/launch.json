@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/python3",
+            "program": "${workspaceFolder}/build/01_light_viewer_basic",
             "args": ["${workspaceFolder}/build/light_viewer.py"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

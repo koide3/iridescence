@@ -117,6 +117,7 @@ add_library(iridescence SHARED
   src/guik/model_control.cpp
   src/guik/imgui_application.cpp
   src/guik/recent_files.cpp
+  src/guik/camera/camera_control.cpp
   src/guik/camera/orbit_camera_control_xy.cpp
   src/guik/camera/orbit_camera_control_xz.cpp
   src/guik/camera/topdown_camera_control.cpp

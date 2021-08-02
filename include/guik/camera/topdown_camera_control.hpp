@@ -22,6 +22,10 @@ public:
 
   virtual Eigen::Matrix4f view_matrix() const override;
 
+  virtual std::string name() const override { return "TopDownCameraControl"; }
+  virtual void load(std::istream& ist) override;
+  virtual void save(std::ostream& ost) const override;
+
 protected:
   Eigen::Vector3f center_offset;
   Eigen::Vector3f center;

@@ -54,4 +54,13 @@ Eigen::Matrix4f OrbitCameraControlXZ::view_matrix() const {
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat)).eval();
 }
 
+
+void OrbitCameraControlXZ::load(std::istream& ist) {
+  OrbitCameraControlXY::load(ist);
+}
+
+void OrbitCameraControlXZ::save(std::ostream& ost) const {
+  OrbitCameraControlXY::save(ost);
+}
+
 }  // namespace guik

@@ -40,6 +40,11 @@ public:
 
   void show();
 
+  // io
+  std::string name() const;
+  void load(std::istream& ist);
+  void save(std::ostream& ost) const;
+
 private:
   bool show_window;
   Eigen::Vector2i size;
@@ -51,6 +56,9 @@ private:
   float near;
   float far;
 };
+
+std::istream& operator>> (std::istream& ist, ProjectionControl& cam);
+std::ostream& operator<< (std::ostream& ost, const ProjectionControl& cam);
 
 }  // namespace guik
 
