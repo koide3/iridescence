@@ -18,6 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodule: true
 
       - name: Docker login
         uses: docker/login-action@v1
