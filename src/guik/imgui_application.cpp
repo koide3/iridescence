@@ -77,6 +77,10 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
   return true;
 }
 
+void Application::enable_vsync() {
+  glfwSwapInterval(1);
+}
+
 Eigen::Vector2i Application::framebuffer_size() const {
   int width, height;
   glfwGetFramebufferSize(window, &width, &height);
