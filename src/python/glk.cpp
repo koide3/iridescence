@@ -21,7 +21,10 @@ void define_glk(py::module_& m) {
   py::module_ primitives_ = glk_.def_submodule("primitives", "");
 
   // classes
+  // glk::Drawable
   py::class_<glk::Drawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable");
+
+  // glk::ThinLines
   py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines")
     .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&, bool>(), "",
       py::arg("points"), py::arg("line_strip") = false
@@ -68,6 +71,7 @@ void define_glk(py::module_& m) {
     )
   ;
 
+  // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
     .def(py::init<float, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&>())
     // pyplot-like constructor
@@ -114,7 +118,32 @@ void define_glk(py::module_& m) {
     )
   ;
 
+  // glk::PointCloudBuffer
+  py::class_<glk::PointCloudBuffer, glk::Drawable, std::shared_ptr<glk::PointCloudBuffer>>(glk_, "PointCloudBuffer")
+    .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&>())
+    .def("add_normals",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) {
+        buffer.add_normals(normals);
+      }
+    )
+    .def("add_color",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) {
+        buffer.add_color(colors);
+      }
+    )
+    .def("add_intensity",
+      [](glk::PointCloudBuffer& buffer, glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) {
+        buffer.add_intensity(colormap, intensities, scale);
+      }, "", py::arg("colormap"), py::arg("intensities"), py::arg("scale") = 1.0f)
+    .def("add_buffer",
+      [](glk::PointCloudBuffer& buffer, const std::string& attribute_name, const Eigen::MatrixXf& data) {
+        buffer.add_buffer(attribute_name, data.cols(), data.data(), sizeof(float) * data.cols(), data.rows());
+      }
+    )
+  ;
 
+
+  // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
   py::class_<glk::NaiveScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::NaiveScreenSpaceAmbientOcclusion>>(glk_, "NaiveScreenSpaceAmbientOcclusion")
     .def(py::init<>());
@@ -161,7 +190,7 @@ void define_glk(py::module_& m) {
 
  // methods
   glk_.def("set_data_path", &glk::set_data_path, "");
-  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> glk::Drawable::Ptr
+  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> std::shared_ptr<glk::PointCloudBuffer>
     {
       auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.rows());
       if(colors.rows() == points.rows()) {
