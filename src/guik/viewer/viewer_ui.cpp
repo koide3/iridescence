@@ -97,7 +97,7 @@ public:
     }
 
     ImGui::Separator();
-    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI"};
+    std::vector<const char*> effect_modes = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI", "SSLI_SPLAT"};
     if(ImGui::Combo("Effect", &effect_mode, effect_modes.data(), effect_modes.size())) {
       if(effect_modes[effect_mode] == std::string("PLAIN")) {
         viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
@@ -109,6 +109,8 @@ public:
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceAmbientOcclusion>(viewer->canvas_size()));
       } else if(effect_modes[effect_mode] == std::string("SSLI")) {
         viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size()));
+      } else if(effect_modes[effect_mode] == std::string("SSLI_SPLAT")) {
+        viewer->set_screen_effect(std::make_shared<glk::ScreenSpaceLighting>(viewer->canvas_size(), true));
       }
     }
 
