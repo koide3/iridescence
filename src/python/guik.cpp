@@ -98,6 +98,9 @@ void define_guik(py::module_& m) {
   
   // LightViewerContext
   py::class_<guik::LightViewerContext, std::shared_ptr<guik::LightViewerContext>>(guik_, "LightViewerContext")
+    .def("set_size", &guik::LightViewerContext::set_size)
+    .def("set_clear_color", &guik::LightViewerContext::set_clear_color)
+    .def("set_pos", &guik::LightViewerContext::set_pos, "", py::arg("pos"), py::arg("cond") = static_cast<int>(ImGuiCond_FirstUseEver))
     .def("clear", &guik::LightViewerContext::clear)
     .def("clear_text", &guik::LightViewerContext::clear_text)
     .def("append_text", &guik::LightViewerContext::append_text)

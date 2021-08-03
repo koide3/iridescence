@@ -22,7 +22,7 @@ void define_imgui(py::module_& m) {
 
   imgui_.attr("Cond_Always") = py::int_(static_cast<int>(ImGuiCond_Always));
   imgui_.attr("Cond_Once") = py::int_(static_cast<int>(ImGuiCond_Once));
-  imgui_.attr("Cond_FirstUserEver") = py::int_(static_cast<int>(ImGuiCond_FirstUseEver));
+  imgui_.attr("Cond_FirstUseEver") = py::int_(static_cast<int>(ImGuiCond_FirstUseEver));
   imgui_.attr("Cond_Appearing") = py::int_(static_cast<int>(ImGuiCond_Appearing));
 
   imgui_.attr("Dir_Left") = py::int_(static_cast<int>(ImGuiDir_Left));
