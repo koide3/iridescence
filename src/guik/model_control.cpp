@@ -8,6 +8,8 @@
 
 #include <Eigen/Core>
 
+#include <guik/viewer/light_viewer.hpp>
+
 namespace guik {
 
 ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix) : name(name), pose(init_model_matrix), gizmo_operation(ImGuizmo::OPERATION::ROTATE) {}
@@ -79,12 +81,19 @@ void ModelControl::draw_gizmo_ui() {
   gizmo_operation = static_cast<ImGuizmo::OPERATION>(op);
 }
 
+void ModelControl::draw_gizmo() {
+  auto viewer = guik::LightViewer::instance();
+  auto size = viewer->canvas_size();
+
+  draw_gizmo(0, 0, size[0], size[1], viewer->view_matrix(), viewer->projection_matrix(), false);
+}
+
 void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window) {
   ImGuizmo::Enable(true);
   if(on_window) {
     ImGuizmo::SetDrawlist();
   }
-  ImGuizmo::SetRect(win_x, win_x, win_w, win_h);
+  ImGuizmo::SetRect(win_x, win_y, win_w, win_h);
 
   Eigen::Matrix4f model = pose.matrix();
   Eigen::Matrix4f delta = Eigen::Matrix4f::Identity();

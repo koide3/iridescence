@@ -19,7 +19,7 @@ namespace guik {
 
 std::shared_ptr<LightViewer> LightViewer::inst;
 
-LightViewer::LightViewer() : Application(), LightViewerContext("main") {}
+LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
 
 LightViewer::~LightViewer() {}
 
@@ -121,7 +121,7 @@ void LightViewer::draw_ui() {
 
   if(!texts_.empty()) {
     ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
-    for(int i = std::max<int>(0, texts_.size() - 32); i < texts_.size(); i++) {
+    for(int i = std::max<int>(0, texts_.size() - max_texts_size); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());
     }
@@ -181,6 +181,10 @@ void LightViewer::clear_text() {
 void LightViewer::append_text(const std::string& text) {
   std::lock_guard<std::mutex> lock(texts_mutex);
   texts.push_back(text);
+}
+
+void LightViewer::set_max_text_buffer_size(int size) {
+  max_texts_size = size;
 }
 
 bool LightViewer::spin_until_click() {

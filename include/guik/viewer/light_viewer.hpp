@@ -42,6 +42,7 @@ public:
   virtual void clear() override;
   virtual void clear_text() override;
   virtual void append_text(const std::string& text) override;
+  void set_max_text_buffer_size(int size);
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
@@ -65,6 +66,7 @@ private:
   std::unique_ptr<InfoWindow> info_window;
 
   std::mutex texts_mutex;
+  int max_texts_size;
   std::deque<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 

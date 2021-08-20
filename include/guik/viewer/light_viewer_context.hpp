@@ -76,6 +76,12 @@ public:
   void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
 
+  Eigen::Vector2i canvas_tl() const {
+    return canvas_rect_min;
+  }
+  Eigen::Vector2i canvas_br() const {
+    return canvas_rect_max;
+  }
   Eigen::Vector2i canvas_size() const {
     return canvas->size;
   }
@@ -92,6 +98,8 @@ public:
 
 protected:
   std::string context_name;
+  Eigen::Vector2i canvas_rect_min;
+  Eigen::Vector2i canvas_rect_max;
   std::unique_ptr<guik::GLCanvas> canvas;
   guik::ShaderSetting global_shader_setting;
 
