@@ -30,6 +30,7 @@ void define_guik(py::module_& m) {
   py::module_ guik_ = m.def_submodule("guik", "");
 
   // classess
+  // guik::ShaderSetting
   py::class_<guik::ShaderSetting, std::shared_ptr<guik::ShaderSetting>>(guik_, "ShaderSetting")
     .def("add", &guik::ShaderSetting::add<float>)
     .def("add", &guik::ShaderSetting::add<Eigen::Vector2f>)
@@ -37,6 +38,7 @@ void define_guik(py::module_& m) {
     .def("addi", &guik::ShaderSetting::add<Eigen::Vector4i>)
     .def("make_transparent", &guik::ShaderSetting::make_transparent);
 
+  // guik::Rainbow
   py::class_<guik::Rainbow, guik::ShaderSetting, std::shared_ptr<guik::Rainbow>>(guik_, "Rainbow")
     .def(py::init<>())
     .def(py::init<Eigen::Matrix4f>())
@@ -48,6 +50,7 @@ void define_guik(py::module_& m) {
         }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
       );
 
+  // guik::VertexColor
   py::class_<guik::VertexColor, guik::ShaderSetting, std::shared_ptr<guik::VertexColor>>(guik_, "VertexColor")
     .def(py::init<>())
     .def(py::init<Eigen::Matrix4f>())
@@ -59,6 +62,7 @@ void define_guik(py::module_& m) {
         }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
       );
 
+  // guik::FlatColor
   py::class_<guik::FlatColor, guik::ShaderSetting, std::shared_ptr<guik::FlatColor>>(guik_, "FlatColor")
     .def(py::init<float, float, float, float>())
     .def(py::init<float, float, float, float, Eigen::Matrix4f>())
@@ -71,6 +75,7 @@ void define_guik(py::module_& m) {
                 py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
       );
 
+  // guik::ModelControl
   py::class_<guik::ModelControl>(guik_, "ModelControl")
     .def(py::init<std::string, Eigen::Matrix4f>(), "", py::arg("label") = "model_control", py::arg("model_matrix") = Eigen::Matrix4f::Identity())
     .def("draw_ui", &guik::ModelControl::draw_ui, "")
@@ -81,12 +86,21 @@ void define_guik(py::module_& m) {
     )
     .def("model_matrix", &guik::ModelControl::model_matrix, "")
     .def("set_model_matrix", &guik::ModelControl::set_model_matrix, "");
+  
+  // guik::CameraControl
+  py::class_<guik::CameraControl, std::shared_ptr<guik::CameraControl>>(guik_, "CameraControl");
+
+  // guik::ProjectionControl
+  py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
 
   // methods
   guik_.def("anon", &guik::anon, "");
   
   // LightViewerContext
   py::class_<guik::LightViewerContext, std::shared_ptr<guik::LightViewerContext>>(guik_, "LightViewerContext")
+    .def("set_size", &guik::LightViewerContext::set_size)
+    .def("set_clear_color", &guik::LightViewerContext::set_clear_color)
+    .def("set_pos", &guik::LightViewerContext::set_pos, "", py::arg("pos"), py::arg("cond") = static_cast<int>(ImGuiCond_FirstUseEver))
     .def("clear", &guik::LightViewerContext::clear)
     .def("clear_text", &guik::LightViewerContext::clear_text)
     .def("append_text", &guik::LightViewerContext::append_text)
@@ -102,6 +116,10 @@ void define_guik(py::module_& m) {
     .def("use_orbit_camera_control", &guik::LightViewerContext::use_orbit_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::LightViewerContext::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
     .def("use_topdown_camera_control", &guik::LightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+    .def("get_camera_control", &guik::LightViewerContext::get_camera_control, "")
+    .def("set_camera_control", &guik::LightViewerContext::set_camera_control, "")
+    .def("get_projection_control", &guik::LightViewerContext::get_projection_control, "")
+    .def("set_projection_control", &guik::LightViewerContext::set_projection_control, "")
     ;
 
   // LightViewer
@@ -114,6 +132,8 @@ void define_guik(py::module_& m) {
     .def("spin", &guik::LightViewer::spin, "")
     .def("spin_once", &guik::LightViewer::spin_once, "")
     .def("spin_until_click", &guik::LightViewer::spin_until_click, "")
+
+    .def("enable_vsync", &guik::LightViewer::enable_vsync, "")
 
     // LightViewerContext methods
     .def("clear", &guik::LightViewer::clear)

@@ -1,5 +1,6 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
+#include <ImGuizmo.h>
 #include <glk/primitives/primitives.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
@@ -16,6 +17,8 @@ LightViewerContext::LightViewerContext(const std::string& context_name) : contex
 LightViewerContext::~LightViewerContext() {}
 
 bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
+  canvas_rect_min.setZero();
+  canvas_rect_max = size;
   canvas.reset(new guik::GLCanvas(size));
   if(!canvas->ready()) {
     return false;
@@ -80,16 +83,20 @@ void LightViewerContext::draw_ui() {
   ImGui::BeginChild("canvas", ImVec2(canvas->size[0], canvas->size[1]), false, flags);
   ImVec2 sub_window_pos = ImGui::GetWindowPos();
 
-  if(ImGui::IsWindowFocused()) {
+  if(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing()) {
     canvas->mouse_control();
   }
 
   ImGui::Image((void*)canvas->frame_buffer->color().id(), ImVec2(canvas->size[0], canvas->size[1]), ImVec2(0, 1), ImVec2(1, 0));
-  ImGui::EndChild();
+  ImVec2 rect_min = ImGui::GetItemRectMin();
+  ImVec2 rect_max = ImGui::GetItemRectMax();
+  canvas_rect_min = Eigen::Vector2i(rect_min.x, rect_min.y);
+  canvas_rect_max = Eigen::Vector2i(rect_max.x, rect_max.y);
 
   for(const auto& callback : sub_ui_callbacks) {
     callback.second();
   }
+  ImGui::EndChild();
 
   ImGui::End();
 
