@@ -23,8 +23,8 @@ LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_text
 
 LightViewer::~LightViewer() {}
 
-bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version) {
-  Application::init(size, glsl_version);
+bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version, bool background) {
+  Application::init(size, glsl_version, background);
   // GL::Renderer::setClearColor(0x474747_rgbf); // lightwave
   // GL::Renderer::setClearColor(0x3a3a3a_rgbf); // blender
 

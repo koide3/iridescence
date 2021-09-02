@@ -221,5 +221,9 @@ void define_glk(py::module_& m) {
   primitives_.def("icosahedron", [] { return glk::Primitives::icosahedron(); });
   primitives_.def("bunny", [] { return glk::Primitives::bunny(); });
   primitives_.def("coordinate_system", [] { return glk::Primitives::coordinate_system(); });
-
+  primitives_.def("wire_sphere", [] { return glk::Primitives::wire_sphere(); });
+  primitives_.def("wire_cube", [] { return glk::Primitives::wire_cube(); });
+  primitives_.def("wire_cone", [] { return glk::Primitives::wire_cone(); });
+  primitives_.def("wire_icosahedron", [] { return glk::Primitives::wire_icosahedron(); });
+  primitives_.def("wire_bunny", [] { return glk::Primitives::wire_bunny(); });
 }
