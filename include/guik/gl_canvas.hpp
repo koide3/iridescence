@@ -27,6 +27,7 @@ public:
   void set_clear_color(const Eigen::Vector4f& color);
   void set_colormap(glk::COLORMAP colormap_type);
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  const std::shared_ptr<glk::ScreenEffect>& get_effect() const;
 
   void enable_normal_buffer();
   void enable_info_buffer();

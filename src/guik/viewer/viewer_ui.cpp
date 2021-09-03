@@ -114,6 +114,66 @@ public:
       }
     }
 
+    if(effect_modes[effect_mode] == std::string("SSLI")) {
+      auto ssli = std::dynamic_pointer_cast<glk::ScreenSpaceLighting>(viewer->get_screen_effect());
+
+      if(ssli) {
+        float albedo = ssli->get_albedo();
+        float roughness = ssli->get_roughness();
+
+        if(ImGui::DragFloat("albedo", &albedo, 0.01f, 0.0f)) {
+          ssli->set_albedo(albedo);
+        }
+
+        if(ImGui::DragFloat("roughness", &roughness, 0.01f, 0.0f)) {
+          ssli->set_roughness(roughness);
+        }
+
+        for(int i = 0; i < ssli->num_lights(); i++) {
+          const float max_color_magnitude = 3.0f;
+          bool directional = ssli->is_light_directional(i);
+          Eigen::Vector3f pos = ssli->get_light_pos(i);
+          Eigen::Vector4f color = ssli->get_light_color(i) / max_color_magnitude;
+
+          if(directional) {
+            pos.normalize();
+          }
+
+          std::string label = "Light_" + std::to_string(i);
+          ImGui::Separator();
+          ImGui::Text(label.c_str());
+
+          label = "directional##" + std::to_string(i);
+          if(ImGui::Checkbox(label.c_str(), &directional)) {
+            ssli->set_light_directional(i, directional);
+          }
+
+          label = (directional ? "dir##" : "pos##") + std::to_string(i);
+          const float speed = directional ? 0.01f : 0.1f;
+          if(ImGui::DragFloat3(label.c_str(), pos.data(), speed)) {
+            if(directional) {
+              pos.normalize();
+            }
+            ssli->set_light_pos(i, pos);
+          }
+
+          label = "color##" + std::to_string(i);
+          if(ImGui::ColorEdit4(label.c_str(), color.data())) {
+            ssli->set_light_color(i, color * max_color_magnitude);
+          }
+        }
+
+        ImGui::Separator();
+        if(ImGui::Button("add positional")) {
+          ssli->set_light(ssli->num_lights(), Eigen::Vector3f::Ones() * 10.0f, Eigen::Vector4f::Ones() * 0.5f);
+        }
+
+        if(ImGui::Button("add directional")) {
+          ssli->set_directional_light(ssli->num_lights(), -Eigen::Vector3f::UnitZ(), Eigen::Vector4f::Ones() * 0.5f);
+        }
+      }
+    }
+
     ImGui::End();
   }
 

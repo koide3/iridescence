@@ -200,6 +200,10 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
   canvas->set_effect(effect);
 }
 
+const std::shared_ptr<glk::ScreenEffect>& LightViewerContext::get_screen_effect() const {
+  return canvas->get_effect();
+}
+
 void LightViewerContext::enable_normal_buffer() {
   canvas->enable_normal_buffer();
 }

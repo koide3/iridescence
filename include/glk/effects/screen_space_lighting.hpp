@@ -27,6 +27,9 @@ public:
   void set_occlusion_model(OCCLUSION_MODEL model);
   void set_iridescence_model(IRIDESCENCE_MODEL model);
 
+  float get_albedo() const;
+  float get_roughness() const;
+
   void set_albedo(float albedo);
   void set_roughness(float roughness);
 
@@ -34,6 +37,20 @@ public:
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color);
   void set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range);
   void set_directional_light(int i, const Eigen::Vector3f& direction, const Eigen::Vector4f& color);
+
+  bool is_light_directional(int i) const;
+  float get_light_range(int i) const;
+  const Eigen::Vector2f& get_light_attenuation(int i) const;
+  const Eigen::Vector3f& get_light_pos(int i) const;
+  const Eigen::Vector3f& get_light_dir(int i) const;
+  const Eigen::Vector4f& get_light_color(int i) const;
+
+  void set_light_directional(int i, bool directional);
+  void set_light_range(int i, float range);
+  void set_light_attenuation(int i, const Eigen::Vector2f& attenuation);
+  void set_light_pos(int i, const Eigen::Vector3f& pos);
+  void set_light_dir(int i, const Eigen::Vector3f& dir);
+  void set_light_color(int i, const Eigen::Vector4f& color);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
   virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
@@ -59,7 +76,7 @@ private:
   bool light_updated;
   std::vector<int> light_directional;
   std::vector<float> light_range;
-  std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenation;
+  std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenuation;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_color;
 };

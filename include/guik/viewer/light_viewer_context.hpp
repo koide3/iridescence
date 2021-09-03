@@ -44,6 +44,7 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  const std::shared_ptr<glk::ScreenEffect>& get_screen_effect() const;
 
   void enable_normal_buffer();
   void enable_info_buffer();
