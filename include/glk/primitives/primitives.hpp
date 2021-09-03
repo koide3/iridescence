@@ -53,6 +53,26 @@ public:
     return primitive_ptr(BUNNY);
   }
 
+  static glk::Drawable::ConstPtr wire_icosahedron() {
+    return primitive_ptr(WIRE_ICOSAHEDRON);
+  }
+
+  static glk::Drawable::ConstPtr wire_sphere() {
+    return primitive_ptr(WIRE_SPHERE);
+  }
+
+  static glk::Drawable::ConstPtr wire_cube() {
+    return primitive_ptr(WIRE_CUBE);
+  }
+
+  static glk::Drawable::ConstPtr wire_cone() {
+    return primitive_ptr(WIRE_CONE);
+  }
+
+  static glk::Drawable::ConstPtr wire_bunny() {
+    return primitive_ptr(WIRE_BUNNY);
+  }
+
 private:
   const glk::Drawable& create_primitive(PrimitiveType type);
   std::shared_ptr<glk::Drawable> create_primitive_ptr(PrimitiveType type);

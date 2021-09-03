@@ -38,7 +38,7 @@ void fb_size_callback(GLFWwindow* window, int width, int height) {
   appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width, height));
 }
 
-bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
+bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background) {
   glfwSetErrorCallback(
       [](int err, const char* desc) { std::cerr << bold_red << "glfw error " << err << ": " << desc << reset << std::endl; });
   if (!glfwInit()) {
@@ -48,6 +48,10 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version) {
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
+  if(background) {
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+  }
 
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
   if (window == nullptr) {
@@ -124,10 +128,6 @@ void Application::spin() {
 }
 
 bool Application::spin_once() {
-  if(!glfwGetWindowAttrib(window, GLFW_VISIBLE)) {
-    return !glfwWindowShouldClose(window);
-  }
-
   glfwPollEvents();
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
