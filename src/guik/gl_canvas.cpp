@@ -118,6 +118,10 @@ void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   }
 }
 
+const std::shared_ptr<glk::ScreenEffect>& GLCanvas::get_effect() const {
+  return screen_effect;
+}
+
 void GLCanvas::enable_normal_buffer() {
   normal_buffer_id = frame_buffer->num_color_buffers();
   frame_buffer->add_color_buffer(2, GL_RGB32F, GL_RGB, GL_FLOAT);

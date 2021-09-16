@@ -167,6 +167,14 @@ bool ScreenSpaceLighting::load_shader() {
   return lighting_shader.init(vertex_shaders, fragment_shaders);
 }
 
+float ScreenSpaceLighting::get_albedo() const {
+  return albedo;
+}
+
+float ScreenSpaceLighting::get_roughness() const {
+  return roughness;
+}
+
 void ScreenSpaceLighting::set_albedo(float albedo) {
   this->albedo = albedo;
 }
@@ -179,6 +187,60 @@ int ScreenSpaceLighting::num_lights() const {
   return light_pos.size();
 }
 
+bool ScreenSpaceLighting::is_light_directional(int i) const {
+  return light_directional[i];
+}
+
+float ScreenSpaceLighting::get_light_range(int i) const {
+  return light_range[i];
+}
+
+const Eigen::Vector2f& ScreenSpaceLighting::get_light_attenuation(int i) const {
+  return light_attenuation[i];
+}
+
+const Eigen::Vector3f& ScreenSpaceLighting::get_light_pos(int i) const {
+  return light_pos[i];
+}
+
+const Eigen::Vector3f& ScreenSpaceLighting::get_light_dir(int i) const {
+  return light_pos[i];
+}
+
+const Eigen::Vector4f& ScreenSpaceLighting::get_light_color(int i) const {
+  return light_color[i];
+}
+
+void ScreenSpaceLighting::set_light_directional(int i, bool directional) {
+  light_updated = true;
+  light_directional[i] = directional;
+}
+
+void ScreenSpaceLighting::set_light_range(int i, float range) {
+  light_updated = true;
+  light_range[i] = range;
+}
+
+void ScreenSpaceLighting::set_light_attenuation(int i, const Eigen::Vector2f& attenuation) {
+  light_updated = true;
+  light_attenuation[i] = attenuation;
+}
+
+void ScreenSpaceLighting::set_light_pos(int i, const Eigen::Vector3f& pos) {
+  light_updated = true;
+  light_pos[i] = pos;
+}
+
+void ScreenSpaceLighting::set_light_dir(int i, const Eigen::Vector3f& dir) {
+  light_updated = true;
+  light_pos[i] = dir;
+}
+
+void ScreenSpaceLighting::set_light_color(int i, const Eigen::Vector4f& color) {
+  light_updated = true;
+  light_color[i] = color;
+}
+
 void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) {
   set_light(i, pos, color, Eigen::Vector2f::Zero(), 1e6f);
 }
@@ -189,14 +251,14 @@ void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eig
   while(i >= light_pos.size()) {
     light_directional.push_back(false);
     light_range.push_back(1000.0f);
-    light_attenation.push_back(Eigen::Vector2f(0.0f, 0.0f));
+    light_attenuation.push_back(Eigen::Vector2f(0.0f, 0.0f));
     light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
   }
 
   light_directional[i] = false;
   light_range[i] = max_range;
-  light_attenation[i] = attenuation;
+  light_attenuation[i] = attenuation;
   light_pos[i] = pos;
   light_color[i] = color;
 }
@@ -207,7 +269,7 @@ void ScreenSpaceLighting::set_directional_light(int i, const Eigen::Vector3f& di
   while(i >= light_pos.size()) {
     light_directional.push_back(false);
     light_range.push_back(1000.0f);
-    light_attenation.push_back(Eigen::Vector2f(0.0f, 0.0f));
+    light_attenuation.push_back(Eigen::Vector2f(0.0f, 0.0f));
     light_pos.push_back(Eigen::Vector3f(0.0f, 0.0f, 0.0f));
     light_color.push_back(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
   }
@@ -268,7 +330,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
     lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
     lighting_shader.set_uniform("light_directional", light_directional);
     lighting_shader.set_uniform("light_range", light_range);
-    lighting_shader.set_uniform("light_attenuation", light_attenation);
+    lighting_shader.set_uniform("light_attenuation", light_attenuation);
     lighting_shader.set_uniform("light_pos", light_pos);
     lighting_shader.set_uniform("light_color", light_color);
   }
