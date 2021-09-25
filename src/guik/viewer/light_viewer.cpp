@@ -139,7 +139,9 @@ void LightViewer::draw_ui() {
     ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::vector<std::string> names;
-    std::transform(images.begin(), images.end(), std::back_inserter(names), [](const auto& img) { return img.first; });
+    for(const auto& image : images) {
+      names.push_back(image.first);
+    }
     std::sort(names.begin(), names.end());
 
     for(const auto& name : names) {
