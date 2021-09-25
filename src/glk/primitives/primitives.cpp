@@ -12,6 +12,7 @@
 #include <glk/primitives/cone.hpp>
 #include <glk/primitives/icosahedron.hpp>
 #include <glk/primitives/coordinate_system.hpp>
+#include <glk/primitives/frustum.hpp>
 #include <glk/io/ply_io.hpp>
 
 namespace glk {
@@ -66,6 +67,10 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
       case COORDINATE_SYSTEM: {
         glk::CoordinateSystem coord;
         meshes[type].reset(new glk::Lines(0.01f, coord.vertices, coord.colors));
+      } break;
+      case WIRE_FRUSTUM: {
+        glk::Frustum frustum(0.6f, 0.4f, 0.5f);
+        meshes[type].reset(new glk::Mesh(frustum.vertices, frustum.normals, frustum.indices, true));
       } break;
     }
   }

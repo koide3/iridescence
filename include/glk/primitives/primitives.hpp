@@ -12,7 +12,22 @@ private:
   }
 
 public:
-  enum PrimitiveType { ICOSAHEDRON = 0, SPHERE, CUBE, CONE, GRID, COORDINATE_SYSTEM, BUNNY, WIRE_ICOSAHEDRON, WIRE_SPHERE, WIRE_CUBE, WIRE_CONE, WIRE_BUNNY, NUM_PRIMITIVES };
+  enum PrimitiveType {
+    ICOSAHEDRON = 0,
+    SPHERE,
+    CUBE,
+    CONE,
+    GRID,
+    COORDINATE_SYSTEM,
+    BUNNY,
+    WIRE_ICOSAHEDRON,
+    WIRE_SPHERE,
+    WIRE_CUBE,
+    WIRE_CONE,
+    WIRE_BUNNY,
+    WIRE_FRUSTUM,
+    NUM_PRIMITIVES
+  };
 
   static Primitives* instance() {
     if(instance_ == nullptr) {
@@ -71,6 +86,10 @@ public:
 
   static glk::Drawable::ConstPtr wire_bunny() {
     return primitive_ptr(WIRE_BUNNY);
+  }
+
+  static glk::Drawable::ConstPtr wire_frustum() {
+    return primitive_ptr(WIRE_FRUSTUM);
   }
 
 private:

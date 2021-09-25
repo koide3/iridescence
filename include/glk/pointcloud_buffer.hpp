@@ -29,6 +29,7 @@ public:
   PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points);
+  PointCloudBuffer(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& points);
 
   virtual ~PointCloudBuffer() override;
 
@@ -39,7 +40,7 @@ public:
 
   void add_normals(const float* data, int stride, int num_points);
   void add_color(const float* data, int stride, int num_points);
-  void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale=1.0f);
+  void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale = 1.0f);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
   virtual void draw(glk::GLSLShader& shader) const override;
