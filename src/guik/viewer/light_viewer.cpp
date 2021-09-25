@@ -97,7 +97,8 @@ void LightViewer::draw_ui() {
         }
       }
 
-      double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
+      double time =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
       std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
       if(glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
         std::cout << "screen shot saved:" << filename << std::endl;
@@ -113,6 +114,7 @@ void LightViewer::draw_ui() {
     }
   }
 
+  // texts
   std::vector<std::string> texts_;
   {
     std::lock_guard<std::mutex> texts_lock(texts_mutex);
@@ -129,6 +131,30 @@ void LightViewer::draw_ui() {
     if(ImGui::Button("clear")) {
       clear_text();
     }
+    ImGui::End();
+  }
+
+  // images
+  if(!images.empty()) {
+    ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    std::vector<std::string> names;
+    for(const auto& image : images) {
+      names.push_back(image.first);
+    }
+    std::sort(names.begin(), names.end());
+
+    for(const auto& name : names) {
+      const auto& image = images[name];
+      const double scale = image.first;
+      const auto& texture = image.second;
+
+      Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
+
+      ImGui::Text(name.c_str());
+      ImGui::Image((void*)texture->id(), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
+    }
+
     ImGui::End();
   }
 
@@ -185,6 +211,21 @@ void LightViewer::append_text(const std::string& text) {
 
 void LightViewer::set_max_text_buffer_size(int size) {
   max_texts_size = size;
+}
+
+void LightViewer::clear_images() {
+  images.clear();
+}
+
+void LightViewer::remove_image(const std::string& name) {
+  auto found = images.find(name);
+  if(found != images.end()) {
+    images.erase(found);
+  }
+}
+
+void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale) {
+  images[name] = std::make_pair(scale, image);
 }
 
 bool LightViewer::spin_until_click() {

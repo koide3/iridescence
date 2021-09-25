@@ -44,6 +44,10 @@ public:
   virtual void append_text(const std::string& text) override;
   void set_max_text_buffer_size(int size);
 
+  void clear_images();
+  void remove_image(const std::string& name);
+  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = 1.0);
+
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
   void show_viewer_ui();
@@ -69,6 +73,8 @@ private:
   int max_texts_size;
   std::deque<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
+
+  std::unordered_map<std::string, std::pair<double, std::shared_ptr<glk::Texture>>> images;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 
