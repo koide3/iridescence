@@ -39,20 +39,7 @@ endif()
 ## Build ##
 ###########
 
-include_directories(
-  include
-  thirdparty/imgui
-  thirdparty/imgui/examples
-  thirdparty/ImGuizmo
-  thirdparty/portable-file-dialogs
-  thirdparty/gl3w
-  ${PNG_INCLUDE_DIRS}
-  ${GLM_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-)
+
 
 
 # imgui
@@ -63,7 +50,7 @@ add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 ###########
 
 add_library(gl_imgui SHARED
-  thirdparty/gl3w/gl3w.c
+  thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
   thirdparty/imgui/imgui_draw.cpp
@@ -74,6 +61,14 @@ add_library(gl_imgui SHARED
   thirdparty/ImGuizmo/ImSequencer.cpp
   thirdparty/imgui/examples/imgui_impl_glfw.cpp
   thirdparty/imgui/examples/imgui_impl_opengl3.cpp
+)
+target_include_directories(gl_imgui PUBLIC
+  include
+  thirdparty/imgui
+  thirdparty/imgui/examples
+  thirdparty/ImGuizmo
+  thirdparty/portable-file-dialogs
+  thirdparty/gl3w
 )
 target_link_libraries(gl_imgui
   ${OPENGL_LIBRARIES}
@@ -127,6 +122,20 @@ add_library(iridescence SHARED
   src/guik/viewer/viewer_ui.cpp
   src/guik/viewer/info_window.cpp
   src/guik/viewer/anonymous.cpp
+)
+target_include_directories(iridescence PUBLIC
+  include
+  thirdparty/imgui
+  thirdparty/imgui/examples
+  thirdparty/ImGuizmo
+  thirdparty/portable-file-dialogs
+  thirdparty/gl3w
+  ${PNG_INCLUDE_DIRS}
+  ${GLM_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui

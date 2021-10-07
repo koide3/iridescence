@@ -31,6 +31,11 @@ public:
   PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& points);
 
+  PointCloudBuffer(const Eigen::Vector3f* points, int num_points);
+  PointCloudBuffer(const Eigen::Vector4f* points, int num_points);
+  PointCloudBuffer(const Eigen::Vector3d* points, int num_points);
+  PointCloudBuffer(const Eigen::Vector4d* points, int num_points);
+
   virtual ~PointCloudBuffer() override;
 
   void add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals);

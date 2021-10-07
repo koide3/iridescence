@@ -45,6 +45,18 @@ PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector4d, Eigen::ali
     : PointCloudBuffer(
           Eigen::Matrix<double, 3, -1>(Eigen::Map<const Eigen::Matrix<double, 4, -1>>(points.front().data(), 4, points.size()).topRows(3))) {}
 
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3f* points, int num_points)
+    : PointCloudBuffer(points->data(), sizeof(Eigen::Vector3f), num_points) {}
+
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points)
+    : PointCloudBuffer(points->data(), sizeof(Eigen::Vector4f), num_points) {}
+
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points)
+    : PointCloudBuffer(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>(points, points + num_points)) {}
+
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points)
+    : PointCloudBuffer(std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>(points, points + num_points)) {}
+
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);
   for(const auto& aux : aux_buffers) {
