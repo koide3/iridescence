@@ -6,7 +6,7 @@
 #include <vector>
 #include <Eigen/Core>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <glk/glsl_shader.hpp>
 
 namespace glk {

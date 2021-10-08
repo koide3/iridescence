@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include <Eigen/Dense>
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
 
 namespace glk {

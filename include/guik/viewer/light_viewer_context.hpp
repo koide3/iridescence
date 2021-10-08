@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/camera/camera_control.hpp>

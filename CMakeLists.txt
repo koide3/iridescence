@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(iridescence)
 
-option(BUILD_PYTHON_BINDINGS "Build python bindings" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -9,18 +10,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-find_package(PCL)
+# find_package(PCL)
 find_package(PNG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
-
-find_package(catkin COMPONENTS roslib)
-
-set(built_in_ros FALSE)
-if(catkin_FOUND AND NOT "${CATKIN_DEVEL_PREFIX}" MATCHES "${CMAKE_CURRENT_SOURCE_DIR}.*")
-  set(built_in_ros TRUE)
-endif()
-message(STATUS "built_in_ros:${built_in_ros}")
 
 ###################################
 ## catkin specific configuration ##
@@ -39,11 +32,9 @@ endif()
 ## Build ##
 ###########
 
-
-
-
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+add_compile_definitions(DATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
 ###########
 ## Build ##
@@ -134,16 +125,12 @@ target_include_directories(iridescence PUBLIC
   ${GLM_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
   pthread
-  ${PCL_LIBRARIES}
   ${PNG_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${catkin_LIBRARIES}
 )
 
 if(BUILD_PYTHON_BINDINGS)
@@ -162,25 +149,31 @@ if(BUILD_PYTHON_BINDINGS)
   # target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
 endif()
 
-# copy shader files
-file(COPY data DESTINATION .)
-
 # build examples
-file(GLOB example_sources "src/example/*.cpp")
+if(BUILD_EXAMPLES)
+  file(GLOB example_sources "src/example/*.cpp")
 
-foreach(example_src IN LISTS example_sources)
-  get_filename_component(example_name ${example_src} NAME_WE)
+  foreach(example_src IN LISTS example_sources)
+    get_filename_component(example_name ${example_src} NAME_WE)
 
-  if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
-    if(NOT PCL_FOUND)
-      continue()
+    if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
+      if(NOT PCL_FOUND)
+        continue()
+      endif()
     endif()
-  endif()
 
-  add_executable(${example_name}
-    ${example_src}
-  )
-  target_link_libraries(${example_name}
-    iridescence
-  )
-endforeach()
+    add_executable(${example_name}
+      ${example_src}
+    )
+    target_link_libraries(${example_name}
+      iridescence
+    )
+  endforeach()
+endif()
+
+
+# install
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+# install(TARGETS gl_imgui iridescence)
+install(DIRECTORY include/ DESTINATION include/iridescence)
+install(DIRECTORY data/ DESTINATION share/iridescence/data)

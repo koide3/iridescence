@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <boost/optional.hpp>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/imgui_application.hpp>
 

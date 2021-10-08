@@ -5,7 +5,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 

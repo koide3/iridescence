@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <Eigen/Dense>
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <glk/thin_lines.hpp>
 
 namespace glk {

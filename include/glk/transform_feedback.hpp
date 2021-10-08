@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <GL/gl3w.h>
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 

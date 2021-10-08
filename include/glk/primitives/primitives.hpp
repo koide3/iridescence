@@ -1,7 +1,7 @@
 #ifndef GLK_PRIMITIVES_HPP
 #define GLK_PRIMITIVES_HPP
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 

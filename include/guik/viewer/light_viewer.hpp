@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/imgui_application.hpp>
 #include <guik/viewer/shader_setting.hpp>
