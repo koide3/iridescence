@@ -174,6 +174,8 @@ endif()
 
 # install
 file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
-# install(TARGETS gl_imgui iridescence)
+install(TARGETS gl_imgui iridescence)
 install(DIRECTORY include/ DESTINATION include/iridescence)
+install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION include/iridescence/GL)
+install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h DESTINATION include/iridescence)
 install(DIRECTORY data/ DESTINATION share/iridescence/data)
