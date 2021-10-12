@@ -89,5 +89,9 @@
   "python.analysis.extraPaths": [
     "/home/koide/catkin_ws/devel/lib/python2.7/dist-packages",
     "/opt/ros/melodic/lib/python2.7/dist-packages"
+  ],
+  "cSpell.words": [
+    "Eigen",
+    "Quaternionf"
   ]
 }

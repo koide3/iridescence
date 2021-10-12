@@ -21,7 +21,7 @@ std::string find_file(const std::string& hint, const std::string& path) {
     boost::filesystem::recursive_directory_iterator itr(hint);
     boost::filesystem::recursive_directory_iterator end;
 
-    for(itr; itr != end; itr++) {
+    for(; itr != end; itr++) {
       if(itr->path().string().find(path) != std::string::npos) {
         std::string found = itr->path().string();
         return found.substr(0, found.size() - path.size() - 1);

@@ -10,7 +10,7 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   ArcBallCameraControl();
-  ArcBallCameraControl(double distance);
+  ArcBallCameraControl(double distance, const Eigen::Quaternionf& quat = Eigen::Quaternionf::Identity());
   virtual ~ArcBallCameraControl() override;
 
   virtual void reset_center() override;
@@ -27,16 +27,25 @@ public:
 
   virtual Eigen::Matrix4f view_matrix() const override;
 
+  virtual std::string name() const override {
+    return "ArcBallCameraControl";
+  }
+  virtual void load(std::istream& ist) override;
+  virtual void save(std::ostream& ost) const override;
+
 protected:
   double distance;
   Eigen::Vector3f center;
   Eigen::Vector3f center_offset;
+
+  Eigen::Vector3f delta_trans;
 
   Eigen::Quaternionf orientation;
   Eigen::Quaternionf delta_orientation;
 
   bool left_button_down;
   bool middle_button_down;
+  Eigen::Vector2i mouse_down_pos;
   Eigen::Vector2i drag_last_pos;
 };
 
