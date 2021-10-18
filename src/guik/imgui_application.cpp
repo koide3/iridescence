@@ -20,7 +20,7 @@ using namespace glk::console;
 Application::Application() : window(nullptr) {}
 
 Application ::~Application() {
-  if (!window) {
+  if(!window) {
     return;
   }
 
@@ -41,7 +41,7 @@ void fb_size_callback(GLFWwindow* window, int width, int height) {
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background) {
   glfwSetErrorCallback(
       [](int err, const char* desc) { std::cerr << bold_red << "glfw error " << err << ": " << desc << reset << std::endl; });
-  if (!glfwInit()) {
+  if(!glfwInit()) {
     std::cerr << bold_red << "failed to initialize GLFW" << reset << std::endl;
     return false;
   }
@@ -54,7 +54,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   }
 
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
-  if (window == nullptr) {
+  if(window == nullptr) {
     return false;
   }
   appmap[window] = this;
@@ -62,9 +62,9 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   glfwSetFramebufferSizeCallback(window, fb_size_callback);
 
   glfwMakeContextCurrent(window);
-  glfwSwapInterval(0);
+  glfwSwapInterval(1);
 
-  if (gl3wInit()) {
+  if(gl3wInit()) {
     std::cerr << bold_red << "failed to initialize GL3W" << reset << std::endl;
     return false;
   }
@@ -83,6 +83,10 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
 
 void Application::enable_vsync() {
   glfwSwapInterval(1);
+}
+
+void Application::disable_vsync() {
+  glfwSwapInterval(0);
 }
 
 Eigen::Vector2i Application::framebuffer_size() const {
@@ -185,7 +189,9 @@ bool Application::closed() {
   return glfwWindowShouldClose(window);
 }
 
-void Application::draw_ui() { ImGui::ShowDemoWindow(); }
+void Application::draw_ui() {
+  ImGui::ShowDemoWindow();
+}
 
 void Application::draw_gl() {}
 

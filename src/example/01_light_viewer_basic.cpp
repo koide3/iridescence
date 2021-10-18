@@ -1,10 +1,9 @@
 #include <glk/primitives/primitives.hpp>
-#include <guik/camera/arcball_camera_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
-  viewer->set_camera_control(std::make_shared<guik::ArcBallCameraControl>(10.0));
+  viewer->show_info_window();
 
   float time = 0.0f;
   viewer->register_ui_callback("ui", [&]() {

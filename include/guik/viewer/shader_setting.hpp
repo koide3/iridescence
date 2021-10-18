@@ -122,20 +122,25 @@ inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::I
   return add<Eigen::Matrix4f>(name, value.matrix());
 }
 
+template<>
+inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::Affine3f& value) {
+  return add<Eigen::Matrix4f>(name, value.matrix());
+}
+
 struct Rainbow : public ShaderSetting {
 public:
   Rainbow() : ShaderSetting(ColorMode::RAINBOW) {}
 
   template<typename Transform>
-  Rainbow(const Transform& transform) : ShaderSetting(ColorMode::RAINBOW, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
+  Rainbow(const Transform& transform)
+      : ShaderSetting(ColorMode::RAINBOW, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~Rainbow() override {}
 };
 
 struct FlatColor : public ShaderSetting {
 public:
-  FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR)
-  {
+  FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR) {
     params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
   }
 
@@ -144,16 +149,47 @@ public:
   }
 
   template<typename Transform>
-  FlatColor(float r, float g, float b, float a, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
+  FlatColor(float r, float g, float b, float a, const Transform& transform)
+      : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
     params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", Eigen::Vector4f(r, g, b, a))));
   }
 
   template<typename Transform>
-  FlatColor(const Eigen::Vector4f& color, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
+  FlatColor(const Eigen::Vector4f& color, const Transform& transform)
+      : ShaderSetting(ColorMode::FLAT_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {
     params.push_back(std::shared_ptr<ShaderParameter<Eigen::Vector4f>>(new ShaderParameter<Eigen::Vector4f>("material_color", color)));
   }
 
   virtual ~FlatColor() override {}
+};
+
+/* primitive colors */
+struct FlatRed : public FlatColor {
+  FlatRed() : FlatColor(1.0f, 0.0f, 0.0f, 1.0f) {}
+
+  template<typename Transform>
+  FlatRed(const Transform& transform) : FlatColor(1.0f, 0.0f, 0.0f, 1.0f, transform) {}
+};
+
+struct FlatGreen : public FlatColor {
+  FlatGreen() : FlatColor(0.0f, 1.0f, 0.0f, 1.0f) {}
+
+  template<typename Transform>
+  FlatGreen(const Transform& transform) : FlatColor(0.0f, 1.0f, 0.0f, 1.0f, transform) {}
+};
+
+struct FlatBlue : public FlatColor {
+  FlatBlue() : FlatColor(0.0f, 0.0f, 1.0f, 1.0f) {}
+
+  template<typename Transform>
+  FlatBlue(const Transform& transform) : FlatColor(0.0f, 0.0f, 1.0f, 1.0f, transform) {}
+};
+
+struct FlatOrange : public FlatColor {
+  FlatOrange() : FlatColor(1.0f, 0.5f, 0.0f, 1.0f) {}
+
+  template<typename Transform>
+  FlatOrange(const Transform& transform) : FlatColor(1.0f, 0.5f, 0.0f, 1.0f, transform) {}
 };
 
 struct VertexColor : public ShaderSetting {
@@ -161,7 +197,8 @@ public:
   VertexColor() : ShaderSetting(ColorMode::VERTEX_COLOR) {}
 
   template<typename Transform>
-  VertexColor(const Transform& transform) : ShaderSetting(ColorMode::VERTEX_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
+  VertexColor(const Transform& transform)
+      : ShaderSetting(ColorMode::VERTEX_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~VertexColor() override {}
 };
@@ -171,7 +208,8 @@ public:
   TextureColor() : ShaderSetting(ColorMode::TEXTURE_COLOR) {}
 
   template<typename Transform>
-  TextureColor(const Transform& transform) : ShaderSetting(ColorMode::TEXTURE_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
+  TextureColor(const Transform& transform)
+      : ShaderSetting(ColorMode::TEXTURE_COLOR, (transform * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~TextureColor() override {}
 };
