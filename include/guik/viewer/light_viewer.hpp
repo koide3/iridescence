@@ -46,7 +46,7 @@ public:
 
   void clear_images();
   void remove_image(const std::string& name);
-  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = 1.0);
+  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0);
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
