@@ -4,7 +4,9 @@ project(iridescence)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 
-set(default_build_type "Release")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -108,6 +110,7 @@ add_library(iridescence SHARED
   src/guik/camera/orbit_camera_control_xy.cpp
   src/guik/camera/orbit_camera_control_xz.cpp
   src/guik/camera/topdown_camera_control.cpp
+  src/guik/camera/arcball_camera_control.cpp
   src/guik/camera/projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp

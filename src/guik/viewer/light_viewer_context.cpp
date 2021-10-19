@@ -7,6 +7,7 @@
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
+#include <guik/camera/arcball_camera_control.hpp>
 
 namespace guik {
 
@@ -306,6 +307,12 @@ void LightViewerContext::use_orbit_camera_control_xz(double distance, double the
 
 void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
   canvas->camera_control.reset(new guik::TopDownCameraControl(distance, theta));
+}
+
+void LightViewerContext::use_arcball_camera_control(double distance, double theta, double phi) {
+  Eigen::Quaternionf quat(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY()));
+
+  canvas->camera_control.reset(new guik::ArcBallCameraControl(distance, quat));
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

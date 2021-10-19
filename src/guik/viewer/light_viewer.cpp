@@ -151,8 +151,8 @@ void LightViewer::draw_ui() {
 
       Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
 
-      ImGui::Text(name.c_str());
-      ImGui::Image((void*)texture->id(), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
+      ImGui::Text("%s", name.c_str());
+      ImGui::Image(reinterpret_cast<void*>(texture->id()), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
     }
 
     ImGui::End();

@@ -19,6 +19,7 @@ public:
   bool ok() const;
 
   void enable_vsync();
+  void disable_vsync();
 
   Eigen::Vector2i window_size() const;
   virtual void show_window();

@@ -13,6 +13,7 @@
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
+#include <guik/camera/arcball_camera_control.hpp>
 
 #include <portable-file-dialogs.h>
 
@@ -141,7 +142,7 @@ public:
 
           std::string label = "Light_" + std::to_string(i);
           ImGui::Separator();
-          ImGui::Text(label.c_str());
+          ImGui::Text("%s", label.c_str());
 
           label = "directional##" + std::to_string(i);
           if(ImGui::Checkbox(label.c_str(), &directional)) {
@@ -442,7 +443,7 @@ public:
 
     ImGui::Begin("camera", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
 
-    std::vector<const char*> view_modes = {"Orbit(XY)", "Orbit(XZ)", "TOPDOWN"};
+    std::vector<const char*> view_modes = {"Orbit(XY)", "Orbit(XZ)", "TOPDOWN", "ARCBALL"};
     if(ImGui::Combo("View mode", &view_mode, view_modes.data(), view_modes.size())) {
       if(view_modes[view_mode] == std::string("Orbit(XY)")) {
         viewer->set_camera_control(std::shared_ptr<OrbitCameraControlXY>(new OrbitCameraControlXY()));
@@ -452,6 +453,9 @@ public:
       }
       if(view_modes[view_mode] == std::string("TOPDOWN")) {
         viewer->set_camera_control(std::shared_ptr<TopDownCameraControl>(new TopDownCameraControl()));
+      }
+      if(view_modes[view_mode] == std::string("ARCBALL")) {
+        viewer->set_camera_control(std::shared_ptr<ArcBallCameraControl>(new ArcBallCameraControl()));
       }
     }
 
@@ -510,10 +514,12 @@ public:
       std::shared_ptr<guik::CameraControl> camera_control;
       if(type == "OrbitCameraControlXY") {
         camera_control.reset(new guik::OrbitCameraControlXY());
-      } else if (type == "OrbitCameraControlXZ") {
+      } else if(type == "OrbitCameraControlXZ") {
         camera_control.reset(new guik::OrbitCameraControlXZ());
-      } else if (type == "TopDownCameraControl") {
+      } else if(type == "TopDownCameraControl") {
         camera_control.reset(new guik::TopDownCameraControl());
+      } else if(type == "ArcBallCameraControl") {
+        camera_control.reset(new guik::ArcBallCameraControl());
       }
 
       if(camera_control == nullptr) {
@@ -585,6 +591,12 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
     display_setting_window->menu_item();
     if(ImGui::MenuItem("Show Info Window")) {
       viewer->show_info_window();
+    }
+    if(ImGui::MenuItem("Enable vsync")) {
+      viewer->enable_vsync();
+    }
+    if(ImGui::MenuItem("Disable vsync")) {
+      viewer->disable_vsync();
     }
     ImGui::EndMenu();
   }
