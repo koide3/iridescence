@@ -106,6 +106,21 @@ public:
     return boost::none;
   }
 
+  template<typename T>
+  const T& cast(const std::string& name) {
+    for(const auto& param : params) {
+      if(param->name != name) {
+        continue;
+      }
+
+      auto p = std::static_pointer_cast<ShaderParameter<T>>(param);
+      return p->value;
+    }
+
+    std::cerr << "error: " << name << " not found in the param list" << std::endl;
+    abort();
+  }
+
   void set(glk::GLSLShader& shader) const {
     for(const auto& param : params) {
       param->set(shader);
