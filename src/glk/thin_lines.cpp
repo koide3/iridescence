@@ -6,10 +6,9 @@
 namespace glk {
 
 ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip)
-: ThinLines(vertices, nullptr, num_vertices, line_strip)
-{}
+    : ThinLines(vertices, nullptr, num_vertices, line_strip) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip) {
+ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip) : line_width(1.0f) {
   this->num_vertices = num_vertices;
   this->mode = line_strip ? GL_LINE_STRIP : GL_LINES;
 
@@ -32,7 +31,8 @@ ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertice
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip) {
+ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip)
+    : line_width(1.0f) {
   num_vertices = vertices.size();
   mode = line_strip ? GL_LINE_STRIP : GL_LINES;
 
@@ -49,7 +49,8 @@ ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip) {
+ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip)
+    : line_width(1.0f) {
   num_vertices = vertices.size();
   mode = line_strip ? GL_LINE_STRIP : GL_LINES;
 
@@ -81,6 +82,8 @@ ThinLines::~ThinLines() {
 void ThinLines::draw(glk::GLSLShader& shader) const {
   GLint position_loc = shader.attrib("vert_position");
   GLint color_loc = shader.attrib("vert_color");
+
+  glLineWidth(line_width);
 
   glBindVertexArray(vao);
 

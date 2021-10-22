@@ -25,11 +25,16 @@ public:
 
   virtual void draw(glk::GLSLShader& shader) const override;
 
+  void set_line_width(float width) {
+    line_width = width;
+  }
+
 private:
   ThinLines(const ThinLines&);
   ThinLines& operator=(const ThinLines&);
 
 private:
+  float line_width;
   int num_vertices;
 
   GLenum mode; // line mode (GL_LINES/GL_LINE_STRIP)
