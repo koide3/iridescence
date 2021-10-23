@@ -33,6 +33,13 @@ public:
     return inst;
   }
 
+  static void destroy() {
+    if(inst) {
+      inst->clear();
+      inst.reset();
+    }
+  }
+
   bool spin_until_click();
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
