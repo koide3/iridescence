@@ -94,6 +94,7 @@ add_library(iridescence SHARED
   src/glk/transform_feedback.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
+  src/glk/io/ascii_io.cpp
   src/glk/io/ply_io.cpp
   src/glk/io/png_io.cpp
   src/glk/effects/plain_rendering.cpp

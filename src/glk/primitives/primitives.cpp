@@ -62,8 +62,8 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
       } break;
       case BUNNY:
       case WIRE_BUNNY: {
-        glk::PLYLoader ply(get_data_path() + "/models/bunny.ply");
-        meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices, wireframe));
+        auto ply = load_ply_ascii(get_data_path() + "/models/bunny.ply");
+        meshes[type].reset(new glk::Mesh(ply->vertices, ply->normals, ply->indices, wireframe));
       } break;
       case COORDINATE_SYSTEM: {
         glk::CoordinateSystem coord;
