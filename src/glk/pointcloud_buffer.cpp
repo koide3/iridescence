@@ -77,6 +77,12 @@ void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4f, Eigen::align
   add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
 }
 
+void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& colors) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(colors.size());
+  std::transform(colors.begin(), colors.end(), colors_f.begin(), [](const Eigen::Vector4d& p) { return p.cast<float>(); });
+  add_color(colors_f);
+}
+
 void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) {
   add_intensity(colormap, intensities.data(), sizeof(float), intensities.size(), scale);
 }

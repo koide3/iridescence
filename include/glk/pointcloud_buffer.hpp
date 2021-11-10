@@ -41,6 +41,7 @@ public:
 
   void add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals);
   void add_color(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors);
+  void add_color(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& colors);
   void add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale = 1.0f);
   void add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale = 1.0f);
 
