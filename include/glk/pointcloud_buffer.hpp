@@ -28,6 +28,7 @@ public:
   PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points);
   PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points);
+  PointCloudBuffer(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points);
   PointCloudBuffer(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& points);
 

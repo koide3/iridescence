@@ -38,6 +38,10 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points)
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points)
     : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<float, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
 
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& points)
+    : PointCloudBuffer(
+          Eigen::Matrix<float, 3, -1>(Eigen::Map<const Eigen::Matrix<float, 4, -1>>(points.front().data(), 4, points.size()).topRows(3))) {}
+
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points)
     : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<double, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
 
