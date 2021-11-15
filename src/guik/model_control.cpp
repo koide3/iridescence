@@ -103,6 +103,10 @@ void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const 
   pose = Eigen::Affine3f(model);
 }
 
+bool ModelControl::is_guizmo_using() const {
+  return ImGuizmo::IsUsing();
+}
+
 const std::string& ModelControl::model_name() const { return name; }
 
 Eigen::Matrix4f ModelControl::model_matrix() const { return pose.matrix(); }
