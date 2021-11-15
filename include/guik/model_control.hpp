@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include <imgui.h>
-#include <ImGuizmo.h>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -30,7 +29,7 @@ private:
   std::string name;
   Eigen::Affine3f pose;
 
-  ImGuizmo::OPERATION gizmo_operation;
+  int gizmo_operation;
 };
 
 }  // namespace guik
