@@ -82,12 +82,17 @@
     "forward_list": "cpp",
     "shared_mutex": "cpp",
     "variant": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "numericaldiff": "cpp"
   },
   "editor.tabSize": 2,
   "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, ColumnLimit: 256, AccessModifierOffset: -2, SortIncludes: false}",
   "python.analysis.extraPaths": [
     "/home/koide/catkin_ws/devel/lib/python2.7/dist-packages",
     "/opt/ros/melodic/lib/python2.7/dist-packages"
+  ],
+  "cSpell.words": [
+    "Eigen",
+    "Quaternionf"
   ]
 }

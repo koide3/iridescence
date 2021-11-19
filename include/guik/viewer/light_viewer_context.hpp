@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/camera/camera_control.hpp>
@@ -76,6 +76,7 @@ public:
   void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
+  void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
 
   Eigen::Vector2i canvas_tl() const {
     return canvas_rect_min;

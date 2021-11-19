@@ -38,6 +38,10 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points)
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points)
     : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<float, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
 
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& points)
+    : PointCloudBuffer(
+          Eigen::Matrix<float, 3, -1>(Eigen::Map<const Eigen::Matrix<float, 4, -1>>(points.front().data(), 4, points.size()).topRows(3))) {}
+
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points)
     : PointCloudBuffer(Eigen::Map<const Eigen::Matrix<double, 3, -1>>(points.front().data(), 3, points.size()).eval()) {}
 
@@ -71,6 +75,12 @@ void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3f, Eigen::ali
 
 void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) {
   add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+}
+
+void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& colors) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(colors.size());
+  std::transform(colors.begin(), colors.end(), colors_f.begin(), [](const Eigen::Vector4d& p) { return p.cast<float>(); });
+  add_color(colors_f[0].data(), sizeof(Eigen::Vector4f), colors_f.size());
 }
 
 void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) {

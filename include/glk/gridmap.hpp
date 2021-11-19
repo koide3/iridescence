@@ -2,7 +2,7 @@
 #define GLK_GRIDMAP_HPP
 
 #include <memory>
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 

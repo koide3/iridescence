@@ -4,6 +4,7 @@
 #include <glk/path.hpp>
 #include <glk/mesh.hpp>
 #include <glk/lines.hpp>
+#include <glk/thin_lines.hpp>
 #include <glk/mesh_utils.hpp>
 #include <glk/console_colors.hpp>
 
@@ -61,10 +62,16 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
       } break;
       case BUNNY:
       case WIRE_BUNNY: {
-        glk::PLYLoader ply(get_data_path() + "/models/bunny.ply");
-        meshes[type].reset(new glk::Mesh(ply.vertices, ply.normals, ply.indices, wireframe));
+        auto ply = load_ply_ascii(get_data_path() + "/models/bunny.ply");
+        meshes[type].reset(new glk::Mesh(ply->vertices, ply->normals, ply->indices, wireframe));
       } break;
       case COORDINATE_SYSTEM: {
+        glk::CoordinateSystem coord;
+        auto lines = std::make_shared<glk::ThinLines>(coord.vertices, coord.colors);
+        lines->set_line_width(2.5f);
+        meshes[type] = lines;
+      } break;
+      case SOLID_COORDINATE_SYSTEM: {
         glk::CoordinateSystem coord;
         meshes[type].reset(new glk::Lines(0.01f, coord.vertices, coord.colors));
       } break;

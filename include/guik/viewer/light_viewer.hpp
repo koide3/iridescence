@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/imgui_application.hpp>
 #include <guik/viewer/shader_setting.hpp>
@@ -33,6 +33,13 @@ public:
     return inst;
   }
 
+  static void destroy() {
+    if(inst) {
+      inst->clear();
+      inst.reset();
+    }
+  }
+
   bool spin_until_click();
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
@@ -46,7 +53,7 @@ public:
 
   void clear_images();
   void remove_image(const std::string& name);
-  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = 1.0);
+  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0);
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 

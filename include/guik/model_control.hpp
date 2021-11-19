@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include <imgui.h>
-#include <ImGuizmo.h>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -22,6 +21,8 @@ public:
   void draw_gizmo();
   void draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window = false);
 
+  bool is_guizmo_using() const;
+  
   const std::string& model_name() const;
   Eigen::Matrix4f model_matrix() const;
   void set_model_matrix(const Eigen::Matrix4f& matrix) { pose = Eigen::Affine3f(matrix); }
@@ -30,7 +31,7 @@ private:
   std::string name;
   Eigen::Affine3f pose;
 
-  ImGuizmo::OPERATION gizmo_operation;
+  int gizmo_operation;
 };
 
 }  // namespace guik

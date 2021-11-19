@@ -151,8 +151,8 @@ void LightViewer::draw_ui() {
 
       Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
 
-      ImGui::Text(name.c_str());
-      ImGui::Image((void*)texture->id(), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
+      ImGui::Text("%s", name.c_str());
+      ImGui::Image(reinterpret_cast<void*>(texture->id()), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
     }
 
     ImGui::End();
@@ -225,6 +225,12 @@ void LightViewer::remove_image(const std::string& name) {
 }
 
 void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale) {
+  if(scale < 0.0) {
+    double scale_x = 640.0 / image->size()[0];
+    double scale_y = 480.0 / image->size()[1];
+    scale = std::min(scale_x, scale_y);
+  }
+
   images[name] = std::make_pair(scale, image);
 }
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <Eigen/Core>
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 

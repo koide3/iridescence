@@ -1,7 +1,13 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(iridescence)
 
-option(BUILD_PYTHON_BINDINGS "Build python bindings" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -9,18 +15,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-find_package(PCL)
+# find_package(PCL)
 find_package(PNG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
-
-find_package(catkin COMPONENTS roslib)
-
-set(built_in_ros FALSE)
-if(catkin_FOUND AND NOT "${CATKIN_DEVEL_PREFIX}" MATCHES "${CMAKE_CURRENT_SOURCE_DIR}.*")
-  set(built_in_ros TRUE)
-endif()
-message(STATUS "built_in_ros:${built_in_ros}")
 
 ###################################
 ## catkin specific configuration ##
@@ -39,11 +37,9 @@ endif()
 ## Build ##
 ###########
 
-
-
-
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+add_compile_definitions(DATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
 ###########
 ## Build ##
@@ -100,6 +96,7 @@ add_library(iridescence SHARED
   src/glk/transform_feedback.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp
+  src/glk/io/ascii_io.cpp
   src/glk/io/ply_io.cpp
   src/glk/io/png_io.cpp
   src/glk/effects/plain_rendering.cpp
@@ -116,6 +113,7 @@ add_library(iridescence SHARED
   src/guik/camera/orbit_camera_control_xy.cpp
   src/guik/camera/orbit_camera_control_xz.cpp
   src/guik/camera/topdown_camera_control.cpp
+  src/guik/camera/arcball_camera_control.cpp
   src/guik/camera/projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
@@ -134,16 +132,12 @@ target_include_directories(iridescence PUBLIC
   ${GLM_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
   pthread
-  ${PCL_LIBRARIES}
   ${PNG_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${catkin_LIBRARIES}
 )
 
 if(BUILD_PYTHON_BINDINGS)
@@ -162,25 +156,34 @@ if(BUILD_PYTHON_BINDINGS)
   # target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
 endif()
 
-# copy shader files
-file(COPY data DESTINATION .)
-
 # build examples
-file(GLOB example_sources "src/example/*.cpp")
+if(BUILD_EXAMPLES)
+  file(GLOB example_sources "src/example/*.cpp")
 
-foreach(example_src IN LISTS example_sources)
-  get_filename_component(example_name ${example_src} NAME_WE)
+  foreach(example_src IN LISTS example_sources)
+    get_filename_component(example_name ${example_src} NAME_WE)
 
-  if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
-    if(NOT PCL_FOUND)
-      continue()
+    if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
+      if(NOT PCL_FOUND)
+        continue()
+      endif()
     endif()
-  endif()
 
-  add_executable(${example_name}
-    ${example_src}
-  )
-  target_link_libraries(${example_name}
-    iridescence
-  )
-endforeach()
+    add_executable(${example_name}
+      ${example_src}
+    )
+    target_link_libraries(${example_name}
+      iridescence
+    )
+  endforeach()
+endif()
+
+
+# install
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS gl_imgui iridescence)
+install(DIRECTORY include/ DESTINATION include/iridescence)
+install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION include/iridescence/GL)
+install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h DESTINATION include/iridescence)
+install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION include/iridescence)
+install(DIRECTORY data/ DESTINATION share/iridescence/data)

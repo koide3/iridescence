@@ -1,7 +1,7 @@
 #ifndef GLK_PRIMITIVES_HPP
 #define GLK_PRIMITIVES_HPP
 
-#include <glk/drawble.hpp>
+#include <glk/drawable.hpp>
 
 namespace glk {
 
@@ -19,6 +19,7 @@ public:
     CONE,
     GRID,
     COORDINATE_SYSTEM,
+    SOLID_COORDINATE_SYSTEM,
     BUNNY,
     WIRE_ICOSAHEDRON,
     WIRE_SPHERE,
@@ -62,6 +63,10 @@ public:
 
   static glk::Drawable::ConstPtr coordinate_system() {
     return primitive_ptr(COORDINATE_SYSTEM);
+  }
+
+  static glk::Drawable::ConstPtr solid_coordinate_system() {
+    return primitive_ptr(SOLID_COORDINATE_SYSTEM);
   }
 
   static glk::Drawable::ConstPtr bunny() {
