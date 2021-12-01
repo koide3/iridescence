@@ -7,6 +7,7 @@
 #include <chrono>
 #include <future>
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <glk/io/png_io.hpp>
 #include <glk/glsl_shader.hpp>
@@ -205,8 +206,11 @@ void LightViewer::clear_text() {
 }
 
 void LightViewer::append_text(const std::string& text) {
+  std::vector<std::string> texts;
+  boost::split(texts, text, boost::is_any_of("\n"));
+
   std::lock_guard<std::mutex> lock(texts_mutex);
-  texts.push_back(text);
+  this->texts.insert(this->texts.end(), texts.begin(), texts.end());
 }
 
 void LightViewer::set_max_text_buffer_size(int size) {

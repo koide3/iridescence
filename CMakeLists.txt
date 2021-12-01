@@ -39,7 +39,7 @@ endif()
 
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
-add_compile_definitions(DATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
+add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
 ###########
 ## Build ##
@@ -181,7 +181,7 @@ endif()
 
 # install
 file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
-install(TARGETS gl_imgui iridescence)
+install(TARGETS gl_imgui iridescence DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include/iridescence)
 install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION include/iridescence/GL)
 install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h DESTINATION include/iridescence)
