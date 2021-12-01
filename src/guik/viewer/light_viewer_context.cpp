@@ -1,5 +1,7 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
+#include <boost/algorithm/string.hpp>
+
 #include <ImGuizmo.h>
 #include <glk/primitives/primitives.hpp>
 
@@ -64,8 +66,11 @@ void LightViewerContext::clear_text() {
 }
 
 void LightViewerContext::append_text(const std::string& text) {
+  std::vector<std::string> texts;
+  boost::split(texts, text, boost::is_any_of("\n"));
+
   std::lock_guard<std::mutex> lock(sub_texts_mutex);
-  sub_texts.push_back(text);
+  sub_texts.insert(sub_texts.end(), texts.begin(), texts.end());
 }
 
 void LightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
