@@ -113,6 +113,12 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* data, 
 void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points) {
   assert(this->num_points == num_points);
 
+  auto found = std::find_if(aux_buffers.begin(), aux_buffers.end(), [&](const AuxBufferData& aux) { return aux.attribute_name == attribute_name; });
+  if(found != aux_buffers.end()) {
+    glDeleteBuffers(1, &found->buffer);
+    aux_buffers.erase(found);
+  }
+
   glBindVertexArray(vao);
 
   GLuint buffer_id;

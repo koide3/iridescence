@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <deque>
+#include <regex>
 #include <memory>
 #include <unordered_map>
 
@@ -60,6 +61,7 @@ public:
 
   std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> find_drawable(const std::string& name);
   void remove_drawable(const std::string& name);
+  void remove_drawable(const std::regex& regex);
   void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
   void clear_drawable_filters();

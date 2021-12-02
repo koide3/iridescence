@@ -263,6 +263,16 @@ void LightViewerContext::remove_drawable(const std::string& name) {
   }
 }
 
+void LightViewerContext::remove_drawable(const std::regex& regex) {
+  for(auto itr = drawables.begin(); itr != drawables.end();) {
+    if(std::regex_match(itr->first, regex)) {
+      itr = drawables.erase(itr);
+    } else {
+      itr++;
+    }
+  }
+}
+
 void LightViewerContext::update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting) {
   drawables[name] = std::make_pair(std::make_shared<ShaderSetting>(shader_setting), drawable);
 }
