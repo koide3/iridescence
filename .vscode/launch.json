@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/01_light_viewer_basic",
+            "program": "${workspaceFolder}/build/ext_pointcloud",
             "args": ["${workspaceFolder}/build/light_viewer.py"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
