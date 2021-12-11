@@ -28,10 +28,7 @@ struct PLYData {
 
 std::shared_ptr<PLYData> load_ply(const std::string& filename);
 
-std::shared_ptr<PLYData> load_ply_ascii(const std::string& filename);
-
 bool save_ply_ascii(const std::string& filename, const PLYData& ply);
-
 bool save_ply_binary(const std::string& filename, const PLYData& ply);
 
 template<typename T, int D>
