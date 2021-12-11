@@ -47,15 +47,18 @@ public:
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   const std::shared_ptr<glk::ScreenEffect>& get_screen_effect() const;
 
-  void enable_decimal_rendering();
   void enable_normal_buffer();
   void enable_info_buffer();
+  void enable_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
+  bool partial_rendering_enabled() const;
 
+  const glk::Texture& depth_buffer() const;
   const glk::Texture& normal_buffer() const;
   const glk::Texture& info_buffer() const;
+  const glk::Texture& dynamic_flag_buffer() const;
 
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
@@ -109,9 +112,6 @@ protected:
   guik::ShaderSetting global_shader_setting;
 
   bool draw_xy_grid;
-  bool decimal_rendering;
-
-  Eigen::Matrix4f last_projection_view_matrix;
 
   std::unordered_map<std::string, std::function<bool(const std::string&)>> drawable_filters;
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>> drawables;

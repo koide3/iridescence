@@ -51,7 +51,7 @@ public:
   void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale = 1.0f);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
-  void enable_decimal_rendering(int points_budget = 8192 * 5);
+  void enable_partial_rendering(int points_budget = 8192 * 5);
 
   virtual void draw(glk::GLSLShader& shader) const override;
 
@@ -64,7 +64,7 @@ public:
 
 private:
   mutable std::atomic_uint rendering_count;
-  int points_budget;
+  int points_rendering_budget;
 
   GLuint vao;
   GLuint vbo;

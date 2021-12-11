@@ -31,16 +31,20 @@ public:
 
   void enable_normal_buffer();
   void enable_info_buffer();
+  void enable_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
+  bool partial_rendering_enabled() const;
 
+  const glk::Texture& depth_buffer() const;
   const glk::Texture& normal_buffer() const;
   const glk::Texture& info_buffer() const;
+  const glk::Texture& dynamic_flag_buffer() const;
 
   void mouse_control();
 
-  void bind(bool clear_buffer = true);
+  void bind();
   void unbind();
 
   void bind_second();
@@ -60,8 +64,12 @@ public:
 
   int normal_buffer_id;
   int info_buffer_id;
+  int dynamic_flag_buffer_id;
+
+  Eigen::Matrix4f last_projection_view_matrix;
 
   std::unique_ptr<glk::GLSLShader> shader;
+  std::unique_ptr<glk::GLSLShader> partial_clear_shader;
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::FrameBuffer> screen_effect_buffer;
   std::shared_ptr<glk::ScreenEffect> screen_effect;

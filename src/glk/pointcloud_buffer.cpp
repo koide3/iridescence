@@ -19,7 +19,7 @@ PointCloudBuffer::PointCloudBuffer(int stride, int num_points) {
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, nullptr, GL_STATIC_DRAW);
 
   rendering_count = 0;
-  points_budget = 8192;
+  points_rendering_budget = 8192;
   ebo = 0;
 }
 
@@ -35,7 +35,7 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
 
   rendering_count = 0;
-  points_budget = 8192;
+  points_rendering_budget = 8192;
   ebo = 0;
 }
 
@@ -144,13 +144,20 @@ void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, co
   aux_buffers.push_back(AuxBufferData{attribute_name, dim, stride, buffer_id});
 }
 
-void PointCloudBuffer::enable_decimal_rendering(int points_budget) {
+void PointCloudBuffer::enable_partial_rendering(int points_budget) {
+  this->points_rendering_budget = points_budget;
+
   std::vector<unsigned int> indices(num_points);
   std::iota(indices.begin(), indices.end(), 0);
 
   std::mt19937 mt;
   std::shuffle(indices.begin(), indices.end(), mt);
-  this->points_budget = points_budget;
+
+  const int block_size = 8192 * 2;
+  for(int i = 0; i < indices.size(); i += block_size) {
+    const int count = std::min<int>(block_size, indices.size() - i);
+    std::sort(indices.begin() + i, indices.begin() + i + count);
+  }
 
   glGenBuffers(1, &ebo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -180,11 +187,11 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
   if(!ebo) {
     glDrawArrays(GL_POINTS, 0, num_points);
   } else {
-    const int offset = ((rendering_count++) * points_budget) % num_points;
-    const int count = std::max(points_budget, num_points - offset);
+    const int offset = ((rendering_count++) * points_rendering_budget) % num_points;
+    const int count = std::max(points_rendering_budget, num_points - offset);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glDrawElements(GL_POINTS, points_budget, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned int)));
+    glDrawElements(GL_POINTS, points_rendering_budget, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned int)));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
 
