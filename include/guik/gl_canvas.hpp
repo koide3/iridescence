@@ -40,7 +40,7 @@ public:
 
   void mouse_control();
 
-  void bind();
+  void bind(bool clear_buffer = true);
   void unbind();
 
   void bind_second();

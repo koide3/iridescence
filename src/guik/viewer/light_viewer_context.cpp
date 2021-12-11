@@ -15,6 +15,8 @@ namespace guik {
 
 LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
   draw_xy_grid = true;
+  decimal_rendering = false;
+  last_projection_view_matrix.setIdentity();
 }
 
 LightViewerContext::~LightViewerContext() {}
@@ -145,7 +147,19 @@ void LightViewerContext::draw_gl() {
     }
   }
 
-  canvas->bind();
+  bool clear_buffer = true;
+
+  if(decimal_rendering) {
+    Eigen::Matrix4f projection_view_matrix = canvas->projection_control->projection_matrix() * canvas->camera_control->view_matrix();
+    if((last_projection_view_matrix - projection_view_matrix).norm() > 1e-6f) {
+      last_projection_view_matrix = projection_view_matrix;
+      clear_buffer = true;
+    } else {
+      clear_buffer = false;
+    }
+  }
+
+  canvas->bind(clear_buffer);
 
   global_shader_setting.set(*canvas->shader);
   canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
@@ -210,6 +224,10 @@ const std::shared_ptr<glk::ScreenEffect>& LightViewerContext::get_screen_effect(
   return canvas->get_effect();
 }
 
+void LightViewerContext::enable_decimal_rendering() {
+  decimal_rendering = true;
+}
+
 void LightViewerContext::enable_normal_buffer() {
   canvas->enable_normal_buffer();
 }
@@ -260,6 +278,16 @@ void LightViewerContext::remove_drawable(const std::string& name) {
   auto found = drawables.find(name);
   if(found != drawables.end()) {
     drawables.erase(found);
+  }
+}
+
+void LightViewerContext::remove_drawable(const std::regex& regex) {
+  for(auto itr = drawables.begin(); itr != drawables.end();) {
+    if(std::regex_match(itr->first, regex)) {
+      itr = drawables.erase(itr);
+    } else {
+      itr++;
+    }
   }
 }
 

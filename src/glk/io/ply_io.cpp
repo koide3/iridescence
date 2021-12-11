@@ -12,49 +12,212 @@ namespace glk {
 
 using namespace glk::console;
 
-std::shared_ptr<PLYData> load_ply_ascii(const std::string& filename) {
-  std::ifstream ifs(filename);
-  if(!ifs) {
-    std::cerr << bold_red << "error: failed to open " << filename << reset << std::endl;
+namespace {
+
+PLYMetaData::PropertyType parse_property_type(const std::string& type) {
+  if(type == "char" || type == "int8") {
+    return PLYMetaData::PropertyType::CHAR;
+  } else if(type == "uchar" || type == "uint8") {
+    return PLYMetaData::PropertyType::UCHAR;
+  } else if(type == "short" || type == "int16") {
+    return PLYMetaData::PropertyType::SHORT;
+  } else if(type == "ushort" || type == "uint16") {
+    return PLYMetaData::PropertyType::USHORT;
+  } else if(type == "int" || type == "int32") {
+    return PLYMetaData::PropertyType::INT;
+  } else if(type == "uint" || type == "uint32") {
+    return PLYMetaData::PropertyType::UINT;
+  } else if(type == "float" || type == "float32") {
+    return PLYMetaData::PropertyType::FLOAT;
+  } else if(type == "double" || type == "float64") {
+    return PLYMetaData::PropertyType::DOUBLE;
+  }
+
+  std::cerr << console::bold_red << "error: unknown ply property type " << type << console::reset << std::endl;
+  return PLYMetaData::PropertyType::CHAR;
+}
+
+int property_bytes(PLYMetaData::PropertyType prop) {
+  switch(prop) {
+    case PLYMetaData::PropertyType::CHAR:
+    case PLYMetaData::PropertyType::UCHAR:
+      return 1;
+    case PLYMetaData::PropertyType::SHORT:
+    case PLYMetaData::PropertyType::USHORT:
+      return 2;
+    case PLYMetaData::PropertyType::INT:
+    case PLYMetaData::PropertyType::UINT:
+    case PLYMetaData::PropertyType::FLOAT:
+      return 4;
+    case PLYMetaData::PropertyType::DOUBLE:
+      return 8;
+  }
+}
+
+template<typename T>
+T property_cast(const char* data, PLYMetaData::PropertyType type) {
+  switch(type) {
+    case PLYMetaData::PropertyType::CHAR:
+      return static_cast<T>(*reinterpret_cast<const int8_t*>(data));
+    case PLYMetaData::PropertyType::UCHAR:
+      return static_cast<T>(*reinterpret_cast<const uint8_t*>(data));
+    case PLYMetaData::PropertyType::SHORT:
+      return static_cast<T>(*reinterpret_cast<const int16_t*>(data));
+    case PLYMetaData::PropertyType::USHORT:
+      return static_cast<T>(*reinterpret_cast<const uint16_t*>(data));
+    case PLYMetaData::PropertyType::INT:
+      return static_cast<T>(*reinterpret_cast<const int32_t*>(data));
+    case PLYMetaData::PropertyType::UINT:
+      return static_cast<T>(*reinterpret_cast<const uint32_t*>(data));
+    case PLYMetaData::PropertyType::FLOAT:
+      return static_cast<T>(*reinterpret_cast<const float*>(data));
+    case PLYMetaData::PropertyType::DOUBLE:
+      return static_cast<T>(*reinterpret_cast<const double*>(data));
+  }
+}
+
+template<typename OutputIterator, typename Func>
+void transform(const char* vertex_buffer, int vertex_step, int num_vertices, int property_offset, OutputIterator output_itr, Func func) {
+  for(int i = 0; i < num_vertices; i++) {
+    const char* ptr = vertex_buffer + vertex_step * i + property_offset;
+    func(ptr, *output_itr);
+    output_itr++;
+  }
+}
+
+std::shared_ptr<PLYData> load_ply_body_binary(std::ifstream& ifs, const PLYMetaData& meta_data) {
+  if(meta_data.format.find("big_endian") != std::string::npos) {
+    std::cerr << console::bold_red << "error: big endian is not supported!!" << console::reset << std::endl;
     return nullptr;
   }
 
-  int num_vertices = 0;
-  int num_faces = 0;
-  std::vector<std::string> properties;
-  while(!ifs.eof()) {
-    std::string line;
-    std::getline(ifs, line);
+  std::vector<int> property_offsets = {0};
+  for(const auto& prop : meta_data.vertex_properties) {
+    property_offsets.push_back(property_offsets.back() + property_bytes(prop.second));
+  }
 
-    if(line.empty()) {
-      continue;
+  const int vertex_step = property_offsets.back();
+  std::vector<char> vertex_buffer(vertex_step * meta_data.num_vertices);
+  ifs.read(vertex_buffer.data(), vertex_buffer.size());
+
+  std::shared_ptr<PLYData> ply(new PLYData);
+  for(int i = 0; i < meta_data.vertex_properties.size(); i++) {
+    const auto& prop_name = meta_data.vertex_properties[i].first;
+    const auto prop_type = meta_data.vertex_properties[i].second;
+    const int prop_offset = property_offsets[i];
+
+    // xyz
+    if(prop_name == "x") {
+      ply->vertices.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->vertices.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.x() = property_cast<float>(data, prop_type); });
+    } else if(prop_name == "y") {
+      ply->vertices.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->vertices.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.y() = property_cast<float>(data, prop_type); });
+    } else if(prop_name == "z") {
+      ply->vertices.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->vertices.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.z() = property_cast<float>(data, prop_type); });
     }
-
-    std::stringstream sst(line);
-    std::string token;
-
-    if(line.find("element vertex") != std::string::npos) {
-      sst >> token >> token >> num_vertices;
+    // normals
+    else if(prop_name == "nx") {
+      ply->normals.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->normals.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.x() = property_cast<float>(data, prop_type); });
+    } else if(prop_name == "ny") {
+      ply->normals.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->normals.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.y() = property_cast<float>(data, prop_type); });
+    } else if(prop_name == "nz") {
+      ply->normals.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->normals.begin(),
+                [=](const char* data, Eigen::Vector3f& pt) { pt.z() = property_cast<float>(data, prop_type); });
     }
-    if(line.find("element face") != std::string::npos) {
-      sst >> token >> token >> num_faces;
-    }
+    // color
+    else if(prop_name == "r" || prop_name == "red") {
+      ply->colors.resize(meta_data.num_vertices, Eigen::Vector4f::UnitW());
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->colors.begin(),
+                [=](const char* data, Eigen::Vector4f& pt) { pt[0] = property_cast<float>(data, prop_type); });
+      if(prop_type == PLYMetaData::PropertyType::UCHAR) {
+        std::for_each(ply->colors.begin(), ply->colors.end(), [](Eigen::Vector4f& pt) { pt[0] /= 255.0f; });
+      }
 
-    if(line.find("property float32") != std::string::npos) {
-      std::string property;
-      sst >> token >> token >> property;
-      properties.push_back(property);
+    } else if(prop_name == "g" || prop_name == "green") {
+      ply->colors.resize(meta_data.num_vertices, Eigen::Vector4f::UnitW());
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->colors.begin(),
+                [=](const char* data, Eigen::Vector4f& pt) { pt[1] = property_cast<float>(data, prop_type); });
+      if(prop_type == PLYMetaData::PropertyType::UCHAR) {
+        std::for_each(ply->colors.begin(), ply->colors.end(), [](Eigen::Vector4f& pt) { pt[1] /= 255.0f; });
+      }
+    } else if(prop_name == "b" || prop_name == "blue") {
+      ply->colors.resize(meta_data.num_vertices, Eigen::Vector4f::UnitW());
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->colors.begin(),
+                [=](const char* data, Eigen::Vector4f& pt) { pt[2] = property_cast<float>(data, prop_type); });
+      if(prop_type == PLYMetaData::PropertyType::UCHAR) {
+        std::for_each(ply->colors.begin(), ply->colors.end(), [](Eigen::Vector4f& pt) { pt[2] /= 255.0f; });
+      }
+    } else if(prop_name == "a" || prop_name == "alpha") {
+      ply->colors.resize(meta_data.num_vertices, Eigen::Vector4f::UnitW());
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->colors.begin(),
+                [=](const char* data, Eigen::Vector4f& pt) { pt[3] = property_cast<float>(data, prop_type); });
+      if(prop_type == PLYMetaData::PropertyType::UCHAR) {
+        std::for_each(ply->colors.begin(), ply->colors.end(), [](Eigen::Vector4f& pt) { pt[3] /= 255.0f; });
+      }
     }
-
-    if(line.find("end") != std::string::npos) {
-      break;
+    // intensity
+    else if(prop_name == "intensity" || prop_name == "scalar_Intensity" || prop_name == "scalar_intensity") {
+      ply->intensities.resize(meta_data.num_vertices);
+      transform(vertex_buffer.data(), vertex_step, meta_data.num_vertices, prop_offset, ply->intensities.begin(),
+                [=](const char* data, float& pt) { pt = property_cast<float>(data, prop_type); });
     }
   }
 
+  if(meta_data.num_faces && meta_data.face_properties.empty()) {
+    std::cerr << console::yellow << "warning: face properties dont exist!!" << console::reset << std::endl;
+  }
+
+  if(meta_data.face_properties.size() == 2) {
+    ply->indices.resize(meta_data.num_faces * 3);
+
+    const auto count_type = meta_data.face_properties[0];
+    const auto index_type = meta_data.face_properties[1];
+
+    const int face_size = property_bytes(count_type) + property_bytes(index_type) * 3;
+    std::vector<char> index_buffer(face_size * meta_data.num_faces);
+    ifs.read(index_buffer.data(), index_buffer.size());
+
+    const char* data_itr = index_buffer.data();
+    for(int i = 0; i < meta_data.num_faces; i++) {
+      int num_vertices = property_cast<int>(data_itr, count_type);
+      if(num_vertices != 3) {
+        std::cerr << console::yellow << "warning: non-triangle faces are not supported!!" << console::reset << std::endl;
+        ply->indices.clear();
+        break;
+      }
+
+      data_itr += property_bytes(count_type);
+
+      for(int j = 0; j < 3; j++) {
+        ply->indices[i * 3 + 2 - j] = property_cast<int>(data_itr, index_type);
+        data_itr += property_bytes(index_type);
+      }
+    }
+
+    if(ply->normals.empty()) {
+      NormalEstimater nest(ply->vertices, ply->indices);
+      ply->normals = nest.normals;
+    }
+  }
+
+  return ply;
+}
+
+std::shared_ptr<PLYData> load_ply_body_ascii(std::ifstream& ifs, const PLYMetaData& meta_data) {
   std::shared_ptr<PLYData> ply(new PLYData);
 
-  ply->vertices.resize(num_vertices);
-  for(int i = 0; i < num_vertices; i++) {
+  ply->vertices.resize(meta_data.num_vertices);
+  for(int i = 0; i < meta_data.num_vertices; i++) {
     std::string line;
     std::getline(ifs, line);
 
@@ -62,8 +225,8 @@ std::shared_ptr<PLYData> load_ply_ascii(const std::string& filename) {
     sst >> ply->vertices[i][0] >> ply->vertices[i][1] >> ply->vertices[i][2];
   }
 
-  ply->indices.resize(num_faces * 3);
-  for(int i = 0; i < num_faces; i++) {
+  ply->indices.resize(meta_data.num_faces * 3);
+  for(int i = 0; i < meta_data.num_faces; i++) {
     std::string line;
     std::getline(ifs, line);
 
@@ -80,6 +243,74 @@ std::shared_ptr<PLYData> load_ply_ascii(const std::string& filename) {
   ply->normals = nest.normals;
 
   return ply;
+}
+
+}  // namespace
+
+std::shared_ptr<PLYData> load_ply(const std::string& filename) {
+  std::ifstream ifs(filename, std::ios::binary);
+  if(!ifs) {
+    std::cerr << bold_red << "error: failed to open " << filename << reset << std::endl;
+    return nullptr;
+  }
+
+  PLYMetaData meta_data;
+
+  while(!ifs.eof()) {
+    std::string line;
+    std::getline(ifs, line);
+
+    if(line.empty()) {
+      continue;
+    }
+
+    std::stringstream sst(line);
+    std::string token;
+
+    if(line.find("format") != std::string::npos) {
+      sst >> token >> meta_data.format;
+    }
+
+    if(line.find("element vertex") != std::string::npos) {
+      sst >> token >> token >> meta_data.num_vertices;
+    }
+    if(line.find("element face") != std::string::npos) {
+      sst >> token >> token >> meta_data.num_faces;
+    }
+
+    if(line.find("property") != std::string::npos) {
+      std::string property;
+      std::string type;
+      sst >> token >> type;
+
+      if(type != "list") {
+        sst >> property;
+        PLYMetaData::PropertyType prop_type = parse_property_type(type);
+        meta_data.vertex_properties.push_back(std::make_pair(property, prop_type));
+      } else {
+        std::string num_type;
+        std::string index_type;
+        sst >> num_type >> index_type;
+        meta_data.face_properties.push_back(parse_property_type(num_type));
+        meta_data.face_properties.push_back(parse_property_type(index_type));
+      }
+    }
+
+    if(line.find("end_header") != std::string::npos) {
+      break;
+    }
+  }
+
+  if(meta_data.format.find("ascii") != std::string::npos) {
+    return load_ply_body_ascii(ifs, meta_data);
+  }
+
+  if(meta_data.format.find("binary") != std::string::npos) {
+    return load_ply_body_binary(ifs, meta_data);
+  }
+
+  std::cerr << console::bold_red << "error: unknown ply format " << meta_data.format << console::reset << std::endl;
+  return nullptr;
 }
 
 bool write_ply_header(std::ofstream& ofs, const PLYData& ply, const std::string& type = "ascii") {
