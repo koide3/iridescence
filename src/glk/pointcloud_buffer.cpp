@@ -1,5 +1,7 @@
 #include <glk/pointcloud_buffer.hpp>
 
+#include <random>
+#include <numeric>
 #include <iostream>
 #include <glk/colormap.hpp>
 
@@ -15,6 +17,10 @@ PointCloudBuffer::PointCloudBuffer(int stride, int num_points) {
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, nullptr, GL_STATIC_DRAW);
+
+  rendering_count = 0;
+  points_budget = 8192;
+  ebo = 0;
 }
 
 PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points) {
@@ -27,6 +33,10 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
+
+  rendering_count = 0;
+  points_budget = 8192;
+  ebo = 0;
 }
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points)
@@ -67,6 +77,10 @@ PointCloudBuffer::~PointCloudBuffer() {
     glDeleteBuffers(1, &aux.buffer);
   }
   glDeleteBuffers(1, &vbo);
+
+  if(ebo) {
+    glDeleteBuffers(1, &ebo);
+  }
 }
 
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) {
@@ -113,7 +127,8 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* data, 
 void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points) {
   assert(this->num_points == num_points);
 
-  auto found = std::find_if(aux_buffers.begin(), aux_buffers.end(), [&](const AuxBufferData& aux) { return aux.attribute_name == attribute_name; });
+  auto found = std::find_if(aux_buffers.begin(), aux_buffers.end(),
+                            [&](const AuxBufferData& aux) { return aux.attribute_name == attribute_name; });
   if(found != aux_buffers.end()) {
     glDeleteBuffers(1, &found->buffer);
     aux_buffers.erase(found);
@@ -127,6 +142,20 @@ void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, co
   glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
 
   aux_buffers.push_back(AuxBufferData{attribute_name, dim, stride, buffer_id});
+}
+
+void PointCloudBuffer::enable_decimal_rendering(int points_budget) {
+  std::vector<unsigned int> indices(num_points);
+  std::iota(indices.begin(), indices.end(), 0);
+
+  std::mt19937 mt;
+  std::shuffle(indices.begin(), indices.end(), mt);
+  this->points_budget = points_budget;
+
+  glGenBuffers(1, &ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_points, indices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
@@ -148,7 +177,16 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
     glVertexAttribPointer(attrib_loc, aux.dim, GL_FLOAT, GL_FALSE, aux.stride, 0);
   }
 
-  glDrawArrays(GL_POINTS, 0, num_points);
+  if(!ebo) {
+    glDrawArrays(GL_POINTS, 0, num_points);
+  } else {
+    const int offset = ((rendering_count++) * points_budget) % num_points;
+    const int count = std::max(points_budget, num_points - offset);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glDrawElements(GL_POINTS, points_budget, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned int)));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glDisableVertexAttribArray(position_loc);
@@ -162,6 +200,10 @@ GLuint PointCloudBuffer::vba_id() const {
 }
 GLuint PointCloudBuffer::vbo_id() const {
   return vbo;
+}
+
+GLuint PointCloudBuffer::ebo_id() const {
+  return ebo;
 }
 
 int PointCloudBuffer::get_aux_size() const {

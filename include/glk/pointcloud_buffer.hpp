@@ -1,6 +1,7 @@
 #ifndef GLK_POINTCLOUD_BUFFER_HPP
 #define GLK_POINTCLOUD_BUFFER_HPP
 
+#include <atomic>
 #include <memory>
 #include <vector>
 #include <Eigen/Dense>
@@ -50,17 +51,24 @@ public:
   void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale = 1.0f);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
+  void enable_decimal_rendering(int points_budget = 8192 * 5);
+
   virtual void draw(glk::GLSLShader& shader) const override;
 
   GLuint vba_id() const;
   GLuint vbo_id() const;
+  GLuint ebo_id() const;
 
   int get_aux_size() const;
   const AuxBufferData& get_aux_buffer(int i) const;
 
 private:
+  mutable std::atomic_uint rendering_count;
+  int points_budget;
+
   GLuint vao;
   GLuint vbo;
+  GLuint ebo;
   int stride;
   int num_points;
 

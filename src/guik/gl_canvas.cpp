@@ -31,7 +31,8 @@ using namespace glk::console;
  *
  * @param size
  */
-GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
+GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name)
+    : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
   frame_buffer.reset(new glk::FrameBuffer(size, 1));
   shader.reset(new glk::GLSLShader());
   if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
@@ -181,11 +182,13 @@ void GLCanvas::set_clear_color(const Eigen::Vector4f& color) {
  * @brief
  *
  */
-void GLCanvas::bind() {
+void GLCanvas::bind(bool clear_buffer) {
   frame_buffer->bind();
   glDisable(GL_SCISSOR_TEST);
-  glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if(clear_buffer) {
+    glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
 
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
   Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
@@ -200,12 +203,12 @@ void GLCanvas::bind() {
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);
 
-  if(normal_buffer_id) {
+  if(normal_buffer_id && clear_buffer) {
     GLfloat clear_color[] = {0.0f, 0.0f, 0.0f};
     glClearTexImage(frame_buffer->color(normal_buffer_id).id(), 0, GL_RGB, GL_FLOAT, clear_color);
   }
 
-  if(info_buffer_id) {
+  if(info_buffer_id && clear_buffer) {
     GLint clear_color[] = {-1, -1, -1, -1};
     glClearTexImage(frame_buffer->color(info_buffer_id).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
     shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
