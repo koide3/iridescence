@@ -93,6 +93,7 @@ add_library(iridescence SHARED
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
   src/glk/query.cpp
+  src/glk/debug_output.cpp
   src/glk/transform_feedback.cpp
   src/glk/texture_renderer.cpp
   src/glk/primitives/primitives.cpp

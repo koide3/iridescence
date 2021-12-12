@@ -147,19 +147,7 @@ void LightViewerContext::draw_gl() {
     }
   }
 
-  bool clear_buffer = true;
-
-  if(decimal_rendering) {
-    Eigen::Matrix4f projection_view_matrix = canvas->projection_control->projection_matrix() * canvas->camera_control->view_matrix();
-    if((last_projection_view_matrix - projection_view_matrix).norm() > 1e-6f) {
-      last_projection_view_matrix = projection_view_matrix;
-      clear_buffer = true;
-    } else {
-      clear_buffer = false;
-    }
-  }
-
-  canvas->bind(clear_buffer);
+  canvas->bind();
 
   global_shader_setting.set(*canvas->shader);
   canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
@@ -236,6 +224,10 @@ void LightViewerContext::enable_info_buffer() {
   canvas->enable_info_buffer();
 }
 
+void LightViewerContext::enable_partial_rendering() {
+  canvas->enable_partial_rendering();
+}
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }
@@ -244,12 +236,24 @@ bool LightViewerContext::info_buffer_enabled() const {
   return canvas->info_buffer_enabled();
 }
 
+bool LightViewerContext::partial_rendering_enabled() const {
+  return canvas->partial_rendering_enabled();
+}
+
+const glk::Texture& LightViewerContext::depth_buffer() const {
+  return canvas->depth_buffer();
+}
+
 const glk::Texture& LightViewerContext::normal_buffer() const {
   return canvas->normal_buffer();
 }
 
 const glk::Texture& LightViewerContext::info_buffer() const {
   return canvas->info_buffer();
+}
+
+const glk::Texture& LightViewerContext::dynamic_flag_buffer() const {
+  return canvas->dynamic_flag_buffer();
 }
 
 void LightViewerContext::clear_drawables() {

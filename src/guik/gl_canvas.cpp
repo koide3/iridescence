@@ -64,7 +64,8 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name)
 
   texture_renderer.reset(new glk::TextureRenderer());
 
-  normal_buffer_id = info_buffer_id = 0;
+  normal_buffer_id = info_buffer_id = dynamic_flag_buffer_id = 0;
+  last_projection_view_matrix.setIdentity();
 }
 
 /**
@@ -133,6 +134,17 @@ void GLCanvas::enable_info_buffer() {
   frame_buffer->add_color_buffer(1, GL_RGBA32I, GL_RGBA_INTEGER, GL_INT);
 }
 
+void GLCanvas::enable_partial_rendering() {
+  dynamic_flag_buffer_id = frame_buffer->num_color_buffers();
+  frame_buffer->add_color_buffer(3, GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE);
+
+  const std::string data_path = glk::get_data_path();
+  partial_clear_shader.reset(new glk::GLSLShader());
+  if(!partial_clear_shader->init(data_path + "/shader/texture.vert", data_path + "/shader/partial_clear.frag")) {
+    partial_clear_shader.reset();
+  }
+}
+
 bool GLCanvas::normal_buffer_enabled() const {
   return normal_buffer_id > 0;
 }
@@ -141,12 +153,24 @@ bool GLCanvas::info_buffer_enabled() const {
   return info_buffer_id > 0;
 }
 
+bool GLCanvas::partial_rendering_enabled() const {
+  return dynamic_flag_buffer_id > 0;
+}
+
+const glk::Texture& GLCanvas::depth_buffer() const {
+  return frame_buffer->depth();
+}
+
 const glk::Texture& GLCanvas::normal_buffer() const {
   return frame_buffer->color(normal_buffer_id);
 }
 
 const glk::Texture& GLCanvas::info_buffer() const {
   return frame_buffer->color(info_buffer_id);
+}
+
+const glk::Texture& GLCanvas::dynamic_flag_buffer() const {
+  return frame_buffer->color(dynamic_flag_buffer_id);
 }
 
 /**
@@ -182,16 +206,19 @@ void GLCanvas::set_clear_color(const Eigen::Vector4f& color) {
  * @brief
  *
  */
-void GLCanvas::bind(bool clear_buffer) {
+void GLCanvas::bind() {
   frame_buffer->bind();
   glDisable(GL_SCISSOR_TEST);
-  if(clear_buffer) {
-    glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  }
 
   Eigen::Matrix4f view_matrix = camera_control->view_matrix();
   Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
+
+  bool clear_buffer = true;
+  if(partial_rendering_enabled()) {
+    Eigen::Matrix4f projection_view_matrix = projection_matrix * view_matrix;
+    clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > 1e-6;
+    last_projection_view_matrix = projection_view_matrix;
+  }
 
   shader->use();
   shader->set_uniform("view_matrix", view_matrix);
@@ -199,19 +226,47 @@ void GLCanvas::bind(bool clear_buffer) {
   shader->set_uniform("projection_matrix", projection_matrix);
   shader->set_uniform("info_enabled", info_buffer_id > 0);
   shader->set_uniform("normal_enabled", normal_buffer_id > 0);
+  shader->set_uniform("partial_rendering_enabled", dynamic_flag_buffer_id > 0);
 
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);
 
-  if(normal_buffer_id && clear_buffer) {
-    GLfloat clear_color[] = {0.0f, 0.0f, 0.0f};
-    glClearTexImage(frame_buffer->color(normal_buffer_id).id(), 0, GL_RGB, GL_FLOAT, clear_color);
-  }
+  if(clear_buffer) {
+    glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  if(info_buffer_id && clear_buffer) {
-    GLint clear_color[] = {-1, -1, -1, -1};
-    glClearTexImage(frame_buffer->color(info_buffer_id).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
-    shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
+    if(normal_buffer_id) {
+      GLfloat clear_color[] = {0.0f, 0.0f, 0.0f};
+      glClearTexImage(frame_buffer->color(normal_buffer_id).id(), 0, GL_RGB, GL_FLOAT, clear_color);
+    }
+
+    if(info_buffer_id) {
+      GLint clear_color[] = {-1, -1, -1, -1};
+      glClearTexImage(frame_buffer->color(info_buffer_id).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
+      shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
+    }
+
+    if(dynamic_flag_buffer_id) {
+      GLint clear_color[] = {255, 255, 255, 255};
+      glClearTexImage(frame_buffer->color(dynamic_flag_buffer_id).id(), 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, clear_color);
+      shader->set_uniform("dynamic_object", 255);
+    }
+  } else {
+    // partial clear
+    partial_clear_shader->use();
+    partial_clear_shader->set_uniform("dynamic_flag_sampler", 0);
+    partial_clear_shader->set_uniform("clear_color", clear_color);
+    partial_clear_shader->set_uniform("info_enabled", info_buffer_id > 0);
+    partial_clear_shader->set_uniform("normal_enabled", normal_buffer_id > 0);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_ALWAYS);
+    glBindTexture(GL_TEXTURE_2D, dynamic_flag_buffer().id());
+
+    texture_renderer->draw_plain(*partial_clear_shader);
+
+    shader->use();
+    glDepthFunc(GL_LESS);
   }
 
   glEnable(GL_DEPTH_TEST);
@@ -268,6 +323,10 @@ void GLCanvas::bind_second() {
   shader->use();
   if(info_buffer_id) {
     shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
+  }
+
+  if(dynamic_flag_buffer_id) {
+    shader->set_uniform("dynamic_object", 255);
   }
 
   glEnable(GL_BLEND);
