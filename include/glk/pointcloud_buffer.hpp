@@ -52,6 +52,7 @@ public:
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
   void enable_partial_rendering(int points_budget = 8192 * 5);
+  void disable_partial_rendering();
 
   virtual void draw(glk::GLSLShader& shader) const override;
 

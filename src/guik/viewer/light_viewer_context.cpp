@@ -15,6 +15,8 @@ namespace guik {
 
 LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
   draw_xy_grid = true;
+  decimal_rendering = false;
+  last_projection_view_matrix.setIdentity();
 }
 
 LightViewerContext::~LightViewerContext() {}
@@ -208,6 +210,10 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
 
 const std::shared_ptr<glk::ScreenEffect>& LightViewerContext::get_screen_effect() const {
   return canvas->get_effect();
+}
+
+void LightViewerContext::enable_decimal_rendering() {
+  decimal_rendering = true;
 }
 
 void LightViewerContext::enable_normal_buffer() {

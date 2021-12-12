@@ -145,6 +145,10 @@ void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, co
 }
 
 void PointCloudBuffer::enable_partial_rendering(int points_budget) {
+  if(ebo) {
+    disable_partial_rendering();
+  }
+
   this->points_rendering_budget = points_budget;
 
   std::vector<unsigned int> indices(num_points);
@@ -163,6 +167,16 @@ void PointCloudBuffer::enable_partial_rendering(int points_budget) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_points, indices.data(), GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void PointCloudBuffer::disable_partial_rendering() {
+  if(ebo == 0) {
+    return;
+  }
+
+  glDeleteBuffers(1, &ebo);
+  ebo = 0;
+  rendering_count = 0;
 }
 
 void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
