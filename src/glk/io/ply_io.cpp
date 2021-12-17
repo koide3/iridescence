@@ -204,7 +204,7 @@ std::shared_ptr<PLYData> load_ply_body_binary(std::ifstream& ifs, const PLYMetaD
       }
     }
 
-    if(ply->normals.empty()) {
+    if(ply->normals.empty() && !ply->vertices.empty() && !ply->indices.empty()) {
       NormalEstimater nest(ply->vertices, ply->indices);
       ply->normals = nest.normals;
     }
@@ -216,13 +216,83 @@ std::shared_ptr<PLYData> load_ply_body_binary(std::ifstream& ifs, const PLYMetaD
 std::shared_ptr<PLYData> load_ply_body_ascii(std::ifstream& ifs, const PLYMetaData& meta_data) {
   std::shared_ptr<PLYData> ply(new PLYData);
 
+  const std::vector<std::string> vertex_props = {"x", "y", "z"};
+  const std::vector<std::string> color_props = {"r", "g", "b", "a", "red", "green", "blue", "alpha"};
+  const std::vector<std::string> normal_props = {"nx", "ny", "nz"};
+  const std::vector<std::string> intensity_props = {"intensity", "scalar_Intensity", "scalar_intensity"};
+  for(const auto& prop: meta_data.vertex_properties) {
+    if(std::find(vertex_props.begin(), vertex_props.end(), prop.first) != vertex_props.end()) {
+      ply->vertices.resize(meta_data.num_vertices, Eigen::Vector3f::Zero());
+    }
+    if(std::find(color_props.begin(), color_props.end(), prop.first) != color_props.end()) {
+      ply->colors.resize(meta_data.num_vertices, Eigen::Vector4f::Ones());
+    }
+    if(std::find(normal_props.begin(), normal_props.end(), prop.first) != normal_props.end()) {
+      ply->normals.resize(meta_data.num_vertices, Eigen::Vector3f::Zero());
+    }
+    if(std::find(intensity_props.begin(), intensity_props.end(), prop.first) != intensity_props.end()) {
+      ply->intensities.resize(meta_data.num_vertices, 0.0f);
+    }
+  }
+
   ply->vertices.resize(meta_data.num_vertices);
   for(int i = 0; i < meta_data.num_vertices; i++) {
     std::string line;
     std::getline(ifs, line);
 
     std::stringstream sst(line);
-    sst >> ply->vertices[i][0] >> ply->vertices[i][1] >> ply->vertices[i][2];
+
+    for(const auto& prop: meta_data.vertex_properties) {
+      // position
+      if(prop.first == "x") {
+        sst >> ply->vertices[i][0];
+      }
+      if(prop.first == "y") {
+        sst >> ply->vertices[i][1];
+      }
+      if(prop.first == "z") {
+        sst >> ply->vertices[i][2];
+      }
+      // normal
+      if(prop.first == "nx") {
+        sst >> ply->normals[i][0];
+      }
+      if(prop.first == "ny") {
+        sst >> ply->normals[i][1];
+      }
+      if(prop.first == "nz") {
+        sst >> ply->normals[i][2];
+      }
+      // color
+      if(prop.first == "r" || prop.first == "red") {
+        sst >> ply->colors[i][0];
+        if(prop.second != PLYMetaData::PropertyType::FLOAT && prop.second != PLYMetaData::PropertyType::DOUBLE) {
+          ply->colors[i][0] /= 255.0f;
+        }
+      }
+      if(prop.first == "g" || prop.first == "green") {
+        sst >> ply->colors[i][1];
+        if(prop.second != PLYMetaData::PropertyType::FLOAT && prop.second != PLYMetaData::PropertyType::DOUBLE) {
+          ply->colors[i][1] /= 255.0f;
+        }
+      }
+      if(prop.first == "b" || prop.first == "blue") {
+        sst >> ply->colors[i][2];
+        if(prop.second != PLYMetaData::PropertyType::FLOAT && prop.second != PLYMetaData::PropertyType::DOUBLE) {
+          ply->colors[i][2] /= 255.0f;
+        }
+      }
+      if(prop.first == "a" || prop.first == "alpha") {
+        sst >> ply->colors[i][3];
+        if(prop.second != PLYMetaData::PropertyType::FLOAT && prop.second != PLYMetaData::PropertyType::DOUBLE) {
+          ply->colors[i][3] /= 255.0f;
+        }
+      }
+      // intensity
+      if(prop.first == "intensity" || prop.first == "scalar_Intensity" || prop.first == "scalar_intensity") {
+        sst >> ply->intensities[i];
+      }
+    }
   }
 
   ply->indices.resize(meta_data.num_faces * 3);
@@ -236,11 +306,15 @@ std::shared_ptr<PLYData> load_ply_body_ascii(std::ifstream& ifs, const PLYMetaDa
 
     if(faces != 3) {
       std::cerr << bold_red << "error : only faces with three vertices are supported!!" << reset << std::endl;
+      ply->indices.clear();
+      break;
     }
   }
 
-  NormalEstimater nest(ply->vertices, ply->indices);
-  ply->normals = nest.normals;
+  if(ply->normals.empty() && !ply->vertices.empty() && !ply->indices.empty()) {
+    NormalEstimater nest(ply->vertices, ply->indices);
+    ply->normals = nest.normals;
+  }
 
   return ply;
 }

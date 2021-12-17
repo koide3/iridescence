@@ -18,9 +18,13 @@ namespace glk {
 class ThinLines : public Drawable {
 public:
   ThinLines(const float* vertices, int num_vertices, bool line_strip=false);
-  ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip=false);
-  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip=false);
-  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip=false);
+  ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip = false);
+  ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip = false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip = false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<unsigned int>& indices, bool line_strip = false);
+  ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, const std::vector<unsigned int>& indices, bool line_strip = false);
+
   virtual ~ThinLines() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;
@@ -36,11 +40,13 @@ private:
 private:
   float line_width;
   int num_vertices;
+  int num_indices;
 
   GLenum mode; // line mode (GL_LINES/GL_LINE_STRIP)
   GLuint vao;  // vertex array object
   GLuint vbo;  // vertices
   GLuint cbo;  // colors
+  GLuint ebo;  // indices
 };
 }  // namespace glk
 
