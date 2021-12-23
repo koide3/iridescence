@@ -54,6 +54,9 @@ public:
   void enable_partial_rendering(int points_budget = 8192 * 5);
   void disable_partial_rendering();
 
+  void bind(glk::GLSLShader& shader) const;
+  void unbind(glk::GLSLShader& shader) const;
+
   virtual void draw(glk::GLSLShader& shader) const override;
 
   GLuint vba_id() const;
@@ -75,6 +78,8 @@ private:
 
   std::vector<AuxBufferData> aux_buffers;
 };
+
+
 
 }  // namespace glk
 

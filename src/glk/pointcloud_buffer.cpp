@@ -179,12 +179,11 @@ void PointCloudBuffer::disable_partial_rendering() {
   rendering_count = 0;
 }
 
-void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
+void PointCloudBuffer::bind(glk::GLSLShader& shader) const {
   if(num_points == 0) {
     return;
   }
-
-  GLint position_loc = shader.attrib("vert_position");
+  const GLint position_loc = shader.attrib("vert_position");
 
   glBindVertexArray(vao);
   glEnableVertexAttribArray(position_loc);
@@ -197,6 +196,27 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
     glBindBuffer(GL_ARRAY_BUFFER, aux.buffer);
     glVertexAttribPointer(attrib_loc, aux.dim, GL_FLOAT, GL_FALSE, aux.stride, 0);
   }
+}
+
+void PointCloudBuffer::unbind(glk::GLSLShader& shader) const {
+  if(num_points == 0) {
+    return;
+  }
+  const GLint position_loc = shader.attrib("vert_position");
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glDisableVertexAttribArray(position_loc);
+  for(const auto& aux : aux_buffers) {
+    glDisableVertexAttribArray(shader.attrib(aux.attribute_name));
+  }
+}
+
+void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
+  if(num_points == 0) {
+    return;
+  }
+
+  bind(shader);
 
   if(!ebo) {
     glDrawArrays(GL_POINTS, 0, num_points);
@@ -209,11 +229,7 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glDisableVertexAttribArray(position_loc);
-  for(const auto& aux : aux_buffers) {
-    glDisableVertexAttribArray(shader.attrib(aux.attribute_name));
-  }
+  unbind(shader);
 }
 
 GLuint PointCloudBuffer::vba_id() const {

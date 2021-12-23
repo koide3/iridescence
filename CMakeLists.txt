@@ -88,6 +88,7 @@ add_library(iridescence SHARED
   src/glk/pointnormals_buffer.cpp
   src/glk/point_correspondences.cpp
   src/glk/normal_distributions.cpp
+  src/glk/indexed_pointcloud_buffer.cpp
   src/glk/colormap.cpp
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
