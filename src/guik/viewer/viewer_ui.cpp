@@ -201,11 +201,11 @@ public:
 
     all_allow = 1;
     filter_pattern.resize(128, 0);
-    viewer->add_drawable_filter("general_drawable_filter", [this](const std::string& name) { return drawable_filter(name); });
+    viewer->register_drawable_filter("general_drawable_filter", [this](const std::string& name) { return drawable_filter(name); });
   }
 
   ~DrawableFilterWindow() {
-    viewer->remove_drawable_filter("general_drawable_filter");
+    viewer->register_drawable_filter("general_drawable_filter");
   }
 
   void menu_item() {

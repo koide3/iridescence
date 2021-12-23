@@ -95,7 +95,7 @@ void LightViewerContext::draw_ui() {
     canvas->mouse_control();
   }
 
-  ImGui::Image((void*)canvas->frame_buffer->color().id(), ImVec2(canvas->size[0], canvas->size[1]), ImVec2(0, 1), ImVec2(1, 0));
+  ImGui::Image(reinterpret_cast<void*>(canvas->frame_buffer->color().id()), ImVec2(canvas->size[0], canvas->size[1]), ImVec2(0, 1), ImVec2(1, 0));
   ImVec2 rect_min = ImGui::GetItemRectMin();
   ImVec2 rect_max = ImGui::GetItemRectMax();
   canvas_rect_min = Eigen::Vector2i(rect_min.x, rect_min.y);
@@ -303,15 +303,16 @@ void LightViewerContext::clear_drawable_filters() {
   drawable_filters.clear();
 }
 
-void LightViewerContext::add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter) {
-  drawable_filters[filter_name] = filter;
-}
-
-void LightViewerContext::remove_drawable_filter(const std::string& filter_name) {
-  auto found = drawable_filters.find(filter_name);
-  if(found != drawable_filters.end()) {
-    drawable_filters.erase(found);
+void LightViewerContext::register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter) {
+  if(!filter) {
+    auto found = drawable_filters.find(filter_name);
+    if(found != drawable_filters.end()) {
+      drawable_filters.erase(found);
+    }
+    return;
   }
+
+  drawable_filters[filter_name] = filter;
 }
 
 const std::shared_ptr<CameraControl>& LightViewerContext::get_camera_control() const {

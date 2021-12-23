@@ -70,8 +70,7 @@ public:
   void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
   void clear_drawable_filters();
-  void add_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter);
-  void remove_drawable_filter(const std::string& filter_name);
+  void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
 
   const std::shared_ptr<CameraControl>& get_camera_control() const;
   const std::shared_ptr<ProjectionControl>& get_projection_control() const;

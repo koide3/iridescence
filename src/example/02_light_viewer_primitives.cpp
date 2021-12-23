@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   // rendering of drawables can be selectively turned off
   bool draw_lines = true;
   viewer->register_ui_callback("line_rendering_setting", [&] { ImGui::Checkbox("lines", &draw_lines); });
-  viewer->add_drawable_filter("line_filter", [&](const std::string& drawable_name) { return draw_lines || drawable_name.find("line") == std::string::npos; });
+  viewer->register_drawable_filter("line_filter", [&](const std::string& drawable_name) { return draw_lines || drawable_name.find("line") == std::string::npos; });
 
   // thin lines (GL_LINES)
   viewer->update_drawable("thin_lines", std::make_shared<glk::ThinLines>(line_vertices), guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f));
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   // coordinate systems
   bool draw_coords = true;
   viewer->register_ui_callback("coord_rendering_setting", [&] { ImGui::Checkbox("coords", &draw_coords); });
-  viewer->add_drawable_filter("coord_filter", [&](const std::string& drawable_name) { return draw_coords || drawable_name.find("coord_") == std::string::npos; });
+  viewer->register_drawable_filter("coord_filter", [&](const std::string& drawable_name) { return draw_coords || drawable_name.find("coord_") == std::string::npos; });
 
   for(double x = -5.0f; x <= 5.0f; x += 2.0) {
     transform = Eigen::Translation3f(x, 6.0f, 1.0f) * Eigen::Quaternionf::UnitRandom();
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
   // primitives
   bool draw_primitives = true;
   viewer->register_ui_callback("privimive_rendering_setting", [&] { ImGui::Checkbox("primitives", &draw_primitives); });
-  viewer->add_drawable_filter("primitive_filter", [&](const std::string& drawable_name) { return draw_primitives || drawable_name.find("solid_") == std::string::npos; });
+  viewer->register_drawable_filter("primitive_filter", [&](const std::string& drawable_name) { return draw_primitives || drawable_name.find("solid_") == std::string::npos; });
 
   transform = Eigen::Translation3f(-5.0f, 9.0f, 1.0f) * Eigen::UniformScaling<float>(0.5f);
   viewer->update_drawable("solid_icosahedron", glk::Primitives::icosahedron(), guik::Rainbow(transform));
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
   // wireframes
   bool draw_wireframes = true;
   viewer->register_ui_callback("wireframe_rendering_setting", [&] { ImGui::Checkbox("wireframes", &draw_wireframes); });
-  viewer->add_drawable_filter("wireframe_filter", [&](const std::string& drawable_name) { return draw_wireframes || drawable_name.find("wire_") == std::string::npos; });
+  viewer->register_drawable_filter("wireframe_filter", [&](const std::string& drawable_name) { return draw_wireframes || drawable_name.find("wire_") == std::string::npos; });
 
   transform = Eigen::Translation3f(-5.0f, 12.0f, 1.0f) * Eigen::UniformScaling<float>(0.5f);
   viewer->update_drawable("wire_icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_ICOSAHEDRON), guik::Rainbow(transform));
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
   // transparent
   bool draw_transparent = true;
   viewer->register_ui_callback("transparent_rendering_setting", [&] { ImGui::Checkbox("transparent", &draw_transparent); });
-  viewer->add_drawable_filter("transparent_filter", [&](const std::string& drawable_name) { return draw_transparent || drawable_name.find("trans_") == std::string::npos; });
+  viewer->register_drawable_filter("transparent_filter", [&](const std::string& drawable_name) { return draw_transparent || drawable_name.find("trans_") == std::string::npos; });
 
   transform = Eigen::Translation3f(-5.0f, 15.0f, 1.0f) * Eigen::UniformScaling<float>(0.5f);
   viewer->update_drawable("trans_icosahedron", glk::Primitives::icosahedron(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
