@@ -5,14 +5,11 @@
 
 namespace glk {
 
-ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip)
-    : ThinLines(vertices, nullptr, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip) : ThinLines(vertices, nullptr, num_vertices, nullptr, 0, line_strip) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip)
-    : ThinLines(vertices, colors, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip) : ThinLines(vertices, colors, num_vertices, nullptr, 0, line_strip) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-    : line_width(1.0f) {
+ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip) : line_width(1.0f) {
   this->num_vertices = num_vertices;
   this->num_indices = num_indices;
   this->mode = line_strip ? GL_LINE_STRIP : GL_LINES;
@@ -26,13 +23,13 @@ ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertice
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * num_vertices, vertices, GL_STATIC_DRAW);
 
-  if(colors) {
+  if (colors) {
     glGenBuffers(1, &cbo);
     glBindBuffer(GL_ARRAY_BUFFER, cbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * num_vertices, colors, GL_STATIC_DRAW);
   }
 
-  if(indices) {
+  if (indices) {
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indices, indices, GL_STATIC_DRAW);
@@ -43,24 +40,11 @@ ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertice
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, bool line_strip)
-    : ThinLines(vertices.front().data(), vertices.size(), line_strip) {}
-
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, bool line_strip)
-    : ThinLines(vertices.front().data(), colors.front().data(), vertices.size(), line_strip) {}
-
-
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<unsigned int>& indices, bool line_strip)
-    : ThinLines(vertices.front().data(), nullptr, vertices.size(), indices.data(), indices.size(), line_strip) {}
-
-ThinLines::ThinLines(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors, const std::vector<unsigned int>& indices, bool line_strip)
-    : ThinLines(vertices.front().data(), colors.front().data(), vertices.size(), indices.data(), indices.size(), line_strip) {}
-
 ThinLines::~ThinLines() {
-  if(cbo) {
+  if (cbo) {
     glDeleteBuffers(1, &cbo);
   }
-  if(ebo) {
+  if (ebo) {
     glDeleteBuffers(1, &ebo);
   }
 
@@ -80,13 +64,13 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  if(cbo) {
+  if (cbo) {
     glEnableVertexAttribArray(color_loc);
     glBindBuffer(GL_ARRAY_BUFFER, cbo);
     glVertexAttribPointer(color_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
   }
 
-  if(!ebo) {
+  if (!ebo) {
     glDrawArrays(mode, 0, num_vertices);
   } else {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -96,7 +80,7 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
 
   glDisableVertexAttribArray(position_loc);
 
-  if(cbo) {
+  if (cbo) {
     glDisableVertexAttribArray(color_loc);
   }
 
