@@ -9,12 +9,12 @@ int main(int argc, char** argv) {
   viewer->register_ui_callback("ui", [&]() {
     ImGui::DragFloat("Time", &time, 0.01f);
 
-    if(ImGui::Button("Close")) {
+    if (ImGui::Button("Close")) {
       viewer->close();
     }
   });
 
-  while(viewer->spin_once()) {
+  while (viewer->spin_once()) {
     Eigen::AngleAxisf transform(time, Eigen::Vector3f::UnitZ());
     viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow(transform));
   }

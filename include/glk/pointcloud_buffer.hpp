@@ -19,7 +19,6 @@ struct AuxBufferData {
 
 class PointCloudBuffer : public glk::Drawable {
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<PointCloudBuffer>;
 
   PointCloudBuffer(int stride, int num_points);
