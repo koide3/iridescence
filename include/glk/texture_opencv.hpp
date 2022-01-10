@@ -6,7 +6,7 @@
 
 namespace glk {
 
-std::shared_ptr<glk::Texture> create_texture(const cv::Mat& image) {
+static std::shared_ptr<glk::Texture> create_texture(const cv::Mat& image) {
   Eigen::Vector2i size(image.cols, image.rows);
 
   GLuint format = GL_BGR;

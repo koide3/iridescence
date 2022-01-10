@@ -5,10 +5,12 @@
 
 namespace glk {
 
-Lines::Lines(float line_width,
-const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices,
-const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors,
-const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& infos)
+template <template <class> class Allocator>
+Lines::Lines(
+  float line_width,
+  const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
+  const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors,
+  const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos)
 : num_vertices(vertices.size()) {
   vao = vbo = cbo = ibo = 0;
 
@@ -16,8 +18,8 @@ const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& i
   glBindVertexArray(vao);
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices_ext(vertices.size() * 4);
-  for(int i=0; i<vertices.size(); i+=2) {
-    Eigen::Vector3f direction = vertices[i+1] - vertices[i];
+  for (int i = 0; i < vertices.size(); i += 2) {
+    Eigen::Vector3f direction = vertices[i + 1] - vertices[i];
     Eigen::Vector3f axis = std::abs(direction.normalized().dot(Eigen::Vector3f::UnitZ())) < 0.9f ? Eigen::Vector3f::UnitZ() : Eigen::Vector3f::UnitX();
 
     Eigen::Vector3f x = axis.cross(direction).normalized();
@@ -38,10 +40,10 @@ const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& i
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices_ext.size() * 3, vertices_ext.data(), GL_STATIC_DRAW);
 
-  if(!colors.empty()){
+  if (!colors.empty()) {
     std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_ext(colors.size() * 4);
-    for(int i = 0; i < colors.size(); i+=2) {
-      for(int j = 0; j < 4; j++) {
+    for (int i = 0; i < colors.size(); i += 2) {
+      for (int j = 0; j < 4; j++) {
         colors_ext[i * 4 + j * 2] = colors[i];
         colors_ext[i * 4 + j * 2 + 1] = colors[i + 1];
       }
@@ -51,10 +53,10 @@ const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& i
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * colors_ext.size() * 4, colors_ext.data(), GL_STATIC_DRAW);
   }
 
-  if(!infos.empty()) {
+  if (!infos.empty()) {
     std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>> infos_ext(infos.size() * 4);
-    for(int i = 0; i < infos.size(); i += 2) {
-      for(int j = 0; j < 4; j++) {
+    for (int i = 0; i < infos.size(); i += 2) {
+      for (int j = 0; j < 4; j++) {
         infos_ext[i * 4 + j * 2] = infos[i];
         infos_ext[i * 4 + j * 2 + 1] = infos[i + 1];
       }
@@ -76,20 +78,11 @@ const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& i
   }
   */
 
-  std::vector<int> sub_indices = {
-      0, 1, 4,
-      1, 5, 4,
-      4, 5, 2,
-      5, 3, 2,
-      2, 3, 6,
-      3, 6, 7,
-      6, 7, 0,
-      7, 1, 0
-  };
+  std::vector<int> sub_indices = {0, 1, 4, 1, 5, 4, 4, 5, 2, 5, 3, 2, 2, 3, 6, 3, 6, 7, 6, 7, 0, 7, 1, 0};
 
   std::vector<int> indices;
-  for(int i = 0; i < vertices_ext.size(); i += 8) {
-    for(int j=0; j<sub_indices.size(); j++) {
+  for (int i = 0; i < vertices_ext.size(); i += 8) {
+    for (int j = 0; j < sub_indices.size(); j++) {
       indices.push_back(sub_indices[j] + i);
     }
   }
@@ -103,12 +96,24 @@ const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& i
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+template Lines::Lines(
+  float line_width,
+  const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices,
+  const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors,
+  const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& infos);
+
+template Lines::Lines(
+  float line_width,
+  const std::vector<Eigen::Vector3f, std::allocator<Eigen::Vector3f>>& vertices,
+  const std::vector<Eigen::Vector4f, std::allocator<Eigen::Vector4f>>& colors,
+  const std::vector<Eigen::Vector4i, std::allocator<Eigen::Vector4i>>& infos);
+
 Lines::~Lines() {
   glDeleteBuffers(1, &vbo);
-  if(cbo) {
+  if (cbo) {
     glDeleteBuffers(1, &cbo);
   }
-  if(ibo) {
+  if (ibo) {
     glDeleteBuffers(1, &ibo);
   }
 
@@ -127,14 +132,14 @@ void Lines::draw(glk::GLSLShader& shader) const {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  if(cbo) {
+  if (cbo) {
     color_loc = shader.attrib("vert_color");
     glEnableVertexAttribArray(color_loc);
     glBindBuffer(GL_ARRAY_BUFFER, cbo);
     glVertexAttribPointer(color_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
   }
 
-  if(ibo) {
+  if (ibo) {
     info_loc = shader.attrib("vert_info");
     glEnableVertexAttribArray(info_loc);
     glBindBuffer(GL_ARRAY_BUFFER, ibo);
@@ -147,14 +152,14 @@ void Lines::draw(glk::GLSLShader& shader) const {
 
   glDisableVertexAttribArray(position_loc);
 
-  if(cbo) {
+  if (cbo) {
     glDisableVertexAttribArray(color_loc);
   }
-  if(ibo) {
+  if (ibo) {
     glDisableVertexAttribArray(info_loc);
   }
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 }
-}
+}  // namespace glk

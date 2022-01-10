@@ -19,7 +19,6 @@ struct AuxBufferData {
 
 class PointCloudBuffer : public glk::Drawable {
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   using Ptr = std::shared_ptr<PointCloudBuffer>;
 
   PointCloudBuffer(int stride, int num_points);
@@ -28,10 +27,9 @@ public:
   // Eigen utility constructors
   PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points);
   PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points);
-  PointCloudBuffer(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points);
-  PointCloudBuffer(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& points);
-  PointCloudBuffer(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& points);
-  PointCloudBuffer(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& points);
+
+  template <typename Scalar, int Dim, typename Allocator>
+  PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points);
 
   PointCloudBuffer(const Eigen::Vector3f* points, int num_points);
   PointCloudBuffer(const Eigen::Vector4f* points, int num_points);
@@ -40,9 +38,15 @@ public:
 
   virtual ~PointCloudBuffer() override;
 
-  void add_normals(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals);
-  void add_color(const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors);
-  void add_color(const std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>& colors);
+  template <typename Allocator>
+  void add_normals(const std::vector<Eigen::Vector3f, Allocator>& normals);
+  template <typename Allocator>
+  void add_normals(const std::vector<Eigen::Vector3d, Allocator>& normals);
+  template <typename Allocator>
+  void add_color(const std::vector<Eigen::Vector4f, Allocator>& colors);
+  template <typename Allocator>
+  void add_color(const std::vector<Eigen::Vector4d, Allocator> colors);
+
   void add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale = 1.0f);
   void add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale = 1.0f);
 
@@ -53,6 +57,9 @@ public:
 
   void enable_partial_rendering(int points_budget = 8192 * 5);
   void disable_partial_rendering();
+
+  void bind(glk::GLSLShader& shader) const;
+  void unbind(glk::GLSLShader& shader) const;
 
   virtual void draw(glk::GLSLShader& shader) const override;
 
@@ -75,6 +82,35 @@ private:
 
   std::vector<AuxBufferData> aux_buffers;
 };
+
+// template members
+template <typename Scalar, int Dim, typename Allocator>
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points)
+: PointCloudBuffer(Eigen::Matrix<Scalar, 3, -1>(Eigen::Map<const Eigen::Matrix<Scalar, Dim, -1>>(points.front().data(), Dim, points.size()).template topRows<3>())) {}
+
+template <typename Allocator>
+void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3f, Allocator>& normals) {
+  add_normals(normals[0].data(), sizeof(Eigen::Vector3f), normals.size());
+}
+
+template <typename Allocator>
+void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3d, Allocator>& normals) {
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals_f(normals.size());
+  std::transform(normals.begin(), normals.end(), normals_f.begin(), [](const Eigen::Vector3d& n) { return n.cast<float>(); });
+  add_normals(normals_f[0].data(), sizeof(Eigen::Vector3f), normals_f.size());
+}
+
+template <typename Allocator>
+void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4f, Allocator>& colors) {
+  add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+}
+
+template <typename Allocator>
+void PointCloudBuffer::add_color(const std::vector<Eigen::Vector4d, Allocator> colors) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(colors.size());
+  std::transform(colors.begin(), colors.end(), colors_f.begin(), [](const Eigen::Vector4d& p) { return p.cast<float>(); });
+  add_color(colors_f[0].data(), sizeof(Eigen::Vector4f), colors_f.size());
+}
 
 }  // namespace glk
 

@@ -37,6 +37,7 @@ public:
 
   virtual void set_maximum(int max) override {
     this->max = max;
+    this->current = 0;
   }
   virtual void set_current(int current) override {
     this->current = current;
@@ -97,6 +98,10 @@ public:
     T ret = std::any_cast<T>(result_);
     result_ = nullptr;
     return ret;
+  }
+
+  bool is_running() const {
+    return running;
   }
 
 private:

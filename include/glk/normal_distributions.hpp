@@ -12,8 +12,18 @@ class Mesh;
 
 class NormalDistributions : public glk::Drawable {
 public:
-  NormalDistributions(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& means, const std::vector<Eigen::Matrix3f, Eigen::aligned_allocator<Eigen::Matrix3f>>& covs, float scale = 1.0f);
-  NormalDistributions(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>& means, const std::vector<Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d>>& covs, float scale = 1.0f);
+  template <template <class> class Allocator>
+  NormalDistributions(
+    const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& means,
+    const std::vector<Eigen::Matrix3f, Allocator<Eigen::Matrix3f>>& covs,
+    float scale = 1.0f);
+
+  template <template <class> class Allocator>
+  NormalDistributions(
+    const std::vector<Eigen::Vector3d, Allocator<Eigen::Vector3d>>& means,
+    const std::vector<Eigen::Matrix3d, Allocator<Eigen::Matrix3d>>& covs,
+    float scale = 1.0f);
+
   virtual ~NormalDistributions();
 
   virtual void draw(glk::GLSLShader& shader) const override;
