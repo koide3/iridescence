@@ -74,6 +74,47 @@ void define_guik(py::module_& m) {
         }), "", py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"),
                 py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
       );
+    
+  // Flat colors
+  py::class_<guik::FlatRed, guik::FlatColor, std::shared_ptr<guik::FlatRed>>(guik_, "FlatRed")
+    .def(py::init<>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::FlatRed(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
+
+  py::class_<guik::FlatGreen, guik::FlatColor, std::shared_ptr<guik::FlatGreen>>(guik_, "FlatGreen")
+    .def(py::init<>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::FlatGreen(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
+
+  py::class_<guik::FlatBlue, guik::FlatColor, std::shared_ptr<guik::FlatBlue>>(guik_, "FlatBlue")
+    .def(py::init<>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::FlatBlue(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
+
+  py::class_<guik::FlatOrange, guik::FlatColor, std::shared_ptr<guik::FlatOrange>>(guik_, "FlatOrange")
+    .def(py::init<>())
+    .def(py::init([] (float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::FlatOrange(mat);
+        }), "", py::arg("scale") = 1.0, py::arg("trans") = Eigen::Vector3f::Zero(), py::arg("rot") = Eigen::Matrix3f::Identity()
+      );
 
   // guik::ModelControl
   py::class_<guik::ModelControl>(guik_, "ModelControl")
