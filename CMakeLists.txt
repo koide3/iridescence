@@ -151,7 +151,7 @@ if(BUILD_PYTHON_BINDINGS)
     src/python/pfd.cpp
     src/python/imgui.cpp
   )
-  target_link_libraries(pyridescence
+  target_link_libraries(pyridescence PRIVATE
     iridescence
   )
   file(COPY src/example/light_viewer.py DESTINATION .)

@@ -104,7 +104,13 @@ void define_guik(py::module_& m) {
     .def("clear", &guik::LightViewerContext::clear)
     .def("clear_text", &guik::LightViewerContext::clear_text)
     .def("append_text", &guik::LightViewerContext::append_text)
-    .def("remove_drawable", &guik::LightViewerContext::remove_drawable)
+    .def("remove_drawable", [](guik::LightViewerContext& context, const std::string& pattern, bool regex) {
+      if(regex) {
+        context.remove_drawable(std::regex(pattern));
+      } else {
+        context.remove_drawable(pattern);
+      }
+    }, py::arg("pattern"), py::arg("regex") = false)
     .def("update_drawable", &guik::LightViewerContext::update_drawable)
     .def("find_drawable", &guik::LightViewerContext::find_drawable)
     .def("reset_center", &guik::LightViewerContext::reset_center)
@@ -141,7 +147,13 @@ void define_guik(py::module_& m) {
     .def("append_text", &guik::LightViewer::append_text)
     .def("register_ui_callback", &guik::LightViewer::register_ui_callback)
 
-    .def("remove_drawable", &guik::LightViewer::remove_drawable)
+    .def("remove_drawable", [](guik::LightViewer& context, const std::string& pattern, bool regex) {
+      if(regex) {
+        context.remove_drawable(std::regex(pattern));
+      } else {
+        context.remove_drawable(pattern);
+      }
+    }, py::arg("pattern"), py::arg("regex") = false)
     .def("update_drawable", &guik::LightViewer::update_drawable)
     .def("find_drawable", &guik::LightViewer::find_drawable)
     .def("reset_center", &guik::LightViewer::reset_center)
