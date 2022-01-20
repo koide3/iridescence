@@ -41,6 +41,7 @@ public:
   }
 
   bool spin_until_click();
+  bool toggle_spin_once();
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
   void invoke(const std::function<void()>& func);

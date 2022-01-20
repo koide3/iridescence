@@ -254,6 +254,22 @@ bool LightViewer::spin_until_click() {
   return true;
 }
 
+bool LightViewer::toggle_spin_once() {
+  bool stop = false;
+
+  register_ui_callback("kill_switch", [&]() { ImGui::Checkbox("break", &stop); });
+
+  do {
+    if(!spin_once()) {
+      return false;
+    }
+  } while (stop);
+
+  register_ui_callback("kill_switch", nullptr);
+
+  return true;
+}
+
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if(!callback) {
     ui_callbacks.erase(name);
