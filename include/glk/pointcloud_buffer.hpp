@@ -70,6 +70,8 @@ public:
   int get_aux_size() const;
   const AuxBufferData& get_aux_buffer(int i) const;
 
+  int size() const { return num_points; }
+
 private:
   mutable std::atomic_uint rendering_count;
   int points_rendering_budget;

@@ -16,6 +16,8 @@ public:
 
   GLuint ebo_id() const;
 
+  int size() const { return num_indices; }
+
 private:
   std::shared_ptr<const glk::PointCloudBuffer> cloud_buffer;
 
