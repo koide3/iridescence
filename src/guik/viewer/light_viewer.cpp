@@ -331,4 +331,21 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
   return found->second;
 }
 
+std::vector<unsigned char> LightViewer::read_color_buffer() {
+  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+  std::vector<unsigned char> flipped(bytes.size(), 255);
+
+  Eigen::Vector2i size = canvas->frame_buffer->color().size();
+  for (int y = 0; y < size[1]; y++) {
+    int y_ = size[1] - y - 1;
+    for (int x = 0; x < size[0]; x++) {
+      for (int k = 0; k < 3; k++) {
+        flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
+      }
+    }
+  }
+
+  return flipped;
+}
+
 }  // namespace guik

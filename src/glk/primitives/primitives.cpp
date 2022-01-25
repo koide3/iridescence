@@ -23,10 +23,10 @@ using namespace glk::console;
 Primitives* Primitives::instance_ = nullptr;
 
 const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
-  if(meshes[type] == nullptr) {
+  if (meshes[type] == nullptr) {
     bool wireframe = int(type) >= WIRE_ICOSAHEDRON;
 
-    switch(type) {
+    switch (type) {
       default:
         std::cerr << bold_red << "error : unknown primitive type " << type << reset << std::endl;
         break;
@@ -89,9 +89,7 @@ class PrimitiveWrapper : public glk::Drawable {
 public:
   PrimitiveWrapper(const glk::Drawable& primitive) : primitive(primitive) {}
 
-  virtual void draw(glk::GLSLShader& shader) const {
-    primitive.draw(shader);
-  }
+  virtual void draw(glk::GLSLShader& shader) const { primitive.draw(shader); }
 
 private:
   const glk::Drawable& primitive;

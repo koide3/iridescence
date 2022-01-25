@@ -17,6 +17,7 @@ find_package(OpenGL REQUIRED)
 
 # find_package(PCL)
 find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
@@ -101,6 +102,7 @@ add_library(iridescence SHARED
   src/glk/io/ascii_io.cpp
   src/glk/io/ply_io.cpp
   src/glk/io/png_io.cpp
+  src/glk/io/jpeg_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_splatting.cpp
   src/glk/effects/screen_space_lighting.cpp
@@ -131,6 +133,7 @@ target_include_directories(iridescence PUBLIC
   thirdparty/portable-file-dialogs
   thirdparty/gl3w
   ${PNG_INCLUDE_DIRS}
+  ${JPEG_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
@@ -139,6 +142,7 @@ target_link_libraries(iridescence
   gl_imgui
   pthread
   ${PNG_LIBRARIES}
+  ${JPEG_LIBRARIES}
   ${Boost_LIBRARIES}
 )
 
