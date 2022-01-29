@@ -8,14 +8,40 @@ namespace glk {
 template <template <class> class Allocator>
 Lines::Lines(
   float line_width,
-  const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
-  const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors,
-  const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos)
-: num_vertices(vertices.size()) {
+  const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices_,
+  const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors_,
+  const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos_,
+  bool line_strip) {
   vao = vbo = cbo = ibo = 0;
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
+
+  std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>> vertices;
+  std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>> colors;
+  std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>> infos;
+  if (!line_strip) {
+    vertices = vertices_;
+    colors = colors_;
+    infos = infos_;
+  } else {
+    for (int i = 1; i < vertices_.size(); i++) {
+      vertices.push_back(vertices_[i - 1]);
+      vertices.push_back(vertices_[i]);
+
+      if (!colors_.empty()) {
+        colors.push_back(colors_[i - 1]);
+        colors.push_back(colors_[i]);
+      }
+
+      if (!infos_.empty()) {
+        infos.push_back(infos_[i - 1]);
+        infos.push_back(infos_[i]);
+      }
+    }
+  }
+
+  num_vertices = vertices.size();
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices_ext(vertices.size() * 4);
   for (int i = 0; i < vertices.size(); i += 2) {
@@ -100,13 +126,15 @@ template Lines::Lines(
   float line_width,
   const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices,
   const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors,
-  const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& infos);
+  const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& infos,
+  bool line_strip);
 
 template Lines::Lines(
   float line_width,
   const std::vector<Eigen::Vector3f, std::allocator<Eigen::Vector3f>>& vertices,
   const std::vector<Eigen::Vector4f, std::allocator<Eigen::Vector4f>>& colors,
-  const std::vector<Eigen::Vector4i, std::allocator<Eigen::Vector4i>>& infos);
+  const std::vector<Eigen::Vector4i, std::allocator<Eigen::Vector4i>>& infos,
+  bool line_strip);
 
 Lines::~Lines() {
   glDeleteBuffers(1, &vbo);
