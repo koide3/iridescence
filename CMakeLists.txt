@@ -118,6 +118,7 @@ add_library(iridescence SHARED
   src/guik/camera/orbit_camera_control_xz.cpp
   src/guik/camera/topdown_camera_control.cpp
   src/guik/camera/arcball_camera_control.cpp
+  src/guik/camera/static_camera_control.cpp
   src/guik/camera/projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
