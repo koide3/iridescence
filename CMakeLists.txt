@@ -94,6 +94,7 @@ add_library(iridescence SHARED
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
+  src/glk/pixel_buffer.cpp
   src/glk/query.cpp
   src/glk/debug_output.cpp
   src/glk/transform_feedback.cpp

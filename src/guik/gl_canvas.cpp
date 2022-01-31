@@ -157,6 +157,10 @@ bool GLCanvas::partial_rendering_enabled() const {
   return dynamic_flag_buffer_id > 0;
 }
 
+const glk::Texture& GLCanvas::color_buffer() const {
+  return frame_buffer->color();
+}
+
 const glk::Texture& GLCanvas::depth_buffer() const {
   return frame_buffer->depth();
 }

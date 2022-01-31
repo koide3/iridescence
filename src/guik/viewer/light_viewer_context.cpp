@@ -240,6 +240,10 @@ bool LightViewerContext::partial_rendering_enabled() const {
   return canvas->partial_rendering_enabled();
 }
 
+const glk::Texture& LightViewerContext::color_buffer() const {
+  return canvas->color_buffer();
+}
+
 const glk::Texture& LightViewerContext::depth_buffer() const {
   return canvas->depth_buffer();
 }
