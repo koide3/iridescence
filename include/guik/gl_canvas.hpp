@@ -31,7 +31,7 @@ public:
 
   void enable_normal_buffer();
   void enable_info_buffer();
-  void enable_partial_rendering();
+  void enable_partial_rendering(double clear_thresh = 1e-6);
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
@@ -67,6 +67,7 @@ public:
   int info_buffer_id;
   int dynamic_flag_buffer_id;
 
+  double partial_rendering_clear_thresh;
   Eigen::Matrix4f last_projection_view_matrix;
 
   std::unique_ptr<glk::GLSLShader> shader;

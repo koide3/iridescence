@@ -224,8 +224,8 @@ void LightViewerContext::enable_info_buffer() {
   canvas->enable_info_buffer();
 }
 
-void LightViewerContext::enable_partial_rendering() {
-  canvas->enable_partial_rendering();
+void LightViewerContext::enable_partial_rendering(double clear_thresh) {
+  canvas->enable_partial_rendering(clear_thresh);
 }
 
 bool LightViewerContext::normal_buffer_enabled() const {
