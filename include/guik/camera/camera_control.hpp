@@ -17,9 +17,9 @@ public:
 
   virtual void lookat(const Eigen::Vector3f& pt) {}
 
-  virtual void mouse(const Eigen::Vector2i& p, int button, bool down) = 0;
-  virtual void drag(const Eigen::Vector2i& p, int button) = 0;
-  virtual void scroll(const Eigen::Vector2f& rel) = 0;
+  virtual void mouse(const Eigen::Vector2i& p, int button, bool down) {}
+  virtual void drag(const Eigen::Vector2i& p, int button) {}
+  virtual void scroll(const Eigen::Vector2f& rel) {}
 
   virtual void updown(int p) {}
   virtual void arrow(const Eigen::Vector2i& p) {}
@@ -31,9 +31,9 @@ public:
   virtual Eigen::Matrix4f view_matrix() const = 0;
 
   // io
-  virtual std::string name() const = 0;
-  virtual void load(std::istream& ist) = 0;
-  virtual void save(std::ostream& ost) const = 0;
+  virtual std::string name() const { return "CameraControl"; }
+  virtual void load(std::istream& ist) {}
+  virtual void save(std::ostream& ost) const {}
 };
 
 std::istream& operator>> (std::istream& ist, CameraControl& cam);

@@ -22,7 +22,8 @@ public:
     float line_width,
     const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
     const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors = std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>(),
-    const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos = std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>());
+    const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos = std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>(),
+    bool line_strip = false);
   virtual ~Lines() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;

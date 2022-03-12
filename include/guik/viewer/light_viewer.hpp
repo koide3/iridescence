@@ -58,6 +58,9 @@ public:
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
+  std::vector<unsigned char> read_color_buffer();
+  std::vector<float> read_depth_buffer(bool real_scale = true);
+
   void show_viewer_ui();
   void show_info_window();
 

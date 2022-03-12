@@ -9,14 +9,26 @@
 
 namespace glk {
 
-Mesh::Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, int num_vertices, const void* indices, int num_indices, bool wireframe) {
+Mesh::Mesh(
+  const void* vertices,
+  int vertex_stride,
+  const void* normals,
+  int normal_stride,
+  const void* colors,
+  int color_stride,
+  int num_vertices,
+  const void* indices,
+  int num_indices,
+  bool wireframe) {
+  //
   this->wireframe = wireframe;
   this->num_vertices = num_vertices;
   this->num_indices = num_indices;
   this->vertex_stride = vertex_stride;
   this->normal_stride = normal_stride;
+  this->color_stride = color_stride;
 
-  vbo = nbo = ebo = 0;
+  vbo = nbo = cbo = ebo = 0;
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
@@ -31,6 +43,12 @@ Mesh::Mesh(const void* vertices, int vertex_stride, const void* normals, int nor
     glBufferData(GL_ARRAY_BUFFER, normal_stride * num_vertices, normals, GL_STATIC_DRAW);
   }
 
+  if(colors) {
+    glGenBuffers(1, &cbo);
+    glBindBuffer(GL_ARRAY_BUFFER, cbo);
+    glBufferData(GL_ARRAY_BUFFER, color_stride * num_vertices, colors, GL_STATIC_DRAW);
+  }
+
   glGenBuffers(1, &ebo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indices, indices, GL_STATIC_DRAW);
@@ -40,13 +58,16 @@ Mesh::Mesh(const void* vertices, int vertex_stride, const void* normals, int nor
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-Mesh::Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices, bool wireframe)
-    : Mesh(vertices.data(), sizeof(float) * 3, normals.data(), sizeof(float) * 3, vertices.size(), indices.data(), indices.size(), wireframe) {}
+Mesh::Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, int num_vertices, const void* indices, int num_indices, bool wireframe)
+: Mesh(vertices, vertex_stride, normals, normal_stride, nullptr, 0, num_vertices, indices, num_indices, wireframe) {}
 
 Mesh ::~Mesh() {
   glDeleteBuffers(1, &vbo);
-  if(nbo) {
+  if (nbo) {
     glDeleteBuffers(1, &nbo);
+  }
+  if (cbo) {
+    glDeleteBuffers(1, &cbo);
   }
   glDeleteBuffers(1, &ebo);
   glDeleteBuffers(1, &vao);
@@ -70,6 +91,14 @@ void Mesh::draw(glk::GLSLShader& shader) const {
     glEnableVertexAttribArray(normal_loc);
     glBindBuffer(GL_ARRAY_BUFFER, nbo);
     glVertexAttribPointer(normal_loc, 3, GL_FLOAT, GL_FALSE, normal_stride, 0);
+  }
+
+  GLint color_loc = -1;
+  if(cbo) {
+    color_loc = shader.attrib("vert_color");
+    glEnableVertexAttribArray(color_loc);
+    glBindBuffer(GL_ARRAY_BUFFER, cbo);
+    glVertexAttribPointer(color_loc, 4, GL_FLOAT, GL_FALSE, color_stride, 0);
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

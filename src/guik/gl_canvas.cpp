@@ -66,6 +66,8 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name)
 
   normal_buffer_id = info_buffer_id = dynamic_flag_buffer_id = 0;
   last_projection_view_matrix.setIdentity();
+
+  partial_rendering_clear_thresh = 1e-6;
 }
 
 /**
@@ -134,7 +136,8 @@ void GLCanvas::enable_info_buffer() {
   frame_buffer->add_color_buffer(1, GL_RGBA32I, GL_RGBA_INTEGER, GL_INT);
 }
 
-void GLCanvas::enable_partial_rendering() {
+void GLCanvas::enable_partial_rendering(double clear_thresh) {
+  partial_rendering_clear_thresh = clear_thresh;
   dynamic_flag_buffer_id = frame_buffer->num_color_buffers();
   frame_buffer->add_color_buffer(3, GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE);
 
@@ -155,6 +158,10 @@ bool GLCanvas::info_buffer_enabled() const {
 
 bool GLCanvas::partial_rendering_enabled() const {
   return dynamic_flag_buffer_id > 0;
+}
+
+const glk::Texture& GLCanvas::color_buffer() const {
+  return frame_buffer->color();
 }
 
 const glk::Texture& GLCanvas::depth_buffer() const {
@@ -216,7 +223,7 @@ void GLCanvas::bind() {
   bool clear_buffer = true;
   if(partial_rendering_enabled()) {
     Eigen::Matrix4f projection_view_matrix = projection_matrix * view_matrix;
-    clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > 1e-6;
+    clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > partial_rendering_clear_thresh;
     last_projection_view_matrix = projection_view_matrix;
   }
 

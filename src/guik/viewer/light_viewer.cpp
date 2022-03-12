@@ -331,4 +331,45 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
   return found->second;
 }
 
+std::vector<unsigned char> LightViewer::read_color_buffer() {
+  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+  std::vector<unsigned char> flipped(bytes.size(), 255);
+
+  Eigen::Vector2i size = canvas->frame_buffer->color().size();
+  for (int y = 0; y < size[1]; y++) {
+    int y_ = size[1] - y - 1;
+    for (int x = 0; x < size[0]; x++) {
+      for (int k = 0; k < 3; k++) {
+        flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
+      }
+    }
+  }
+
+  return flipped;
+}
+
+std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
+  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT);
+  std::vector<float> flipped(floats.size());
+
+  Eigen::Vector2i size = canvas->frame_buffer->color().size();
+  for (int y = 0; y < size[1]; y++) {
+    int y_ = size[1] - y - 1;
+    for (int x = 0; x < size[0]; x++) {
+        flipped[y_ * size[0] + x] = floats[y * size[0] + x];
+    }
+  }
+
+  if (real_scale) {
+    const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
+    const float near = depth_range[0];
+    const float far = depth_range[1];
+    for (auto& depth : flipped) {
+      depth = 2.0 * near * far / (far + near - depth * (far - near));
+    }
+  }
+
+  return flipped;
+}
+
 }  // namespace guik

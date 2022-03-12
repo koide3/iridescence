@@ -13,7 +13,25 @@ namespace glk {
 class Mesh : public Drawable {
 public:
   Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, int num_vertices, const void* indices, int num_indices, bool wireframe = false);
-  Mesh(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals, const std::vector<int>& indices, bool wireframe = false);
+  Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, const void* colors, int color_stride, int num_vertices, const void* indices, int num_indices, bool wireframe = false);
+
+  template <template <class> class Alloc>
+  Mesh(
+    const std::vector<Eigen::Vector3f, Alloc<Eigen::Vector3f>>& vertices,
+    const std::vector<Eigen::Vector3f, Alloc<Eigen::Vector3f>>& normals,
+    const std::vector<int>& indices,
+    bool wireframe = false)
+  : Mesh(vertices.data(), sizeof(float) * 3, normals.data(), sizeof(float) * 3, vertices.size(), indices.data(), indices.size(), wireframe) {}
+
+  template <template <class> class Alloc>
+  Mesh(
+    const std::vector<Eigen::Vector3f, Alloc<Eigen::Vector3f>>& vertices,
+    const std::vector<Eigen::Vector3f, Alloc<Eigen::Vector3f>>& normals,
+    const std::vector<Eigen::Vector4f, Alloc<Eigen::Vector4f>>& colors,
+    const std::vector<int>& indices,
+    bool wireframe = false)
+  : Mesh(vertices.data(), sizeof(float) * 3, normals.data(), sizeof(float) * 3, colors.data(), sizeof(float) * 4, vertices.size(), indices.data(), indices.size(), wireframe) {}
+
   virtual ~Mesh();
 
   virtual void draw(glk::GLSLShader& shader) const override;
@@ -27,12 +45,14 @@ private:
 
   int vertex_stride;
   int normal_stride;
+  int color_stride;
   int num_vertices;
   int num_indices;
 
   GLuint vao;
   GLuint vbo;
   GLuint nbo;
+  GLuint cbo;
   GLuint ebo;
 };
 

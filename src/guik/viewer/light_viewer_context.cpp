@@ -224,8 +224,8 @@ void LightViewerContext::enable_info_buffer() {
   canvas->enable_info_buffer();
 }
 
-void LightViewerContext::enable_partial_rendering() {
-  canvas->enable_partial_rendering();
+void LightViewerContext::enable_partial_rendering(double clear_thresh) {
+  canvas->enable_partial_rendering(clear_thresh);
 }
 
 bool LightViewerContext::normal_buffer_enabled() const {
@@ -238,6 +238,10 @@ bool LightViewerContext::info_buffer_enabled() const {
 
 bool LightViewerContext::partial_rendering_enabled() const {
   return canvas->partial_rendering_enabled();
+}
+
+const glk::Texture& LightViewerContext::color_buffer() const {
+  return canvas->color_buffer();
 }
 
 const glk::Texture& LightViewerContext::depth_buffer() const {

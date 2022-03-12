@@ -50,12 +50,13 @@ public:
   void enable_decimal_rendering();
   void enable_normal_buffer();
   void enable_info_buffer();
-  void enable_partial_rendering();
+  void enable_partial_rendering(double clear_thresh = 1e-6);
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
   bool partial_rendering_enabled() const;
 
+  const glk::Texture& color_buffer() const;
   const glk::Texture& depth_buffer() const;
   const glk::Texture& normal_buffer() const;
   const glk::Texture& info_buffer() const;
