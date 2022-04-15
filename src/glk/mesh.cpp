@@ -70,7 +70,7 @@ Mesh ::~Mesh() {
     glDeleteBuffers(1, &cbo);
   }
   glDeleteBuffers(1, &ebo);
-  glDeleteBuffers(1, &vao);
+  glDeleteVertexArrays(1, &vao);
 }
 
 void Mesh::draw(glk::GLSLShader& shader) const {

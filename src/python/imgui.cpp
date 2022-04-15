@@ -35,6 +35,12 @@ void define_imgui(py::module_& m) {
   imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
 
+  imgui_.def("open_popup", &ImGui::OpenPopup);
+  imgui_.def("begin_popup", &ImGui::BeginPopup);
+  imgui_.def("begin_popup_modal", &ImGui::BeginPopupModal);
+  imgui_.def("end_popup", &ImGui::EndPopup);
+  imgui_.def("close_current_popup", &ImGui::CloseCurrentPopup);
+
   imgui_.def("set_next_window_pos", [] (const Eigen::Vector2i& pos, int cond, const Eigen::Vector2i& pivot) { ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1]), cond, ImVec2(pivot[0], pivot[1])); }, "",
     py::arg("pos"), py::arg("cond") = 0, py::arg("pivot") = Eigen::Vector2i(0, 0));
   imgui_.def("set_next_window_size", [] (const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); }, "",

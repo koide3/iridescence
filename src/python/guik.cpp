@@ -211,4 +211,17 @@ void define_guik(py::module_& m) {
     .def("pick_depth", &guik::LightViewer::pick_depth, "", py::arg("p"), py::arg("window") = 2)
     .def("unproject", &guik::LightViewer::unproject, "", py::arg("p"), py::arg("depth"))
     ;
+
+  // guik::RecentFiles
+  py::class_<guik::RecentFiles>(guik_, "RecentFiles")
+    .def(py::init<const std::string&>())
+    .def("clear", &guik::RecentFiles::clear)
+    .def("push", [](guik::RecentFiles& recent, const std::string& filename) { recent.push(filename); })
+    .def("push_all", [](guik::RecentFiles& recent, const std::vector<std::string>& filenames) { recent.push(filenames); })
+    .def("empty", &guik::RecentFiles::empty)
+    .def("size", &guik::RecentFiles::size)
+    .def("most_recent", &guik::RecentFiles::most_recent)
+    .def("fullpath", &guik::RecentFiles::fullpath)
+    .def("filename", &guik::RecentFiles::filename)
+    ;
 }
