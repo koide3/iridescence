@@ -17,13 +17,18 @@ namespace glk {
  */
 class Lines : public Drawable {
 public:
+  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, const Eigen::Vector4i* infos, int num_points, bool line_strip);
+  Lines(float line_width, const Eigen::Vector3f* vertices, int num_points, bool line_strip);
+  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip);
+
   template <template <class> class Allocator>
   Lines(
     float line_width,
     const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
     const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors = std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>(),
     const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos = std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>(),
-    bool line_strip = false);
+    bool line_strip = false) : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), infos.empty() ? nullptr : infos.data(), vertices.size(), line_strip) {}
+
   virtual ~Lines() override;
 
   virtual void draw(glk::GLSLShader& shader) const override;

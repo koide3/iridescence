@@ -5,36 +5,34 @@
 
 namespace glk {
 
-template <template <class> class Allocator>
-Lines::Lines(
-  float line_width,
-  const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices_,
-  const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors_,
-  const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos_,
-  bool line_strip) {
+Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Vector4f* colors_, const Eigen::Vector4i* infos_, int num_points, bool line_strip) {
   vao = vbo = cbo = ibo = 0;
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
-  std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>> colors;
-  std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>> infos;
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+  std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>> infos;
   if (!line_strip) {
-    vertices = vertices_;
-    colors = colors_;
-    infos = infos_;
+    vertices.assign(vertices_, vertices_ + num_points);
+    if(colors_) {
+      colors.assign(colors_, colors_ + num_points);
+    }
+    if(infos_) {
+      infos.assign(infos_, infos_ + num_points);
+    }
   } else {
-    for (int i = 1; i < vertices_.size(); i++) {
+    for (int i = 1; i < num_points; i++) {
       vertices.push_back(vertices_[i - 1]);
       vertices.push_back(vertices_[i]);
 
-      if (!colors_.empty()) {
+      if (colors_) {
         colors.push_back(colors_[i - 1]);
         colors.push_back(colors_[i]);
       }
 
-      if (!infos_.empty()) {
+      if (infos_) {
         infos.push_back(infos_[i - 1]);
         infos.push_back(infos_[i]);
       }
@@ -122,19 +120,9 @@ Lines::Lines(
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-template Lines::Lines(
-  float line_width,
-  const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices,
-  const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors,
-  const std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>>& infos,
-  bool line_strip);
+Lines::Lines(float line_width, const Eigen::Vector3f* vertices, int num_points, bool line_strip) : Lines(line_width, vertices, nullptr, nullptr, num_points, line_strip) {}
 
-template Lines::Lines(
-  float line_width,
-  const std::vector<Eigen::Vector3f, std::allocator<Eigen::Vector3f>>& vertices,
-  const std::vector<Eigen::Vector4f, std::allocator<Eigen::Vector4f>>& colors,
-  const std::vector<Eigen::Vector4i, std::allocator<Eigen::Vector4i>>& infos,
-  bool line_strip);
+Lines::Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip) : Lines(line_width, vertices, colors, nullptr, num_points, line_strip) {}
 
 Lines::~Lines() {
   glDeleteBuffers(1, &vbo);
