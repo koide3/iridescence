@@ -11,6 +11,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
+set(OpenGL_GL_PREFERENCE GLVND)
 
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
