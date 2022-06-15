@@ -539,6 +539,53 @@ private:
   int view_mode;
 };
 
+class LightViewer::ViewerUI::PointPickingWindow {
+public:
+  PointPickingWindow(guik::LightViewer* viewer) : viewer(viewer) {
+    show_window = false;
+
+    clicked_pos_2d.setZero();
+    clicked_depth = 0.0f;
+    clicked_pos_3d.setZero();
+  }
+
+  ~PointPickingWindow() {}
+
+  void menu_item() {
+    ImGui::MenuItem("Point Picking", nullptr, &show_window);
+  }
+
+  void draw_ui() {
+    if(!show_window) {
+      return;
+    }
+
+    auto& io = ImGui::GetIO();
+    if(!io.WantCaptureMouse && io.MouseClicked[1]) {
+      clicked_pos_2d = Eigen::Vector2i(io.MousePos[0], io.MousePos[1]);
+      clicked_depth = viewer->pick_depth(clicked_pos_2d);
+      clicked_pos_3d = viewer->unproject(clicked_pos_2d, clicked_depth);
+    }
+
+    ImGui::Begin("picking", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::Text("picked_pos_2d:%d %d", clicked_pos_2d[0], clicked_pos_2d[1]);
+    ImGui::Text("picked_depth :%.3f", clicked_depth);
+    ImGui::Text("picked_pos_3d:%.3f %.3f %.3f", clicked_pos_3d[0], clicked_pos_3d[1], clicked_pos_3d[2]);
+
+    ImGui::End();
+  }
+
+  LightViewer* viewer;
+
+  bool show_window;
+
+  Eigen::Vector2i clicked_pos_2d;
+
+  float clicked_depth;
+  Eigen::Vector3f clicked_pos_3d;
+};
+
 /**
  * ViewerUI::ViewerUI
  */
@@ -547,6 +594,7 @@ LightViewer::ViewerUI::ViewerUI(guik::LightViewer* viewer) : viewer(viewer) {
   drawable_filter_window.reset(new DrawableFilterWindow(viewer));
   drawable_editor_window.reset(new DrawableEditorWindow(viewer));
   camera_setting_window.reset(new CameraSettingWindow(viewer));
+  point_picking_window.reset(new PointPickingWindow(viewer));
 }
 /**
  * ViewerUI::ViewerUI
@@ -566,6 +614,7 @@ bool LightViewer::ViewerUI::draw_ui() {
   drawable_filter_window->draw_ui();
   drawable_editor_window->draw_ui();
   camera_setting_window->draw_ui();
+  point_picking_window->draw_ui();
 
   return true;
 }
@@ -609,6 +658,11 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
 
   if(ImGui::BeginMenu("Camera")) {
     camera_setting_window->menu_item();
+    ImGui::EndMenu();
+  }
+
+  if(ImGui::BeginMenu("Utility")) {
+    point_picking_window->menu_item();
     ImGui::EndMenu();
   }
 
