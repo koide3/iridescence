@@ -178,6 +178,7 @@ void define_guik(py::module_& m) {
     .def("close", &guik::LightViewer::close, "")
     .def("spin", &guik::LightViewer::spin, "")
     .def("spin_once", &guik::LightViewer::spin_once, "")
+    .def("toggle_spin_once", &guik::LightViewer::toggle_spin_once, "")
     .def("spin_until_click", &guik::LightViewer::spin_until_click, "")
 
     .def("enable_vsync", &guik::LightViewer::enable_vsync, "")

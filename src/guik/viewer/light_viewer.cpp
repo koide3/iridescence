@@ -139,21 +139,49 @@ void LightViewer::draw_ui() {
   if(!images.empty()) {
     ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    std::vector<std::string> names;
-    for(const auto& image : images) {
-      names.push_back(image.first);
+    std::unordered_map<std::string, std::vector<std::string>> groups;
+    for(const auto& image: images) {
+      const size_t separator_loc = image.first.find_first_of('/');
+      const std::string group = separator_loc == std::string::npos ? "default" : image.first.substr(0, separator_loc);
+      groups[group].push_back(image.first);
     }
-    std::sort(names.begin(), names.end());
 
-    for(const auto& name : names) {
-      const auto& image = images[name];
-      const double scale = image.first;
-      const auto& texture = image.second;
+    const bool grouping = groups.size() > 1;
 
-      Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
+    if(grouping) {
+        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+      ImGui::BeginTabBar("imagetab", tab_bar_flags);
+    }
 
-      ImGui::Text("%s", name.c_str());
-      ImGui::Image(reinterpret_cast<void*>(texture->id()), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
+    for(auto& group: groups) {
+      if(grouping) {
+        if(!ImGui::BeginTabItem(group.first.c_str())) {
+          continue;
+        }
+      }
+
+      const auto& group_name = group.first;
+      auto& image_names = group.second;
+      std::sort(image_names.begin(), image_names.end());
+
+      for(const auto& name: image_names) {
+        const auto& image = images[name];
+        const double scale = image.first;
+        const auto& texture = image.second;
+
+        Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
+
+        ImGui::Text("%s", name.c_str());
+        ImGui::Image(reinterpret_cast<void*>(texture->id()), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
+      }
+
+      if(grouping) {
+        ImGui::EndTabItem();
+      }
+    }
+
+    if(grouping) {
+      ImGui::EndTabBar();
     }
 
     ImGui::End();
