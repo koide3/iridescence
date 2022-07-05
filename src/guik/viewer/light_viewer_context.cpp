@@ -117,7 +117,7 @@ void LightViewerContext::draw_ui() {
   if(!texts_.empty()) {
     std::string window_name = "sub_texts_" + context_name;
     ImGui::SetNextWindowPos(ImVec2(sub_window_pos.x + 5, sub_window_pos.y + 5), ImGuiCond_Always);
-    ImGui::Begin(window_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin(window_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
     for(int i = std::max<int>(0, texts_.size() - 28); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());

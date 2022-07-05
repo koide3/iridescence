@@ -123,7 +123,7 @@ void LightViewer::draw_ui() {
   }
 
   if(!texts_.empty()) {
-    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
     for(int i = std::max<int>(0, texts_.size() - max_texts_size); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());
