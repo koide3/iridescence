@@ -187,9 +187,13 @@ void LightViewer::draw_ui() {
     ImGui::End();
   }
 
-  std::unordered_map<std::string, std::function<void()>> callbacks = ui_callbacks;
-  for(const auto callback : callbacks) {
-    callback.second();
+  // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
+  std::vector<const std::function<void()>*> callbacks;
+  for(const auto& callback: ui_callbacks) {
+    callbacks.emplace_back(&callback.second);
+  }
+  for(const auto& callback: callbacks) {
+    (*callback)();
   }
 
   // mouse control
@@ -304,7 +308,7 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
     return;
   }
 
-  ui_callbacks[name] = callback;
+  ui_callbacks.emplace(name, callback);
 }
 
 void LightViewer::show_viewer_ui() {

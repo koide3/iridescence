@@ -16,7 +16,7 @@ public:
 
   virtual ~Drawable() {}
 
-  virtual void draw(glk::GLSLShader& shader) const = 0;
+  virtual void draw(glk::GLSLShader& shader) const {}
 };
 
 }  // namespace glk

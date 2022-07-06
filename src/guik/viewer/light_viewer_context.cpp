@@ -81,7 +81,7 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
     return;
   }
 
-  sub_ui_callbacks[name] = callback;
+  sub_ui_callbacks.emplace(name, callback);
 }
 
 void LightViewerContext::draw_ui() {
@@ -101,9 +101,15 @@ void LightViewerContext::draw_ui() {
   canvas_rect_min = Eigen::Vector2i(rect_min.x, rect_min.y);
   canvas_rect_max = Eigen::Vector2i(rect_max.x, rect_max.y);
 
+  std::vector<const std::function<void()>*> callbacks;
   for(const auto& callback : sub_ui_callbacks) {
-    callback.second();
+    callbacks.emplace_back(&callback.second);
   }
+
+  for(const auto& callback : callbacks) {
+    (*callback)();
+  }
+
   ImGui::EndChild();
 
   ImGui::End();
