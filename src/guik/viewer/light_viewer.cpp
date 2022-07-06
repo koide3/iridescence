@@ -123,7 +123,7 @@ void LightViewer::draw_ui() {
   }
 
   if(!texts_.empty()) {
-    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
     for(int i = std::max<int>(0, texts_.size() - max_texts_size); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());
@@ -187,9 +187,13 @@ void LightViewer::draw_ui() {
     ImGui::End();
   }
 
-  std::unordered_map<std::string, std::function<void()>> callbacks = ui_callbacks;
-  for(const auto callback : callbacks) {
-    callback.second();
+  // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
+  std::vector<const std::function<void()>*> callbacks;
+  for(const auto& callback: ui_callbacks) {
+    callbacks.emplace_back(&callback.second);
+  }
+  for(const auto& callback: callbacks) {
+    (*callback)();
   }
 
   // mouse control
@@ -304,7 +308,7 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
     return;
   }
 
-  ui_callbacks[name] = callback;
+  ui_callbacks.emplace(name, callback);
 }
 
 void LightViewer::show_viewer_ui() {

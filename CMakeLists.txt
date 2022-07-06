@@ -113,6 +113,8 @@ add_library(iridescence SHARED
   src/glk/effects/naive_screen_space_ambient_occlusion.cpp
   src/guik/gl_canvas.cpp
   src/guik/model_control.cpp
+  src/guik/hovered_drawings.cpp
+  src/guik/hovered_primitives.cpp
   src/guik/imgui_application.cpp
   src/guik/recent_files.cpp
   src/guik/camera/camera_control.cpp
