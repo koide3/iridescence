@@ -46,28 +46,34 @@ void HoveredCircle::draw(ImDrawList* drawlist, const Eigen::Vector3f& uvz) {
 }
 
 // HoveredTriangle
-HoveredTriangle::HoveredTriangle(const std::uint32_t color, const float height, const float thickness, const bool upsidedown)
+HoveredTriangle::HoveredTriangle(const std::uint32_t color, const float height, const float thickness, const bool upsidedown, const bool centering)
 : color(color),
   half_width(height / 1.73),
   height(upsidedown ? -height : height),
-  thickness(thickness) {}
+  thickness(thickness),
+  centering(centering) {}
 
 HoveredTriangle::~HoveredTriangle() {}
 
 void HoveredTriangle::draw(ImDrawList* drawlist, const Eigen::Vector3f& uvz) {
-  drawlist->AddTriangle(ImVec2(uvz.x(), uvz.y()), ImVec2(uvz.x() + half_width, uvz.y() + height), ImVec2(uvz.x() - half_width, uvz.y() + height), color, thickness);
+  const Eigen::Vector2f offset = centering ? Eigen::Vector2f(0.0f, -height / 2.0f) : Eigen::Vector2f(0.0f, 0.0f);
+  const Eigen::Vector2f tl = uvz.head<2>() + offset;
+  drawlist->AddTriangle(ImVec2(tl.x(), tl.y()), ImVec2(tl.x() + half_width, tl.y() + height), ImVec2(tl.x() - half_width, tl.y() + height), color, thickness);
 }
 
 // HoveredFilledTriangle
-HoveredFilledTriangle::HoveredFilledTriangle(const std::uint32_t color, const float height, const bool upsidedown)
+HoveredFilledTriangle::HoveredFilledTriangle(const std::uint32_t color, const float height, const bool upsidedown, const bool centering)
 : color(color),
   half_width(height / 1.73),
-  height(upsidedown ? -height : height) {}
+  height(upsidedown ? -height : height),
+  centering(centering) {}
 
 HoveredFilledTriangle::~HoveredFilledTriangle() {}
 
 void HoveredFilledTriangle::draw(ImDrawList* drawlist, const Eigen::Vector3f& uvz) {
-  drawlist->AddTriangleFilled(ImVec2(uvz.x(), uvz.y()), ImVec2(uvz.x() + half_width, uvz.y() + height), ImVec2(uvz.x() - half_width, uvz.y() + height), color);
+  const Eigen::Vector2f offset = centering ? Eigen::Vector2f(0.0f, -height / 2.0f) : Eigen::Vector2f(0.0f, 0.0f);
+  const Eigen::Vector2f tl = uvz.head<2>() + offset;
+  drawlist->AddTriangleFilled(ImVec2(tl.x(), tl.y()), ImVec2(tl.x() + half_width, tl.y() + height), ImVec2(tl.x() - half_width, tl.y() + height), color);
 }
 
 // HoveredRect

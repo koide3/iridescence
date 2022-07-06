@@ -57,7 +57,7 @@ class HoveredTriangle : public HoveredDrawing {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  HoveredTriangle(const std::uint32_t color = 0xFFFFFFFF, const float height = 5.0f, const float thickness = 1.0f, const bool upsidedown = true);
+  HoveredTriangle(const std::uint32_t color = 0xFFFFFFFF, const float height = 5.0f, const float thickness = 1.0f, const bool upsidedown = true, const bool centering = false);
   virtual ~HoveredTriangle() override;
 
   virtual void draw(ImDrawList* drawlist, const Eigen::Vector3f& uvz) override;
@@ -67,13 +67,14 @@ private:
   const float half_width;
   const float height;
   const float thickness;
+  const bool centering;
 };
 
 class HoveredFilledTriangle : public HoveredDrawing {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  HoveredFilledTriangle(const std::uint32_t color = 0xFFFFFFFF, const float height = 5.0f, const bool upsidedown = true);
+  HoveredFilledTriangle(const std::uint32_t color = 0xFFFFFFFF, const float height = 5.0f, const bool upsidedown = true, const bool centering = false);
   virtual ~HoveredFilledTriangle() override;
 
   virtual void draw(ImDrawList* drawlist, const Eigen::Vector3f& uvz) override;
@@ -82,6 +83,7 @@ private:
   const std::uint32_t color;
   const float half_width;
   const float height;
+  const bool centering;
 };
 
 class HoveredRect : public HoveredDrawing {

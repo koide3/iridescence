@@ -40,11 +40,23 @@ public:
   void add_circle(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const float radius = 10.0f, const int num_segments = 32, const float thickness = 1.0f);
   void add_circle(const std::string& drawable_name, const std::uint32_t color = 0xFFFFFFFF, const float radius = 10.0f, const int num_segments = 32, const float thickness = 1.0f);
 
-  void add_triangle(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const float thickness = 1.0f, const bool upsidedown = true);
-  void add_triangle(const std::string& drawable, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const float thickness = 1.0f, const bool upsidedown = true);
+  void add_triangle(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const float thickness = 1.0f, const bool upsidedown = true, const bool centering = false);
+  void add_triangle(
+    const std::string& drawable,
+    const std::uint32_t color = 0xFFFFFFFF,
+    const float height = 20.0f,
+    const float thickness = 1.0f,
+    const bool upsidedown = true,
+    const bool centering = false);
 
-  void add_filled_triangle(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const bool upsidedown = true);
-  void add_filled_triangle(const std::string& drawable_name, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const bool upsidedown = true);
+  void
+  add_filled_triangle(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const float height = 20.0f, const bool upsidedown = true, const bool centering = false);
+  void add_filled_triangle(
+    const std::string& drawable_name,
+    const std::uint32_t color = 0xFFFFFFFF,
+    const float height = 20.0f,
+    const bool upsidedown = true,
+    const bool centering = false);
 
   void add_rect(const Eigen::Vector3f& pt, const std::uint32_t color = 0xFFFFFFFF, const Eigen::Vector2f& size = {15.0f, 15.0f}, const Eigen::Vector2f& offset = {0.0f, 0.0f});
   void add_rect(const std::string& drawable, const std::uint32_t color = 0xFFFFFFFF, const Eigen::Vector2f& size = {15.0f, 15.0f}, const Eigen::Vector2f& offset = {0.0f, 0.0f});

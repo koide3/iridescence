@@ -56,20 +56,26 @@ void HoveredDrawings::add_circle(const std::string& drawable_name, const std::ui
   add(drawable_name, glk::make_shared<HoveredCircle>(color, radius, num_segments, thickness));
 }
 
-void HoveredDrawings::add_triangle(const Eigen::Vector3f& pt, const std::uint32_t color, const float height, const float thickness, const bool upsidedown) {
-  add(pt, glk::make_shared<HoveredTriangle>(color, height, thickness, upsidedown));
+void HoveredDrawings::add_triangle(const Eigen::Vector3f& pt, const std::uint32_t color, const float height, const float thickness, const bool upsidedown, const bool centering) {
+  add(pt, glk::make_shared<HoveredTriangle>(color, height, thickness, upsidedown, centering));
 }
 
-void HoveredDrawings::add_triangle(const std::string& drawable_name, const std::uint32_t color, const float height, const float thickness, const bool upsidedown) {
-  add(drawable_name, glk::make_shared<HoveredTriangle>(color, height, thickness, upsidedown));
+void HoveredDrawings::add_triangle(
+  const std::string& drawable_name,
+  const std::uint32_t color,
+  const float height,
+  const float thickness,
+  const bool upsidedown,
+  const bool centering) {
+  add(drawable_name, glk::make_shared<HoveredTriangle>(color, height, thickness, upsidedown, centering));
 }
 
-void HoveredDrawings::add_filled_triangle(const Eigen::Vector3f& pt, const std::uint32_t color, const float height, const bool upsidedown) {
-  add(pt, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown));
+void HoveredDrawings::add_filled_triangle(const Eigen::Vector3f& pt, const std::uint32_t color, const float height, const bool upsidedown, const bool centering) {
+  add(pt, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown, centering));
 }
 
-void HoveredDrawings::add_filled_triangle(const std::string& drawable_name, const std::uint32_t color, const float height, const bool upsidedown) {
-  add(drawable_name, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown));
+void HoveredDrawings::add_filled_triangle(const std::string& drawable_name, const std::uint32_t color, const float height, const bool upsidedown, const bool centering) {
+  add(drawable_name, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown, centering));
 }
 
 void HoveredDrawings::add_rect(const Eigen::Vector3f& pt, const std::uint32_t color, const Eigen::Vector2f& size, const Eigen::Vector2f& offset) {

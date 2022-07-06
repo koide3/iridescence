@@ -2,6 +2,7 @@
 #include <glk/thin_lines.hpp>
 #include <glk/colormap.hpp>
 #include <glk/primitives/primitives.hpp>
+#include <guik/hovered_drawings.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
@@ -108,7 +109,39 @@ int main(int argc, char** argv) {
   transform = Eigen::Translation3f(5.0f, 15.0f, 1.0f) * Eigen::Isometry3f::Identity();
   viewer->update_drawable("trans_cone", glk::Primitives::cone(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, transform).make_transparent());
 
-  // change the coloring band width of guik::Rainbow coloring scheme
+  // hovered 2D drawings
+  auto hovered = glk::make_shared<guik::HoveredDrawings>();
+
+  // Put hovered texts
+  hovered->add_text(Eigen::Vector3f(8.0f, 0.0f, 1.0f), "thin_lines", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128));
+  hovered->add_text(Eigen::Vector3f(8.0f, 3.0f, 1.0f), "lines");
+  hovered->add_text(Eigen::Vector3f(8.0f, 6.0f, 1.0f), "coords");
+  hovered->add_text(Eigen::Vector3f(8.0f, 9.0f, 1.0f), "solid");
+  hovered->add_text(Eigen::Vector3f(8.0f, 12.0f, 1.0f), "wire");
+  hovered->add_text(Eigen::Vector3f(8.0f, 15.0f, 1.0f), "transparent");
+
+  // Put texts on drawables
+  hovered->add_text("trans_icosahedron", "icosahedron");
+  hovered->add_text("trans_sphere", "sphere");
+  hovered->add_text("trans_bunny", "bunny");
+  hovered->add_text("trans_cube", "cube");
+  hovered->add_text("trans_cone", "cone");
+
+  hovered->add_circle(Eigen::Vector3f(-5.0f, 18.0f, 1.0f), IM_COL32(255, 255, 255, 255), 12.0f);
+  hovered->add_cross(Eigen::Vector3f(-2.5f, 18.0f, 1.0f), IM_COL32(255, 255, 255, 255), 10.0f);
+  hovered->add_triangle(Eigen::Vector3f(0.0f, 18.0f, 1.0f), IM_COL32(255, 255, 255, 255), 20.0f, 1.0f, false, true);
+  hovered->add_rect(Eigen::Vector3f(2.5f, 18.0f, 1.0f), IM_COL32(255, 255, 255, 255), {20.0f, 20.0f});
+  hovered->add_filled_rect(Eigen::Vector3f(5.0f, 18.0f, 1.0f), IM_COL32(255, 255, 255, 255), {20.0f, 20.0f});
+
+  hovered->add_text(Eigen::Vector3f(-5.0f, 18.0f, 1.0f), "circle", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
+  hovered->add_text(Eigen::Vector3f(-2.5f, 18.0f, 1.0f), "cross", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
+  hovered->add_text(Eigen::Vector3f(0.0f, 18.0f, 1.0f), "triangle", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
+  hovered->add_text(Eigen::Vector3f(2.5f, 18.0f, 1.0f), "rect", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
+  hovered->add_text(Eigen::Vector3f(5.0f, 18.0f, 1.0f), "filled_rect", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
+
+  viewer->register_ui_callback("hovered", hovered->create_callback());
+
+  // Change the coloring bandwidth of the guik::Rainbow coloring scheme
   Eigen::Vector2f z_range(-3.0f, 5.0f);
   viewer->register_ui_callback("control_z_range", [&] {
     if (ImGui::DragFloatRange2("z_range", &z_range[0], &z_range[1], 0.01f)) {
