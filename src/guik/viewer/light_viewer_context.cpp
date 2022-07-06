@@ -81,7 +81,7 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
     return;
   }
 
-  sub_ui_callbacks.emplace(name, callback);
+  sub_ui_callbacks[name] = callback;
 }
 
 void LightViewerContext::draw_ui() {

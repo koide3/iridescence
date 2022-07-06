@@ -308,7 +308,7 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
     return;
   }
 
-  ui_callbacks.emplace(name, callback);
+  ui_callbacks[name] = callback;
 }
 
 void LightViewer::show_viewer_ui() {
