@@ -27,8 +27,17 @@ public:
     float line_width,
     const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
     const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors = std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>(),
-    const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos = std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>(),
-    bool line_strip = false) : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), infos.empty() ? nullptr : infos.data(), vertices.size(), line_strip) {}
+    bool line_strip = false)
+  : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), nullptr, vertices.size(), line_strip) {}
+
+  template <template <class> class Allocator>
+  Lines(
+    float line_width,
+    const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
+    const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors,
+    const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos,
+    bool line_strip = false)
+  : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), infos.empty() ? nullptr : infos.data(), vertices.size(), line_strip) {}
 
   virtual ~Lines() override;
 

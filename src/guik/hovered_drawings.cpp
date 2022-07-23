@@ -31,7 +31,7 @@ void HoveredDrawings::add_text(const Eigen::Vector3f& pt, const std::string& tex
   add(pt, glk::make_shared<HoveredText>(text, fg_color, bg_color, offset));
 }
 
-void HoveredDrawings::add_text(
+void HoveredDrawings::add_text_on(
   const std::string& drawable_name,
   const std::string& text,
   const std::uint32_t fg_color,
@@ -44,7 +44,7 @@ void HoveredDrawings::add_cross(const Eigen::Vector3f& pt, const std::uint32_t c
   add(pt, glk::make_shared<HoveredCross>(color, size, thickness));
 }
 
-void HoveredDrawings::add_cross(const std::string& drawable_name, const std::uint32_t color, const float size, const float thickness) {
+void HoveredDrawings::add_cross_on(const std::string& drawable_name, const std::uint32_t color, const float size, const float thickness) {
   add(drawable_name, glk::make_shared<HoveredCross>(color, size, thickness));
 }
 
@@ -52,7 +52,7 @@ void HoveredDrawings::add_circle(const Eigen::Vector3f& pt, const std::uint32_t 
   add(pt, glk::make_shared<HoveredCircle>(color, radius, num_segments, thickness));
 }
 
-void HoveredDrawings::add_circle(const std::string& drawable_name, const std::uint32_t color, const float radius, const int num_segments, const float thickness) {
+void HoveredDrawings::add_circle_on(const std::string& drawable_name, const std::uint32_t color, const float radius, const int num_segments, const float thickness) {
   add(drawable_name, glk::make_shared<HoveredCircle>(color, radius, num_segments, thickness));
 }
 
@@ -60,7 +60,7 @@ void HoveredDrawings::add_triangle(const Eigen::Vector3f& pt, const std::uint32_
   add(pt, glk::make_shared<HoveredTriangle>(color, height, thickness, upsidedown, centering));
 }
 
-void HoveredDrawings::add_triangle(
+void HoveredDrawings::add_triangle_on(
   const std::string& drawable_name,
   const std::uint32_t color,
   const float height,
@@ -74,7 +74,7 @@ void HoveredDrawings::add_filled_triangle(const Eigen::Vector3f& pt, const std::
   add(pt, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown, centering));
 }
 
-void HoveredDrawings::add_filled_triangle(const std::string& drawable_name, const std::uint32_t color, const float height, const bool upsidedown, const bool centering) {
+void HoveredDrawings::add_filled_triangle_on(const std::string& drawable_name, const std::uint32_t color, const float height, const bool upsidedown, const bool centering) {
   add(drawable_name, glk::make_shared<HoveredFilledTriangle>(color, height, upsidedown, centering));
 }
 
@@ -82,7 +82,7 @@ void HoveredDrawings::add_rect(const Eigen::Vector3f& pt, const std::uint32_t co
   add(pt, glk::make_shared<HoveredRect>(color, size, offset));
 }
 
-void HoveredDrawings::add_rect(const std::string& drawable_name, const std::uint32_t color, const Eigen::Vector2f& size, const Eigen::Vector2f& offset) {
+void HoveredDrawings::add_rect_on(const std::string& drawable_name, const std::uint32_t color, const Eigen::Vector2f& size, const Eigen::Vector2f& offset) {
   add(drawable_name, glk::make_shared<HoveredRect>(color, size, offset));
 }
 
@@ -90,7 +90,7 @@ void HoveredDrawings::add_filled_rect(const Eigen::Vector3f& pt, const std::uint
   add(pt, glk::make_shared<HoveredFilledRect>(color, size, offset));
 }
 
-void HoveredDrawings::add_filled_rect(const std::string& drawable_name, const std::uint32_t color, const Eigen::Vector2f& size, const Eigen::Vector2f& offset) {
+void HoveredDrawings::add_filled_rect_on(const std::string& drawable_name, const std::uint32_t color, const Eigen::Vector2f& size, const Eigen::Vector2f& offset) {
   add(drawable_name, glk::make_shared<HoveredFilledRect>(color, size, offset));
 }
 
@@ -105,7 +105,7 @@ void HoveredDrawings::add_image(
   add(pt, glk::make_shared<HoveredImage>(texture, size, offset, bg_color, border_color, border_thickness));
 }
 
-void HoveredDrawings::add_image(
+void HoveredDrawings::add_image_on(
   const std::string& drawable_name,
   const std::shared_ptr<glk::Texture>& texture,
   const Eigen::Vector2f& size,
@@ -160,7 +160,7 @@ std::function<void()> HoveredDrawings::create_callback() {
     uvz.row(1) = canvas_size[1] - uvz.array().row(1);
 
     ImDrawList* drawlist;
-    if(data->context->canvas_tl().isZero()) {
+    if (data->context->canvas_tl().isZero()) {
       drawlist = ImGui::GetBackgroundDrawList();
     } else {
       drawlist = ImGui::GetWindowDrawList();
