@@ -14,8 +14,8 @@ int main(int argc, char** argv) {
   int effect = 0;
   viewer->register_ui_callback("effect_ui", [&]() {
     std::vector<const char*> effects = {"PLAIN", "NAIVE_SSAO", "NORMAL", "SSAO", "SSLI"};
-    if(ImGui::Combo("Effect", &effect, effects.data(), effects.size())) {
-      switch(effect) {
+    if (ImGui::Combo("Effect", &effect, effects.data(), effects.size())) {
+      switch (effect) {
         case 0:
           viewer->set_screen_effect(std::make_shared<glk::PlainRendering>());
           break;
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     }
   });
 
-  viewer->update_drawable("floor", glk::Primitives::cube(), guik::Rainbow(Eigen::Scaling<float>(25.0f, 25.0f, 0.1f)));
+  viewer->update_drawable("floor", glk::Primitives::cube(), guik::Rainbow().scale({25.0f, 25.0f, 0.1f}));
   viewer->update_drawable("bunny", glk::Primitives::bunny(), guik::Rainbow(Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f)));
 
   viewer->spin();

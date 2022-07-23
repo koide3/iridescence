@@ -35,31 +35,31 @@ int main(int argc, char** argv) {
   bool rotate_lights = true;
   const int num_lights = 8;
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_colors(num_lights);
-  for(int i = 0; i < num_lights; i++) {
+  for (int i = 0; i < num_lights; i++) {
     light_colors[i] = glk::colormap_categoricalf(glk::COLORMAP::TURBO, i, num_lights);
   }
 
   viewer->register_ui_callback("ui", [&] {
-    if(ImGui::Combo("diffuse", &diffuse_model, diffuse_models.data(), diffuse_models.size())) {
+    if (ImGui::Combo("diffuse", &diffuse_model, diffuse_models.data(), diffuse_models.size())) {
       effect->set_diffuse_model(static_cast<glk::ScreenSpaceLighting::DIFFUSE_MODEL>(diffuse_model));
     }
 
-    if(ImGui::Combo("specular", &specular_model, specular_models.data(), specular_models.size())) {
+    if (ImGui::Combo("specular", &specular_model, specular_models.data(), specular_models.size())) {
       effect->set_specular_model(static_cast<glk::ScreenSpaceLighting::SPECULAR_MODEL>(specular_model));
     }
 
-    if(ImGui::Combo("occlusion", &occlusion_model, occlusion_models.data(), occlusion_models.size())) {
+    if (ImGui::Combo("occlusion", &occlusion_model, occlusion_models.data(), occlusion_models.size())) {
       effect->set_occlusion_model(static_cast<glk::ScreenSpaceLighting::OCCLUSION_MODEL>(occlusion_model));
     }
 
-    if(ImGui::Combo("iridescence", &iridescence_model, iridescence_models.data(), iridescence_models.size())) {
+    if (ImGui::Combo("iridescence", &iridescence_model, iridescence_models.data(), iridescence_models.size())) {
       effect->set_iridescence_model(static_cast<glk::ScreenSpaceLighting::IRIDESCENCE_MODEL>(iridescence_model));
     }
 
-    if(ImGui::DragFloat("roughness", &roughness, 0.01f, 0.01f, 10.0f)) {
+    if (ImGui::DragFloat("roughness", &roughness, 0.01f, 0.01f, 10.0f)) {
       effect->set_roughness(roughness);
     }
-    if(ImGui::DragFloat("albedo", &albedo, 0.01f, 0.0f, 10.0f)) {
+    if (ImGui::DragFloat("albedo", &albedo, 0.01f, 0.0f, 10.0f)) {
       effect->set_albedo(albedo);
     }
 
@@ -67,27 +67,30 @@ int main(int argc, char** argv) {
     ImGui::Checkbox("rotate", &rotate_lights);
 
     ImGui::SameLine();
-    if(ImGui::Button("rainbow")) {
-      for(int i = 0; i < num_lights; i++) {
+    if (ImGui::Button("rainbow")) {
+      for (int i = 0; i < num_lights; i++) {
         light_colors[i] = glk::colormap_categoricalf(glk::COLORMAP::TURBO, i, num_lights);
       }
     }
 
     ImGui::SameLine();
-    if(ImGui::Button("flat")) {
-      for(int i = 0; i < num_lights; i++) {
+    if (ImGui::Button("flat")) {
+      for (int i = 0; i < num_lights; i++) {
         light_colors[i].setConstant(0.8f);
       }
     }
   });
 
-  viewer->update_drawable("floor", glk::Primitives::cube(), guik::FlatColor(Eigen::Vector4f::Ones(), Eigen::Scaling<float>(25.0f, 25.0f, 0.1f)));
-  viewer->update_drawable("bunny", glk::Primitives::bunny(), guik::FlatColor(Eigen::Vector4f::Ones(), Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f)));
+  viewer->update_drawable("floor", glk::Primitives::cube(), guik::FlatColor(Eigen::Vector4f::Ones()).scale({25.0f, 25.0f, 0.1f}));
+  viewer->update_drawable(
+    "bunny",
+    glk::Primitives::bunny(),
+    guik::FlatColor(Eigen::Vector4f::Ones(), Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f)));
 
   double t = 0.0;
-  while(viewer->spin_once()) {
+  while (viewer->spin_once()) {
     t += rotate_lights ? ImGui::GetIO().DeltaTime : 0.0f;
-    for(int i = 0; i < num_lights; i++) {
+    for (int i = 0; i < num_lights; i++) {
       double theta = t + i * 2.0 * M_PI / num_lights;
       Eigen::Vector3f light_pos(10.0 * std::cos(theta), 10.0 * std::sin(theta), 2.0f);
       Eigen::Vector2f attenuation(0.0f, 0.001f);

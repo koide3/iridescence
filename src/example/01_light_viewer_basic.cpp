@@ -3,7 +3,6 @@
 
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
-  viewer->show_info_window();
 
   float time = 0.0f;
   viewer->register_ui_callback("ui", [&]() {
