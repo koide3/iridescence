@@ -647,6 +647,13 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
     if(ImGui::MenuItem("Disable vsync")) {
       viewer->disable_vsync();
     }
+    if (ImGui::MenuItem("Enable XY grid")) {
+      viewer->set_draw_xy_grid(true);
+    }
+    if (ImGui::MenuItem("Disable XY grid")) {
+      viewer->set_draw_xy_grid(false);
+    }
+
     ImGui::EndMenu();
   }
 
