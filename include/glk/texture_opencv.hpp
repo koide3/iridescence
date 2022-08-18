@@ -4,6 +4,11 @@
 #include <glk/texture.hpp>
 #include <opencv2/opencv.hpp>
 
+// for old OpenCV
+#ifndef CV_16F
+#define CV_16F 7
+#endif
+
 namespace glk {
 
 static std::shared_ptr<glk::Texture> create_texture(const cv::Mat& image) {
