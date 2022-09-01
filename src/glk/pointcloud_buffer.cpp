@@ -75,6 +75,15 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const std::vector<d
   add_intensity(colormap, intensities_, scale);
 }
 
+void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* intensities, const int num_points, float scale) {
+  add_intensity(colormap, intensities, sizeof(float), num_points, scale);
+}
+
+void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const double* intensities, const int num_points, float scale) {
+  std::vector<double> intensities_(intensities, intensities + num_points);
+  return add_intensity(colormap, intensities_, scale);
+}
+
 void PointCloudBuffer::add_normals(const float* data, int stride, int num_points) {
   add_buffer("vert_normal", 3, data, stride, num_points);
 }

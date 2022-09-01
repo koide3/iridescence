@@ -49,6 +49,8 @@ public:
 
   void add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale = 1.0f);
   void add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale = 1.0f);
+  void add_intensity(glk::COLORMAP colormap, const float* intensities, const int num_points, float scale = 1.0f);
+  void add_intensity(glk::COLORMAP colormap, const double* intensities, const int num_points, float scale = 1.0f);
 
   void add_normals(const float* data, int stride, int num_points);
   void add_color(const float* data, int stride, int num_points);
