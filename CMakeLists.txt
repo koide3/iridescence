@@ -52,19 +52,23 @@ add_library(gl_imgui SHARED
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
   thirdparty/imgui/imgui_draw.cpp
+  thirdparty/imgui/imgui_tables.cpp
   thirdparty/imgui/imgui_widgets.cpp
   thirdparty/ImGuizmo/ImCurveEdit.cpp
   thirdparty/ImGuizmo/ImGradient.cpp
   thirdparty/ImGuizmo/ImGuizmo.cpp
   thirdparty/ImGuizmo/ImSequencer.cpp
-  thirdparty/imgui/examples/imgui_impl_glfw.cpp
-  thirdparty/imgui/examples/imgui_impl_opengl3.cpp
+  thirdparty/implot/implot.cpp
+  thirdparty/implot/implot_items.cpp
+  thirdparty/imgui/backends/imgui_impl_glfw.cpp
+  thirdparty/imgui/backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(gl_imgui PUBLIC
   include
   thirdparty/imgui
-  thirdparty/imgui/examples
+  thirdparty/imgui/backends
   thirdparty/ImGuizmo
+  thirdparty/implot
   thirdparty/portable-file-dialogs
   thirdparty/gl3w
 )

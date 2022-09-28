@@ -6,6 +6,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <implot.h>
 #include <ImGuizmo.h>
 
 #include <GL/gl3w.h>
@@ -26,6 +27,7 @@ Application ::~Application() {
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
   glfwDestroyWindow(window);
@@ -72,6 +74,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   // setup imgui
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImPlot::CreateContext();
 
   ImGui::StyleColorsDark();
 
