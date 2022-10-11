@@ -35,17 +35,14 @@ public:
   virtual void append_text(const std::string& text);
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
-  guik::ShaderSetting& shader_setting() {
-    return global_shader_setting;
-  }
-  const guik::ShaderSetting& shader_setting() const {
-    return global_shader_setting;
-  }
+  guik::ShaderSetting& shader_setting() { return global_shader_setting; }
+  const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
 
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   const std::shared_ptr<glk::ScreenEffect>& get_screen_effect() const;
+  void set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture);
 
   void enable_decimal_rendering();
   void enable_normal_buffer();
@@ -85,21 +82,11 @@ public:
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
   void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
 
-  Eigen::Vector2i canvas_tl() const {
-    return canvas_rect_min;
-  }
-  Eigen::Vector2i canvas_br() const {
-    return canvas_rect_max;
-  }
-  Eigen::Vector2i canvas_size() const {
-    return canvas->size;
-  }
-  Eigen::Matrix4f view_matrix() const {
-    return canvas->camera_control->view_matrix();
-  }
-  Eigen::Matrix4f projection_matrix() const {
-    return canvas->projection_control->projection_matrix();
-  }
+  Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }
+  Eigen::Vector2i canvas_br() const { return canvas_rect_max; }
+  Eigen::Vector2i canvas_size() const { return canvas->size; }
+  Eigen::Matrix4f view_matrix() const { return canvas->camera_control->view_matrix(); }
+  Eigen::Matrix4f projection_matrix() const { return canvas->projection_control->projection_matrix(); }
 
   Eigen::Vector4i pick_info(const Eigen::Vector2i& p, int window = 2) const;
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;

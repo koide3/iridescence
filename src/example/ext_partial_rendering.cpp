@@ -9,12 +9,12 @@
 
 int main(int argc, char** argv) {
   const auto paths = pfd::open_file("Select PLY file", "", std::vector<std::string>{"PLY files", "*.ply"}).result();
-  if(paths.empty()) {
+  if (paths.empty()) {
     return 0;
   }
 
   const auto ply = glk::load_ply(paths[0]);
-  if(!ply) {
+  if (!ply) {
     std::cerr << "failed to open " << paths[0] << std::endl;
     return 0;
   }
@@ -37,13 +37,13 @@ int main(int argc, char** argv) {
   viewer->register_ui_callback("ui", [&] {
     ImGui::Begin("Partial rendering", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text("Points:%d", ply->vertices.size());
+    ImGui::Text("Points:%zu", ply->vertices.size());
     ImGui::DragInt("Budget", &points_rendering_budget, 1024, 1024, std::numeric_limits<int>::max());
 
-    if(ImGui::Button("Enable")) {
+    if (ImGui::Button("Enable")) {
       cloud_buffer->enable_partial_rendering(points_rendering_budget);
     }
-    if(ImGui::Button("Disable")) {
+    if (ImGui::Button("Disable")) {
       cloud_buffer->disable_partial_rendering();
     }
 
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
   });
 
   double t = 0.0;
-  while(viewer->spin_once()) {
+  while (viewer->spin_once()) {
     t += 1e-3;
     Eigen::Affine3f model_matrix = Eigen::Affine3f::Identity();
     model_matrix.linear() = Eigen::AngleAxisf(t * 0.5, Eigen::Vector3f::Ones().normalized()).toRotationMatrix() * Eigen::UniformScaling<float>(15.0f);

@@ -20,6 +20,7 @@
 
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/camera/camera_control.hpp>
+#include <guik/camera/basic_projection_control.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 
 namespace guik {
@@ -31,11 +32,10 @@ using namespace glk::console;
  *
  * @param size
  */
-GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name)
-    : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
+GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
   frame_buffer.reset(new glk::FrameBuffer(size, 1));
   shader.reset(new glk::GLSLShader());
-  if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
+  if (!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
     return;
   }
@@ -56,11 +56,17 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name)
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);
 
+  texture_shader.reset(new glk::GLSLShader());
+  if (!texture_shader->init(glk::get_data_path() + "/shader/texture")) {
+    texture_shader.reset();
+    return;
+  }
+
   auto colormap_table = glk::colormap_table(glk::COLORMAP::TURBO);
   colormap.reset(new glk::Texture(Eigen::Vector2i(256, 1), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, colormap_table.data()));
 
   camera_control.reset(new guik::OrbitCameraControlXY());
-  projection_control.reset(new guik::ProjectionControl(size));
+  projection_control.reset(new guik::BasicProjectionControl(size));
 
   texture_renderer.reset(new glk::TextureRenderer());
 
@@ -85,7 +91,7 @@ bool GLCanvas::ready() const {
  */
 bool GLCanvas::load_shader(const std::string& shader_name) {
   shader.reset(new glk::GLSLShader());
-  if(!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
+  if (!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
     return false;
   }
@@ -117,13 +123,17 @@ void GLCanvas::set_colormap(glk::COLORMAP colormap_type) {
 void GLCanvas::set_effect(const std::shared_ptr<glk::ScreenEffect>& effect) {
   screen_effect = effect;
   screen_effect->set_size(size);
-  if(!screen_effect_buffer) {
+  if (!screen_effect_buffer) {
     screen_effect_buffer.reset(new glk::FrameBuffer(size, 1, false));
   }
 }
 
 const std::shared_ptr<glk::ScreenEffect>& GLCanvas::get_effect() const {
   return screen_effect;
+}
+
+void GLCanvas::set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture) {
+  this->bg_texture = bg_texture;
 }
 
 void GLCanvas::enable_normal_buffer() {
@@ -143,7 +153,7 @@ void GLCanvas::enable_partial_rendering(double clear_thresh) {
 
   const std::string data_path = glk::get_data_path();
   partial_clear_shader.reset(new glk::GLSLShader());
-  if(!partial_clear_shader->init(data_path + "/shader/texture.vert", data_path + "/shader/partial_clear.frag")) {
+  if (!partial_clear_shader->init(data_path + "/shader/texture.vert", data_path + "/shader/partial_clear.frag")) {
     partial_clear_shader.reset();
   }
 }
@@ -191,11 +201,11 @@ void GLCanvas::set_size(const Eigen::Vector2i& size) {
   projection_control->set_size(size);
   frame_buffer->set_size(size);
 
-  if(screen_effect) {
+  if (screen_effect) {
     screen_effect->set_size(size);
   }
 
-  if(screen_effect_buffer) {
+  if (screen_effect_buffer) {
     screen_effect_buffer->set_size(size);
   }
 }
@@ -221,7 +231,7 @@ void GLCanvas::bind() {
   Eigen::Matrix4f projection_matrix = projection_control->projection_matrix();
 
   bool clear_buffer = true;
-  if(partial_rendering_enabled()) {
+  if (partial_rendering_enabled()) {
     Eigen::Matrix4f projection_view_matrix = projection_matrix * view_matrix;
     clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > partial_rendering_clear_thresh;
     last_projection_view_matrix = projection_view_matrix;
@@ -238,22 +248,36 @@ void GLCanvas::bind() {
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);
 
-  if(clear_buffer) {
+  if (clear_buffer) {
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(normal_buffer_id) {
+    if (bg_texture) {
+      glDepthMask(GL_FALSE);
+
+      texture_shader->use();
+
+      bg_texture->bind();
+      texture_renderer->draw_plain(*texture_shader);
+      bg_texture->unbind();
+
+      shader->use();
+
+      glDepthMask(GL_TRUE);
+    }
+
+    if (normal_buffer_id) {
       GLfloat clear_color[] = {0.0f, 0.0f, 0.0f};
       glClearTexImage(frame_buffer->color(normal_buffer_id).id(), 0, GL_RGB, GL_FLOAT, clear_color);
     }
 
-    if(info_buffer_id) {
+    if (info_buffer_id) {
       GLint clear_color[] = {-1, -1, -1, -1};
       glClearTexImage(frame_buffer->color(info_buffer_id).id(), 0, GL_RGBA_INTEGER, GL_INT, clear_color);
       shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
     }
 
-    if(dynamic_flag_buffer_id) {
+    if (dynamic_flag_buffer_id) {
       GLint clear_color[] = {255, 255, 255, 255};
       glClearTexImage(frame_buffer->color(dynamic_flag_buffer_id).id(), 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, clear_color);
       shader->set_uniform("dynamic_object", 255);
@@ -296,12 +320,12 @@ void GLCanvas::unbind() {
 
   frame_buffer->unbind();
 
-  if(screen_effect) {
+  if (screen_effect) {
     glk::TextureRendererInput::Ptr input(new glk::TextureRendererInput());
     input->set("view_matrix", camera_control->view_matrix());
     input->set("projection_matrix", projection_control->projection_matrix());
 
-    if(normal_buffer_id) {
+    if (normal_buffer_id) {
       input->set("normal_texture", normal_buffer().id());
     }
 
@@ -328,11 +352,11 @@ void GLCanvas::bind_second() {
   glDisable(GL_SCISSOR_TEST);
 
   shader->use();
-  if(info_buffer_id) {
+  if (info_buffer_id) {
     shader->set_uniform("info_values", Eigen::Vector4i(-1, -1, -1, -1));
   }
 
-  if(dynamic_flag_buffer_id) {
+  if (dynamic_flag_buffer_id) {
     shader->set_uniform("dynamic_object", 255);
   }
 
@@ -383,39 +407,39 @@ void GLCanvas::mouse_control() {
 
   Eigen::Vector2i p(mouse_pos.x, mouse_pos.y);
 
-  for(int i = 0; i < 3; i++) {
-    if(ImGui::IsMouseClicked(i)) {
+  for (int i = 0; i < 3; i++) {
+    if (ImGui::IsMouseClicked(i)) {
       camera_control->mouse(p, i, true);
     }
-    if(ImGui::IsMouseReleased(i)) {
+    if (ImGui::IsMouseReleased(i)) {
       camera_control->mouse(p, i, false);
     }
-    if(ImGui::IsMouseDragging(i)) {
+    if (ImGui::IsMouseDragging(i)) {
       camera_control->drag(p, i);
     }
 
-    if(io.KeyCtrl) {
+    if (io.KeyCtrl) {
       Eigen::Vector2i arrow(0, 0);
-      if(io.KeysDown[GLFW_KEY_LEFT]) {
+      if (io.KeysDown[GLFW_KEY_LEFT]) {
         arrow[0] = 1;
-      } else if(io.KeysDown[GLFW_KEY_RIGHT]) {
+      } else if (io.KeysDown[GLFW_KEY_RIGHT]) {
         arrow[0] = -1;
       }
 
-      if(io.KeysDown[GLFW_KEY_UP]) {
+      if (io.KeysDown[GLFW_KEY_UP]) {
         arrow[1] = 1;
-      } else if(io.KeysDown[GLFW_KEY_DOWN]) {
+      } else if (io.KeysDown[GLFW_KEY_DOWN]) {
         arrow[1] = -1;
       }
 
-      if(!arrow.isZero()) {
+      if (!arrow.isZero()) {
         camera_control->arrow(arrow);
       }
 
       int updown = 0;
-      if(io.KeysDown[GLFW_KEY_PAGE_UP]) {
+      if (io.KeysDown[GLFW_KEY_PAGE_UP]) {
         updown = 1;
-      } else if(io.KeysDown[GLFW_KEY_PAGE_DOWN]) {
+      } else if (io.KeysDown[GLFW_KEY_PAGE_DOWN]) {
         updown = -1;
       }
 
@@ -435,12 +459,12 @@ void GLCanvas::mouse_control() {
  * @return Eigen::Vector4i
  */
 Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const {
-  if(!info_buffer_id) {
+  if (!info_buffer_id) {
     std::cerr << bold_yellow << "warning: info buffer has not been enabled!!" << reset << std::endl;
     return Eigen::Vector4i::Constant(-1);
   }
 
-  if(p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
+  if (p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
     return Eigen::Vector4i(-1, -1, -1, -1);
   }
 
@@ -448,19 +472,19 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
 
   std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
 
-  for(int i = -window; i <= window; i++) {
-    for(int j = -window; j <= window; j++) {
+  for (int i = -window; i <= window; i++) {
+    for (int j = -window; j <= window; j++) {
       ps.push_back(Eigen::Vector2i(i, j));
     }
   }
 
   std::sort(ps.begin(), ps.end(), [=](const Eigen::Vector2i& lhs, const Eigen::Vector2i& rhs) { return lhs.norm() < rhs.norm(); });
-  for(int i = 0; i < ps.size(); i++) {
+  for (int i = 0; i < ps.size(); i++) {
     Eigen::Vector2i p_ = p + ps[i];
     int index = ((size[1] - p[1]) * size[0] + p_[0]) * 4;
     Eigen::Vector4i info = Eigen::Map<Eigen::Vector4i>(&pixels[index]);
 
-    if((info.array() != -1).any()) {
+    if ((info.array() != -1).any()) {
       return info;
     }
   }
@@ -476,7 +500,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
  * @return float
  */
 float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
-  if(p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
+  if (p[0] < 5 || p[1] < 5 || p[0] > size[0] - 5 || p[1] > size[1] - 5) {
     return -1.0f;
   }
 
@@ -484,19 +508,19 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
 
   std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
 
-  for(int i = -window; i <= window; i++) {
-    for(int j = -window; j <= window; j++) {
+  for (int i = -window; i <= window; i++) {
+    for (int j = -window; j <= window; j++) {
       ps.push_back(Eigen::Vector2i(i, j));
     }
   }
 
   std::sort(ps.begin(), ps.end(), [=](const Eigen::Vector2i& lhs, const Eigen::Vector2i& rhs) { return lhs.norm() < rhs.norm(); });
-  for(int i = 0; i < ps.size(); i++) {
+  for (int i = 0; i < ps.size(); i++) {
     Eigen::Vector2i p_ = p + ps[i];
     int index = ((size[1] - p[1]) * size[0] + p_[0]);
     float depth = pixels[index];
 
-    if(depth < 1.0f) {
+    if (depth < 1.0f) {
       return depth;
     }
   }

@@ -9,56 +9,25 @@ class ProjectionControl {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  ProjectionControl(const Eigen::Vector2i& size);
-  ~ProjectionControl();
+  ProjectionControl() {}
+  virtual ~ProjectionControl() {}
 
-  void set_size(const Eigen::Vector2i& size) {
-    this->size = size;
-  }
+  virtual void set_size(const Eigen::Vector2i& size) = 0;
 
-  int get_projection_mode() const {
-    return projection_mode;
-  }
+  virtual void set_depth_range(const Eigen::Vector2f& range) = 0;
 
-  void set_projection_mode(int mode) {
-    projection_mode = mode;
-  }
+  virtual Eigen::Matrix4f projection_matrix() const = 0;
 
-  float get_fov() const {
-    return fovy;
-  }
-
-  void set_fov(float fov) {
-    fovy = fov;
-  }
-
-  void set_depth_range(const Eigen::Vector2f& range);
-
-  Eigen::Matrix4f projection_matrix() const;
-
-  void draw_ui();
-
-  void show();
+  virtual void draw_ui(){};
 
   // io
-  std::string name() const;
-  void load(std::istream& ist);
-  void save(std::ostream& ost) const;
-
-private:
-  bool show_window;
-  Eigen::Vector2i size;
-
-  int projection_mode;
-
-  float fovy;
-  float width;
-  float near;
-  float far;
+  virtual std::string name() const { return "NONE"; }
+  virtual void load(std::istream& ist){};
+  virtual void save(std::ostream& ost) const {};
 };
 
-std::istream& operator>> (std::istream& ist, ProjectionControl& cam);
-std::ostream& operator<< (std::ostream& ost, const ProjectionControl& cam);
+std::istream& operator>>(std::istream& ist, ProjectionControl& cam);
+std::ostream& operator<<(std::ostream& ost, const ProjectionControl& cam);
 
 }  // namespace guik
 

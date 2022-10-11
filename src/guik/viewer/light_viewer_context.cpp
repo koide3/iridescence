@@ -25,7 +25,7 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
   canvas_rect_min.setZero();
   canvas_rect_max = size;
   canvas.reset(new guik::GLCanvas(size));
-  if(!canvas->ready()) {
+  if (!canvas->ready()) {
     return false;
   }
 
@@ -76,7 +76,7 @@ void LightViewerContext::append_text(const std::string& text) {
 }
 
 void LightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
-  if(!callback) {
+  if (!callback) {
     sub_ui_callbacks.erase(name);
     return;
   }
@@ -87,11 +87,12 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
 void LightViewerContext::draw_ui() {
   ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
+  ImGuiWindowFlags flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+                           ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
   ImGui::BeginChild("canvas", ImVec2(canvas->size[0], canvas->size[1]), false, flags);
   ImVec2 sub_window_pos = ImGui::GetWindowPos();
 
-  if(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing()) {
+  if (ImGui::IsWindowFocused() && !ImGuizmo::IsUsing()) {
     canvas->mouse_control();
   }
 
@@ -102,11 +103,11 @@ void LightViewerContext::draw_ui() {
   canvas_rect_max = Eigen::Vector2i(rect_max.x, rect_max.y);
 
   std::vector<const std::function<void()>*> callbacks;
-  for(const auto& callback : sub_ui_callbacks) {
+  for (const auto& callback : sub_ui_callbacks) {
     callbacks.emplace_back(&callback.second);
   }
 
-  for(const auto& callback : callbacks) {
+  for (const auto& callback : callbacks) {
     (*callback)();
   }
 
@@ -120,16 +121,19 @@ void LightViewerContext::draw_ui() {
     std::vector<std::string>(sub_texts.begin(), sub_texts.end()).swap(texts_);
   }
 
-  if(!texts_.empty()) {
+  if (!texts_.empty()) {
     std::string window_name = "sub_texts_" + context_name;
     ImGui::SetNextWindowPos(ImVec2(sub_window_pos.x + 5, sub_window_pos.y + 5), ImGuiCond_Always);
-    ImGui::Begin(window_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
-    for(int i = std::max<int>(0, texts_.size() - 28); i < texts_.size(); i++) {
+    ImGui::Begin(
+      window_name.c_str(),
+      nullptr,
+      ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
+    for (int i = std::max<int>(0, texts_.size() - 28); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());
     }
 
-    if(ImGui::Button("clear")) {
+    if (ImGui::Button("clear")) {
       clear_text();
     }
     ImGui::End();
@@ -138,17 +142,17 @@ void LightViewerContext::draw_ui() {
 
 void LightViewerContext::draw_gl() {
   std::vector<std::pair<guik::ShaderSetting::Ptr, glk::Drawable::ConstPtr>> active_drawables;
-  for(const auto& itr : drawables) {
+  for (const auto& itr : drawables) {
     bool draw = true;
-    for(const auto& filter : drawable_filters) {
-      if(!filter.second(itr.first)) {
+    for (const auto& filter : drawable_filters) {
+      if (!filter.second(itr.first)) {
         draw = false;
         break;
       }
     }
 
     const auto& drawable = itr.second.second;
-    if(draw && drawable) {
+    if (draw && drawable) {
       active_drawables.push_back(itr.second);
     }
   }
@@ -158,14 +162,14 @@ void LightViewerContext::draw_gl() {
   global_shader_setting.set(*canvas->shader);
   canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
   canvas->shader->set_uniform("color_mode", 1);
-  if(draw_xy_grid) {
+  if (draw_xy_grid) {
     canvas->shader->set_uniform("material_color", Eigen::Vector4f(0.6f, 0.6f, 0.6f, 1.0f));
     glk::Primitives::instance()->primitive(glk::Primitives::GRID).draw(*canvas->shader);
   }
 
   bool transparent_exists = false;
-  for(const auto& drawable : active_drawables) {
-    if(!drawable.first->transparent) {
+  for (const auto& drawable : active_drawables) {
+    if (!drawable.first->transparent) {
       drawable.first->set(*canvas->shader);
       drawable.second->draw(*canvas->shader);
     } else {
@@ -175,7 +179,7 @@ void LightViewerContext::draw_gl() {
 
   canvas->unbind();
 
-  if(transparent_exists) {
+  if (transparent_exists) {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -185,8 +189,8 @@ void LightViewerContext::draw_gl() {
     canvas->shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
     canvas->shader->set_uniform("color_mode", 1);
 
-    for(const auto& drawable : active_drawables) {
-      if(drawable.first->transparent) {
+    for (const auto& drawable : active_drawables) {
+      if (drawable.first->transparent) {
         drawable.first->set(*canvas->shader);
         drawable.second->draw(*canvas->shader);
       }
@@ -216,6 +220,10 @@ void LightViewerContext::set_screen_effect(const std::shared_ptr<glk::ScreenEffe
 
 const std::shared_ptr<glk::ScreenEffect>& LightViewerContext::get_screen_effect() const {
   return canvas->get_effect();
+}
+
+void LightViewerContext::set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture) {
+  canvas->set_bg_texture(bg_texture);
 }
 
 void LightViewerContext::enable_decimal_rendering() {
@@ -271,8 +279,8 @@ void LightViewerContext::clear_drawables() {
 }
 
 void LightViewerContext::clear_drawables(const std::function<bool(const std::string&)>& fn) {
-  for(auto it = drawables.begin(); it != drawables.end();) {
-    if(fn(it->first)) {
+  for (auto it = drawables.begin(); it != drawables.end();) {
+    if (fn(it->first)) {
       it = drawables.erase(it);
     } else {
       it++;
@@ -282,7 +290,7 @@ void LightViewerContext::clear_drawables(const std::function<bool(const std::str
 
 std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> LightViewerContext::find_drawable(const std::string& name) {
   auto found = drawables.find(name);
-  if(found != drawables.end()) {
+  if (found != drawables.end()) {
     return found->second;
   }
   return std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>();
@@ -290,14 +298,14 @@ std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> LightViewerContext::find_
 
 void LightViewerContext::remove_drawable(const std::string& name) {
   auto found = drawables.find(name);
-  if(found != drawables.end()) {
+  if (found != drawables.end()) {
     drawables.erase(found);
   }
 }
 
 void LightViewerContext::remove_drawable(const std::regex& regex) {
-  for(auto itr = drawables.begin(); itr != drawables.end();) {
-    if(std::regex_match(itr->first, regex)) {
+  for (auto itr = drawables.begin(); itr != drawables.end();) {
+    if (std::regex_match(itr->first, regex)) {
       itr = drawables.erase(itr);
     } else {
       itr++;
@@ -314,9 +322,9 @@ void LightViewerContext::clear_drawable_filters() {
 }
 
 void LightViewerContext::register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter) {
-  if(!filter) {
+  if (!filter) {
     auto found = drawable_filters.find(filter_name);
-    if(found != drawable_filters.end()) {
+    if (found != drawable_filters.end()) {
       drawable_filters.erase(found);
     }
     return;

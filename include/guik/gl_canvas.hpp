@@ -28,6 +28,7 @@ public:
   void set_colormap(glk::COLORMAP colormap_type);
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   const std::shared_ptr<glk::ScreenEffect>& get_effect() const;
+  void set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture);
 
   void enable_normal_buffer();
   void enable_info_buffer();
@@ -71,11 +72,13 @@ public:
   Eigen::Matrix4f last_projection_view_matrix;
 
   std::unique_ptr<glk::GLSLShader> shader;
+  std::unique_ptr<glk::GLSLShader> texture_shader;
   std::unique_ptr<glk::GLSLShader> partial_clear_shader;
   std::unique_ptr<glk::FrameBuffer> frame_buffer;
   std::unique_ptr<glk::FrameBuffer> screen_effect_buffer;
   std::shared_ptr<glk::ScreenEffect> screen_effect;
   std::unique_ptr<glk::TextureRenderer> texture_renderer;
+  std::shared_ptr<glk::Texture> bg_texture;
 
   std::unique_ptr<glk::Texture> colormap;
   std::shared_ptr<guik::CameraControl> camera_control;

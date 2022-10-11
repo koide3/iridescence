@@ -23,6 +23,9 @@ bool load_jpeg(const std::string& filename, int& width, int& height, std::vector
   jpeg_read_header(&cinfo, TRUE);
   jpeg_start_decompress(&cinfo);
 
+  width = cinfo.output_width;
+  height = cinfo.output_height;
+
   bytes.resize(cinfo.output_width * cinfo.output_height * 4, 255);
 
   int row_stride = cinfo.output_width * cinfo.output_components;

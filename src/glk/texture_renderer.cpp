@@ -8,7 +8,11 @@ namespace glk {
 TextureRenderer::TextureRenderer() {
   plain_effect = std::make_shared<PlainRendering>();
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices = {Eigen::Vector3f(-1.0f, -1.0f, 0.0f), Eigen::Vector3f(1.0f, -1.0f, 0.0f), Eigen::Vector3f(-1.0f, 1.0f, 0.0f), Eigen::Vector3f(1.0f, 1.0f, 0.0f)};
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices = {
+    Eigen::Vector3f(-1.0f, -1.0f, 0.0f),
+    Eigen::Vector3f(1.0f, -1.0f, 0.0f),
+    Eigen::Vector3f(-1.0f, 1.0f, 0.0f),
+    Eigen::Vector3f(1.0f, 1.0f, 0.0f)};
 
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
