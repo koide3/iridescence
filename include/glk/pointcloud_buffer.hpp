@@ -38,14 +38,21 @@ public:
 
   virtual ~PointCloudBuffer() override;
 
-  template <typename Allocator>
-  void add_normals(const std::vector<Eigen::Vector3f, Allocator>& normals);
-  template <typename Allocator>
-  void add_normals(const std::vector<Eigen::Vector3d, Allocator>& normals);
+  template <int N, typename Allocator>
+  void add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals);
+  template <int N, typename Allocator>
+  void add_normals(const std::vector<Eigen::Matrix<double, N, 1>, Allocator>& normals);
+  template <int N>
+  void add_normals(const Eigen::Matrix<float, N, 1>* normals, int num_points);
+  template <int N>
+  void add_normals(const Eigen::Matrix<double, N, 1>* normals, int num_points);
+
   template <typename Allocator>
   void add_color(const std::vector<Eigen::Vector4f, Allocator>& colors);
   template <typename Allocator>
   void add_color(const std::vector<Eigen::Vector4d, Allocator> colors);
+  void add_color(const Eigen::Vector4f* colors, int num_points);
+  void add_color(const Eigen::Vector4d* colors, int num_points);
 
   void add_intensity(glk::COLORMAP colormap, const std::vector<float>& intensities, float scale = 1.0f);
   void add_intensity(glk::COLORMAP colormap, const std::vector<double>& intensities, float scale = 1.0f);
@@ -87,21 +94,33 @@ private:
   std::vector<AuxBufferData> aux_buffers;
 };
 
-// template members
+// template methods
 template <typename Scalar, int Dim, typename Allocator>
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points)
 : PointCloudBuffer(Eigen::Matrix<Scalar, 3, -1>(Eigen::Map<const Eigen::Matrix<Scalar, Dim, -1>>(points.front().data(), Dim, points.size()).template topRows<3>())) {}
 
-template <typename Allocator>
-void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3f, Allocator>& normals) {
-  add_normals(normals[0].data(), sizeof(Eigen::Vector3f), normals.size());
+template <int N, typename Allocator>
+void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {
+  add_normals(normals[0].data(), sizeof(float) * N, normals.size());
 }
 
-template <typename Allocator>
-void PointCloudBuffer::add_normals(const std::vector<Eigen::Vector3d, Allocator>& normals) {
+template <int N, typename Allocator>
+void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<double, N, 1>, Allocator>& normals) {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals_f(normals.size());
-  std::transform(normals.begin(), normals.end(), normals_f.begin(), [](const Eigen::Vector3d& n) { return n.cast<float>(); });
+  std::transform(normals.begin(), normals.end(), normals_f.begin(), [](const Eigen::Matrix<double, N, 1>& n) { return n.template head<3>().template cast<float>(); });
   add_normals(normals_f[0].data(), sizeof(Eigen::Vector3f), normals_f.size());
+}
+
+template <int N>
+void PointCloudBuffer::add_normals(const Eigen::Matrix<float, N, 1>* normals, int num_points) {
+  add_normals(normals->data(), sizeof(float) * N, num_points);
+}
+
+template <int N>
+void PointCloudBuffer::add_normals(const Eigen::Matrix<double, N, 1>* normals, int num_points) {
+  std::vector<Eigen::Matrix<float, N, 1>, Eigen::aligned_allocator<Eigen::Matrix<float, N, 1>>> normals_f(num_points);
+  std::transform(normals, normals + num_points, normals_f.begin(), [](const Eigen::Matrix<double, N, 1>& p) { return p.template cast<float>(); });
+  add_normals(normals_f);
 }
 
 template <typename Allocator>

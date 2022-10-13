@@ -84,6 +84,16 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const double* inten
   return add_intensity(colormap, intensities_, scale);
 }
 
+void PointCloudBuffer::add_color(const Eigen::Vector4f* colors, int num_points) {
+  add_color(colors->data(), sizeof(float) * 4, num_points);
+}
+
+void PointCloudBuffer::add_color(const Eigen::Vector4d* colors, int num_points) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(num_points);
+  std::transform(colors, colors + num_points, colors_f.begin(), [](const Eigen::Vector4d& c) { return c.cast<float>(); });
+  add_color(colors_f);
+}
+
 void PointCloudBuffer::add_normals(const float* data, int stride, int num_points) {
   add_buffer("vert_normal", 3, data, stride, num_points);
 }
