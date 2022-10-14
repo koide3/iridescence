@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <iostream>
 #include <unordered_map>
 
 #include <GL/gl3w.h>
