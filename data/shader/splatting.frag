@@ -30,7 +30,7 @@ layout (location=3) out int dynamic_flag;
 void main() {
   if (texture_enabled) {
     color = texture(texture_sampler, fragment_in.texcoord.xy);
-    if (color.z < 0.01) {
+    if (color.a < 0.01) {
       discard;
     }
   } else {
@@ -43,6 +43,10 @@ void main() {
 
   if (color_mode != 3) {
     color = color * fragment_in.color;
+  }
+
+  if (color.a < 0.01) {
+    discard;
   }
 
   if(info_enabled) {
