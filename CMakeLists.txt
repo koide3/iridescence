@@ -3,6 +3,7 @@ project(iridescence)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
+option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -12,6 +13,12 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(OpenGL_GL_PREFERENCE GLVND)
+
+if(BUILD_WITH_MARCH_NATIVE)
+  add_compile_options(-march=native)
+  set(CMAKE_C_FLAGS "-march=native ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "-march=native ${CMAKE_CXX_FLAGS}")
+endif()
 
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
