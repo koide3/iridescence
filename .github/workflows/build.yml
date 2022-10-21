@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ROS_DISTRO: [bionic, bionic_llvm, focal, focal_llvm]
+        ROS_DISTRO: [bionic, bionic_llvm, focal, focal_llvm, jammy, jammy_llvm]
 
     steps:
       - uses: actions/checkout@v2
