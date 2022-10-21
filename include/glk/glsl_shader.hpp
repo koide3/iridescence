@@ -1,10 +1,12 @@
 #ifndef GLK_GLSL_SHADER_HPP
 #define GLK_GLSL_SHADER_HPP
 
+#include <thread>
 #include <vector>
 #include <memory>
 #include <string>
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 
 #include <GL/gl3w.h>
