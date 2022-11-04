@@ -21,13 +21,13 @@ std::string find_file(const std::string& hint, const std::string& path) {
     boost::filesystem::recursive_directory_iterator itr(hint);
     boost::filesystem::recursive_directory_iterator end;
 
-    for(; itr != end; itr++) {
-      if(itr->path().string().find(path) != std::string::npos) {
+    for (; itr != end; itr++) {
+      if (itr->path().string().find(path) != std::string::npos) {
         std::string found = itr->path().string();
         return found.substr(0, found.size() - path.size() - 1);
       }
     }
-  } catch(boost::filesystem::filesystem_error& e) {
+  } catch (boost::filesystem::filesystem_error& e) {
     return "";
   }
 
@@ -36,9 +36,9 @@ std::string find_file(const std::string& hint, const std::string& path) {
 
 std::string find_file(const std::vector<std::string>& hints, const std::string& path) {
   std::string found;
-  for(const auto& hint : hints) {
+  for (const auto& hint : hints) {
     found = find_file(hint, path);
-    if(!found.empty()) {
+    if (!found.empty()) {
       break;
     }
   }
@@ -47,7 +47,7 @@ std::string find_file(const std::vector<std::string>& hints, const std::string& 
 }
 
 std::string get_data_path() {
-  if(data_path.empty()) {
+  if (data_path.empty()) {
     std::vector<std::string> hints;
     hints.push_back("./data");
     hints.push_back("/usr/share/iridescence");
@@ -57,12 +57,12 @@ std::string get_data_path() {
 #endif
 
     data_path = find_file(hints, "shader/rainbow.vert");
-    if(data_path.empty()) {
+    if (data_path.empty()) {
       std::cerr << console::bold_red << "error: data directory not found!!" << console::reset << std::endl;
       data_path = "./data";
     }
 
-    std::cout << "data_path:" << data_path << std::endl;
+    // std::cout << "data_path:" << data_path << std::endl;
   }
 
   return data_path;
