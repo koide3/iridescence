@@ -35,7 +35,7 @@ void define_imgui(py::module_& m) {
   imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
 
-  imgui_.def("open_popup", &ImGui::OpenPopup);
+  imgui_.def("open_popup", [](const std::string& name) { ImGui::OpenPopup(name.c_str()); });
   imgui_.def("begin_popup", &ImGui::BeginPopup);
   imgui_.def("begin_popup_modal", &ImGui::BeginPopupModal);
   imgui_.def("end_popup", &ImGui::EndPopup);
