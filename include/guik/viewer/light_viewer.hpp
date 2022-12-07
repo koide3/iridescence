@@ -86,6 +86,7 @@ private:
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 
   std::unordered_map<std::string, std::pair<double, std::shared_ptr<glk::Texture>>> images;
+  std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 

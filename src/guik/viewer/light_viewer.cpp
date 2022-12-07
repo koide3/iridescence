@@ -139,11 +139,13 @@ void LightViewer::draw_ui() {
   if(!images.empty()) {
     ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
+    images_in_rendering.clear();
     std::unordered_map<std::string, std::vector<std::string>> groups;
     for(const auto& image: images) {
       const size_t separator_loc = image.first.find_first_of('/');
       const std::string group = separator_loc == std::string::npos ? "default" : image.first.substr(0, separator_loc);
       groups[group].push_back(image.first);
+      images_in_rendering.emplace_back(image.second.second);
     }
 
     const bool grouping = groups.size() > 1;
