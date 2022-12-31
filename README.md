@@ -151,6 +151,12 @@ while viewer.spin_once():
 ![example_01](https://user-images.githubusercontent.com/31344317/210127177-31630466-f8a1-45b6-8bc7-2fdd2e4c9548.gif)
 
 
+## Other examples in my academic works
+
+![ral2021](https://user-images.githubusercontent.com/31344317/210128637-80f79abf-69c3-479c-91e9-0807e5b8b3ae.jpg)
+![iros2022](https://user-images.githubusercontent.com/31344317/210128635-2ef02dff-3d74-499e-bde8-2c9c0dc047ff.jpg)
+
+
 ## License
 
 This package is released under the MIT license.
