@@ -29,19 +29,6 @@ find_package(JPEG REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED filesystem program_options)
 
-###################################
-## catkin specific configuration ##
-###################################
-if(built_in_ros)
-  # check if the package is built in a catkin workspace
-  catkin_package(
-    INCLUDE_DIRS include thirdparty/imgui thirdparty/ImGuizmo thirdparty/gl3w thirdparty/portable-file-dialogs
-    LIBRARIES dl glfw gl_imgui iridescence ${catkin_LIBRARIES}
-    #  CATKIN_DEPENDS roscpp rospy
-    DEPENDS roslib
-  )
-endif()
-
 ###########
 ## Build ##
 ###########
@@ -49,10 +36,6 @@ endif()
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
-
-###########
-## Build ##
-###########
 
 add_library(gl_imgui SHARED
   thirdparty/gl3w/gl3w.cpp
@@ -86,9 +69,6 @@ target_link_libraries(gl_imgui
 )
 
 set(path_src path_std.cpp)
-if(built_in_ros)
-  set(path_src path_ros.cpp)
-endif()
 
 add_library(iridescence SHARED
   src/glk/${path_src}
