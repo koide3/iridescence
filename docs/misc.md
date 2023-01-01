@@ -1,5 +1,18 @@
 # Miscellaneous
 
+## Enable/Disable Vsync
+
+By default, vsync is enabled and the maximum FPS is limited to the refresh speed of the display.
+The maximum FPS can be unlimited by disabling vsync.
+
+```cpp
+// Disable vsync to unlimit the maximum FPS
+viewer->disable_vsync();
+
+// Enable vsync to limit the maximum FPS
+viewer->enable_vsync();
+```
+
 
 ## Text output
 
@@ -20,7 +33,6 @@ viewer->remove_drawable(std::regex("drawable_.+"));
 // Remove all drawables
 viewer->clear_drawables();
 ```
-
 
 ## Drawable filter
 

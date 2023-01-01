@@ -149,7 +149,7 @@ void LightViewer::draw_ui() {
     const bool grouping = groups.size() > 1;
 
     if(grouping) {
-        ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+      ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
       ImGui::BeginTabBar("imagetab", tab_bar_flags);
     }
 

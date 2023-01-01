@@ -4,5 +4,6 @@ imgui.ini
 build/*
 dist/*
 pyridescence*/*
+src/example/ext_examples.cpp
 
 *.swp

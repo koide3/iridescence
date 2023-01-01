@@ -8,9 +8,9 @@ namespace glk {
 
 class ScreenSpaceAttributeEstimation : public ScreenEffect {
 public:
-  enum class BufferType { NONE, POSITION, SMOOTHED_POSITION_X, SMOOTHED_POSITION, NORMAL, SSAO, SMOOTHED_SSAO_X, SMOOTHED_SSAO };
+  enum class BufferType { NONE, DEPTH, POSITION, SMOOTHED_POSITION_X, SMOOTHED_POSITION, NORMAL, SSAO, SMOOTHED_SSAO_X, SMOOTHED_SSAO };
 
-  ScreenSpaceAttributeEstimation(const Eigen::Vector2i& size, BufferType rendering_type = BufferType::NONE);
+  ScreenSpaceAttributeEstimation(const Eigen::Vector2i& size = Eigen::Vector2i(1920, 1080), BufferType rendering_type = BufferType::NONE);
   virtual ~ScreenSpaceAttributeEstimation() override;
 
   virtual void set_size(const Eigen::Vector2i& size) override;

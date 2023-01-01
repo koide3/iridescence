@@ -260,9 +260,18 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
       frame_buffer->bind();
     }
 
-    const glk::FrameBuffer* buffers[] = {position_buffer.get(), position_smoothing_x_buffer.get(), position_smoothing_y_buffer.get(), normal_buffer.get(), occlusion_buffer.get(), bilateral_x_buffer.get(), bilateral_y_buffer.get()};
-    const auto buffer = buffers[static_cast<int>(rendering_type) - 1];
-    buffer->color().bind();
+    const glk::Texture* textures[] = {
+      &depth_texture,
+      &position_buffer->color(),
+      &position_smoothing_x_buffer->color(),
+      &position_smoothing_y_buffer->color(),
+      &normal_buffer->color(),
+      &occlusion_buffer->color(),
+      &bilateral_x_buffer->color(),
+      &bilateral_y_buffer->color()
+    };
+    const auto texture = textures[static_cast<int>(rendering_type) - 1];
+    texture->bind();
 
     texture_shader.use();
     renderer.draw_plain(texture_shader);

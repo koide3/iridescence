@@ -24,7 +24,7 @@ Eigen::Vector3f center_pos = ...;
 viewer->lookat(center_pos);
 ```
 
-## Model matrix control (Gizmo)
+## Model matrix control (ImGuizmo)
 
 ```cpp
 #include <guik/model_control.hpp>
@@ -37,5 +37,8 @@ viewer->register_ui_callback("model_control_ui", [&]{
   model_control.draw_gizmo();
 
   Eigen::Matrix4f model_matrix = model_control.model_matrix();
+  viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow(model_matrix));
 });
 ```
+
+![guizmo](https://user-images.githubusercontent.com/31344317/210159001-58b69d32-70b2-4fd1-9885-d40af93514d4.gif)

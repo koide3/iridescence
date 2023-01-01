@@ -23,6 +23,7 @@ public:
   virtual ~ShaderParameterInterface() {}
 
   virtual void set(glk::GLSLShader& shader) const = 0;
+  virtual Ptr clone() const = 0;
 
 public:
   std::string name;
@@ -36,6 +37,8 @@ public:
   virtual ~ShaderParameter() override {}
 
   virtual void set(glk::GLSLShader& shader) const override { shader.set_uniform(name, value); }
+
+  virtual Ptr clone() const override { return glk::make_shared<ShaderParameter<T>>(name, value); }
 
 public:
   T value;
@@ -71,6 +74,14 @@ public:
   {}
 
   virtual ~ShaderSetting() {}
+
+  ShaderSetting clone() const {
+    ShaderSetting cloned;
+    cloned.transparent = transparent;
+    cloned.params.resize(params.size());
+    std::transform(params.begin(), params.end(), cloned.params.begin(), [](const auto& p) { return p->clone(); });
+    return cloned;
+  }
 
   ShaderSetting& make_transparent() {
     transparent = true;

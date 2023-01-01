@@ -50,6 +50,7 @@ std::string get_data_path() {
   if (data_path.empty()) {
     std::vector<std::string> hints;
     hints.push_back("./data");
+    hints.push_back("../data");
     hints.push_back("/usr/share/iridescence");
     hints.push_back("/usr/local/share/iridescence");
 #ifdef DATA_PATH_GUESS

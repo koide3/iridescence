@@ -171,6 +171,9 @@ int dim = 1;
 cloud_buffer->add_buffer("radius", dim, values.data(), sizeof(float) * dim, values.size());
 ```
 
+![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
+```glk::PointCloudBuffer``` rendered with ```guik::Rainbow```
+
 **glk::IndexedPointCloudBuffer** enables specify the indices of vertices to be rendered.
 
 ```cpp
@@ -182,6 +185,8 @@ auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertices);
 std::vector<unsigned int> indices = ...;
 auto indexed_buffer = std::make_shared<glk::IndexedPointCloudBuffer>(cloud_buffer, indices);
 ```
+
+
 
 ## Normal distributions
 
@@ -225,6 +230,15 @@ std::vector<float> radii = ...;
 cloud_buffer->add_buffer("radius", 1, radii.data(), radii.size());
 ```
 
+![points](https://user-images.githubusercontent.com/31344317/210149278-ac7a1424-5846-4a8c-94a8-dc2173229566.png)
+```glk::PointCloudBuffer```
+
+![splats](https://user-images.githubusercontent.com/31344317/210149280-7160f17f-c6cd-46c5-a66c-4a41d480db69.png)
+```glk::Splatting```
+
+![splats2](https://user-images.githubusercontent.com/31344317/210149281-18ad2296-4bc6-4f44-9ef5-0696f1b03141.png)
+Closer look at ```glk::Splatting```: Points are rendered as oriented disks
+
 
 ## Image (2D texture)
 
@@ -249,4 +263,18 @@ There is also a utility function to create a texture from ```cv::Mat```.
 
 cv::Mat image = ...;
 auto texture = glk::create_texture(image);
+
+viewer->update_image("image", texture);
 ```
+
+![Screenshot_20230101_011615](https://user-images.githubusercontent.com/31344317/210149508-e98dd695-9a38-4bd9-8216-96aa5c2510d1.png)
+
+If an image name contains '/', the string before the slash is recognized as a group name, and images with the same group name are grouped in a tab.
+
+```cpp
+viewer->update_image("group0/image0", texture);
+viewer->update_image("group0/image1", texture);
+viewer->update_image("group1/image0", texture);
+```
+
+![Screenshot_20230101_011918](https://user-images.githubusercontent.com/31344317/210149509-c096fdcb-7337-44bf-833d-ce369378bbe1.png)
