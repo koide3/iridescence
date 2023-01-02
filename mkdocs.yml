@@ -45,5 +45,6 @@ nav:
     - 'drawables.md'
     - 'controls.md'
     - 'picking.md'
+    - 'multithread.md'
     - 'effects.md'
     - 'misc.md'

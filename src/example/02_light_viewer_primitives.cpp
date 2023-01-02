@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
 
   // hovered 2D drawings
   auto hovered = glk::make_shared<guik::HoveredDrawings>();
+  viewer->register_ui_callback("hovered", hovered->create_callback());
 
   // Put hovered texts
   hovered->add_text({8.0f, 0.0f, 1.0f}, "thin_lines", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128));
@@ -129,8 +130,6 @@ int main(int argc, char** argv) {
   hovered->add_text({0.0f, 18.0f, 1.0f}, "triangle", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
   hovered->add_text({2.5f, 18.0f, 1.0f}, "rect", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
   hovered->add_text({5.0f, 18.0f, 1.0f}, "filled_rect", IM_COL32(255, 255, 255, 255), IM_COL32(0, 0, 0, 128), {0.0f, 25.0f});
-
-  viewer->register_ui_callback("hovered", hovered->create_callback());
 
   // Change the coloring bandwidth of the guik::Rainbow coloring scheme
   Eigen::Vector2f z_range(-3.0f, 5.0f);

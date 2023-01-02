@@ -5,6 +5,11 @@
 #include <glk/effects/screen_space_lighting.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
+#include <glk/io/png_io.hpp>
+#include <glk/io/jpeg_io.hpp>
+#include <glk/io/ply_io.hpp>
+#include <glk/io/ascii_io.hpp>
+
 int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
   viewer->set_draw_xy_grid(false);

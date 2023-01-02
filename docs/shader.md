@@ -13,13 +13,13 @@ int color_mode = glk::ColorMode::RAINBOW;
 Eigen::Matrix4f transformation = Eigen::Matrix4f::Identity();
 auto shader_setting = guik::ShaderSetting(color_mode, transformation)
 
-// Register the drawable object and the shader setting to the viewer
+// Register the pair of drawable object and shader setting to the viewer
 viewer->update_drawable("drawable_name", drawable, shader_setting);
 ```
 
 ## Coloring schemes
 
-There are four coloring schemes, and they have corresponding utility classes that are derived from ```guik::ShaderSetting```:
+There are four coloring schemes in Iridescence, and they have corresponding utility classes that are derived from ```guik::ShaderSetting```:
 
 - **RAINBOW (guik::Rainbow)** scheme draws pixels with colors that encode the 3D position of each pixel (By default, it encodes the height (z) position of each pixel).
 - **FLAT_COLOR (guik::FlatColor)** scheme draws pixels with a flat color.
@@ -53,13 +53,16 @@ auto shader_setting = guik::VertexColor(transformation);
 auto shader_setting = guik::TextureColor(transformation).make_transparent();
 ```
 
+![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
+Example of point clouds rendered using the rainbow coloring scheme
 
 ## Transformation
 
-```Eigen::Matrix4f```, ```Eigen::Isometry3f```, ```Eigen::Affine3f``` and their double counterparts.
+**guik::ShaderSetting** accepts ```Eigen::Matrix4f```, ```Eigen::Isometry3f```, ```Eigen::Affine3f``` and their double counterparts as the model transformation.
 
-```guik::ShaderSetting``` has several utility methods to manipulate the model matrix:
+It also has several utility methods to manipulate the model matrix. The utility methods applies a transformation on the right side of the original model transformation.
 ```cpp
+// The model matrix becomes Identity() * Translation(1,0,0) * Scale(0.1)
 viewer->update_drawable("drawable_name", drawable,
   guik::Rainbow().translate({1.0f, 0.0f, 0.0f}).scale(0.1f)
 );

@@ -7,10 +7,12 @@
 ## Features
 
 What this library provides:
+
 - An easy-to-use 3D visualization framework (inpaticular suitable for rendering point clouds)
 - Tightly integrated Dear ImGui interfaces for rapid UI design
 
 What this library does NOT provide:
+
 - Realistic rendering and shading
 - Rich textured 3D mesh rendering
 
@@ -112,7 +114,6 @@ int main(int argc, char** argv) {
 #!/usr/bin/python3
 import numpy
 from scipy.spatial.transform import Rotation
-
 from pyridescence import *
 
 # Create a viewer instance (global singleton)

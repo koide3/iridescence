@@ -13,7 +13,6 @@ viewer->disable_vsync();
 viewer->enable_vsync();
 ```
 
-
 ## Text output
 
 ```cpp
@@ -82,3 +81,59 @@ if (!path.empty()) {
 }
 ```
 
+## Image and 3D model IO
+
+### PNG
+
+```cpp
+#include <glk/io/png_io.hpp>
+
+// Load PNG image
+// Pixel data are stored in 8-bit RGBA format
+int width, height;
+std::vector<unsigned char> pixels;
+glk::load_png("image.png", width, height, pixels);
+
+// Save image as a PNG image
+// Pixel data must be 8-bit RGBA
+glk::save_png("image.png", width, height, pixels);
+```
+
+### JPEG
+
+```cpp
+#include <glk/io/jpeg_io.hpp>
+
+// Load JPEG image
+// Pixel data are stored in 8-bit RGBA format
+int width, height;
+std::vector<unsigned char> pixels;
+glk::load_jpeg("image.png", width, height, pixels);
+
+// Save image as a JPEG image
+// Pixel data must be 8-bit RGBA
+int quality = 100;
+glk::save_jpeg("image.png", width, height, pixels, quality);
+```
+
+### PLY
+
+```cpp
+#include <glk/io/ply_io.hpp>
+
+// Load a PLY model
+auto ply = glk::load_ply("model.ply");
+
+// ply->vertices    : std::vector<Eigen::Vector3f>
+// ply->colors      : std::vector<Eigen::Vector4f>
+// ply->normals     : std::vector<Eigen::Vector3f>
+// ply->intensities : std::vector<float>
+// ply->indices     : std::vector<int>
+
+// Save the PLY data
+glk::save_ply_binary("model.ply", *ply);
+
+// Save a point cloud in the PLY format
+std::vector<Eigen::Vector3f> points
+glk::save_ply_binary("model.ply", points.data(), points.size());
+```

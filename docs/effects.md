@@ -5,6 +5,10 @@
 
 ![ss](https://user-images.githubusercontent.com/31344317/210160116-b1456193-a12d-4681-acbf-49964ec3faa9.png)
 
+## Input image without screen effects
+
+[![Screenshot_20230101_160408](https://user-images.githubusercontent.com/31344317/210163351-acb4540c-91b7-4cff-94ea-668afce822a2.png){: style="height:300px;width:300px"}](https://user-images.githubusercontent.com/31344317/210163351-acb4540c-91b7-4cff-94ea-668afce822a2.png)
+
 ## Naive screen space ambient occlusion
 
 ```cpp

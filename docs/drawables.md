@@ -49,7 +49,7 @@ glk::Primitives::wire_frustum();
 
 ## 2D drawings
 
-**guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives.
+**guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives on the projected positions.
 
 ```cpp
 #include <guik/hovered_drawings.hpp>
@@ -174,7 +174,7 @@ cloud_buffer->add_buffer("radius", dim, values.data(), sizeof(float) * dim, valu
 ![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
 ```glk::PointCloudBuffer``` rendered with ```guik::Rainbow```
 
-**glk::IndexedPointCloudBuffer** enables specify the indices of vertices to be rendered.
+**glk::IndexedPointCloudBuffer** enables specifying the indices of vertices to be rendered.
 
 ```cpp
 #include <glk/indexed_pointcloud_buffer.hpp>
@@ -227,18 +227,45 @@ splatting->set_cloud_buffer(cloud_buffer);
 splatting->enable_vertex_radius();
 
 std::vector<float> radii = ...;
-cloud_buffer->add_buffer("radius", 1, radii.data(), radii.size());
+cloud_buffer->add_buffer("radius", 1, radii.data(), sizeof(float), radii.size());
 ```
 
 ![points](https://user-images.githubusercontent.com/31344317/210149278-ac7a1424-5846-4a8c-94a8-dc2173229566.png)
-```glk::PointCloudBuffer```
+Sparse point cloud
 
 ![splats](https://user-images.githubusercontent.com/31344317/210149280-7160f17f-c6cd-46c5-a66c-4a41d480db69.png)
-```glk::Splatting```
+Sparse point cloud rendered using ```glk::Splatting```
 
 ![splats2](https://user-images.githubusercontent.com/31344317/210149281-18ad2296-4bc6-4f44-9ef5-0696f1b03141.png)
-Closer look at ```glk::Splatting```: Points are rendered as oriented disks
+Closer look at the splatting result: Points are rendered as oriented disks
 
+
+## Mesh
+
+```cpp
+#include <glk/mesh.hpp>
+
+std::vector<Eigen::Vector3f> vertices = ...;
+std::vector<Eigen::Vector3f> normals = ...;
+std::vector<Eigen::Vector4f> colors = ...;
+std::vector<Eigen::Vector2f> tex_coords;
+std::vector<unsigned int> indices;
+
+// Create a mesh instance
+// Pass nullptr if normal/color/tex_coord is not available
+auto mesh = std::make_shared<glk::Mesh>(
+  vertices.data(), sizeof(float) * 3,
+  normals.data(), sizeof(float) * 3,
+  colors.data(), sizeof(float) * 4,
+  tex_coords.data(), sizeof(float) * 2,
+  vertices.size()
+  indices.data(),
+  indices.size()
+);
+
+std::shared_ptr<glk::Texture> texture = ...;
+mesh->set_texture(texture);
+```
 
 ## Image (2D texture)
 
