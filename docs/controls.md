@@ -18,11 +18,15 @@ viewer->use_topdown_camera_control();
 viewer->use_arcball_camera_control();
 ```
 
+A useful method to let the camera keep focusing on a moving object is the ```lookat``` method that moves the camera such that the specified position comes to the center of the camera view.
 
 ```cpp
 Eigen::Vector3f center_pos = ...;
 viewer->lookat(center_pos);
 ```
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/TarRKF_Xd2E?start=13" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+```lookat``` example (0:13 ~)
 
 ## Model matrix control (ImGuizmo)
 
@@ -40,5 +44,7 @@ viewer->register_ui_callback("model_control_ui", [&]{
   viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow(model_matrix));
 });
 ```
+
+Note: ImGuizmo cannot be shown twice or more in one frame.
 
 ![guizmo](https://user-images.githubusercontent.com/31344317/210159001-58b69d32-70b2-4fd1-9885-d40af93514d4.gif)

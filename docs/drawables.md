@@ -144,7 +144,7 @@ auto lines = std::make_shared<glk::Lines>(line_width, vertices, colors, line_str
 
 ## Point cloud
 
-**glk::PointCloudBuffer** holds and renders 3D point properties.
+**glk::PointCloudBuffer** holds and renders a 3D point cloud.
 
 ```cpp
 #include <glk/pointcloud_buffer.hpp>

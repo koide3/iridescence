@@ -137,3 +137,18 @@ glk::save_ply_binary("model.ply", *ply);
 std::vector<Eigen::Vector3f> points
 glk::save_ply_binary("model.ply", points.data(), points.size());
 ```
+
+
+## Viewer menu
+
+By pressing "Ctrl+M", a hidden menu bar appears. Via the manu bar, you can:
+
+- Change the rainbow colormap, coloring axis and range
+- Show an information window (FPS/CPU&GPU Usage)
+- Enable/Disable vsync
+- Enable/Disable XY grid
+- Show drawable filter and editor
+- Save/Load the camera setting
+- Get 3D positions of objects via point picking
+
+![Screenshot_20230102_202624](https://user-images.githubusercontent.com/31344317/210225203-e6edf5d8-d495-413b-b554-15fb61294923.png)
