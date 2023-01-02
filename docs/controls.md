@@ -45,6 +45,6 @@ viewer->register_ui_callback("model_control_ui", [&]{
 });
 ```
 
-Note: ImGuizmo cannot be shown twice or more in one frame.
+Note: ImGuizmo cannot be shown twice or more in one rendering frame.
 
 ![guizmo](https://user-images.githubusercontent.com/31344317/210159001-58b69d32-70b2-4fd1-9885-d40af93514d4.gif)

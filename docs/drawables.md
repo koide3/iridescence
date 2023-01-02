@@ -219,11 +219,13 @@ cloud_buffer->add_normals(normals);
 auto splatting_shader = glk::create_splatting_shader();
 
 // Create a splatting instance
+float point_radius = 0.1f;
 auto splatting = std::make_shared<glk::Splatting>(splatting_shader);
-splatting->set_point_radius(0.1f);
+splatting->set_point_radius(point_radius);
 splatting->set_cloud_buffer(cloud_buffer);
 
-// If vertex radius is enabled, the radius of each point is calculated as point_radius * vertex's radius
+// If vertex radius is enabled, the radius of each point is calculated as point_radius * vertex's radius.
+// Otherwise, the fixed point_radius is used for rendering all points.
 splatting->enable_vertex_radius();
 
 std::vector<float> radii = ...;

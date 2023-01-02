@@ -168,9 +168,37 @@ public:
     return *this;
   }
 
+  template <typename Transform>
+  ShaderSetting& transform(const Transform& transform) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * transform.template cast<float>()).matrix();
+    return *this;
+  }
+
   ShaderSetting& translate(const Eigen::Vector3f& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value.block<3, 1>(0, 3) += translation;
+    return *this;
+  }
+
+  ShaderSetting& rotate(const float angle, const Eigen::Vector3f& axis) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis)).matrix();
+    return *this;
+  }
+
+  ShaderSetting& rotate(const Eigen::Quaternionf& quat) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * quat).matrix();
+    return *this;
+  }
+
+  ShaderSetting& rotate(const Eigen::Matrix3f& rot) {
+    Eigen::Isometry3f R = Eigen::Isometry3f::Identity();
+    R.linear() = rot;
+
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * R.matrix();
     return *this;
   }
 

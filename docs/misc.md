@@ -13,6 +13,32 @@ viewer->disable_vsync();
 viewer->enable_vsync();
 ```
 
+## Spin methods
+
+In addition to ```spin_once()``` and ```spin()```, there are two methods for spinning the viewer, ```spin_until_click()``` and ```toggle_spin_once()``` that are useful for debugging.
+
+```spin_until_click()``` spins the viewer until the ```break``` button gets clicked for step-by-step debugging.
+```cpp
+double angle = 0.0;
+while (viewer->spin_until_click()) {
+  viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow().rotate(angle, {0.0f, 0.0f, 1.0f}));
+  angle += 0.1;
+}
+```
+
+![until_click](https://user-images.githubusercontent.com/31344317/210242895-9bf043b1-1c30-4348-bd52-62ff4593da6d.gif)
+
+```toggle_spin_once()``` spins the viewer once but stops while the ```break``` checkbox is checked.
+```cpp
+double angle = 0.0;
+while(viewer->toggle_spin_once()) {
+  viewer->update_drawable("cube", glk::Primitives::cube(), guik::Rainbow().rotate(angle, {0.0f, 0.0f, 1.0f}));
+  angle += 0.01;
+}
+```
+![toggle](https://user-images.githubusercontent.com/31344317/210242889-c0f5582c-b2dc-451e-8fb2-6cd1847460df.gif)
+
+
 ## Text output
 
 ```cpp
@@ -60,6 +86,9 @@ auto sub_viewer2 = viewer->sub_viewer("sub2");
 sub_viewer2->update_drawable("sphere", glk::Primitives::sphere(), guik::Rainbow());
 ```
 
+![Screenshot_20230102_222655](https://user-images.githubusercontent.com/31344317/210237883-97ec8b69-b0ec-4572-861d-2184aaa68485.png)
+
+
 ## Share the default camera control with sub-viewers
 
 ```cpp
@@ -67,6 +96,8 @@ auto camera_control = viewer->get_camera_control();
 sub_viewer1->set_camera_control(camera_control);
 sub_viewer2->set_camera_control(camera_control);
 ```
+
+![subs](https://user-images.githubusercontent.com/31344317/210238057-629ea9ea-d439-4fa3-abcb-2d696edb7eee.gif)
 
 ## File dialogs (portable-file-dialogs)
 
@@ -130,7 +161,7 @@ auto ply = glk::load_ply("model.ply");
 // ply->intensities : std::vector<float>
 // ply->indices     : std::vector<int>
 
-// Save the PLY data
+// Save a PLY data
 glk::save_ply_binary("model.ply", *ply);
 
 // Save a point cloud in the PLY format

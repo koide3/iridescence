@@ -17,6 +17,18 @@ auto shader_setting = guik::ShaderSetting(color_mode, transformation)
 viewer->update_drawable("drawable_name", drawable, shader_setting);
 ```
 
+## Transformation
+
+**guik::ShaderSetting** accepts Eigen transformations (e.g., ```Eigen::Matrix4f```, ```Eigen::Isometry3f```, ```Eigen::Affine3f``` and their double counterparts) as the model transformation.
+
+It also has several utility methods to manipulate the model matrix. The utility methods applies a transformation on the right side of the original model transformation.
+```cpp
+// The model matrix becomes Identity() * Rotate(3.14rad, (1,0,0)) * Translation(1,0,0) * Scale(0.1)
+viewer->update_drawable("drawable_name", drawable,
+  guik::Rainbow().rotate(3.14f, {1.0f, 0.0f, 0.0f}).translate({1.0f, 0.0f, 0.0f}).scale(0.1f)
+);
+```
+
 ## Coloring schemes
 
 There are four coloring schemes in Iridescence, and they have corresponding utility classes that are derived from ```guik::ShaderSetting```:
@@ -55,15 +67,3 @@ auto shader_setting = guik::TextureColor(transformation).make_transparent();
 
 ![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
 Example of point clouds rendered using the rainbow coloring scheme
-
-## Transformation
-
-**guik::ShaderSetting** accepts ```Eigen::Matrix4f```, ```Eigen::Isometry3f```, ```Eigen::Affine3f``` and their double counterparts as the model transformation.
-
-It also has several utility methods to manipulate the model matrix. The utility methods applies a transformation on the right side of the original model transformation.
-```cpp
-// The model matrix becomes Identity() * Translation(1,0,0) * Scale(0.1)
-viewer->update_drawable("drawable_name", drawable,
-  guik::Rainbow().translate({1.0f, 0.0f, 0.0f}).scale(0.1f)
-);
-```

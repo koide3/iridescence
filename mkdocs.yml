@@ -41,10 +41,12 @@ extra_css:
 
 nav:
     - 'index.md'
+    - 'basic.md'
     - 'shader.md'
     - 'drawables.md'
     - 'controls.md'
     - 'picking.md'
     - 'multithread.md'
     - 'effects.md'
+    - 'cookbook.md'
     - 'misc.md'
