@@ -2,9 +2,9 @@
 
 ## Creating a viewer instance
 
-```guik::LightViewer::instance()``` creates and returns a global viewer instance. The viewer instance is created on only the first call, and results of ```guik::LightViewer::instance()``` refer to the same globally singular instance (i.e., singleton pattern).
+```guik::LightViewer::instance()``` creates and returns a global viewer instance. The viewer instance is created on the first call, and results of ```guik::LightViewer::instance()``` refer to the same globally singular instance (i.e., singleton pattern).
 
-```viewer->spin_once()``` updates viewer contents and renders a frame. It returns ```false``` when the viewer window is closed.
+```viewer->spin_once()``` updates viewer contents and renders a frame on the window. It returns ```false``` when the viewer window is closed.
 
 The following code is a minimum example to show a blank viewer window.
 
@@ -32,7 +32,7 @@ while(viewer->spin_once()) {}
 
 ## Registering drawables to the viewer
 
-3D objects to be drawn are called **drawables** and managed with unique names (or IDs) in Iridescence. The following code shows a minimum example to register a wire sphere to the viewer.
+3D objects to be drawn are called **drawables** and managed with unique names (or IDs). The following code shows a minimum example to register a wire sphere to the viewer.
 
 ```cpp
 #include <glk/primitives/primitives.hpp>
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   auto viewer = guik::LightViewer::instance();
 
   // Register a wire sphere drawable with the name "sphere"
-  // and flat red coloring setting.
+  // and the flat red coloring setting.
   viewer->update_drawable(
     "sphere",
     glk::Primitives::wire_sphere(),
@@ -55,9 +55,9 @@ int main(int argc, char** argv) {
 
 ![Screenshot_20230102_233458](https://user-images.githubusercontent.com/31344317/210245441-2506d0c1-e044-4ed3-904d-00f9c96ef520.png)
 
-The first argument of ```update_drawable()``` is a name to be assigned to the drawable. If the name already exists, the viewer overwrites the drawable with the new one.
+The first argument of ```update_drawable()``` is a name to be assigned to the drawable. If the name already exists, the viewer overwrites the existing drawable with the new one.
 
-The second argument is a drawable to be registered. Take a look at [Drawables](drawables.md) to see supported 3D drawable types in Iridescence.
+The second argument is a drawable to be registered. Take a look at [Drawables](drawables.md) to see supported 3D drawable types.
 
 The third argument is a shader setting to hold rendering parameters. By changing shader setting parameters, you can control the color, pose, and shape of drawables as shown in below:
 ```cpp
@@ -77,9 +77,9 @@ See [Shader setting](shader.md) for more details.
 
 ## Registering UI callbacks (Dear ImGui)
 
-Research and development often involve trial-and-error processes with many parameter settings that often take a large amount of effort. To accelerate such development processes, Iridescence provides tightly integrated interfaces to [Dear ImGui](https://github.com/ocornut/imgui), an immediate mode GUI library that enables designing interactive UI easily and rapidly.
+Research and development often involve trial-and-error processes with many parameter settings that often take a large amount of effort. To accelerate such development processes, Iridescence provides tightly integrated interfaces to [Dear ImGui](https://github.com/ocornut/imgui), an immediate mode GUI library that enables designing interactive user interfaces easily and rapidly.
 
-To create a ImGui-based GUI, call ```register_ui_callback()``` to register a callback function for UI rendering events. In the following example, we create a simple GUI with ```DragFloat``` to rotate a sphere, and ```Button``` to close the viewer window.
+To create a ImGui-based GUI, register a callback function for UI rendering events using ```register_ui_callback()``` . In the following example, we create a simple GUI with ```DragFloat``` to rotate a sphere, and ```Button``` to close the viewer window.
 
 ```cpp
 #include <glk/primitives/primitives.hpp>
@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
   // Register a callback for UI rendering with the name "ui_callback".
   viewer->register_ui_callback("ui_callback", [&]() {
     // In the callback, you can call ImGui commands to create your UI.
-    // Here, we use "DragFloat" and "Button" to create a simple UI.
+
     ImGui::DragFloat("Angle", &angle, 0.01f);
 
     if (ImGui::Button("Close")) {

@@ -3,7 +3,7 @@
 Examples of lines, 3D primitives, and 2D drawings ([Code](https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_primitives.cpp)):
 ![primitives](https://user-images.githubusercontent.com/31344317/210129208-2d126725-67d9-48ff-9eae-7af118a319f9.png)
 
-## Primitives
+## 3D Primitives
 
 - Icosahedron
 - Sphere
@@ -64,7 +64,7 @@ std::uint32_t bg_color = IM_COL32(0, 0, 0, 128);
 hovered->add_text({1.0f, 2.0f, 3.0f}, "text1", fg_color, bg_color);
 
 // Instead of directly giving a 3D position, a drawable name can be 
-// used to draw the text on the drawable position
+// used to draw a 2D drawing on the drawable position
 hovered->add_text_on("drawable_name", "text2", fg_color, bg_color);
 
 

@@ -2,8 +2,8 @@
 
 ## Enabling/Disabling Vsync
 
-By default, vsync is enabled and the maximum FPS is limited to the refresh speed of the display.
-The maximum FPS can be unlimited by disabling vsync.
+By default, vsync is enabled and the maximum FPS is limited to the refresh rate of the display.
+The maximum FPS can be unbounded by disabling vsync.
 
 ```cpp
 // Disable vsync to unlimit the maximum FPS
@@ -15,7 +15,7 @@ viewer->enable_vsync();
 
 ## Spin methods
 
-In addition to ```spin_once()``` and ```spin()```, there are two methods for spinning the viewer, ```spin_until_click()``` and ```toggle_spin_once()``` that are useful for debugging.
+In addition to ```spin_once()``` and ```spin()```, there are two utility methods for spinning the viewer, ```spin_until_click()``` and ```toggle_spin_once()``` that are useful for debugging.
 
 ```spin_until_click()``` spins the viewer until the ```break``` button gets clicked for step-by-step debugging.
 ```cpp
@@ -28,7 +28,7 @@ while (viewer->spin_until_click()) {
 
 ![until_click](https://user-images.githubusercontent.com/31344317/210242895-9bf043b1-1c30-4348-bd52-62ff4593da6d.gif)
 
-```toggle_spin_once()``` spins the viewer once but stops while the ```break``` checkbox is checked.
+```toggle_spin_once()``` spins the viewer and stops while the ```break``` checkbox is checked.
 ```cpp
 double angle = 0.0;
 while(viewer->toggle_spin_once()) {
@@ -41,8 +41,10 @@ while(viewer->toggle_spin_once()) {
 ## Background color/image
 
 ```cpp
+// Change the background color
 viewer->set_clear_color({0.2f, 0.2f, 0.2f, 1.0f});
 
+// Set a background image
 std::shared_ptr<glk::Texture> texture = ...;
 viewer->set_bg_texture(texture);
 ```
@@ -84,14 +86,38 @@ viewer->register_drawable_filter("filter", [](const std::string& drawable_name) 
 viewer->register_drawable_filter("filter", 0);
 ```
 
-## Changing the coloring range and axis of the Rainbow scheme
+## Changing the coloring settings of the Rainbow scheme
 
 ```cpp
-Eigen::Vector2f range(-3.0f, 5.0f);
-Eigen::Vector3f axis(1.0f, 0.0f, 0.0f);
 
+glk::COLORMAP colormap = glk::COLORMAP::AUTUMN;   // Colormap type
+Eigen::Vector2f range(-3.0f, 5.0f);               // Coloring range
+Eigen::Vector3f axis(1.0f, 0.0f, 0.0f);           // Coloring axis
+
+viewer->set_colormap(colormap);
 viewer->shader_setting().add("z_range", range);
 viewer->shader_setting().add("colormap_axis", axis);
+```
+
+## Colormaps
+
+```cpp
+#include <glk/colromap.hpp>
+
+// Get colormap value (integer version: value range = [0, 255])
+Eigen::Vector4i color = colormap(glk::COLORMAP::TURBO, 128);
+
+// Get colormap value (float version: value range = [0.0, 1.0])
+Eigen::Vector4f colorf = colormapf(glk::COLORMAP::TURBO, 0.5f);
+
+// Get a caterogical color by evenly sampling colors from a colormap
+// The color loops every "num_categories" counts
+int count = 1;
+int num_categories = 16;
+Eigen::Vector4i cat_color = colormap_categorical(glk::COLORMAP::TURBO, count, num_categories);
+
+// Float version
+Eigen::Vector4f cat_colorf = colormap_categoricalf(glk::COLORMAP::TURBO, count, num_categories);
 ```
 
 ## Sub-viewer
@@ -116,19 +142,6 @@ sub_viewer2->set_camera_control(camera_control);
 ```
 
 ![subs](https://user-images.githubusercontent.com/31344317/210238057-629ea9ea-d439-4fa3-abcb-2d696edb7eee.gif)
-
-## Colormaps
-
-```cpp
-#include <glk/colromap.hpp>
-
-// Get colormap value (integer version: value range = [0, 255])
-Eigen::Vector4i color = colormap(glk::COLORMAP::TURBO, 128);
-
-// Get colormap value (float version: value range = [0.0, 1.0])
-Eigen::Vector4f colorf = colormapf(glk::COLORMAP::TURBO, 0.5f);
-
-```
 
 ## Taking screenshot
 

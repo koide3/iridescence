@@ -23,7 +23,7 @@ viewer->update_drawable("drawable_name", drawable, shader_setting);
 
 It also has several utility methods to manipulate the model matrix. The utility methods applies a transformation on the right side of the original model transformation.
 ```cpp
-// The model matrix becomes Identity() * Rotate(3.14rad, (1,0,0)) * Translation(1,0,0) * Scale(0.1)
+// The model matrix becomes Identity() * Rotation(3.14rad, (1,0,0)) * Translation(1,0,0) * Scale(0.1)
 viewer->update_drawable("drawable_name", drawable,
   guik::Rainbow().rotate(3.14f, {1.0f, 0.0f, 0.0f}).translate({1.0f, 0.0f, 0.0f}).scale(0.1f)
 );

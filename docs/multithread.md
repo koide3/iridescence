@@ -2,14 +2,13 @@
 
 ## Invoke
 
-Because OpenGL commands can only be executed on a single GUI context thread, most of functionalities of Iridescence are also need to be executed on the GUI thread. For safely updating visualization contents, Iridescence provides ```invoke()``` method that pushes a task (functor) to a thread-safe task queue and requests the viewer to execute it on the GUI thread.
+Because OpenGL commands can only be executed on a single GUI context thread, most of functionalities of Iridescence are also required to be executed on the single GUI thread. For safely updating visualization contents, Iridescence provides ```invoke()``` method that pushes a task (functor) to a thread-safe task queue and requests the viewer to execute it on the GUI thread.
 
 ```cpp
 
+// This function is executed in a background thread
 void async_update() {
   for (int i=0; i<100; i++) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
     // Prepare point cloud data to be rendered
     std::shared_ptr<std::vector<Eigen::Vector3f>> points = ...;
 
