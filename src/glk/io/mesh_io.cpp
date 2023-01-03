@@ -5,6 +5,7 @@
 #include <glk/io/image_io.hpp>
 #include <glk/texture.hpp>
 #include <guik/viewer/shader_setting.hpp>
+#include <boost/filesystem.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -45,11 +46,12 @@ std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
         return s.size() < suffix.size() ? false : std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
       };
 
-      const std::string path(tex_path.C_Str());
+      const std::string filename = boost::filesystem::path(path).parent_path().string() + "/" + std::string(tex_path.C_Str());
 
       int width, height;
       std::vector<unsigned char> pixels;
-      if (glk::load_image(path, width, height, pixels)) {
+      if (glk::load_image(filename, width, height, pixels)) {
+        shader_setting.add("color_mode", guik::ColorMode::TEXTURE_COLOR);
         texture = std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
       }
     }
