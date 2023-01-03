@@ -18,7 +18,7 @@ viewer->use_topdown_camera_control();
 viewer->use_arcball_camera_control();
 ```
 
-A useful method to let the camera keep focusing on a moving object is the ```lookat``` method that moves the camera such that the specified position comes to the center of the camera view.
+A useful method to let the camera keep focusing on a moving object is ```lookat()``` that moves the camera such that the specified position comes to the center of the camera view.
 
 ```cpp
 Eigen::Vector3f center_pos = ...;

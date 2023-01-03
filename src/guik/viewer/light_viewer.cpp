@@ -261,6 +261,11 @@ void LightViewer::remove_image(const std::string& name) {
 }
 
 void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale) {
+  if (!image) {
+    remove_image(name);
+    return;
+  }
+
   if(scale < 0.0) {
     double scale_x = 640.0 / image->size()[0];
     double scale_y = 480.0 / image->size()[1];

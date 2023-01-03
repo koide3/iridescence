@@ -38,6 +38,8 @@ public:
   guik::ShaderSetting& shader_setting() { return global_shader_setting; }
   const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
 
+  void disable_xy_grid() { set_draw_xy_grid(false); }
+  void enable_xy_grid() { set_draw_xy_grid(true); }
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);

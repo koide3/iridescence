@@ -11,7 +11,7 @@ Examples of lines, 3D primitives, and 2D drawings ([Code](https://github.com/koi
 - Cube
 - Cone
 - Coordinate system
-- Frustom
+- Frustum
 
 ```cpp
 #include <glk/primitives/primitives.hpp>
@@ -169,6 +169,10 @@ cloud_buffer->add_normals(normals);
 std::vector<float> values = ...;
 int dim = 1;
 cloud_buffer->add_buffer("radius", dim, values.data(), sizeof(float) * dim, values.size());
+
+// Enlarge point size
+auto shader_setting = guik::Rainbow().set_point_scale(2.0f);
+viewer->update_drawable("points", cloud_buffer, shader_setting);
 ```
 
 ![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)

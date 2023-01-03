@@ -47,6 +47,7 @@ auto lighting_effect = std::make_shared<glk::ScreenSpaceLighting>();
 lighting_effect->set_light(0, light0_pos, light0_color);
 lighting_effect->set_light(1, light1_pos, light1_color);
 
+viewer->enable_normal_buffer();
 viewer->set_screen_effect(lighting_effect);
 ```
 

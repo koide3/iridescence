@@ -74,3 +74,48 @@ viewer->update_drawable("sphere2", glk::Primitives::wire_sphere(), setting2);
 
 
 See [Shader setting](shader.md) for more details.
+
+## Registering UI callbacks (Dear ImGui)
+
+Research and development often involve trial-and-error processes with many parameter settings that often take a large amount of effort. To accelerate such development processes, Iridescence provides tightly integrated interfaces to [Dear ImGui](https://github.com/ocornut/imgui), an immediate mode GUI library that enables designing interactive UI easily and rapidly.
+
+To create a ImGui-based GUI, call ```register_ui_callback()``` to register a callback function for UI rendering events. In the following example, we create a simple GUI with ```DragFloat``` to rotate a sphere, and ```Button``` to close the viewer window.
+
+```cpp
+#include <glk/primitives/primitives.hpp>
+#include <guik/viewer/light_viewer.hpp>
+
+int main(int argc, char** argv) {
+  auto viewer = guik::LightViewer::instance();
+
+  float angle = 0.0f;
+
+  // Register a callback for UI rendering with the name "ui_callback".
+  viewer->register_ui_callback("ui_callback", [&]() {
+    // In the callback, you can call ImGui commands to create your UI.
+    // Here, we use "DragFloat" and "Button" to create a simple UI.
+    ImGui::DragFloat("Angle", &angle, 0.01f);
+
+    if (ImGui::Button("Close")) {
+      viewer->close();
+    }
+  });
+
+  while (viewer->spin_once()) {
+    // Show rotated solid and wire spheres.
+    viewer->update_drawable("sphere", glk::Primitives::sphere(),
+      guik::Rainbow().rotate(angle, {0.0f, 0.0f, 1.0f}));
+    viewer->update_drawable("wire_sphere", glk::Primitives::wire_sphere(),
+      guik::FlatColor(0.1f, 0.7f, 1.0f, 1.0f).rotate(angle, {0.0f, 0.0f, 1.0f}));
+  }
+
+  return 0;
+}
+```
+
+![example_01](https://user-images.githubusercontent.com/31344317/210127177-31630466-f8a1-45b6-8bc7-2fdd2e4c9548.gif)
+
+See [Dear ImGui](https://github.com/ocornut/imgui) for details of the GUI library.
+
+!!!note 
+    In addition to Dear ImGui, several libraries ([implot](https://github.com/epezent/implot), [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo), and [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs)) are bundled for rapid prototyping.

@@ -1,6 +1,6 @@
 # Miscellaneous
 
-## Enable/Disable Vsync
+## Enabling/Disabling Vsync
 
 By default, vsync is enabled and the maximum FPS is limited to the refresh speed of the display.
 The maximum FPS can be unlimited by disabling vsync.
@@ -38,6 +38,14 @@ while(viewer->toggle_spin_once()) {
 ```
 ![toggle](https://user-images.githubusercontent.com/31344317/210242889-c0f5582c-b2dc-451e-8fb2-6cd1847460df.gif)
 
+## Background color/image
+
+```cpp
+viewer->set_clear_color({0.2f, 0.2f, 0.2f, 1.0f});
+
+std::shared_ptr<glk::Texture> texture = ...;
+viewer->set_bg_texture(texture);
+```
 
 ## Text output
 
@@ -46,7 +54,7 @@ viewer->append_text("text1");
 viewer->append_text("text2");
 ```
 
-## Remove drawables
+## Removing drawables
 
 ```cpp
 // Remove a drawable with a specified name
@@ -72,8 +80,18 @@ viewer->register_drawable_filter("filter", [](const std::string& drawable_name) 
   return do_rendering;
 });
 
-// Drawable filter can be cleared by giving 0
+// Drawable filter can be removed by overwriting with 0
 viewer->register_drawable_filter("filter", 0);
+```
+
+## Changing the coloring range and axis of the Rainbow scheme
+
+```cpp
+Eigen::Vector2f range(-3.0f, 5.0f);
+Eigen::Vector3f axis(1.0f, 0.0f, 0.0f);
+
+viewer->shader_setting().add("z_range", range);
+viewer->shader_setting().add("colormap_axis", axis);
 ```
 
 ## Sub-viewer
@@ -89,7 +107,7 @@ sub_viewer2->update_drawable("sphere", glk::Primitives::sphere(), guik::Rainbow(
 ![Screenshot_20230102_222655](https://user-images.githubusercontent.com/31344317/210237883-97ec8b69-b0ec-4572-861d-2184aaa68485.png)
 
 
-## Share the default camera control with sub-viewers
+## Sharing the default camera control with sub-viewers
 
 ```cpp
 auto camera_control = viewer->get_camera_control();
@@ -98,6 +116,31 @@ sub_viewer2->set_camera_control(camera_control);
 ```
 
 ![subs](https://user-images.githubusercontent.com/31344317/210238057-629ea9ea-d439-4fa3-abcb-2d696edb7eee.gif)
+
+## Colormaps
+
+```cpp
+#include <glk/colromap.hpp>
+
+// Get colormap value (integer version: value range = [0, 255])
+Eigen::Vector4i color = colormap(glk::COLORMAP::TURBO, 128);
+
+// Get colormap value (float version: value range = [0.0, 1.0])
+Eigen::Vector4f colorf = colormapf(glk::COLORMAP::TURBO, 0.5f);
+
+```
+
+## Taking screenshot
+
+Simple but slow screen capture methods (1~30 FPS):
+```cpp
+// 8-bit RGBA pixel data
+std::vector<unsigned char> color_pixels = viewer->read_color_buffer();
+// float depth data
+std::vector<float> depth_pixels = viewer->read_depth_buffer();
+```
+
+For efficient asynchronous screen data transfer with pixel buffer objects (~500FPS), see [src/example/ext_light_viewer_capture.cpp](https://github.com/koide3/iridescence/blob/master/src/example/ext_light_viewer_capture.cpp)
 
 ## File dialogs (portable-file-dialogs)
 
@@ -111,6 +154,8 @@ if (!path.empty()) {
   recent_files.push(path);
 }
 ```
+
+![Screenshot_20230103_003820](https://user-images.githubusercontent.com/31344317/210252758-45787529-1a65-4f67-8c73-030e467448a0.png)
 
 ## Image and 3D model IO
 

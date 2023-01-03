@@ -1,12 +1,3 @@
-# Cookbook
-
-## Point cloud editor
-
-[src/example/ext_pointcloud_editor.cpp](https://github.com/koide3/iridescence/blob/master/src/example/ext_pointcloud_editor.cpp)
-
-<details>
-  <summary>ext_pointcloud_editor.cpp</summary>
-```cpp linenums="1"
 #include <glk/io/ply_io.hpp>
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/indexed_pointcloud_buffer.hpp>
@@ -115,11 +106,3 @@ int main(int argc, char** argv) {
   PointCloudEditor editor;
   return 0;
 }
-```
-</details>
-
-- PLY file IO with portable-file-dialogs
-- Gizmo-based model matrix control
-- Point cloud rendering using ```PointCloudBuffer``` and ```IndexedPointCloudBuffer```
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/pHPGS8VNN2o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
