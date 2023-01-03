@@ -1,16 +1,18 @@
-![Iridescence](docs/assets/logo.png)
+![Iridescence](assets/logo.png)
 
-**Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
+**Iridescence** a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
 
 [![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 18.04 / 20.04 / 22.04
 
 ## Features
 
 What this library provides:
+
 - An easy-to-use 3D visualization framework (inpaticular suitable for rendering point clouds)
 - Tightly integrated Dear ImGui interfaces for rapid UI design
 
 What this library does NOT provide:
+
 - Realistic rendering and shading
 - Rich textured 3D mesh rendering
 
@@ -112,7 +114,6 @@ int main(int argc, char** argv) {
 #!/usr/bin/python3
 import numpy
 from scipy.spatial.transform import Rotation
-
 from pyridescence import *
 
 # Create a viewer instance (global singleton)

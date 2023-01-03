@@ -23,6 +23,7 @@ public:
   virtual ~ShaderParameterInterface() {}
 
   virtual void set(glk::GLSLShader& shader) const = 0;
+  virtual Ptr clone() const = 0;
 
 public:
   std::string name;
@@ -36,6 +37,8 @@ public:
   virtual ~ShaderParameter() override {}
 
   virtual void set(glk::GLSLShader& shader) const override { shader.set_uniform(name, value); }
+
+  virtual Ptr clone() const override { return glk::make_shared<ShaderParameter<T>>(name, value); }
 
 public:
   T value;
@@ -71,6 +74,14 @@ public:
   {}
 
   virtual ~ShaderSetting() {}
+
+  ShaderSetting clone() const {
+    ShaderSetting cloned;
+    cloned.transparent = transparent;
+    cloned.params.resize(params.size());
+    std::transform(params.begin(), params.end(), cloned.params.begin(), [](const auto& p) { return p->clone(); });
+    return cloned;
+  }
 
   ShaderSetting& make_transparent() {
     transparent = true;
@@ -157,9 +168,37 @@ public:
     return *this;
   }
 
+  template <typename Transform>
+  ShaderSetting& transform(const Transform& transform) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * transform.template cast<float>()).matrix();
+    return *this;
+  }
+
   ShaderSetting& translate(const Eigen::Vector3f& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value.block<3, 1>(0, 3) += translation;
+    return *this;
+  }
+
+  ShaderSetting& rotate(const float angle, const Eigen::Vector3f& axis) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis)).matrix();
+    return *this;
+  }
+
+  ShaderSetting& rotate(const Eigen::Quaternionf& quat) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * quat).matrix();
+    return *this;
+  }
+
+  ShaderSetting& rotate(const Eigen::Matrix3f& rot) {
+    Eigen::Isometry3f R = Eigen::Isometry3f::Identity();
+    R.linear() = rot;
+
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * R.matrix();
     return *this;
   }
 

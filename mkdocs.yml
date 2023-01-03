@@ -1,0 +1,52 @@
+site_name: "Iridescence"
+site_author: k.koide
+repo_url: https://github.com/koide3/iridescence
+site_url: https://iridescence.github.io/site
+site_description: "Iridescence: Visualization library for rapid prototyping of 3D point cloud algorithms"
+
+theme: 
+    name: material
+    palette:
+        primary: indigo
+    front:
+        text: Roboto
+
+markdown_extensions:
+    - meta
+    - attr_list
+    - admonition
+    - pymdownx.highlight:
+        anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.emoji:
+        emoji_index: !!python/name:materialx.emoji.twemoji
+        emoji_generator: !!python/name:materialx.emoji.to_svg
+    - fontawesome_markdown
+
+copyright: Copyright &copy; 2021 - 2022 Kenji Koide
+extra:
+    social:
+        - icon: material/home
+          link: https://staff.aist.go.jp/k.koide/
+        - icon: fontawesome/brands/github
+          link: https://github.com/koide3/iridescence
+        - icon: fontawesome/brands/twitter
+          link: https://twitter.com/k_koide3
+
+extra_css:
+    - "css/custom.css"
+    - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+
+nav:
+    - 'index.md'
+    - 'basic.md'
+    - 'shader.md'
+    - 'drawables.md'
+    - 'controls.md'
+    - 'picking.md'
+    - 'multithread.md'
+    - 'effects.md'
+    - 'cookbook.md'
+    - 'misc.md'
