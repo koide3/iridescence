@@ -73,6 +73,7 @@ set(path_src path_std.cpp)
 add_library(iridescence SHARED
   src/glk/${path_src}
   src/glk/mesh.cpp
+  src/glk/mesh_model.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
   src/glk/trajectory.cpp
