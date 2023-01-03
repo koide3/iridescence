@@ -1,10 +1,8 @@
-#ifndef GLK_MESH_MODEL_ASSIMP_HPP
-#define GLK_MESH_MODEL_ASSIMP_HPP
+#include <glk/io/mesh_io.hpp>
 
 #include <glk/mesh.hpp>
 #include <glk/mesh_model.hpp>
-#include <glk/io/png_io.hpp>
-#include <glk/io/jpeg_io.hpp>
+#include <glk/io/image_io.hpp>
 #include <glk/texture.hpp>
 #include <guik/viewer/shader_setting.hpp>
 
@@ -14,7 +12,7 @@
 
 namespace glk {
 
-static std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
+std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
   Assimp::Importer importer;
   const auto scene =
     importer.ReadFile(path, aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
@@ -51,19 +49,7 @@ static std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
 
       int width, height;
       std::vector<unsigned char> pixels;
-      if (ends_with(path, ".png") || ends_with(path, ".PNG")) {
-        if (!glk::load_png(path, width, height, pixels)) {
-          std::cerr << "warning: failed to load " << path << std::endl;
-        }
-      } else if (ends_with(path, ".jpg") || ends_with(path, ".JPG")) {
-        if (!glk::load_jpeg(path, width, height, pixels)) {
-          std::cerr << "warning: failed to load " << path << std::endl;
-        }
-      } else {
-        std::cerr << "warning: unsupported image type " << path << std::endl;
-      }
-
-      if (!pixels.empty()) {
+      if (glk::load_image(path, width, height, pixels)) {
         texture = std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
       }
     }
@@ -136,5 +122,3 @@ static std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
   return model;
 }
 }  // namespace glk
-
-#endif

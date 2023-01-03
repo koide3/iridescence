@@ -24,10 +24,11 @@ find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # find_package(PCL)
+find_package(Boost REQUIRED filesystem program_options)
+find_package(Eigen3 REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(Boost REQUIRED filesystem program_options)
+find_package(assimp QUIET)
 
 ###########
 ## Build ##
@@ -68,10 +69,13 @@ target_link_libraries(gl_imgui
   dl
 )
 
-set(path_src path_std.cpp)
+if(${assimp_FOUND})
+  list(APPEND EXTRA_LIBRARIES assimp)
+  list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
+endif()
 
 add_library(iridescence SHARED
-  src/glk/${path_src}
+  src/glk/path_std.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
   src/glk/lines.cpp
@@ -98,6 +102,7 @@ add_library(iridescence SHARED
   src/glk/io/ply_io.cpp
   src/glk/io/png_io.cpp
   src/glk/io/jpeg_io.cpp
+  src/glk/io/image_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_splatting.cpp
   src/glk/effects/screen_space_lighting.cpp
@@ -123,6 +128,7 @@ add_library(iridescence SHARED
   src/guik/viewer/viewer_ui.cpp
   src/guik/viewer/info_window.cpp
   src/guik/viewer/anonymous.cpp
+  ${EXTRA_SOURCE}
 )
 target_include_directories(iridescence PUBLIC
   include
@@ -143,6 +149,7 @@ target_link_libraries(iridescence
   ${PNG_LIBRARIES}
   ${JPEG_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${EXTRA_LIBRARIES}
 )
 
 if(BUILD_PYTHON_BINDINGS)
