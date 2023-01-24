@@ -16,7 +16,7 @@ namespace guik {
  * viewer->register_ui_callback("logging", guik::create_logger_ui(ringbuffer_sink));
  */
 template <typename RingBufferSink>
-std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& sink) {
+std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& sink, double bg_alpha = 1.0) {
   auto enabled = std::make_shared<bool>(true);
   return [=] {
     if (!(*enabled)) {
@@ -26,10 +26,9 @@ std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& si
     const auto log_messages = sink->last_raw();
 
     ImGui::SetNextWindowSize(ImVec2(660, 400), ImGuiCond_FirstUseEver);
-    if (!ImGui::Begin("logging", enabled.get())) {
-      ImGui::End();
-      return;
-    }
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, bg_alpha));
+    ImGui::Begin("logging", enabled.get());
+    ImGui::PopStyleColor();
 
     if (ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar)) {
       std::array<ImVec4, spdlog::level::n_levels> colors;
