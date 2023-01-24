@@ -25,7 +25,7 @@ std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& si
 
     const auto log_messages = sink->last_raw();
 
-    ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(660, 400), ImGuiCond_FirstUseEver);
     if (!ImGui::Begin("logging", enabled.get())) {
       ImGui::End();
       return;
@@ -35,7 +35,7 @@ std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& si
       std::array<ImVec4, spdlog::level::n_levels> colors;
       colors[static_cast<int>(spdlog::level::trace)] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f);
       colors[static_cast<int>(spdlog::level::debug)] = ImVec4(0.6f, 0.9f, 1.0f, 0.7f);
-      colors[static_cast<int>(spdlog::level::info)] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+      colors[static_cast<int>(spdlog::level::info)] = ImVec4(0.9f, 1.0f, 0.9f, 1.0f);
       colors[static_cast<int>(spdlog::level::warn)] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
       colors[static_cast<int>(spdlog::level::err)] = ImVec4(1.0f, 0.5f, 0.0f, 1.0f);
       colors[static_cast<int>(spdlog::level::critical)] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
