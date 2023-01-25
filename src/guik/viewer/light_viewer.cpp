@@ -53,6 +53,15 @@ void LightViewer::draw_ui() {
   }
   lock.unlock();
 
+  // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
+  std::vector<const std::function<void()>*> callbacks;
+  for (const auto& callback : ui_callbacks) {
+    callbacks.emplace_back(&callback.second);
+  }
+  for (const auto& callback : callbacks) {
+    (*callback)();
+  }
+
   // viewer UI
   if(viewer_ui) {
     if(!viewer_ui->draw_ui()) {
@@ -187,15 +196,6 @@ void LightViewer::draw_ui() {
     }
 
     ImGui::End();
-  }
-
-  // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
-  std::vector<const std::function<void()>*> callbacks;
-  for(const auto& callback: ui_callbacks) {
-    callbacks.emplace_back(&callback.second);
-  }
-  for(const auto& callback: callbacks) {
-    (*callback)();
   }
 
   // mouse control
