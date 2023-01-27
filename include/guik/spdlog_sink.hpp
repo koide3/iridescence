@@ -3,7 +3,14 @@
 
 #include <deque>
 #include <imgui.h>
+#include <spdlog/version.h>
+
+#if SPDLOG_VERSION >= 10600
 #include <spdlog/pattern_formatter.h>
+#else
+#include <spdlog/details/pattern_formatter.h>
+#endif
+
 #include <spdlog/sinks/ringbuffer_sink.h>
 
 namespace guik {
