@@ -36,6 +36,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           file: ${{github.workspace}}/docker/${{ matrix.DISTRO.file }}/Dockerfile
-          build-args: BASE_IMAGE="ubuntu:${{ matrix.DISTRO.ubuntu }}"
+          build-args: |
+            BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
           context: .
           push: false
