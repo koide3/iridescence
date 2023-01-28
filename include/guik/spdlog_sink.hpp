@@ -3,15 +3,13 @@
 
 #include <deque>
 #include <imgui.h>
-#include <spdlog/version.h>
+#include <spdlog/spdlog.h>
 
 #if SPDLOG_VERSION >= 10600
 #include <spdlog/pattern_formatter.h>
 #else
 #include <spdlog/details/pattern_formatter.h>
 #endif
-
-#include <spdlog/sinks/ringbuffer_sink.h>
 
 namespace guik {
 
@@ -38,14 +36,13 @@ std::function<void()> create_logger_ui(const std::shared_ptr<RingBufferSink>& si
     ImGui::PopStyleColor();
 
     if (ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar)) {
-      std::array<ImVec4, spdlog::level::n_levels> colors;
+      std::array<ImVec4, 6> colors;
       colors[static_cast<int>(spdlog::level::trace)] = ImVec4(0.7f, 0.7f, 0.7f, 0.5f);
       colors[static_cast<int>(spdlog::level::debug)] = ImVec4(0.6f, 0.9f, 1.0f, 0.7f);
       colors[static_cast<int>(spdlog::level::info)] = ImVec4(0.9f, 1.0f, 0.9f, 1.0f);
       colors[static_cast<int>(spdlog::level::warn)] = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
       colors[static_cast<int>(spdlog::level::err)] = ImVec4(1.0f, 0.5f, 0.0f, 1.0f);
       colors[static_cast<int>(spdlog::level::critical)] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-      colors[static_cast<int>(spdlog::level::off)] = ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
 
       spdlog::pattern_formatter formatter;
 

@@ -14,7 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ROS_DISTRO: [bionic, bionic_llvm, focal, focal_llvm, jammy, jammy_llvm]
+        DISTRO: [
+          { "ubuntu": "focal", "file": "ubuntu" },
+          { "ubuntu": "focal", "file": "ubuntu_llvm" },
+          { "ubuntu": "jammy", "file": "ubuntu" },
+          { "ubuntu": "jammy", "file": "ubuntu_llvm" }
+        ]
 
     steps:
       - uses: actions/checkout@v2
@@ -30,6 +35,7 @@ jobs:
       - name: Docker build
         uses: docker/build-push-action@v2
         with:
-          file: ${{github.workspace}}/docker/${{ matrix.ROS_DISTRO }}/Dockerfile
+          file: ${{github.workspace}}/docker/${{ matrix.DISTRO.file }}/Dockerfile
+          build-args: BASE_IMAGE="ubuntu:${{ matrix.DISTRO.ubuntu }}"
           context: .
           push: false
