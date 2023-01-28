@@ -4,6 +4,7 @@ project(iridescence)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
+option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -190,6 +191,23 @@ if(BUILD_EXAMPLES)
   endforeach()
 endif()
 
+if(BUILD_EXT_TESTS)
+  find_package(spdlog REQUIRED)
+  find_package(assimp REQUIRED)
+
+  file(GLOB test_sources "src/test/*.cpp")
+  foreach(test_src IN LISTS test_sources)
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name}
+      ${test_src}
+    )
+    target_link_libraries(${test_name}
+      fmt
+      spdlog
+      iridescence
+    )
+  endforeach()
+endif()
 
 # install
 file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
