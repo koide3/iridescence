@@ -68,6 +68,18 @@ GridMap::GridMap(double resolution, int width, int height, float scale, const fl
   init_vao(resolution, width, height);
 }
 
+GridMap::GridMap(double resolution, int width, int height, const unsigned char* values, bool tmp) {
+  std::vector<unsigned char> rgba(values, values + (width * height * 4));
+
+  texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
+  texture->bind();
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  texture->unbind();
+
+  init_vao(resolution, width, height);
+}
+
 GridMap::~GridMap() {
   glDeleteBuffers(1, &vao);
   glDeleteBuffers(1, &vbo);
