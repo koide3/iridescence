@@ -23,8 +23,12 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
       case ColorMode::PROB_TURBO:
         rgb = glk::colormap(glk::COLORMAP::TURBO, (100 - x) * 255.0 / 100.0).cast<unsigned char>().head<3>();
         break;
+      case ColorMode::RGBA:
+        std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
+        break;
     }
-    rgba[i * 4 + 3] = alpha;
+    if (mode != ColorMode::RGBA)
+      rgba[i * 4 + 3] = alpha;
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
