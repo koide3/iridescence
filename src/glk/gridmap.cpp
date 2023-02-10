@@ -23,8 +23,12 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
       case ColorMode::PROB_TURBO:
         rgb = glk::colormap(glk::COLORMAP::TURBO, (100 - x) * 255.0 / 100.0).cast<unsigned char>().head<3>();
         break;
+      case ColorMode::RGBA:
+        std::copy(values + i * 4, values + i * 4 + 3, rgba.begin() + i * 4);
+        break;
     }
-    rgba[i * 4 + 3] = alpha;
+    if (mode != ColorMode::RGBA)
+      rgba[i * 4 + 3] = alpha;
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
@@ -60,18 +64,6 @@ GridMap::GridMap(double resolution, int width, int height, float scale, const fl
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_FLOAT, rgba.data()));
-  texture->bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  texture->unbind();
-
-  init_vao(resolution, width, height);
-}
-
-GridMap::GridMap(double resolution, int width, int height, const unsigned char* values, bool tmp) {
-  std::vector<unsigned char> rgba(values, values + (width * height * 4));
-
-  texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
   texture->bind();
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

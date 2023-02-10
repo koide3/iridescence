@@ -10,11 +10,10 @@ class Texture;
 
 class GridMap : public Drawable {
 public:
-  enum class ColorMode { RAW = 0, TURBO, PROB, PROB_TURBO };
+  enum class ColorMode { RAW = 0, TURBO, PROB, PROB_TURBO, RGBA };
 
   GridMap(double resolution, int width, int height, const unsigned char* values, int alpha = 255, ColorMode mode = ColorMode::PROB);
   GridMap(double resolution, int width, int height, float scale, const float* values, float alpha = 1.0f, ColorMode mode = ColorMode::PROB);
-  GridMap(double resolution, int width, int height, const unsigned char* values, bool tmp);   // Added bool to avoid ambiguity
   virtual ~GridMap();
 
   virtual void draw(glk::GLSLShader& shader) const override;

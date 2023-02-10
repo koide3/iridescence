@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  auto grid_map_free = std::make_shared<glk::GridMap>(resolution, width, height, color_map_free.data(), true);
+  auto grid_map_free = std::make_shared<glk::GridMap>(resolution, width, height, color_map_free.data(), 255, glk::GridMap::ColorMode::RGBA);
   viewer->update_drawable("gridmap_free", grid_map_free, guik::TextureColor());
 
   std::vector<unsigned char> color_map_turbo(height * width);
