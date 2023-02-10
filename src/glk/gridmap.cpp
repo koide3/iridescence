@@ -24,7 +24,7 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
         rgb = glk::colormap(glk::COLORMAP::TURBO, (100 - x) * 255.0 / 100.0).cast<unsigned char>().head<3>();
         break;
       case ColorMode::RGBA:
-        std::copy(values + i * 4, values + i * 4 + 3, rgba.begin() + i * 4);
+        std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
         break;
     }
     if (mode != ColorMode::RGBA)
