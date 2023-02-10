@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
   int width = 100, height = 100;
   double resolution = 0.1;
 
-  std::vector<unsigned char> color_map_free(height * width * 4);
+  std::vector<unsigned char> color_map_rgba(height * width * 4);
   unsigned char r, g, b, a;
   b = 0;
   a = 255;
@@ -20,15 +20,15 @@ int main(int argc, char** argv) {
       g = j * (255 / (double)width);
       
       int idx = (i * width + j) * 4;
-      color_map_free[idx + 0] = r;
-      color_map_free[idx + 1] = g;
-      color_map_free[idx + 2] = b;
-      color_map_free[idx + 3] = a;
+      color_map_rgba[idx + 0] = r;
+      color_map_rgba[idx + 1] = g;
+      color_map_rgba[idx + 2] = b;
+      color_map_rgba[idx + 3] = a;
     }
   }
 
-  auto grid_map_free = std::make_shared<glk::GridMap>(resolution, width, height, color_map_free.data(), 255, glk::GridMap::ColorMode::RGBA);
-  viewer->update_drawable("gridmap_free", grid_map_free, guik::TextureColor());
+  auto grid_map_rgba = std::make_shared<glk::GridMap>(resolution, width, height, color_map_rgba.data(), 255, glk::GridMap::ColorMode::RGBA);
+  viewer->update_drawable("gridmap_rgba", grid_map_rgba, guik::TextureColor());
 
   std::vector<unsigned char> color_map_turbo(height * width);
   for (int i = 0; i < height; i++) {
@@ -42,11 +42,11 @@ int main(int argc, char** argv) {
 
   int color_map_type = 0;
   viewer->register_ui_callback("colormap_selector", [&]() {
-    ImGui::Combo("ColorMap", &color_map_type, "FREE\0TURBO\0\0");
+    ImGui::Combo("ColorMap", &color_map_type, "RGBA\0TURBO\0\0");
   });
 
   viewer->register_drawable_filter("drawable_filter", [&](const std::string& drawable_name){
-    if (color_map_type != 0 && drawable_name.find("gridmap_free") != std::string::npos)
+    if (color_map_type != 0 && drawable_name.find("gridmap_rgba") != std::string::npos)
       return false;
     if (color_map_type != 1 && drawable_name.find("gridmap_turbo") != std::string::npos)
       return false;
