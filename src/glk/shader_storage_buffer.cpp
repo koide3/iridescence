@@ -4,7 +4,7 @@
 
 namespace glk {
 
-ShaderStorageBuffer::ShaderStorageBuffer(size_t size, void* data, GLenum usage) {
+ShaderStorageBuffer::ShaderStorageBuffer(size_t size, const void* data, GLenum usage) {
   this->buffer_size = size;
 
   glGenBuffers(1, &ssbo);
@@ -17,11 +17,15 @@ ShaderStorageBuffer::~ShaderStorageBuffer() {
   glDeleteBuffers(1, &ssbo);
 }
 
+GLuint ShaderStorageBuffer::id() const {
+  return ssbo;
+}
+
 size_t ShaderStorageBuffer::size() const {
   return buffer_size;
 }
 
-void ShaderStorageBuffer::set_data(size_t buffer_size, void* data) {
+void ShaderStorageBuffer::set_data(size_t buffer_size, const void* data) {
   if (buffer_size > this->buffer_size) {
     std::cerr << console::yellow << "warning: specified input buffer size is larger than SSBO buffer size!!" << console::yellow << std::endl;
     buffer_size = this->buffer_size;

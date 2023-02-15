@@ -1,5 +1,6 @@
 #include <glk/glsl_shader.hpp>
 
+#include <regex>
 #include <memory>
 #include <string>
 #include <vector>
@@ -10,6 +11,7 @@
 
 #include <GL/gl3w.h>
 #include <Eigen/Core>
+#include <boost/filesystem.hpp>
 
 #include <glk/console_colors.hpp>
 
@@ -27,14 +29,33 @@ GLSLShader::~GLSLShader() {
   }
 }
 
-bool GLSLShader::attach_source(const std::string& filename, GLuint shader_type) {
-  GLuint shader = read_shader_from_file(filename, shader_type);
+bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, GLuint shader_type) {
+  std::unordered_map<std::string, std::string> include_map;
+  for (const auto& include_filename : include_filenames) {
+    const std::string filename = boost::filesystem::path(include_filename).filename().string();
+    include_map[filename] = include_filename;
+  }
+
+  GLuint shader = read_shader_from_file(filename, include_map, shader_type);
   if (shader == GL_FALSE) {
     return false;
   }
 
   shaders.push_back(shader);
   return true;
+}
+
+bool GLSLShader::attach_source(const std::vector<std::string>& filenames, const std::unordered_set<std::string>& include_filenames, GLuint shader_type) {
+  for (const auto& filename : filenames) {
+    if (!attach_source(filename, include_filenames, shader_type)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool GLSLShader::attach_source(const std::string& filename, GLuint shader_type) {
+  return attach_source(filename, {}, shader_type);
 }
 
 bool GLSLShader::attach_source(const std::vector<std::string>& filenames, GLuint shader_type) {
@@ -190,20 +211,48 @@ void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, cons
   glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
 }
 
-GLuint GLSLShader::read_shader_from_file(const std::string& filename, GLuint shader_type) {
+GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
 
-  std::stringstream sst;
+  const auto read_source = [](const std::string& filename) -> std::string {
+    std::ifstream ifs(filename);
+    if (!ifs) {
+      std::cerr << bold_red << "error: failed to open " << filename << reset << std::endl;
+      return "";
+    }
 
-  std::ifstream ifs(filename);
-  if (!ifs) {
-    std::cerr << bold_red << "error: failed to open " << filename << reset << std::endl;
+    std::stringstream sst;
+    sst << ifs.rdbuf();
+
+    return sst.str();
+  };
+
+  std::string source = read_source(filename);
+  if (source.empty()) {
     return GL_FALSE;
   }
 
-  sst << ifs.rdbuf();
+  std::regex include_pattern("(//)?\\s*#include\\s*<([^>]+)>");
+  std::smatch match;
+  while (std::regex_search(source, match, include_pattern)) {
+    const std::string include_filename = match.str(2);
+    const auto found = include_map.find(include_filename);
+    if (found == include_map.end()) {
+      return GL_FALSE;
+    }
 
-  std::string source = sst.str();
+    const std::string include_source = read_source(found->second);
+    if (include_source.empty()) {
+      return GL_FALSE;
+    }
+
+    std::stringstream sst;
+    sst << match.prefix() << "\n";
+    sst << include_source << "\n";
+    sst << match.suffix();
+
+    source = sst.str();
+  }
 
   GLint result = GL_FALSE;
   int info_log_length = 0;

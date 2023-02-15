@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <optional>
+#include <unordered_set>
 #include <unordered_map>
 
 #include <GL/gl3w.h>
@@ -23,6 +24,9 @@ public:
   bool attach_source(const std::string& filename, GLuint shader_type);
   bool attach_source(const std::vector<std::string>& filenames, GLuint shader_type);
 
+  bool attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, GLuint shader_type);
+  bool attach_source(const std::vector<std::string>& filenames, const std::unordered_set<std::string>& include_filenames, GLuint shader_type);
+
   bool add_feedback_varying(const std::string& name);
 
   bool link_program();
@@ -31,15 +35,9 @@ public:
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
 
-  GLuint id() const {
-    return shader_program;
-  }
-  void use() const {
-    glUseProgram(shader_program);
-  }
-  void unuse() const {
-    glUseProgram(0);
-  }
+  GLuint id() const { return shader_program; }
+  void use() const { glUseProgram(shader_program); }
+  void unuse() const { glUseProgram(0); }
 
   GLint attrib(const std::string& name);
   GLint uniform(const std::string& name);
@@ -70,10 +68,10 @@ public:
     return mat;
   }
 
-  template<typename T>
+  template <typename T>
   T get_uniform_cache(const std::string& name) const {
     const auto found = uniform_variable_cache.find(name);
-    if(found == uniform_variable_cache.end()) {
+    if (found == uniform_variable_cache.end()) {
       std::cerr << "warning: failed to find uniform variable cache " << name << std::endl;
       return T();
     }
@@ -134,7 +132,7 @@ public:
     glUniform1fv(uniform(name), vectors.size(), vectors.data());
     set_uniform_cache(name, vectors);
   }
-  template<typename Allocator>
+  template <typename Allocator>
   void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f, Allocator>& vectors) {
     glUniform2fv(uniform(name), vectors.size(), vectors[0].data());
     set_uniform_cache(name, vectors);
@@ -157,7 +155,7 @@ public:
   void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);
 
 private:
-  GLuint read_shader_from_file(const std::string& filename, GLuint shader_type);
+  GLuint read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, GLuint shader_type);
 
   template <typename T>
   void set_uniform_cache(const std::string& name, const T& value) {
