@@ -102,7 +102,7 @@ viewer->shader_setting().add("colormap_axis", axis);
 ## Colormaps
 
 ```cpp
-#include <glk/colromap.hpp>
+#include <glk/colormap.hpp>
 
 // Get colormap value (integer version: value range = [0, 255])
 Eigen::Vector4i color = colormap(glk::COLORMAP::TURBO, 128);
