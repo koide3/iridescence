@@ -34,6 +34,10 @@ bool LightViewerContext::init_canvas(const Eigen::Vector2i& size) {
   return true;
 }
 
+guik::GLCanvas& LightViewerContext::get_canvas() {
+  return *canvas;
+}
+
 void LightViewerContext::set_size(const Eigen::Vector2i& size) {
   canvas->set_size(size);
 }

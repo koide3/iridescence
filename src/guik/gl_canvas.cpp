@@ -74,6 +74,10 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) 
   last_projection_view_matrix.setIdentity();
 
   partial_rendering_clear_thresh = 1e-6;
+
+  alpha_blend_sfactor = GL_SRC_ALPHA;
+  alpha_blend_dfactor = GL_ONE_MINUS_SRC_ALPHA;
+  blend_depth_write = true;
 }
 
 /**
@@ -134,6 +138,15 @@ const std::shared_ptr<glk::ScreenEffect>& GLCanvas::get_effect() const {
 
 void GLCanvas::set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture) {
   this->bg_texture = bg_texture;
+}
+
+void GLCanvas::set_blend_func(GLenum sfactor, GLenum dfactor) {
+  alpha_blend_sfactor = sfactor;
+  alpha_blend_dfactor = dfactor;
+}
+
+void GLCanvas::set_blend_depth_write(bool blend_depth_write) {
+  this->blend_depth_write = blend_depth_write;
 }
 
 void GLCanvas::enable_normal_buffer() {
@@ -361,7 +374,10 @@ void GLCanvas::bind_second() {
   }
 
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  if (!blend_depth_write) {
+    glDepthMask(GL_FALSE);
+  }
+  glBlendFunc(alpha_blend_sfactor, alpha_blend_dfactor);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
@@ -375,6 +391,9 @@ void GLCanvas::bind_second() {
 void GLCanvas::unbind_second() {
   glBindTexture(GL_TEXTURE_2D, 0);
 
+  if (!blend_depth_write) {
+    glDepthMask(GL_TRUE);
+  }
   glDisable(GL_BLEND);
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);

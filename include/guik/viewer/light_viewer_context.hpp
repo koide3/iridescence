@@ -26,6 +26,7 @@ public:
   void draw_gl();
 
   bool init_canvas(const Eigen::Vector2i& size);
+
   void set_size(const Eigen::Vector2i& size);
   void set_clear_color(const Eigen::Vector4f& color);
   void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver);
@@ -84,6 +85,7 @@ public:
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
   void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
 
+  guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }
   Eigen::Vector2i canvas_br() const { return canvas_rect_max; }
   Eigen::Vector2i canvas_size() const { return canvas->size; }
