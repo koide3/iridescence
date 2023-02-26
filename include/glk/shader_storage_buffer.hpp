@@ -18,7 +18,7 @@ public:
   void set_data(size_t buffer_size, const void* data);
   void get_data(size_t buffer_size, void* data) const;
 
-  void copy_to(ShaderStorageBuffer& dst);
+  void copy_to(ShaderStorageBuffer& dst, size_t size = 0);
 
   void bind(int index = 0);
   void unbind(int index = 0);

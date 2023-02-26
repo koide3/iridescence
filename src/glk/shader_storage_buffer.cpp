@@ -52,8 +52,12 @@ void ShaderStorageBuffer::get_data(size_t buffer_size, void* data) const {
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void ShaderStorageBuffer::copy_to(ShaderStorageBuffer& dst) {
-  if (dst.buffer_size < buffer_size) {
+void ShaderStorageBuffer::copy_to(ShaderStorageBuffer& dst, size_t size) {
+  if (size == 0) {
+    size = buffer_size;
+  }
+
+  if (dst.buffer_size < size) {
     std::cerr << console::yellow << "warning: dst buffer size is smaller than src buffer size!!" << console::reset << std::endl;
   }
 
