@@ -9,13 +9,16 @@ namespace glk {
 
 class ShaderStorageBuffer {
 public:
-  ShaderStorageBuffer(size_t size, void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY);
+  ShaderStorageBuffer(size_t size, const void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY);
   ~ShaderStorageBuffer();
 
+  GLuint id() const;
   size_t size() const;
 
-  void set_data(size_t buffer_size, void* data);
+  void set_data(size_t buffer_size, const void* data);
   void get_data(size_t buffer_size, void* data) const;
+
+  void copy_to(ShaderStorageBuffer& dst, size_t size = 0);
 
   void bind(int index = 0);
   void unbind(int index = 0);

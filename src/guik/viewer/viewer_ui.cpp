@@ -237,6 +237,17 @@ public:
       ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
       ImGui::BeginChild("filtered_list", ImVec2(ImGui::GetWindowContentRegionWidth(), std::min<int>(120, filtered.size() * 20)), false, window_flags);
       for (const auto& name : filtered) {
+        std::string allow_button_name = "Allow##" + name;
+        if (ImGui::Button(allow_button_name.c_str())) {
+          drawable_filters.push_back(std::make_tuple(true, name, std::regex(name)));
+        }
+        ImGui::SameLine();
+        std::string deny_button_name = "Deny##" + name;
+        if (ImGui::Button(deny_button_name.c_str())) {
+          drawable_filters.push_back(std::make_tuple(false, name, std::regex(name)));
+        }
+
+        ImGui::SameLine();
         ImGui::Text("%s", name.c_str());
       }
       ImGui::EndChild();

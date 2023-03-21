@@ -29,6 +29,8 @@ public:
   void set_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
   const std::shared_ptr<glk::ScreenEffect>& get_effect() const;
   void set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture);
+  void set_blend_func(GLenum sfactor, GLenum dfactor);
+  void set_blend_depth_write(bool blend_depth_write);
 
   void enable_normal_buffer();
   void enable_info_buffer();
@@ -63,6 +65,10 @@ public:
 public:
   Eigen::Vector2i size;
   Eigen::Vector4f clear_color;
+
+  GLenum alpha_blend_sfactor;
+  GLenum alpha_blend_dfactor;
+  bool blend_depth_write;
 
   int normal_buffer_id;
   int info_buffer_id;
