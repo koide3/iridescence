@@ -1,5 +1,7 @@
 #include <glk/shader_storage_buffer.hpp>
 
+#include <cstdint>
+#include <Eigen/Core>
 #include <glk/console_colors.hpp>
 
 namespace glk {
@@ -50,6 +52,56 @@ void ShaderStorageBuffer::get_data(size_t buffer_size, void* data) const {
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
   glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, buffer_size, data);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const std::int8_t& data) {
+  glClearNamedBufferData(ssbo, GL_R8, GL_RED, GL_UNSIGNED_BYTE, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const std::int32_t& data) {
+  glClearNamedBufferData(ssbo, GL_R32I, GL_RED, GL_INT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const std::uint32_t& data) {
+  glClearNamedBufferData(ssbo, GL_R32UI, GL_RED, GL_UNSIGNED_INT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector2i& data) {
+  glClearNamedBufferData(ssbo, GL_RG32I, GL_RG, GL_INT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector3i& data) {
+  glClearNamedBufferData(ssbo, GL_RGB32I, GL_RGB, GL_INT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector4i& data) {
+  glClearNamedBufferData(ssbo, GL_RGBA32I, GL_RGBA, GL_INT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const float& data) {
+  glClearNamedBufferData(ssbo, GL_R32F, GL_RED, GL_FLOAT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector2f& data) {
+  glClearNamedBufferData(ssbo, GL_RG32F, GL_RG, GL_FLOAT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector3f& data) {
+  glClearNamedBufferData(ssbo, GL_RGB32F, GL_RGB, GL_FLOAT, &data);
+}
+
+template <>
+void ShaderStorageBuffer::clear_data(const Eigen::Vector4f& data) {
+  glClearNamedBufferData(ssbo, GL_RGBA32F, GL_RGBA, GL_FLOAT, &data);
 }
 
 void ShaderStorageBuffer::copy_to(ShaderStorageBuffer& dst, size_t size) {
