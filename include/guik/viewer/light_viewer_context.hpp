@@ -220,7 +220,7 @@ LightViewerContext::update_points(const std::string& name, const Eigen::Matrix<S
 template <typename Scalar, int Dim, typename Allocator>
 std::shared_ptr<glk::PointCloudBuffer>
 LightViewerContext::update_points(const std::string& name, std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting) {
-  return update_points(name, points.data(), shader_setting);
+  return update_points(name, points.data(), points.size(), shader_setting);
 }
 
 // ThinLines
