@@ -2,6 +2,7 @@
 
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/normal_distributions.hpp>
 #include <glk/primitives/primitives.hpp>
 
 namespace guik {
@@ -13,6 +14,22 @@ LightViewerContext::update_points(const std::string& name, const float* data, in
   update_drawable(name, cloud_buffer, shader_setting);
   return cloud_buffer;
 }
+
+template <typename Scalar, int Dim>
+void LightViewerContext::update_normal_dists(
+  const std::string& name,
+  const Eigen::Matrix<Scalar, Dim, 1>* points,
+  const Eigen::Matrix<Scalar, Dim, Dim>* covs,
+  int num_points,
+  float scale,
+  const ShaderSetting& shader_setting) {
+  update_drawable(name, std::make_shared<glk::NormalDistributions>(points, covs, num_points, scale), shader_setting);
+}
+
+template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<float, 3, 1>*, const Eigen::Matrix<float, 3, 3>*, int, float, const ShaderSetting&);
+template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<float, 4, 1>*, const Eigen::Matrix<float, 4, 4>*, int, float, const ShaderSetting&);
+template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<double, 3, 1>*, const Eigen::Matrix<double, 3, 3>*, int, float, const ShaderSetting&);
+template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<double, 4, 1>*, const Eigen::Matrix<double, 4, 4>*, int, float, const ShaderSetting&);
 
 // ThinLines
 void LightViewerContext::update_thin_lines(

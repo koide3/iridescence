@@ -111,6 +111,24 @@ public:
   template <typename Scalar, int Dim, typename Allocator>
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting);
 
+  // NormalDistributions
+  template <typename Scalar, int Dim>
+  void update_normal_dists(
+    const std::string& name,
+    const Eigen::Matrix<Scalar, Dim, 1>* points,
+    const Eigen::Matrix<Scalar, Dim, Dim>* covs,
+    int num_points,
+    float scale,
+    const ShaderSetting& shader_setting);
+
+  template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
+  void update_normal_dists(
+    const std::string& name,
+    const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
+    const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+    float scale,
+    const ShaderSetting& shader_setting);
+
   // ThinLines
   void update_thin_lines(
     const std::string& name,
@@ -147,6 +165,7 @@ public:
 
   template <typename Point, typename Alloc>
   void update_thin_lines(const std::string& name, const std::vector<Point, Alloc>& points, bool line_strip, const ShaderSetting& shader_setting);
+
   template <typename Point, typename Alloc>
   void update_thin_lines(
     const std::string& name,
@@ -162,6 +181,7 @@ public:
     const std::vector<Color, AllocC>& colors,
     bool line_strip,
     const ShaderSetting& shader_setting);
+
   template <typename Point, typename AllocP, typename Color, typename AllocC>
   void update_thin_lines(
     const std::string& name,
@@ -221,6 +241,17 @@ template <typename Scalar, int Dim, typename Allocator>
 std::shared_ptr<glk::PointCloudBuffer>
 LightViewerContext::update_points(const std::string& name, std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting) {
   return update_points(name, points.data(), points.size(), shader_setting);
+}
+
+// NormalDistributions
+template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
+void LightViewerContext::update_normal_dists(
+  const std::string& name,
+  const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
+  const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+  float scale,
+  const ShaderSetting& shader_setting) {
+  update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
 }
 
 // ThinLines
