@@ -210,10 +210,10 @@ template <typename Scalar, int Dim>
 std::shared_ptr<glk::PointCloudBuffer>
 LightViewerContext::update_points(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, const ShaderSetting& shader_setting) {
   if constexpr (std::is_same_v<Scalar, float>) {
-    update_points(name, reinterpret_cast<const float*>(points), sizeof(float) * Dim, num_points, shader_setting);
+    return update_points(name, reinterpret_cast<const float*>(points), sizeof(float) * Dim, num_points, shader_setting);
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3>(points, num_points);
-    update_points(name, points_3f.data(), num_points, shader_setting);
+    return update_points(name, points_3f.data(), num_points, shader_setting);
   }
 }
 
