@@ -35,18 +35,21 @@ convert_vector(const std::vector<Eigen::Matrix<Src_Scalar, Src_Dim, 1>, Allocato
   return converted;
 }
 
-template <typename Dst_Scalar, int Dst_Dim, typename Src_Scalar, int Src_Dim, template <class> class Allocator = std::allocator>
-std::vector<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>>> convert_to_vector(
-  const Eigen::Matrix<Src_Scalar, Src_Dim, 1>* points,
+template <typename Dst_Scalar, int Dst_Rows, int Dst_Cols, typename Src_Scalar, int Src_Rows, int Src_Cols, template <class> class Allocator = std::allocator>
+std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>> convert_to_vector(
+  const Eigen::Matrix<Src_Scalar, Src_Rows, Src_Cols>* points,
   int num_points) {
   if (points == nullptr) {
-    return std::vector<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>>>();
+    return std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>>(num_points);
   }
 
-  std::vector<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Dim, 1>>> converted(num_points);
-  std::transform(points, points + num_points, converted.data(), [](const Eigen::Matrix<Src_Scalar, Src_Dim, 1>& x) {
-    return x.template cast<Dst_Scalar>().template head<Dst_Dim>();
-  });
+  constexpr int Rows = std::min(Dst_Rows, Src_Rows);
+  constexpr int Cols = std::min(Dst_Cols, Src_Cols);
+
+  std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>> converted(num_points);
+  for (int i = 0; i < num_points; i++) {
+    converted[i].template block<Rows, Cols>(0, 0) = points[i].template cast<Dst_Scalar>().template block<Rows, Cols>(0, 0);
+  }
   return converted;
 }
 

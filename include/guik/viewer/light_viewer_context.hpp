@@ -232,7 +232,7 @@ LightViewerContext::update_points(const std::string& name, const Eigen::Matrix<S
   if constexpr (std::is_same<Scalar, float>::value) {
     return update_points(name, reinterpret_cast<const float*>(points), sizeof(float) * Dim, num_points, shader_setting);
   } else {
-    const auto points_3f = glk::convert_to_vector<float, 3>(points, num_points);
+    const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     return update_points(name, points_3f.data(), num_points, shader_setting);
   }
 }
@@ -265,7 +265,7 @@ void LightViewerContext::update_thin_lines(
   if constexpr (std::is_same<Scalar, float>::value && Dim == 3) {
     update_thin_lines(name, reinterpret_cast<const float*>(points), nullptr, num_points, nullptr, 0, line_strip, shader_setting);
   } else {
-    const auto points_3f = glk::convert_to_vector<float, 3>(points, num_points);
+    const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     update_thin_lines(name, points_3f.data(), num_points, line_strip, shader_setting);
   }
 }
@@ -281,8 +281,8 @@ void LightViewerContext::update_thin_lines(
   if constexpr (std::is_same<ScalarV, float>::value && DimV == 3 && std::is_same<ScalarC, float>::value && DimC == 4) {
     update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, nullptr, 0, line_strip, shader_setting);
   } else {
-    const auto points_3f = glk::convert_to_vector<float, 3>(points, num_points);
-    const auto colors_4f = glk::convert_to_vector<float, 4>(colors, num_points);
+    const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
+    const auto colors_4f = glk::convert_to_vector<float, 4, 1>(colors, num_points);
     update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, line_strip, shader_setting);
   }
 }
@@ -300,8 +300,8 @@ void LightViewerContext::update_thin_lines(
   if constexpr (std::is_same<ScalarV, float>::value && DimV == 3 && std::is_same<ScalarC, float>::value && DimC == 4) {
     update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, indices, num_indices, line_strip, shader_setting);
   } else {
-    const auto points_3f = glk::convert_to_vector<float, 3>(points, num_points);
-    const auto colors_4f = glk::convert_to_vector<float, 4>(colors, num_points);
+    const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
+    const auto colors_4f = glk::convert_to_vector<float, 4, 1>(colors, num_points);
     update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, indices, num_indices, line_strip, shader_setting);
   }
 }
