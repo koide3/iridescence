@@ -5,6 +5,7 @@
 #include <deque>
 #include <regex>
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 #include <glk/drawable.hpp>
@@ -100,6 +101,7 @@ public:
   Eigen::Vector4i pick_info(const Eigen::Vector2i& p, int window = 2) const;
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
   Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
+  std::optional<Eigen::Vector3f> pick_point(int button = 0, int window = 2, Eigen::Vector4i* info = nullptr) const;
 
   // utility methods to directly create and update drawables
   // PointCloudBuffer
