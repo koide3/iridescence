@@ -97,7 +97,7 @@ private:
 // template methods
 template <typename Scalar, int Dim, typename Allocator>
 PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points)
-: PointCloudBuffer(Eigen::Matrix<Scalar, 3, -1>(Eigen::Map<const Eigen::Matrix<Scalar, Dim, -1>>(points.front().data(), Dim, points.size()).template topRows<3>())) {}
+: PointCloudBuffer(points.data(), points.size()) {}
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {
