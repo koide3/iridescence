@@ -83,6 +83,7 @@ add_library(iridescence SHARED
   src/glk/thin_lines.cpp
   src/glk/trajectory.cpp
   src/glk/gridmap.cpp
+  src/glk/async_buffer_copy.cpp
   src/glk/pointcloud_buffer.cpp
   src/glk/pointnormals_buffer.cpp
   src/glk/point_correspondences.cpp

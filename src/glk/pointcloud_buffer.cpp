@@ -5,6 +5,7 @@
 #include <iostream>
 #include <glk/colormap.hpp>
 #include <glk/type_conversion.hpp>
+#include <glk/async_buffer_copy.hpp>
 
 namespace glk {
 
@@ -33,7 +34,11 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
 
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, stride * num_points, nullptr, GL_STATIC_DRAW);
+
+  if (data) {
+    write_buffer_async(GL_ARRAY_BUFFER, stride * num_points, data);
+  }
 
   rendering_count = 0;
   points_rendering_budget = 8192;
@@ -124,7 +129,11 @@ void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, co
   GLuint buffer_id;
   glGenBuffers(1, &buffer_id);
   glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
-  glBufferData(GL_ARRAY_BUFFER, stride * num_points, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, stride * num_points, nullptr, GL_STATIC_DRAW);
+
+  if (data) {
+    write_buffer_async(GL_ARRAY_BUFFER, stride * num_points, data);
+  }
 
   aux_buffers.push_back(AuxBufferData{attribute_name, dim, stride, buffer_id});
 }
@@ -150,7 +159,9 @@ void PointCloudBuffer::enable_partial_rendering(int points_budget) {
 
   glGenBuffers(1, &ebo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_points, indices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_points, nullptr, GL_STATIC_DRAW);
+  write_buffer_async(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_points, indices.data());
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
