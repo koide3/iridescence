@@ -273,6 +273,36 @@ std::shared_ptr<glk::Texture> texture = ...;
 mesh->set_texture(texture);
 ```
 
+## Shorthand methods
+
+
+For frequently used drawable types, ```guik::LightViewer``` provides shorthand methods to quickly create and update drawables.
+
+```cpp
+// Primitives
+viewer->update_sphere("sphere", guik::FlatRed());
+viewer->update_wire_sphere("wire_sphere", guik::FlatRed());
+viewer->update_coord("coord", guik::VertexColor());
+viewer->update_wire_frustum("frustum", guik::FlatGreen());
+
+// PointCloudBuffer
+// Any of Vector(3|4)(f|d) are allowed as input
+std::vector<Eigen::Vector4d> points = ...;
+viewer->update_points("points", points, guik::Rainbow());
+
+// NormalDistributions
+std::vector<Eigen::Vector3f> means = ...;
+std::vector<Eigen::Matrix3f> covs = ...;
+float scale = 1.0f;
+viewer->update_normal_dists("normal_dists", means, covs, scale, guik::Rainbow());)
+
+// ThinLine
+std::vector<Eigen::Vector3f> line_vertices = ...;
+bool line_strip = true;
+viewer->update_thin_lines("lines", line_vertices, true, guik::FlatGreen());
+```
+
+
 ## Image (2D texture)
 
 ```cpp

@@ -22,6 +22,17 @@ viewer->register_ui_callback("ui", [&] {
 
 ![picking](https://user-images.githubusercontent.com/31344317/210159144-bacd830b-aad9-4167-9a2d-c233efc4a0ff.gif)
 
+There is also a convenient method ```pick_point()``` that check if the clicked point has valid 3D coordinates.
+```cpp
+viewer->register_ui_callback("ui", [&] {
+  int button = ImGuiMouseButton_Right;
+  std::optional<Eigen::Vector3f> pt = viewer->pick_point(button);
+  if (pt) {
+    std::cout << "clicked point=" << pt->transpose() << std::endl;
+  }
+}
+```
+
 
 ## Getting the clicked object information
 
