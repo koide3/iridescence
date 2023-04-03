@@ -11,7 +11,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(OpenGL_GL_PREFERENCE GLVND)
 
@@ -127,6 +127,7 @@ add_library(iridescence SHARED
   src/guik/camera/basic_projection_control.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
+  src/guik/viewer/light_viewer_context_util.cpp
   src/guik/viewer/viewer_ui.cpp
   src/guik/viewer/info_window.cpp
   src/guik/viewer/anonymous.cpp

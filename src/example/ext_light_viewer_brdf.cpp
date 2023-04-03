@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     }
   });
 
-  viewer->update_drawable("floor", glk::Primitives::cube(), guik::FlatColor(Eigen::Vector4f::Ones()).scale({25.0f, 25.0f, 0.1f}));
+  viewer->update_drawable("floor", glk::Primitives::cube(), guik::FlatColor(Eigen::Vector4f::Ones()).scale(25.0f, 25.0f, 0.1f));
   viewer->update_drawable(
     "bunny",
     glk::Primitives::bunny(),

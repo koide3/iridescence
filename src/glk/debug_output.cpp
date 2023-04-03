@@ -6,7 +6,7 @@
 namespace glk {
 
 std::string debug_source_string(GLenum source) {
-  switch(source) {
+  switch (source) {
     case GL_DEBUG_SOURCE_API:
       return "GL_DEBUG_SOURCE_API";
     case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
@@ -25,7 +25,7 @@ std::string debug_source_string(GLenum source) {
 }
 
 std::string debug_type_string(GLenum type) {
-  switch(type) {
+  switch (type) {
     case GL_DEBUG_TYPE_ERROR:
       return "GL_DEBUG_TYPE_ERROR";
     case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
@@ -50,7 +50,7 @@ std::string debug_type_string(GLenum type) {
 }
 
 std::string debug_severity_string(GLenum severity) {
-  switch(severity) {
+  switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
       return "GL_DEBUG_SEVERITY_HIGH";
     case GL_DEBUG_SEVERITY_MEDIUM:
@@ -67,7 +67,7 @@ std::string debug_severity_string(GLenum severity) {
 void set_color(GLenum severity, std::ostream& ost) {
   using namespace glk::console;
 
-  switch(severity) {
+  switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
       ost << red;
       return;
@@ -84,6 +84,10 @@ void set_color(GLenum severity, std::ostream& ost) {
 void default_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param) {
   using namespace glk::console;
 
+  if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+    return;
+  }
+
   set_color(severity, std::cerr);
   std::cerr << "*** " << debug_severity_string(severity) << " ***" << std::endl;
   std::cerr << "severity:" << debug_severity_string(severity) << std::endl;
@@ -92,8 +96,7 @@ void default_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 void insert_debug_message(const std::string& message, GLuint id) {
-  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, id, GL_DEBUG_SEVERITY_NOTIFICATION, message.size(),
-                       message.data());
+  glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, id, GL_DEBUG_SEVERITY_NOTIFICATION, message.size(), message.data());
 }
 
 void enable_debug_output() {

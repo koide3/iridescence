@@ -4,6 +4,7 @@
 #include <numeric>
 #include <iostream>
 #include <glk/colormap.hpp>
+#include <glk/type_conversion.hpp>
 
 namespace glk {
 
@@ -47,11 +48,9 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3f* points, int num_points
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points) : PointCloudBuffer(points->data(), sizeof(Eigen::Vector4f), num_points) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points)
-: PointCloudBuffer(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>>(points, points + num_points)) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points)
-: PointCloudBuffer(std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d>>(points, points + num_points)) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
 
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);

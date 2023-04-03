@@ -21,11 +21,8 @@ int main(int argc, char** argv) {
   viewer->update_drawable("thin_lines", std::make_shared<glk::ThinLines>(line_vertices, line_strip), guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f));
 
   // thick lines with flat and vertex colors
-  viewer->update_drawable(
-    "lines",
-    std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors, line_strip),
-    guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f).translate({0.0f, 2.0f, 0.0f}));
-  viewer->update_drawable("colored_lines", std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors, line_strip), guik::VertexColor().translate({0.0f, 4.0f, 0.0f}));
+  viewer->update_drawable("lines", std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors, line_strip), guik::FlatColor(0.0f, 1.0f, 0.0f, 1.0f).translate(0.0f, 2.0f, 0.0f));
+  viewer->update_drawable("colored_lines", std::make_shared<glk::Lines>(0.1f, line_vertices, line_colors, line_strip), guik::VertexColor().translate(0.0f, 4.0f, 0.0f));
 
   // coordinate systems
   bool draw_coords = true;
@@ -38,38 +35,38 @@ int main(int argc, char** argv) {
   }
 
   // primitives
-  viewer->update_drawable("solid_icosahedron", glk::Primitives::icosahedron(), guik::Rainbow().scale(0.5f).translate({-5.0f, 9.0f, 1.0f}));
-  viewer->update_drawable("solid_sphere", glk::Primitives::sphere(), guik::Rainbow().translate({-2.5f, 9.0f, 1.0f}));
+  viewer->update_drawable("solid_icosahedron", glk::Primitives::icosahedron(), guik::Rainbow().scale(0.5f).translate(-5.0f, 9.0f, 1.0f));
+  viewer->update_drawable("solid_sphere", glk::Primitives::sphere(), guik::Rainbow().translate(-2.5f, 9.0f, 1.0f));
   viewer->update_drawable(
     "solid_bunny",
     glk::Primitives::bunny(),
     guik::Rainbow(Eigen::Translation3f(0.0f, 9.0f, 0.0f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f)));
-  viewer->update_drawable("solid_cube", glk::Primitives::cube(), guik::Rainbow().translate({2.5f, 9.0f, 1.0f}));
-  viewer->update_drawable("solid_cone", glk::Primitives::cone(), guik::Rainbow().translate({5.0f, 9.0f, 1.0f}));
+  viewer->update_drawable("solid_cube", glk::Primitives::cube(), guik::Rainbow().translate(2.5f, 9.0f, 1.0f));
+  viewer->update_drawable("solid_cone", glk::Primitives::cone(), guik::Rainbow().translate(5.0f, 9.0f, 1.0f));
 
   // wireframes
-  viewer->update_drawable("wire_icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_ICOSAHEDRON), guik::Rainbow().scale(0.5f).translate({-5.0f, 12.0f, 1.0f}));
-  viewer->update_drawable("wire_sphere", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_SPHERE), guik::Rainbow().translate({-2.5f, 12.0f, 1.0f}));
+  viewer->update_drawable("wire_icosahedron", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_ICOSAHEDRON), guik::Rainbow().scale(0.5f).translate(-5.0f, 12.0f, 1.0f));
+  viewer->update_drawable("wire_sphere", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_SPHERE), guik::Rainbow().translate(-2.5f, 12.0f, 1.0f));
   viewer->update_drawable(
     "wire_bunny",
     glk::Primitives::primitive_ptr(glk::Primitives::WIRE_BUNNY),
     guik::Rainbow(Eigen::Translation3f(0.0f, 12.0f, 0.0f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f)));
-  viewer->update_drawable("wire_cube", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CUBE), guik::Rainbow().translate({2.5f, 12.0f, 1.0f}));
-  viewer->update_drawable("wire_cone", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CONE), guik::Rainbow().translate({5.0f, 12.0f, 1.0f}));
+  viewer->update_drawable("wire_cube", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CUBE), guik::Rainbow().translate(2.5f, 12.0f, 1.0f));
+  viewer->update_drawable("wire_cone", glk::Primitives::primitive_ptr(glk::Primitives::WIRE_CONE), guik::Rainbow().translate(5.0f, 12.0f, 1.0f));
 
   // transparent
   viewer->update_drawable(
     "trans_icosahedron",
     glk::Primitives::icosahedron(),
-    guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).scale(0.5f).translate({-5.0f, 15.0f, 1.0f}).make_transparent());
-  viewer->update_drawable("trans_sphere", glk::Primitives::sphere(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate({-2.5f, 15.0f, 1.0f}).make_transparent());
+    guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).scale(0.5f).translate(-5.0f, 15.0f, 1.0f).make_transparent());
+  viewer->update_drawable("trans_sphere", glk::Primitives::sphere(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate(-2.5f, 15.0f, 1.0f).make_transparent());
   viewer->update_drawable(
     "trans_bunny",
     glk::Primitives::bunny(),
     guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f, Eigen::Translation3f(0.0f, 15.0f, 0.0f) * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(8.0f))
       .make_transparent());
-  viewer->update_drawable("trans_cube", glk::Primitives::cube(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate({2.5f, 15.0f, 1.0f}).make_transparent());
-  viewer->update_drawable("trans_cone", glk::Primitives::cone(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate({5.0f, 15.0f, 1.0f}).make_transparent());
+  viewer->update_drawable("trans_cube", glk::Primitives::cube(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate(2.5f, 15.0f, 1.0f).make_transparent());
+  viewer->update_drawable("trans_cone", glk::Primitives::cone(), guik::FlatColor(1.0f, 0.5f, 0.0f, 0.5f).translate(5.0f, 15.0f, 1.0f).make_transparent());
 
   // rendering of drawables can be selectively turned off
   bool draw_lines = true;

@@ -175,9 +175,12 @@ public:
     return *this;
   }
 
-  ShaderSetting& translate(const Eigen::Vector3f& translation) {
+  ShaderSetting& translate(float tx, float ty, float tz) { return translate(Eigen::Vector3f(tx, ty, tz)); }
+
+  template <typename Scalar, int Dim>
+  ShaderSetting& translate(const Eigen::Matrix<Scalar, Dim, 1>& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value.block<3, 1>(0, 3) += translation;
+    p->value.block<3, 1>(0, 3) += translation.template cast<float>().template head<3>();
     return *this;
   }
 
@@ -187,15 +190,17 @@ public:
     return *this;
   }
 
-  ShaderSetting& rotate(const Eigen::Quaternionf& quat) {
+  template <typename Scalar>
+  ShaderSetting& rotate(const Eigen::Quaternion<Scalar>& quat) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = p->value * (Eigen::Isometry3f::Identity() * quat).matrix();
+    p->value = p->value * (Eigen::Isometry3f::Identity() * quat.template cast<float>()).matrix();
     return *this;
   }
 
-  ShaderSetting& rotate(const Eigen::Matrix3f& rot) {
+  template <typename Scalar, int Dim>
+  ShaderSetting& rotate(const Eigen::Matrix<Scalar, Dim, Dim>& rot) {
     Eigen::Isometry3f R = Eigen::Isometry3f::Identity();
-    R.linear() = rot;
+    R.linear() = rot.template cast<float>().template block<3, 3>(0, 0);
 
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value = p->value * R.matrix();
@@ -208,7 +213,16 @@ public:
     return *this;
   }
 
-  ShaderSetting& scale(const Eigen::Vector3f& scaling) {
+  ShaderSetting& scale(float sx, float sy, float sz) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value.col(0) *= sx;
+    p->value.col(1) *= sy;
+    p->value.col(2) *= sz;
+    return *this;
+  }
+
+  template <typename Scalar, int Dim>
+  ShaderSetting& scale(const Eigen::Matrix<Scalar, Dim, 1>& scaling) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value.col(0) *= scaling[0];
     p->value.col(1) *= scaling[1];

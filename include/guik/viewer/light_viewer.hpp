@@ -20,12 +20,12 @@ public:
   virtual ~LightViewer();
 
   static std::shared_ptr<LightViewer> instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
-    if(!inst) {
+    if (!inst) {
       Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
       inst.reset(new LightViewer());
       inst->init(init_size, "#version 330", background);
     } else {
-      if((size.array() > 0).all() && inst->window_size() != size) {
+      if ((size.array() > 0).all() && inst->window_size() != size) {
         inst->resize(size);
       }
     }
@@ -34,7 +34,7 @@ public:
   }
 
   static void destroy() {
-    if(inst) {
+    if (inst) {
       inst->clear();
       inst.reset();
     }
@@ -96,6 +96,10 @@ private:
   std::mutex post_render_invoke_requests_mutex;
   std::deque<std::function<void()>> post_render_invoke_requests;
 };
+
+inline std::shared_ptr<LightViewer> viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
+  return LightViewer::instance();
+}
 
 }  // namespace guik
 

@@ -387,4 +387,22 @@ Eigen::Vector3f LightViewerContext::unproject(const Eigen::Vector2i& p, float de
   return canvas->unproject(p, depth);
 }
 
+std::optional<Eigen::Vector3f> LightViewerContext::pick_point(int button, int window, Eigen::Vector4i* info) const {
+  const auto& io = ImGui::GetIO();
+  if (io.WantCaptureMouse || !io.MouseClicked[button]) {
+    return std::nullopt;
+  }
+
+  float depth = pick_depth({io.MousePos.x, io.MousePos.y}, window);
+  if (depth >= 1.0f) {
+    return std::nullopt;
+  }
+
+  if (info) {
+    *info = pick_info({io.MousePos.x, io.MousePos.y}, window);
+  }
+
+  return unproject({io.MousePos.x, io.MousePos.y}, depth);
+}
+
 }  // namespace guik

@@ -1,0 +1,28 @@
+#version 430
+
+layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+
+uniform int num_means;
+uniform int num_sphere_vertices;
+uniform int num_sphere_indices;
+
+layout(std430, binding=0) readonly buffer SphereIndices {
+  uint[] sphere_indices;
+};
+
+layout(std430, binding=1) writeonly buffer OutputIndices {
+  uint[] indices_out;
+};
+
+void main() {
+  uint i = gl_GlobalInvocationID.x;
+  if (i > num_means * num_sphere_indices) {
+    return;
+  }
+
+  uint mean_id = i / num_sphere_indices;
+  uint index_id = i - mean_id * num_sphere_indices;
+
+  uint index = mean_id * num_sphere_vertices + sphere_indices[index_id];
+  indices_out[i] = index;
+}
