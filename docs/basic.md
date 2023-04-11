@@ -30,6 +30,12 @@ viewer->spin();
 while(viewer->spin_once()) {}
 ```
 
+There is also a shorthand function ```guik::viewer()``` that is equivalent to ```guik::LightViewer::instance()```.
+
+```cpp
+auto viewer =  guik::viewer();  // Equivalent to guik::LightViewer::instance()
+```
+
 ## Registering drawables to the viewer
 
 3D objects to be drawn are called **drawables** and managed with unique names (or IDs). The following code shows a minimum example to register a wire sphere to the viewer.

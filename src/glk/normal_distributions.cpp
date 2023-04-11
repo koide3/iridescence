@@ -5,6 +5,7 @@
 #include <glk/glsl_shader.hpp>
 #include <glk/shader_storage_buffer.hpp>
 #include <glk/primitives/icosahedron.hpp>
+#include <glk/async_buffer_copy.hpp>
 
 namespace glk {
 
@@ -48,21 +49,10 @@ NormalDistributions::NormalDistributions(const float* means, const float* covs, 
   auto transformed_index_buffer = std::make_unique<glk::ShaderStorageBuffer>(sizeof(unsigned int) * num_transformed_indices, nullptr, GL_STREAM_COPY);
 
   // Host to device copy
-  GLbitfield map_flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-  void* sphere_vertex_buffer_ptr = glMapNamedBufferRange(sphere_vertex_buffer->id(), 0, sizeof(float) * 4 * sphere_vertices.size(), map_flags);
-  void* sphere_index_buffer_ptr = glMapNamedBufferRange(sphere_index_buffer->id(), 0, sizeof(unsigned int) * sphere_indices.size(), map_flags);
-  void* means_buffer_ptr = glMapNamedBufferRange(means_buffer->id(), 0, sizeof(float) * 4 * num_points, map_flags);
-  void* covs_buffer_ptr = glMapNamedBufferRange(covs_buffer->id(), 0, sizeof(float) * 16 * num_points, map_flags);
-
-  memcpy(sphere_vertex_buffer_ptr, sphere_vertices.data(), sizeof(float) * 4 * sphere_vertices.size());
-  memcpy(sphere_index_buffer_ptr, sphere_indices.data(), sizeof(unsigned int) * sphere_indices.size());
-  memcpy(means_buffer_ptr, means, sizeof(float) * 4 * num_points);
-  memcpy(covs_buffer_ptr, covs, sizeof(float) * 16 * num_points);
-
-  glUnmapNamedBuffer(sphere_vertex_buffer->id());
-  glUnmapNamedBuffer(sphere_index_buffer->id());
-  glUnmapNamedBuffer(means_buffer->id());
-  glUnmapNamedBuffer(covs_buffer->id());
+  write_named_buffer_async(sphere_vertex_buffer->id(), sizeof(float) * 4 * sphere_vertices.size(), sphere_vertices.data());
+  write_named_buffer_async(sphere_index_buffer->id(), sizeof(unsigned int) * sphere_indices.size(), sphere_indices.data());
+  write_named_buffer_async(means_buffer->id(), sizeof(float) * 4 * num_points, means);
+  write_named_buffer_async(covs_buffer->id(), sizeof(float) * 16 * num_points, covs);
 
   const int LOCAL_SIZE = 32;
 

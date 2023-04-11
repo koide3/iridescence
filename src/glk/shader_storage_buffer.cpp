@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <Eigen/Core>
 #include <glk/console_colors.hpp>
+#include <glk/async_buffer_copy.hpp>
 
 namespace glk {
 
@@ -11,7 +12,12 @@ ShaderStorageBuffer::ShaderStorageBuffer(size_t size, const void* data, GLenum u
 
   glGenBuffers(1, &ssbo);
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, usage);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, usage);
+
+  if (data) {
+    write_buffer_async(GL_SHADER_STORAGE_BUFFER, size, data);
+  }
+
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -34,12 +40,17 @@ void ShaderStorageBuffer::set_data(size_t buffer_size, const void* data) {
   }
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+  GLbitfield flag = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+  void* dst = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, buffer_size, flag);
+
   if (data) {
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, buffer_size, data);
+    std::memcpy(dst, data, buffer_size);
   } else {
-    std::vector<char> buffer(buffer_size, 0);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, buffer_size, buffer.data());
+    std::memset(dst, 0, buffer_size);
   }
+
+  glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 

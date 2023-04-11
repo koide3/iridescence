@@ -3,6 +3,8 @@
 #include <iostream>
 #include <Eigen/Geometry>
 
+#include <glk/async_buffer_copy.hpp>
+
 namespace glk {
 
 ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip) : ThinLines(vertices, nullptr, num_vertices, nullptr, 0, line_strip) {}
@@ -21,23 +23,26 @@ ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertice
 
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * num_vertices, vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * num_vertices, nullptr, GL_STATIC_DRAW);
+  write_buffer_async(GL_ARRAY_BUFFER, sizeof(float) * 3 * num_vertices, vertices);
 
   if (colors) {
     glGenBuffers(1, &cbo);
     glBindBuffer(GL_ARRAY_BUFFER, cbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * num_vertices, colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * num_vertices, nullptr, GL_STATIC_DRAW);
+    write_buffer_async(GL_ARRAY_BUFFER, sizeof(float) * 4 * num_vertices, colors);
   }
 
   if (indices) {
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indices, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indices, nullptr, GL_STATIC_DRAW);
+    write_buffer_async(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indices, indices);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
 
-  glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 }
 
 ThinLines::~ThinLines() {
