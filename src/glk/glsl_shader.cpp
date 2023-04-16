@@ -12,6 +12,7 @@
 #include <GL/gl3w.h>
 #include <Eigen/Core>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <glk/console_colors.hpp>
 
@@ -268,8 +269,29 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
   glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
 
   if (result != GL_TRUE) {
+    const std::string error_text(error_message.begin(), error_message.end());
     std::cerr << bold_red << "error : failed to compile shader " << filename << "\033[0m" << std::endl;
-    std::cerr << std::string(error_message.begin(), error_message.end()) << std::endl;
+
+    std::vector<std::string> source_lines;
+    boost::split(source_lines, source, boost::is_any_of("\n"));
+
+    std::vector<std::string> error_lines;
+    boost::split(error_lines, std::string(error_message.begin(), error_message.end()), boost::is_any_of("\n"));
+
+    for (const auto& error_line : error_lines) {
+      std::cerr << error_line << std::endl;
+
+      std::smatch matched;
+      if (std::regex_search(error_line, matched, std::regex("[0-9]+\\(([0-9]+)\\) : (error|warning)"))) {
+        const int line = std::stoi(matched.str(1)) - 1;
+
+        if(line < source_lines.size()) {
+          std::cout << console::cyan << "       :            : L" << line << "= " << source_lines[line] << console::reset << std::endl;
+        } else {
+          std::cout << console::cyan << "       :            : L" << line << "= out of source" << console::reset << std::endl;
+        }
+      }
+    }
   }
 
   return shader_id;
