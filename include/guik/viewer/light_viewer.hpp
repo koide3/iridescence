@@ -98,7 +98,7 @@ private:
 };
 
 inline std::shared_ptr<LightViewer> viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
-  return LightViewer::instance();
+  return LightViewer::instance(size, background);
 }
 
 }  // namespace guik

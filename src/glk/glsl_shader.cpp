@@ -12,6 +12,7 @@
 #include <GL/gl3w.h>
 #include <Eigen/Core>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <glk/console_colors.hpp>
 
@@ -29,14 +30,14 @@ GLSLShader::~GLSLShader() {
   }
 }
 
-bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, GLuint shader_type) {
+bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type) {
   std::unordered_map<std::string, std::string> include_map;
   for (const auto& include_filename : include_filenames) {
     const std::string filename = boost::filesystem::path(include_filename).filename().string();
     include_map[filename] = include_filename;
   }
 
-  GLuint shader = read_shader_from_file(filename, include_map, shader_type);
+  GLuint shader = read_shader_from_file(filename, include_map, defines, shader_type);
   if (shader == GL_FALSE) {
     return false;
   }
@@ -45,9 +46,13 @@ bool GLSLShader::attach_source(const std::string& filename, const std::unordered
   return true;
 }
 
-bool GLSLShader::attach_source(const std::vector<std::string>& filenames, const std::unordered_set<std::string>& include_filenames, GLuint shader_type) {
+bool GLSLShader::attach_source(
+  const std::vector<std::string>& filenames,
+  const std::unordered_set<std::string>& include_filenames,
+  const std::string& defines,
+  GLuint shader_type) {
   for (const auto& filename : filenames) {
-    if (!attach_source(filename, include_filenames, shader_type)) {
+    if (!attach_source(filename, include_filenames, defines, shader_type)) {
       return false;
     }
   }
@@ -55,7 +60,7 @@ bool GLSLShader::attach_source(const std::vector<std::string>& filenames, const 
 }
 
 bool GLSLShader::attach_source(const std::string& filename, GLuint shader_type) {
-  return attach_source(filename, {}, shader_type);
+  return attach_source(filename, {}, "", shader_type);
 }
 
 bool GLSLShader::attach_source(const std::vector<std::string>& filenames, GLuint shader_type) {
@@ -211,7 +216,7 @@ void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, cons
   glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
 }
 
-GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, GLuint shader_type) {
+GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, const std::string& defines, GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
 
   const auto read_source = [](const std::string& filename) -> std::string {
@@ -236,14 +241,20 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
   std::smatch match;
   while (std::regex_search(source, match, include_pattern)) {
     const std::string include_filename = match.str(2);
-    const auto found = include_map.find(include_filename);
-    if (found == include_map.end()) {
-      return GL_FALSE;
-    }
 
-    const std::string include_source = read_source(found->second);
-    if (include_source.empty()) {
-      return GL_FALSE;
+    std::string include_source;
+    if(include_filename == "define") {
+      include_source = defines;
+    } else {
+      const auto found = include_map.find(include_filename);
+      if (found == include_map.end()) {
+        return GL_FALSE;
+      }
+
+      include_source = read_source(found->second);
+      if (include_source.empty()) {
+        return GL_FALSE;
+      }
     }
 
     std::stringstream sst;
@@ -268,8 +279,29 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
   glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
 
   if (result != GL_TRUE) {
+    const std::string error_text(error_message.begin(), error_message.end());
     std::cerr << bold_red << "error : failed to compile shader " << filename << "\033[0m" << std::endl;
-    std::cerr << std::string(error_message.begin(), error_message.end()) << std::endl;
+
+    std::vector<std::string> source_lines;
+    boost::split(source_lines, source, boost::is_any_of("\n"));
+
+    std::vector<std::string> error_lines;
+    boost::split(error_lines, std::string(error_message.begin(), error_message.end()), boost::is_any_of("\n"));
+
+    for (const auto& error_line : error_lines) {
+      std::cerr << error_line << std::endl;
+
+      std::smatch matched;
+      if (std::regex_search(error_line, matched, std::regex("[0-9]+\\(([0-9]+)\\) : (error|warning)"))) {
+        const int line = std::stoi(matched.str(1)) - 1;
+
+        if(line < source_lines.size()) {
+          std::cout << console::cyan << "       :            : L" << line << "= " << source_lines[line] << console::reset << std::endl;
+        } else {
+          std::cout << console::cyan << "       :            : L" << line << "= out of source" << console::reset << std::endl;
+        }
+      }
+    }
   }
 
   return shader_id;
