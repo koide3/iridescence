@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 
 #include <glk/path.hpp>
+#include <glk/texture.hpp>
 #include <guik/recent_files.hpp>
 #include <guik/model_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
@@ -241,6 +242,10 @@ void define_guik(py::module_& m) {
 
     .def("enable_vsync", &guik::LightViewer::enable_vsync, "")
     .def("enable_docking", &guik::LightViewer::enable_docking, "")
+
+    .def("clear_images", &guik::LightViewer::clear_images, "")
+    .def("remove_image", &guik::LightViewer::remove_image, "")
+    .def("update_image", &guik::LightViewer::update_image, "", py::arg("name"), py::arg("image"), py::arg("scale") = -1.0)
 
     // LightViewerContext methods
     .def("clear", &guik::LightViewer::clear)

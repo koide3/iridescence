@@ -7,6 +7,8 @@
 #include <imgui_internal.h>
 #include <Eigen/Core>
 
+#include <glk/texture.hpp>
+
 namespace py = pybind11;
 
 void define_imgui(py::module_& m) {
@@ -49,6 +51,15 @@ void define_imgui(py::module_& m) {
   // macros
   imgui_.def("IM_COL32", [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); });
 
+  // structs
+  py::class_<ImVec2>(imgui_, "ImVec2", py::buffer_protocol())
+    .def_buffer([](ImVec2& m) -> py::buffer_info { return py::buffer_info(&m.x, sizeof(float), py::format_descriptor<float>::format(), 1, {2}, {sizeof(float)}); })
+    .def(py::init([](float x, float y) { return std::make_unique<ImVec2>(x, y); }))
+    .def(py::init([](py::array_t<float> x) {
+      auto r = x.unchecked<1>();
+      return std::make_unique<ImVec2>(r(0), r(1));
+    }));
+
   // functions
   imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
@@ -60,10 +71,19 @@ void define_imgui(py::module_& m) {
   imgui_.def("end_popup", &ImGui::EndPopup);
   imgui_.def("close_current_popup", &ImGui::CloseCurrentPopup);
 
-  imgui_.def("set_next_window_pos", [] (const Eigen::Vector2i& pos, int cond, const Eigen::Vector2i& pivot) { ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1]), cond, ImVec2(pivot[0], pivot[1])); }, "",
-    py::arg("pos"), py::arg("cond") = 0, py::arg("pivot") = Eigen::Vector2i(0, 0));
-  imgui_.def("set_next_window_size", [] (const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); }, "",
-    py::arg("size"), py::arg("cond") = 0);
+  imgui_.def(
+    "set_next_window_pos",
+    [](const Eigen::Vector2i& pos, int cond, const Eigen::Vector2i& pivot) { ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1]), cond, ImVec2(pivot[0], pivot[1])); },
+    "",
+    py::arg("pos"),
+    py::arg("cond") = 0,
+    py::arg("pivot") = Eigen::Vector2i(0, 0));
+  imgui_.def(
+    "set_next_window_size",
+    [](const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); },
+    "",
+    py::arg("size"),
+    py::arg("cond") = 0);
 
   imgui_.def("separator", &ImGui::Separator);
   imgui_.def("same_line", &ImGui::SameLine, "", py::arg("offset_from_start_x") = 0.0, py::arg("spacing") = -1.0);
@@ -101,6 +121,31 @@ void define_imgui(py::module_& m) {
 
   imgui_.def("push_button_repeat", &ImGui::PushButtonRepeat);
   imgui_.def("pop_button_repeat", &ImGui::PopButtonRepeat);
+
+  imgui_.def(
+    "image",
+    [](
+      const std::shared_ptr<glk::Texture>& texture,
+      const Eigen::Vector2i& size,
+      const Eigen::Vector2f& uv0,
+      const Eigen::Vector2f& uv1,
+      const Eigen::Vector4f& tint_col,
+      const Eigen::Vector4f& border_col) {
+      ImGui::Image(
+        reinterpret_cast<void*>(texture->id()),
+        ImVec2(size[0], size[1]),
+        ImVec2(uv0[0], uv0[1]),
+        ImVec2(uv1[0], uv1[1]),
+        ImVec4(tint_col[0], tint_col[1], tint_col[2], tint_col[3]),
+        ImVec4(border_col[0], border_col[1], border_col[2], border_col[3]));
+    },
+    "",
+    py::arg("texture"),
+    py::arg("size"),
+    py::arg("uv0") = Eigen::Vector2f(0.0, 0.0),
+    py::arg("uv1") = Eigen::Vector2f(1.0, 1.0),
+    py::arg("tint_col") = Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f),
+    py::arg("border_col") = Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
   // Tab bars
   imgui_.def("begin_tab_bar", &ImGui::BeginTabBar, "", py::arg("id"), py::arg("flags") = 0);

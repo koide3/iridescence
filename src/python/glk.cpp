@@ -3,8 +3,10 @@
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
 
+#include <iostream>
 #include <glk/path.hpp>
 #include <glk/lines.hpp>
+#include <glk/texture.hpp>
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -141,6 +143,36 @@ void define_glk(py::module_& m) {
       }
     )
   ;
+
+  // glk::Texture
+  py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture");
+  glk_.def("create_texture", [](py::array_t<std::uint8_t, py::array::c_style | py::array::forcecast> arr) {
+    auto r = arr.unchecked<3>();
+    const int height = r.shape(0);
+    const int width = r.shape(1);
+    const int ch = r.shape(2);
+
+    GLuint format = GL_RGB;
+    switch (ch) {
+      default:
+        std::cerr << "warning: invalid ch=" << ch << std::endl;
+        break;
+      case 1:
+        format = GL_RED;
+        break;
+      case 2:
+        format = GL_RG;
+        break;
+      case 3:
+        format = GL_BGR;
+        break;
+      case 4:
+        format = GL_BGRA;
+        break;
+    }
+
+    return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, arr.data());
+  });
 
   // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
