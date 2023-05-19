@@ -65,8 +65,11 @@ void define_imgui(py::module_& m) {
   imgui_.def("set_next_window_size", [] (const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); }, "",
     py::arg("size"), py::arg("cond") = 0);
 
-  imgui_.def("same_line", &ImGui::SameLine, "", py::arg("offset_from_start_x") = 0.0, py::arg("spacing") = -1.0);
   imgui_.def("separator", &ImGui::Separator);
+  imgui_.def("same_line", &ImGui::SameLine, "", py::arg("offset_from_start_x") = 0.0, py::arg("spacing") = -1.0);
+  imgui_.def("newline", &ImGui::NewLine);
+  imgui_.def("spacing", &ImGui::Spacing);
+
   imgui_.def("text", [](const std::string& text) { ImGui::Text("%s", text.c_str()); });
   imgui_.def("input_text",
     [](const std::string& label, const std::string& text, int flags, int buffer_size) { 
@@ -99,6 +102,13 @@ void define_imgui(py::module_& m) {
   imgui_.def("push_button_repeat", &ImGui::PushButtonRepeat);
   imgui_.def("pop_button_repeat", &ImGui::PopButtonRepeat);
 
+  // Tab bars
+  imgui_.def("begin_tab_bar", &ImGui::BeginTabBar, "", py::arg("id"), py::arg("flags") = 0);
+  imgui_.def("end_tab_bar", &ImGui::EndTabBar);
+  imgui_.def("begin_tab_item", [](const char* label) { return ImGui::BeginTabItem(label); });
+  imgui_.def("end_tab_item", &ImGui::EndTabItem);
+  imgui_.def("tab_item_button", &ImGui::TabItemButton, "", py::arg("label"), py::arg("flags") = 0);
+
   imgui_.def("show_demo_window", [] { ImGui::ShowDemoWindow(); });
 
   // Docking
@@ -113,19 +123,26 @@ void define_imgui(py::module_& m) {
     [](int flags) { return ImGui::DockSpaceOverViewport(nullptr, flags); },
     py::arg("flags") = 0);
 
-  // dock builder
+  // Dock builder
   imgui_.def("dock_builder_split_node", [](unsigned int node_id, int split_dir, float size_ratio_for_node_at_dir) -> std::pair<unsigned int, unsigned int> {
     ImGuiID id_at_dir, id_at_opposite_dir;
     ImGui::DockBuilderSplitNode(node_id, split_dir, size_ratio_for_node_at_dir, &id_at_dir, &id_at_opposite_dir);
     return std::make_pair(id_at_dir, id_at_opposite_dir);
   });
-
   imgui_.def("dock_builder_dock_window", [](const std::string& window_name, unsigned int node_id) { ImGui::DockBuilderDockWindow(window_name.c_str(), node_id); });
-
   imgui_.def("dock_builder_finish", [](unsigned int node_id) { ImGui::DockBuilderFinish(node_id); });
 
   // DrawList
   py::class_<ImDrawList, std::shared_ptr<ImDrawList>>(imgui_, "ImDrawList")
+    .def(
+      "add_line",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color, float thickness) {
+        draw_list->AddLine(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color, thickness);
+      },
+      py::arg("p0"),
+      py::arg("p1"),
+      py::arg("col"),
+      py::arg("thickness") = 1.0f)
     .def(
       "add_rect_filled",
       [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
@@ -136,9 +153,36 @@ void define_imgui(py::module_& m) {
       [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
         draw_list->AddRect(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color);
       })
-    .def("add_line", [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
-      draw_list->AddLine(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color);
-    });
+    .def(
+      "add_circle",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& center, float radius, unsigned int color, int num_segments, float thickness) {
+        draw_list->AddCircle(ImVec2(center[0], center[1]), radius, color, num_segments, thickness);
+      },
+      py::arg("center"),
+      py::arg("radius"),
+      py::arg("color"),
+      py::arg("num_segments") = 0,
+      py::arg("thickness") = 1.0f)
+    .def(
+      "add_circle_filled",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& center, float radius, unsigned int color, int num_segments) {
+        draw_list->AddCircleFilled(ImVec2(center[0], center[1]), radius, color, num_segments);
+      },
+      py::arg("center"),
+      py::arg("radius"),
+      py::arg("color"),
+      py::arg("num_segments") = 0)
+    .def(
+      "add_text",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& pos, unsigned int color, const std::string& text) {
+        draw_list->AddText(ImVec2(pos[0], pos[1]), color, text.c_str());
+      },
+      py::arg("pos"),
+      py::arg("color"),
+      py::arg("text")
+    )
+    //
+    ;
 
   imgui_.def("get_window_draw_list", [] {
     auto draw_list = ImGui::GetWindowDrawList();
