@@ -122,14 +122,17 @@ void define_imgui(py::module_& m) {
     "dockspace_over_viewport",
     [](int flags) { return ImGui::DockSpaceOverViewport(nullptr, flags); },
     py::arg("flags") = 0);
+  imgui_.def("set_next_window_dock_id", &ImGui::SetNextWindowDockID, "", py::arg("dock_id"), py::arg("cond") = 0);
 
   // Dock builder
+  imgui_.def("dock_builder_dock_window", &ImGui::DockBuilderDockWindow);
+  imgui_.def("dock_builder_add_node", &ImGui::DockBuilderAddNode, "", py::arg("node_id") = 0, py::arg("flags") = 0);
+  imgui_.def("dock_builder_remove_node", &ImGui::DockBuilderRemoveNode);
   imgui_.def("dock_builder_split_node", [](unsigned int node_id, int split_dir, float size_ratio_for_node_at_dir) -> std::pair<unsigned int, unsigned int> {
     ImGuiID id_at_dir, id_at_opposite_dir;
     ImGui::DockBuilderSplitNode(node_id, split_dir, size_ratio_for_node_at_dir, &id_at_dir, &id_at_opposite_dir);
     return std::make_pair(id_at_dir, id_at_opposite_dir);
   });
-  imgui_.def("dock_builder_dock_window", [](const std::string& window_name, unsigned int node_id) { ImGui::DockBuilderDockWindow(window_name.c_str(), node_id); });
   imgui_.def("dock_builder_finish", [](unsigned int node_id) { ImGui::DockBuilderFinish(node_id); });
 
   // DrawList
