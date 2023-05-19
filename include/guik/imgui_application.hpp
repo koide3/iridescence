@@ -21,6 +21,9 @@ public:
   void enable_vsync();
   void disable_vsync();
 
+  void enable_docking();
+  void disable_docking();
+
   Eigen::Vector2i window_size() const;
   virtual void show_window();
   virtual void hide_window();

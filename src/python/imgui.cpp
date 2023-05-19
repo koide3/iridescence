@@ -2,7 +2,9 @@
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
 
+#include <iostream>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <Eigen/Core>
 
 namespace py = pybind11;
@@ -31,9 +33,26 @@ void define_imgui(py::module_& m) {
   imgui_.attr("Dir_Down") = py::int_(static_cast<int>(ImGuiDir_Down));
   imgui_.attr("Dir_None") = py::int_(static_cast<int>(ImGuiDir_None));
 
+  imgui_.attr("ButtonFlags_None") = py::int_(static_cast<int>(ImGuiButtonFlags_None));
+  imgui_.attr("ButtonFlags_MouseButtonLeft") = py::int_(static_cast<int>(ImGuiButtonFlags_MouseButtonLeft));
+  imgui_.attr("ButtonFlags_MouseButtonRight") = py::int_(static_cast<int>(ImGuiButtonFlags_MouseButtonRight));
+  imgui_.attr("ButtonFlags_MouseButtonMiddle") = py::int_(static_cast<int>(ImGuiButtonFlags_MouseButtonMiddle));
+
+  imgui_.attr("DockNodeFlags_None") = py::int_(static_cast<int>(ImGuiDockNodeFlags_None));
+  imgui_.attr("DockNodeFlags_KeepAliveOnly") = py::int_(static_cast<int>(ImGuiDockNodeFlags_KeepAliveOnly));
+  imgui_.attr("DockNodeFlags_NoDockingInCentralNode") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoDockingInCentralNode));
+  imgui_.attr("DockNodeFlags_PassthruCentralNode") = py::int_(static_cast<int>(ImGuiDockNodeFlags_PassthruCentralNode));
+  imgui_.attr("DockNodeFlags_NoSplit") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoSplit));
+  imgui_.attr("DockNodeFlags_NoResize") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoResize));
+  imgui_.attr("DockNodeFlags_AutoHideTabBar") = py::int_(static_cast<int>(ImGuiDockNodeFlags_AutoHideTabBar));
+
+  // macros
+  imgui_.def("IM_COL32", [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); });
+
   // functions
   imgui_.def("begin", [] (const std::string& name, bool open, int flags) { return std::make_tuple(ImGui::Begin(name.c_str(), &open, flags), open); });
   imgui_.def("end", [] { ImGui::End(); });
+  imgui_.def("get_id", [](const std::string& name) { return ImGui::GetID(name.c_str()); });
 
   imgui_.def("open_popup", [](const std::string& name) { ImGui::OpenPopup(name.c_str()); });
   imgui_.def("begin_popup", &ImGui::BeginPopup);
@@ -59,6 +78,14 @@ void define_imgui(py::module_& m) {
   imgui_.def("button", [](const std::string& label) { return ImGui::Button(label.c_str()); });
   imgui_.def("arrow_button", ImGui::ArrowButton);
 
+  imgui_.def(
+    "invisible_button",
+    [](const std::string& id, const Eigen::Vector2i& size, int flags) { return ImGui::InvisibleButton(id.c_str(), ImVec2(size[0], size[1]), flags); },
+    "",
+    py::arg("id"),
+    py::arg("size"),
+    py::arg("flags") = 0);
+
   imgui_.def("checkbox", [](const std::string& label, bool v) { return std::make_tuple(ImGui::Checkbox(label.c_str(), &v), v); });
   imgui_.def("drag_int", [](const std::string& label, int v, int v_speed, int v_min, int v_max, const std::string& format)
     { return std::make_tuple(ImGui::DragInt(label.c_str(), &v, v_speed, v_min, v_max, format.c_str()), v); }, "",
@@ -72,6 +99,52 @@ void define_imgui(py::module_& m) {
   imgui_.def("push_button_repeat", &ImGui::PushButtonRepeat);
   imgui_.def("pop_button_repeat", &ImGui::PopButtonRepeat);
 
+  imgui_.def("show_demo_window", [] { ImGui::ShowDemoWindow(); });
+
+  // Docking
+  imgui_.def(
+    "dockspace",
+    [](unsigned int id, const Eigen::Vector2i& size, int flags) { return ImGui::DockSpace(id, ImVec2(size[0], size[1]), flags); },
+    py::arg("id"),
+    py::arg("size") = Eigen::Vector2i(0, 0),
+    py::arg("flags") = 0);
+  imgui_.def(
+    "dockspace_over_viewport",
+    [](int flags) { return ImGui::DockSpaceOverViewport(nullptr, flags); },
+    py::arg("flags") = 0);
+
+  // dock builder
+  imgui_.def("dock_builder_split_node", [](unsigned int node_id, int split_dir, float size_ratio_for_node_at_dir) -> std::pair<unsigned int, unsigned int> {
+    ImGuiID id_at_dir, id_at_opposite_dir;
+    ImGui::DockBuilderSplitNode(node_id, split_dir, size_ratio_for_node_at_dir, &id_at_dir, &id_at_opposite_dir);
+    return std::make_pair(id_at_dir, id_at_opposite_dir);
+  });
+
+  imgui_.def("dock_builder_dock_window", [](const std::string& window_name, unsigned int node_id) { ImGui::DockBuilderDockWindow(window_name.c_str(), node_id); });
+
+  imgui_.def("dock_builder_finish", [](unsigned int node_id) { ImGui::DockBuilderFinish(node_id); });
+
+  // DrawList
+  py::class_<ImDrawList, std::shared_ptr<ImDrawList>>(imgui_, "ImDrawList")
+    .def(
+      "add_rect_filled",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
+        draw_list->AddRectFilled(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color);
+      })
+    .def(
+      "add_rect",
+      [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
+        draw_list->AddRect(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color);
+      })
+    .def("add_line", [](ImDrawList* draw_list, const Eigen::Vector2i& p0, const Eigen::Vector2i& p1, unsigned int color) {
+      draw_list->AddLine(ImVec2(p0[0], p0[1]), ImVec2(p1[0], p1[1]), color);
+    });
+
+  imgui_.def("get_window_draw_list", [] {
+    auto draw_list = ImGui::GetWindowDrawList();
+    return std::shared_ptr<ImDrawList>(draw_list, [](ImDrawList* ptr) {});
+  });
+
   // IO
   py::class_<ImGuiIO>(imgui_, "IO")
     .def_readonly("want_capture_keyboard", &ImGuiIO::WantCaptureKeyboard)
@@ -79,13 +152,8 @@ void define_imgui(py::module_& m) {
     .def_readonly("framerate", &ImGuiIO::Framerate)
     .def_readonly("delta_time", &ImGuiIO::DeltaTime)
 
-
-    .def_property_readonly("mouse_pos", [] (const ImGuiIO& io) {
-      return py::array(2, &io.MousePos.x);
-    })
-    .def_property_readonly("mouse_down", [] (const ImGuiIO& io) {
-      return py::array(5, io.MouseDown);
-    })
+    .def_property_readonly("mouse_pos", [](const ImGuiIO& io) { return py::array(2, &io.MousePos.x); })
+    .def_property_readonly("mouse_down", [](const ImGuiIO& io) { return py::array(5, io.MouseDown); })
 
     .def_readonly("mouse_wheel", &ImGuiIO::MouseWheel)
     .def_readonly("mouse_wheel_h", &ImGuiIO::MouseWheelH)
@@ -93,15 +161,32 @@ void define_imgui(py::module_& m) {
     .def_readonly("key_shift", &ImGuiIO::KeyShift)
     .def_readonly("key_alt", &ImGuiIO::KeyAlt)
     .def_readonly("key_super", &ImGuiIO::KeySuper)
-    .def_property_readonly("keys_down", [] (const ImGuiIO& io) {
-      return py::array(512, io.KeysDown);
-    })
-    .def_property_readonly("nav_inputs", [] (const ImGuiIO& io) {
-      return py::array(ImGuiNavInput_COUNT, io.NavInputs);
-    })
-  ;
+    .def_property_readonly("keys_down", [](const ImGuiIO& io) { return py::array(512, io.KeysDown); })
+    .def_property_readonly("nav_inputs", [](const ImGuiIO& io) { return py::array(ImGuiNavInput_COUNT, io.NavInputs); });
 
   imgui_.def("get_io", [] { return ImGui::GetIO(); });
-  imgui_.def("is_mouse_clicked", &ImGui::IsMouseClicked, "", py::arg("button") = 0, py::arg("repeat") = false);
-  imgui_.def("get_mouse_pos", [] { auto pos = ImGui::GetMousePos(); return Eigen::Vector2f(pos[0], pos[1]); });
+  imgui_.def(
+    "is_mouse_clicked",
+    [](int button, bool repeat) { return ImGui::IsMouseClicked(button, repeat); },
+    "",
+    py::arg("button") = 0,
+    py::arg("repeat") = false);
+
+  imgui_.def("get_mouse_pos", [] {
+    auto pos = ImGui::GetMousePos();
+    return Eigen::Vector2f(pos[0], pos[1]);
+  });
+
+  imgui_.def("get_cursor_screen_pos", [] {
+    auto pos = ImGui::GetCursorScreenPos();
+    return Eigen::Vector2f(pos[0], pos[1]);
+  });
+  imgui_.def("get_content_region_avail", [] {
+    auto pos = ImGui::GetContentRegionAvail();
+    return Eigen::Vector2f(pos[0], pos[1]);
+  });
+
+  imgui_.def("is_item_hovered", &ImGui::IsItemHovered, "", py::arg("flags") = 0);
+  imgui_.def("is_item_active", &ImGui::IsItemActive, "");
+  imgui_.def("is_item_focused", &ImGui::IsItemFocused, "");
 }
