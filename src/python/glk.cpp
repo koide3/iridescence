@@ -23,6 +23,28 @@ void define_glk(py::module_& m) {
   py::module_ primitives_ = glk_.def_submodule("primitives", "");
 
   // classes
+  // enums
+  py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
+    .value("TURBO", glk::COLORMAP::TURBO)
+    .value("JET", glk::COLORMAP::JET)
+    .value("CIVIDIS", glk::COLORMAP::CIVIDIS)
+    .value("OCEAN", glk::COLORMAP::OCEAN)
+    .value("SPRING", glk::COLORMAP::SPRING)
+    .value("SUMMER", glk::COLORMAP::SUMMER)
+    .value("AUTUMN", glk::COLORMAP::AUTUMN)
+    .value("WINTER", glk::COLORMAP::WINTER)
+    .value("GREAN_YELLOW", glk::COLORMAP::GREAN_YELLOW)
+    .value("BLUE_RED", glk::COLORMAP::BLUE_RED)
+    .value("PUBUGN", glk::COLORMAP::PUBUGN)
+    .value("TURBID", glk::COLORMAP::TURBID)
+    .value("PASTEL", glk::COLORMAP::PASTEL)
+    .value("HELIX", glk::COLORMAP::HELIX)
+    .value("PHASE", glk::COLORMAP::PHASE)
+    .value("VEGETATION", glk::COLORMAP::VEGETATION)
+    .value("CURL", glk::COLORMAP::CURL)
+    .value("COOL_WARM", glk::COLORMAP::COOL_WARM)
+    .export_values();
+
   // glk::Drawable
   py::class_<glk::Drawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable");
 
@@ -75,121 +97,127 @@ void define_glk(py::module_& m) {
 
   // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
-    .def(py::init<float, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&>())
+    .def(
+      py::init<
+        float,
+        const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&,
+        const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&>(),
+      py::arg("thickness"),
+      py::arg("vertices"),
+      py::arg("colors"))
     // pyplot-like constructor
-    .def(py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, float line_width, bool line_strip) {
-      int size = std::max(x.size(), std::max(y.size(), z.size()));
-      if(x.size()) {
-        size = std::min<int>(size, x.size());
-      }
-      if(y.size()) {
-        size = std::min<int>(size, y.size());
-      }
-      if(z.size()) {
-        size = std::min<int>(size, z.size());
-      }
-
-      std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
-      for(int i=1; i < size && i < x.size(); i++) {
-        vertices[(i - 1) * 2].x() = x[i - 1];
-        vertices[(i - 1) * 2 + 1].x() = x[i];
-      }
-
-      for(int i=1; i < size && i < y.size(); i++) {
-        vertices[(i - 1) * 2].y() = y[i - 1];
-        vertices[(i - 1) * 2 + 1].y() = y[i];
-      }
-
-      for(int i=1; i < size && i < z.size(); i++) {
-        vertices[(i - 1) * 2].z() = z[i - 1];
-        vertices[(i - 1) * 2 + 1].z() = z[i];
-      }
-
-      std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
-      if(c.size()) {
-        colors.reserve((size - 1) * 2);
-        for(int i=1; i < size && i < c.size(); i++) {
-          colors.push_back(glk::colormapf(glk::COLORMAP::TURBO, c[i-1]));
-          colors.push_back(glk::colormapf(glk::COLORMAP::TURBO, c[i]));
+    .def(
+      py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, float line_width, bool line_strip) {
+        int size = std::max(x.size(), std::max(y.size(), z.size()));
+        if (x.size()) {
+          size = std::min<int>(size, x.size());
         }
-      }
+        if (y.size()) {
+          size = std::min<int>(size, y.size());
+        }
+        if (z.size()) {
+          size = std::min<int>(size, z.size());
+        }
 
-      return std::make_shared<glk::Lines>(line_width, vertices, colors);
-    }), "",
-      py::arg("x") = Eigen::VectorXf(), py::arg("y") = Eigen::VectorXf(), py::arg("z") = Eigen::VectorXf(), py::arg("c") = Eigen::VectorXf(), py::arg("width") = 0.1f, py::arg("line_strip") = true
-    )
-  ;
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
+        for (int i = 1; i < size && i < x.size(); i++) {
+          vertices[(i - 1) * 2].x() = x[i - 1];
+          vertices[(i - 1) * 2 + 1].x() = x[i];
+        }
+
+        for (int i = 1; i < size && i < y.size(); i++) {
+          vertices[(i - 1) * 2].y() = y[i - 1];
+          vertices[(i - 1) * 2 + 1].y() = y[i];
+        }
+
+        for (int i = 1; i < size && i < z.size(); i++) {
+          vertices[(i - 1) * 2].z() = z[i - 1];
+          vertices[(i - 1) * 2 + 1].z() = z[i];
+        }
+
+        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+        if (c.size()) {
+          colors.reserve((size - 1) * 2);
+          for (int i = 1; i < size && i < c.size(); i++) {
+            colors.push_back(glk::colormapf(glk::COLORMAP::TURBO, c[i - 1]));
+            colors.push_back(glk::colormapf(glk::COLORMAP::TURBO, c[i]));
+          }
+        }
+
+        return std::make_shared<glk::Lines>(line_width, vertices, colors);
+      }),
+      "",
+      py::arg("x") = Eigen::VectorXf(),
+      py::arg("y") = Eigen::VectorXf(),
+      py::arg("z") = Eigen::VectorXf(),
+      py::arg("c") = Eigen::VectorXf(),
+      py::arg("width") = 0.1f,
+      py::arg("line_strip") = true);
 
   // glk::PointCloudBuffer
   py::class_<glk::PointCloudBuffer, glk::Drawable, std::shared_ptr<glk::PointCloudBuffer>>(glk_, "PointCloudBuffer")
     .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&>())
-    .def("add_normals",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) {
-        buffer.add_normals(normals);
-      }
-    )
-    .def("add_color",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) {
-        buffer.add_color(colors);
-      }
-    )
-    .def("add_intensity",
-      [](glk::PointCloudBuffer& buffer, glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) {
-        buffer.add_intensity(colormap, intensities, scale);
-      }, "", py::arg("colormap"), py::arg("intensities"), py::arg("scale") = 1.0f)
-    .def("add_buffer",
+    .def(
+      "add_normals",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) { buffer.add_normals(normals); },
+      py::arg("normals"))
+    .def(
+      "add_color",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) { buffer.add_color(colors); },
+      py::arg("colors"))
+    .def(
+      "add_intensity",
+      [](glk::PointCloudBuffer& buffer, glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) { buffer.add_intensity(colormap, intensities, scale); },
+      py::arg("colormap"),
+      py::arg("intensities"),
+      py::arg("scale") = 1.0f)
+    .def(
+      "add_buffer",
       [](glk::PointCloudBuffer& buffer, const std::string& attribute_name, const Eigen::MatrixXf& data) {
         buffer.add_buffer(attribute_name, data.cols(), data.data(), sizeof(float) * data.cols(), data.rows());
-      }
-    )
-  ;
+      },
+      py::arg("attribute_name"),
+      py::arg("data"));
 
   // glk::Texture
   py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture");
-  glk_.def("create_texture", [](py::array_t<std::uint8_t, py::array::c_style | py::array::forcecast> arr) {
-    auto r = arr.unchecked<3>();
-    const int height = r.shape(0);
-    const int width = r.shape(1);
-    const int ch = r.shape(2);
+  glk_.def(
+    "create_texture",
+    [](py::array_t<std::uint8_t, py::array::c_style | py::array::forcecast> arr) {
+      auto r = arr.unchecked<3>();
+      const int height = r.shape(0);
+      const int width = r.shape(1);
+      const int ch = r.shape(2);
 
-    GLuint format = GL_RGB;
-    switch (ch) {
-      default:
-        std::cerr << "warning: invalid ch=" << ch << std::endl;
-        break;
-      case 1:
-        format = GL_RED;
-        break;
-      case 2:
-        format = GL_RG;
-        break;
-      case 3:
-        format = GL_BGR;
-        break;
-      case 4:
-        format = GL_BGRA;
-        break;
-    }
+      GLuint format = GL_RGB;
+      switch (ch) {
+        default:
+          std::cerr << "warning: invalid ch=" << ch << std::endl;
+          break;
+        case 1:
+          format = GL_RED;
+          break;
+        case 2:
+          format = GL_RG;
+          break;
+        case 3:
+          format = GL_BGR;
+          break;
+        case 4:
+          format = GL_BGRA;
+          break;
+      }
 
-    return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, arr.data());
-  });
+      return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, arr.data());
+    },
+    py::arg("image_uint8"));
 
   // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
   py::class_<glk::NaiveScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::NaiveScreenSpaceAmbientOcclusion>>(glk_, "NaiveScreenSpaceAmbientOcclusion")
     .def(py::init<>());
-  py::class_<glk::ScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::ScreenSpaceAmbientOcclusion>>(glk_, "ScreenSpaceAmbientOcclusion")
-    .def(py::init<>());
+  py::class_<glk::ScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::ScreenSpaceAmbientOcclusion>>(glk_, "ScreenSpaceAmbientOcclusion").def(py::init<>());
   py::class_<glk::ScreenSpaceLighting, glk::ScreenEffect, std::shared_ptr<glk::ScreenSpaceLighting>> ssli(glk_, "ScreenSpaceLighting");
-  ssli.def(py::init<>())
-    .def("num_lights", &glk::ScreenSpaceLighting::num_lights, "")
-    .def("set_diffuse_model", &glk::ScreenSpaceLighting::set_diffuse_model)
-    .def("set_specular_model", &glk::ScreenSpaceLighting::set_specular_model)
-    .def("set_occlusion_model", &glk::ScreenSpaceLighting::set_occlusion_model)
-    .def("set_iridescence_model", &glk::ScreenSpaceLighting::set_iridescence_model)
-    .def("set_light", [](glk::ScreenSpaceLighting& effect, int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) { return effect.set_light(i, pos, color); }, "")
-    .def("set_albedo", &glk::ScreenSpaceLighting::set_albedo, "")
-    .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, "");
 
   // enums
   py::enum_<glk::ScreenSpaceLighting::DIFFUSE_MODEL>(ssli, "DIFFUSE_MODEL")
@@ -219,6 +247,16 @@ void define_glk(py::module_& m) {
     .value("IRIDESCENCE3", glk::ScreenSpaceLighting::IRIDESCENCE_MODEL::IRIDESCENCE3)
     .export_values();
 
+  ssli.def(py::init<>())
+    .def("num_lights", &glk::ScreenSpaceLighting::num_lights, "")
+    .def("set_diffuse_model", &glk::ScreenSpaceLighting::set_diffuse_model)
+    .def("set_specular_model", &glk::ScreenSpaceLighting::set_specular_model)
+    .def("set_occlusion_model", &glk::ScreenSpaceLighting::set_occlusion_model)
+    .def("set_iridescence_model", &glk::ScreenSpaceLighting::set_iridescence_model)
+    .def("set_light", [](glk::ScreenSpaceLighting& effect, int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) { return effect.set_light(i, pos, color); }, "")
+    .def("set_albedo", &glk::ScreenSpaceLighting::set_albedo, "")
+    .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, "");
+
  // methods
   glk_.def("set_data_path", &glk::set_data_path, "");
   glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> std::shared_ptr<glk::PointCloudBuffer>
@@ -233,18 +271,10 @@ void define_glk(py::module_& m) {
   );
 
   // colormaps
-    py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
-    .value("TURBO", glk::COLORMAP::TURBO)
-    .value("JET", glk::COLORMAP::JET)
-    .value("CIVIDIS", glk::COLORMAP::CIVIDIS)
-    .value("OCEAN", glk::COLORMAP::OCEAN)
-    .value("SPRING", glk::COLORMAP::SPRING)
-    .export_values();
-
-  glk_.def("colormap", &glk::colormap);
-  glk_.def("colormapf", &glk::colormapf);
-  glk_.def("colormap_categorical", &glk::colormap_categorical);
-  glk_.def("colormap_categoricalf", &glk::colormap_categoricalf);
+  glk_.def("colormap", &glk::colormap, py::arg("colormap_type"), py::arg("x"));
+  glk_.def("colormapf", &glk::colormapf, py::arg("colormap_type"), py::arg("x"));
+  glk_.def("colormap_categorical", &glk::colormap_categorical, py::arg("colormap_type"), py::arg("x"), py::arg("num_categories"));
+  glk_.def("colormap_categoricalf", &glk::colormap_categoricalf, py::arg("colormap_type"), py::arg("x"), py::arg("num_categories"));
 
   // primitives
   primitives_.def("sphere", [] { return glk::Primitives::sphere(); });

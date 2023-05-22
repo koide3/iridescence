@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get install -y --no-install-recommends wget nano build-essential cmake git clang lld \
   libpng-dev libjpeg-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev ca-certificates \
   libfmt-dev libspdlog-dev libassimp-dev \
+  python3-pip \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
@@ -22,6 +23,10 @@ RUN update-alternatives --install /usr/bin/ld ld /usr/bin/ld.lld 50
 WORKDIR /root/iridescence/build
 RUN CC=clang CXX=clang++ cmake .. -DBUILD_EXAMPLES=ON -DBUILD_EXT_TESTS=ON
 RUN make -j$(nproc)
+
+WORKDIR /root/iridescence
+# RUN python3 setup.py build
+# RUN python3 setup.py install --user
 
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
