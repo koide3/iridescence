@@ -44,6 +44,11 @@ cd ..
 sudo python3 setup.py install
 ```
 
+### Docker
+
+* Build: `docker build -t iridescence -f docker/ubuntu/Dockerfile .`
+* Run: `bash docker/run.sh iridescence`
+
 ## Use Iridescence in your cmake project
 
 ```bash
