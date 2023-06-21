@@ -35,7 +35,7 @@ bool LightViewer::InfoWindow::draw_ui() {
 
   if(show_cpu_info) {
     ImGui::Separator();
-    if(async_cpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+    if(async_cpu_info.valid()) {
       cpu_info = async_cpu_info.get();
       async_cpu_info = std::async(std::launch::async, [this]() { return get_cpu_info(); });
     }
@@ -45,7 +45,7 @@ bool LightViewer::InfoWindow::draw_ui() {
 
   if(show_gpu_info) {
     ImGui::Separator();
-    if(async_gpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+    if(async_gpu_info.valid()) {
       gpu_info = async_gpu_info.get();
       async_gpu_info = std::async(std::launch::async, [this]() { return get_gpu_info(); });
     }
@@ -100,22 +100,27 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
 
 std::string LightViewer::InfoWindow::get_gpu_info() const {
   boost::process::ipstream pipe_stream;
-  boost::process::child c("nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader", boost::process::std_out > pipe_stream);
-
   std::stringstream sst;
 
-  std::string line;
-  while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
-    std::vector<std::string> tokens;
-    boost::split(tokens, line, boost::is_any_of(","));
+  try {
+    boost::process::child c(
+            "nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader",
+            boost::process::std_out > pipe_stream);
 
-    if(tokens.size() != 6) {
-      continue;
+    std::string line;
+    while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+      std::vector<std::string> tokens;
+      boost::split(tokens, line, boost::is_any_of(","));
+
+      if(tokens.size() != 6) {
+        continue;
+      }
+
+      sst << boost::format("%5s %20s : GPU %5s    Memory (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[4] % tokens[5];
     }
+    c.wait();
+  } catch (const std::exception& e) {}
 
-    sst << boost::format("%5s %20s : GPU %5s    Memory (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[4] % tokens[5];
-  }
-  c.wait();
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   if(sst.str().empty()) {
