@@ -108,6 +108,7 @@ public:
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, const float* data, int stride, int num_points, const ShaderSetting& shader_setting);
   template <typename Scalar, int Dim>
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, const ShaderSetting& shader_setting);
+
   template <typename Scalar, int Dim, typename Allocator>
   std::shared_ptr<glk::PointCloudBuffer>
   update_points(const std::string& name, const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting);
