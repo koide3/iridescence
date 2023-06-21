@@ -24,7 +24,8 @@ std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool ba
     is_first = false;
   }
 
-  return guik::LightViewer::instance(size, background);
+  static std::shared_ptr<guik::LightViewer> inst = guik::LightViewer::instance(size, background);
+  return inst;
 }
 
 void define_guik(py::module_& m) {

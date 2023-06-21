@@ -19,10 +19,26 @@ namespace py = pybind11;
 
 
 void define_glk(py::module_& m) {
+  py::module_ gl_ = m.def_submodule("gl", "");
   py::module_ glk_ = m.def_submodule("glk", "");
   py::module_ primitives_ = glk_.def_submodule("primitives", "");
 
-  // classes
+  // constants
+  gl_.attr("RED") = py::int_(static_cast<int>(GL_RED));
+  gl_.attr("RG") = py::int_(static_cast<int>(GL_RG));
+  gl_.attr("RGB") = py::int_(static_cast<int>(GL_RGB));
+  gl_.attr("BGR") = py::int_(static_cast<int>(GL_BGR));
+  gl_.attr("RGBA") = py::int_(static_cast<int>(GL_RGBA));
+  gl_.attr("BGRA") = py::int_(static_cast<int>(GL_BGRA));
+  gl_.attr("UNSIGNED_BYTE") = py::int_(static_cast<int>(GL_UNSIGNED_BYTE));
+  gl_.attr("BYTE") = py::int_(static_cast<int>(GL_BYTE));
+  gl_.attr("UNSIGNED_SHORT") = py::int_(static_cast<int>(GL_UNSIGNED_SHORT));
+  gl_.attr("SHORT") = py::int_(static_cast<int>(GL_SHORT));
+  gl_.attr("UNSIGNED_INT") = py::int_(static_cast<int>(GL_UNSIGNED_INT));
+  gl_.attr("INT") = py::int_(static_cast<int>(GL_INT));
+  gl_.attr("HALF_FLOAT") = py::int_(static_cast<int>(GL_HALF_FLOAT));
+  gl_.attr("FLOAT") = py::int_(static_cast<int>(GL_FLOAT));
+
   // enums
   py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
     .value("TURBO", glk::COLORMAP::TURBO)
@@ -45,6 +61,7 @@ void define_glk(py::module_& m) {
     .value("COOL_WARM", glk::COLORMAP::COOL_WARM)
     .export_values();
 
+  // classes
   // glk::Drawable
   py::class_<glk::Drawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable");
 
@@ -180,19 +197,37 @@ void define_glk(py::module_& m) {
       py::arg("data"));
 
   // glk::Texture
-  py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture");
+  py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture")
+    .def(
+      py::init([](const Eigen::Vector2i& size, unsigned int internal_format, unsigned int format, unsigned int type, const std::vector<std::uint8_t>& bytes) {
+        return std::make_shared<glk::Texture>(size, internal_format, format, type, bytes.data());
+      }),
+      py::arg("size"),
+      py::arg("internal_format"),
+      py::arg("format"),
+      py::arg("type"),
+      py::arg("bytes"));
+  ;
+
   glk_.def(
     "create_texture",
-    [](py::array_t<std::uint8_t, py::array::c_style | py::array::forcecast> arr) {
-      auto r = arr.unchecked<3>();
-      const int height = r.shape(0);
-      const int width = r.shape(1);
-      const int ch = r.shape(2);
+    [](py::array_t<std::uint8_t, py::array::c_style | py::array::forcecast> arr) -> std::shared_ptr<glk::Texture> {
+      if (arr.ndim() != 2 && arr.ndim() != 3) {
+        std::cerr << "ndim must be 2 or 3 (ndim=" << arr.ndim() << ")" << std::endl;
+        return nullptr;
+      }
 
-      GLuint format = GL_RGB;
-      switch (ch) {
+      const int height = arr.shape(0);
+      const int width = arr.shape(1);
+
+      if (arr.ndim() == 2) {
+        return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RED, GL_UNSIGNED_BYTE, arr.data());
+      }
+
+      GLuint format = GL_BGR;
+      switch (arr.shape(2)) {
         default:
-          std::cerr << "warning: invalid ch=" << ch << std::endl;
+          std::cerr << "warning: invalid ch=" << arr.shape(2) << std::endl;
           break;
         case 1:
           format = GL_RED;
@@ -208,7 +243,7 @@ void define_glk(py::module_& m) {
           break;
       }
 
-      return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE, arr.data());
+      return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, format, GL_UNSIGNED_BYTE, arr.data());
     },
     py::arg("image_uint8"));
 

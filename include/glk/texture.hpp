@@ -12,6 +12,10 @@ public:
   Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels = nullptr);
   ~Texture();
 
+  // Forbid copy
+  Texture(const Texture& temp_obj) = delete;
+  Texture& operator=(const Texture& temp_obj) = delete;
+
   GLuint id() const;
   Eigen::Vector2i size() const;
   void set_size(const Eigen::Vector2i& size);
