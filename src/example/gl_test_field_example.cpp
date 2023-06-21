@@ -21,7 +21,7 @@ public:
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version, bool background = false) override {
     Application::init(size, glsl_version);
 
-    main_canvas.reset(new guik::GLCanvas(size, "phong"));
+    main_canvas.reset(new guik::GLCanvas(size, "phong", 3));
     if(!main_canvas->ready()) {
       close();
       return false;
