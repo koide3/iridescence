@@ -20,7 +20,7 @@ public:
     normals.push_back(Eigen::Vector3f(0, 0, 1));
     normals.push_back(Eigen::Vector3f(0, 0, 1));
 
-    for(int i = 0; i < 4; i++) {
+    for(size_t i = 0; i < 4; i++) {
       indices.push_back(i);
       indices.push_back((i + 1) % 4);
 

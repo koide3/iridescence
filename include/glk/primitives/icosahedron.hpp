@@ -18,7 +18,7 @@ public:
         Eigen::Vector3f(t, 0, -1), Eigen::Vector3f(t, 0, 1), Eigen::Vector3f(-t, 0, -1), Eigen::Vector3f(-t, 0, 1)};
 
     std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals(vertices.size());
-    for(int i = 0; i < vertices.size(); i++) {
+    for(size_t i = 0; i < vertices.size(); i++) {
       normals[i] = vertices[i].normalized();
     }
 
@@ -33,7 +33,7 @@ public:
 
   void subdivide() {
     std::vector<int> new_indices;
-    for(int i = 0; i < indices.size(); i += 3) {
+    for(size_t i = 0; i < indices.size(); i += 3) {
       int a = insert_middle_point(indices[i], indices[i + 1]);
       int b = insert_middle_point(indices[i + 1], indices[i + 2]);
       int c = insert_middle_point(indices[i + 2], indices[i]);
@@ -46,7 +46,7 @@ public:
     indices.swap(new_indices);
 
     normals.resize(vertices.size());
-    for(int i = 0; i < vertices.size(); i++) {
+    for(size_t i = 0; i < vertices.size(); i++) {
       normals[i] = vertices[i].normalized();
     }
   }
@@ -57,7 +57,7 @@ public:
     }
 
     normals.resize(vertices.size());
-    for(int i = 0; i < vertices.size(); i++) {
+    for(size_t i = 0; i < vertices.size(); i++) {
       normals[i] = vertices[i].normalized();
     }
   }

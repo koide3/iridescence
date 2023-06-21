@@ -47,7 +47,7 @@ std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matr
   constexpr int Cols = std::min(Dst_Cols, Src_Cols);
 
   std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>> converted(num_points);
-  for (int i = 0; i < num_points; i++) {
+  for (size_t i = 0; i < num_points; i++) {
     converted[i].template block<Rows, Cols>(0, 0) = points[i].template cast<Dst_Scalar>().template block<Rows, Cols>(0, 0);
   }
   return converted;

@@ -43,7 +43,7 @@ public:
     std::string label_format = "\%-" + std::to_string(max_name_length) + "s";
 
     double sum_time_msec = 0.0;
-    for(int i = 0; i < labels.size(); i++) {
+    for(size_t i = 0; i < labels.size(); i++) {
       int result = 0;
       glGetQueryObjectiv(queries[i], GL_QUERY_RESULT, &result);
       double time_msec = result / 1e6;
@@ -109,7 +109,7 @@ public:
     }
     std::string label_format = "\%-" + std::to_string(max_name_length) + "s";
 
-    for(int i = 0; i < labels.size() - 1; i++) {
+    for(size_t i = 0; i < labels.size() - 1; i++) {
       double time_msec = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times[i]).count() / 1e6;
       double sum_time_msec = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times.front()).count() / 1e6;
       std::cout << boost::format(label_format) % labels[i] << boost::format(":%.3f[msec] (%.3f[msec])") % time_msec % sum_time_msec << std::endl;
@@ -170,7 +170,7 @@ public:
     std::string label_format = "\%-" + std::to_string(max_name_length) + "s";
 
     double sum_time_msec_gl = 0.0;
-    for(int i = 0; i < labels.size(); i++) {
+    for(size_t i = 0; i < labels.size(); i++) {
       int result = 0;
       glGetQueryObjectiv(queries[i], GL_QUERY_RESULT, &result);
       double time_msec_gl = result / 1e6;

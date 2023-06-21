@@ -29,7 +29,7 @@ public:
     };
 
     std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals(vertices.size());
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); i++) {
       normals[i] = vertices[i].normalized();
     }
 

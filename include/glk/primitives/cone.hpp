@@ -14,7 +14,7 @@ public:
     vertices.push_back(Eigen::Vector3f::UnitZ());
 
     double step = 2.0 * M_PI / div;
-    for(int i = 0; i < div; i++) {
+    for(size_t i = 0; i < div; i++) {
       double rad = step * i;
       vertices.push_back(Eigen::Vector3f(std::cos(rad), std::sin(rad), 0.0f));
 
