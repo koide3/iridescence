@@ -18,7 +18,7 @@ class GLCanvas {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name = "rainbow");
+  GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name = "rainbow", size_t num_color_buffers = 1);
 
   bool ready() const;
   bool load_shader(const std::string& shader_name);
