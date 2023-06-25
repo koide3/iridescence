@@ -337,6 +337,10 @@ void LightViewerContext::register_drawable_filter(const std::string& filter_name
   drawable_filters[filter_name] = filter;
 }
 
+void LightViewerContext::clear_partial_rendering() {
+  canvas->clear_partial_rendering();
+}
+
 const std::shared_ptr<CameraControl>& LightViewerContext::get_camera_control() const {
   return canvas->camera_control;
 }

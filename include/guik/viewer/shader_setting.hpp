@@ -88,6 +88,10 @@ public:
     return *this;
   }
 
+  ShaderSetting& static_object() { return add("dynamic_object", 0); }
+
+  ShaderSetting& dymamic_object() { return add("dynamic_object", 1); }
+
   template <typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
     for (int i = 0; i < params.size(); i++) {

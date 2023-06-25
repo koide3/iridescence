@@ -46,10 +46,12 @@ int main(int argc, char** argv) {
   });
 
   viewer->register_drawable_filter("drawable_filter", [&](const std::string& drawable_name){
-    if (color_map_type != 0 && drawable_name.find("gridmap_rgba") != std::string::npos)
+    if (color_map_type != 0 && drawable_name.find("gridmap_rgba") != std::string::npos) {
       return false;
-    if (color_map_type != 1 && drawable_name.find("gridmap_turbo") != std::string::npos)
+    }
+    if (color_map_type != 1 && drawable_name.find("gridmap_turbo") != std::string::npos) {
       return false;
+    }
 
     return true;
   });

@@ -79,6 +79,8 @@ public:
   void clear_drawable_filters();
   void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
 
+  void clear_partial_rendering();
+
   const std::shared_ptr<CameraControl>& get_camera_control() const;
   const std::shared_ptr<ProjectionControl>& get_projection_control() const;
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
