@@ -53,7 +53,7 @@ public:
       ImGui::Combo("type", &primitive_type_combo, items, IM_ARRAYSIZE(items));
 
       // because COORDINATE_SYSTEM falls through to SOLID_COORDINATE_SYSTEM in Primitives::create_primitive,
-      //increment bunny toggle from gui (in items) by one if primitive type is 5 (COORDINATE_SYSTEM)
+      //increment bunny toggle from gui (in items) by one if primitive type is 6 (COORDINATE_SYSTEM)
       primitive_type_render = (primitive_type_combo == 6) ? primitive_type_combo + 1 : primitive_type_combo;
 
       ImGui::End();
