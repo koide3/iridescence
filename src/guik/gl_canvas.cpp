@@ -32,8 +32,8 @@ using namespace glk::console;
  *
  * @param size
  */
-GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name) : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
-  frame_buffer.reset(new glk::FrameBuffer(size, 1));
+GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, size_t num_color_buffers) : size(size), clear_color(0.27f, 0.27f, 0.27f, 1.0f) {
+  frame_buffer.reset(new glk::FrameBuffer(size, num_color_buffers));
   shader.reset(new glk::GLSLShader());
   if (!shader->init(glk::get_data_path() + "/shader/" + shader_name)) {
     shader.reset();
