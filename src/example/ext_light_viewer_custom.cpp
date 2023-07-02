@@ -1,10 +1,13 @@
 #include <guik/viewer/light_viewer.hpp>
 
+/**
+ * @brief Custom drawable class that directly use OpenGL commands to render points
+*/
 class CustomDrawable : public glk::Drawable {
 public:
   CustomDrawable() {
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-    std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+    std::vector<Eigen::Vector3f> vertices;
+    std::vector<Eigen::Vector4f> colors;
 
     for(int x = 0; x <= 5; x++) {
       for(int y = 0; y <= 5; y++) {

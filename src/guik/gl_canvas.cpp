@@ -73,6 +73,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   normal_buffer_id = info_buffer_id = dynamic_flag_buffer_id = 0;
   last_projection_view_matrix.setIdentity();
 
+  clear_partial_rendering_flag = false;
   partial_rendering_clear_thresh = 1e-6;
 
   alpha_blend_sfactor = GL_SRC_ALPHA;
@@ -171,6 +172,10 @@ void GLCanvas::enable_partial_rendering(double clear_thresh) {
   }
 }
 
+void GLCanvas::clear_partial_rendering() {
+  clear_partial_rendering_flag = true;
+}
+
 bool GLCanvas::normal_buffer_enabled() const {
   return normal_buffer_id > 0;
 }
@@ -246,7 +251,9 @@ void GLCanvas::bind() {
   bool clear_buffer = true;
   if (partial_rendering_enabled()) {
     Eigen::Matrix4f projection_view_matrix = projection_matrix * view_matrix;
-    clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > partial_rendering_clear_thresh;
+    clear_buffer = (last_projection_view_matrix - projection_view_matrix).norm() > partial_rendering_clear_thresh || clear_partial_rendering_flag;
+    clear_partial_rendering_flag = false;
+
     last_projection_view_matrix = projection_view_matrix;
   }
 
