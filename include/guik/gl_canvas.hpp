@@ -18,7 +18,7 @@ class GLCanvas {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name = "rainbow");
+  GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name = "rainbow", size_t num_color_buffers = 1);
 
   bool ready() const;
   bool load_shader(const std::string& shader_name);
@@ -35,6 +35,7 @@ public:
   void enable_normal_buffer();
   void enable_info_buffer();
   void enable_partial_rendering(double clear_thresh = 1e-6);
+  void clear_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
@@ -74,6 +75,7 @@ public:
   int info_buffer_id;
   int dynamic_flag_buffer_id;
 
+  bool clear_partial_rendering_flag;
   double partial_rendering_clear_thresh;
   Eigen::Matrix4f last_projection_view_matrix;
 

@@ -76,7 +76,7 @@ const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
         meshes[type].reset(new glk::Lines(0.01f, coord.vertices, coord.colors));
       } break;
       case WIRE_FRUSTUM: {
-        glk::Frustum frustum(0.6f, 0.4f, 0.5f);
+          glk::Frustum frustum(0.6f, 0.4f, 0.5f);
         meshes[type].reset(new glk::Mesh(frustum.vertices, frustum.normals, frustum.indices, true));
       } break;
     }

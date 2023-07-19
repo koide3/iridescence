@@ -21,13 +21,12 @@ public:
   virtual bool init(const Eigen::Vector2i& size, const char* glsl_version, bool background = false) override {
     Application::init(size, glsl_version);
 
-    main_canvas.reset(new guik::GLCanvas(size, "phong"));
-    if(!main_canvas->ready()) {
+    main_canvas.reset(new guik::GLCanvas(size, "phong", 3));
+    if (!main_canvas->ready()) {
       close();
       return false;
     }
 
-    primitive_type = 0;
     model_control.reset(new guik::ModelControl("cube"));
 
     return true;
@@ -38,9 +37,9 @@ public:
    */
   virtual void draw_ui() override {
     // main menu
-    if(ImGui::BeginMainMenuBar()) {
-      if(ImGui::BeginMenu("File")) {
-        if(ImGui::MenuItem("Quit")) {
+    if (ImGui::BeginMainMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Quit")) {
           close();
         }
         ImGui::EndMenu();
@@ -49,9 +48,14 @@ public:
     }
 
     {
-      const char* items[] = {"ICOSAHEDRON", "SPHERE", "CUBE", "CONE", "GRID", "COORDINATE_SYSTEM", "BUNNYY"};
+      const char* items[] = {"ICOSAHEDRON", "SPHERE", "CUBE", "CONE", "GRID", "COORDINATE_SYSTEM", "BUNNY"};
       ImGui::Begin("primitive", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-      ImGui::Combo("type", &primitive_type, items, IM_ARRAYSIZE(items));
+      ImGui::Combo("type", &primitive_type_combo, items, IM_ARRAYSIZE(items));
+
+      // because COORDINATE_SYSTEM falls through to SOLID_COORDINATE_SYSTEM in Primitives::create_primitive,
+      //increment bunny toggle from gui (in items) by one if primitive type is 6 (COORDINATE_SYSTEM)
+      primitive_type_render = (primitive_type_combo == 6) ? primitive_type_combo + 1 : primitive_type_combo;
+
       ImGui::End();
     }
 
@@ -74,7 +78,7 @@ public:
     model_control->draw_gizmo(0, 0, 1920, 1080, view_matrix, projection_matrix);
 
     // mouse control
-    if(!ImGui::GetIO().WantCaptureMouse && !ImGuizmo::IsUsing()) {
+    if (!ImGui::GetIO().WantCaptureMouse && !ImGuizmo::IsUsing()) {
       main_canvas->mouse_control();
     }
   }
@@ -107,14 +111,15 @@ public:
     main_canvas->shader->set_uniform("material_emission", Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
     main_canvas->shader->set_uniform("model_matrix", model_control->model_matrix());
-    glk::Primitives::primitive(static_cast<glk::Primitives::PrimitiveType>(primitive_type)).draw(*main_canvas->shader);
+    glk::Primitives::primitive(static_cast<glk::Primitives::PrimitiveType>(primitive_type_render)).draw(*main_canvas->shader);
 
     main_canvas->unbind();
     main_canvas->render_to_screen();
   }
 
 private:
-  int primitive_type;
+  int primitive_type_combo = 0;
+  int primitive_type_render = 0;
   std::unique_ptr<guik::GLCanvas> main_canvas;
   std::unique_ptr<guik::ModelControl> model_control;
 };
@@ -122,7 +127,7 @@ private:
 int main(int argc, char** argv) {
   std::unique_ptr<guik::Application> app(new GLTestField());
 
-  if(!app->init(Eigen::Vector2i(1920, 1080), "#version 330")) {
+  if (!app->init(Eigen::Vector2i(1920, 1080), "#version 330")) {
     return 1;
   }
 

@@ -49,6 +49,11 @@ cd ~/.local/lib/python3.10/site-packages
 pybind11-stubgen -o . --ignore-invalid=all pyridescence
 ```
 
+### Docker
+
+* Build: `docker build -t iridescence -f docker/ubuntu/Dockerfile .`
+* Run: `bash docker/run.sh iridescence`
+
 ## Use Iridescence in your cmake project
 
 ```bash

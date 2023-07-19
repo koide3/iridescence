@@ -67,21 +67,23 @@ Eigen::Vector2i FrameBuffer::size() const {
 }
 
 const Texture& FrameBuffer::color() const {
-  return *color_buffers[0];
+  return *color_buffers.at(0);
 }
+
 const Texture& FrameBuffer::color(int i) const {
-  return *color_buffers[i];
+  return *color_buffers.at(i);
 }
+
 const Texture& FrameBuffer::depth() const {
   return *depth_buffer;
 }
 
 Texture& FrameBuffer::color() {
-  return *color_buffers[0];
+    return *color_buffers.at(0);
 }
 
 Texture& FrameBuffer::color(int i) {
-  return *color_buffers[i];
+  return *color_buffers.at(i);
 }
 
 Texture& FrameBuffer::depth() {

@@ -79,6 +79,8 @@ public:
   void clear_drawable_filters();
   void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
 
+  void clear_partial_rendering();
+
   const std::shared_ptr<CameraControl>& get_camera_control() const;
   const std::shared_ptr<ProjectionControl>& get_projection_control() const;
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
@@ -108,6 +110,7 @@ public:
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, const float* data, int stride, int num_points, const ShaderSetting& shader_setting);
   template <typename Scalar, int Dim>
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, const ShaderSetting& shader_setting);
+
   template <typename Scalar, int Dim, typename Allocator>
   std::shared_ptr<glk::PointCloudBuffer>
   update_points(const std::string& name, const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting);

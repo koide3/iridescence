@@ -1,62 +1,70 @@
 #include <iostream>
+#include <algorithm>
 
-#include <portable-file-dialogs.h>
-
-#include <glk/io/ply_io.hpp>
 #include <glk/pointcloud_buffer.hpp>
-#include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
-  const auto paths = pfd::open_file("Select PLY file", "", std::vector<std::string>{"PLY files", "*.ply"}).result();
-  if (paths.empty()) {
-    return 0;
-  }
-
-  const auto ply = glk::load_ply(paths[0]);
-  if (!ply) {
-    std::cerr << "failed to open " << paths[0] << std::endl;
-    return 0;
-  }
-
   auto viewer = guik::LightViewer::instance();
   viewer->disable_vsync();
   viewer->show_info_window();
+
+  // 
   viewer->enable_partial_rendering();
 
-  Eigen::Affine3f model_matrix = Eigen::Affine3f::Identity();
-  model_matrix.linear() = Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitX()) * Eigen::UniformScaling<float>(15.0f);
-  model_matrix.translation() = Eigen::Vector3f(0.0f, -15.0f, 0.0f);
+  // Number of points
+  int num_points = 8192 * 64;
+  std::shared_ptr<glk::PointCloudBuffer> cloud_buffer;
 
-  viewer->update_drawable("bunny", glk::Primitives::bunny(), guik::Rainbow(model_matrix).add("dynamic_object", 0));
+  // Create a point cloud buffer and register it to the viewer
+  const auto update_points = [&] {
+    // Generate a point cloud buffer with random points
+    std::vector<Eigen::Vector3f> points(num_points);
+    std::generate(points.begin(), points.end(), [] { return Eigen::Vector3f::Random(); });
+    cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points);
 
-  auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(ply->vertices);
-  viewer->update_drawable("cloud", cloud_buffer, guik::Rainbow().add("dynamic_object", 0));
+    // Clear the partial rendering buffer
+    viewer->clear_partial_rendering();
 
-  int points_rendering_budget = 8192 * 5;
-  viewer->register_ui_callback("ui", [&] {
-    ImGui::Begin("Partial rendering", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    // Clear drawables and register new cloud buffers
+    viewer->clear_drawables();
+    for (int x = -4; x <= 4; x += 4) {
+      for (int y = -4; y <= 4; y += 4) {
+        viewer->update_drawable(guik::anon(), cloud_buffer, guik::Rainbow().translate(x, y, 0).static_object());
+      }
+    }
+  };
 
-    ImGui::Text("Points:%zu", ply->vertices.size());
+  update_points();
+
+  int points_rendering_budget = 8192;
+  viewer->register_ui_callback("ui_callback", [&] {
+    ImGui::Begin("control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    ImGui::DragInt("Num points", &num_points, 8192, 8192, std::numeric_limits<int>::max());
     ImGui::DragInt("Budget", &points_rendering_budget, 1024, 1024, std::numeric_limits<int>::max());
 
-    if (ImGui::Button("Enable")) {
+    if (ImGui::Button("Change num points")) {
+      update_points();
+    }
+
+    // Enable partial rendering.
+    // Only `points_rendering_budget` points are rendered every frame.
+    // This greatly reduces the rendering cost and helps rendering a very large point cloud.
+    if (ImGui::Button("Enable partial rendering")) {
       cloud_buffer->enable_partial_rendering(points_rendering_budget);
     }
-    if (ImGui::Button("Disable")) {
+
+    // Disable partial rendering.
+    // All the points are rendered every frame.
+    if (ImGui::Button("Disable partial rendering")) {
       cloud_buffer->disable_partial_rendering();
     }
 
     ImGui::End();
   });
 
-  double t = 0.0;
-  while (viewer->spin_once()) {
-    t += 1e-3;
-    Eigen::Affine3f model_matrix = Eigen::Affine3f::Identity();
-    model_matrix.linear() = Eigen::AngleAxisf(t * 0.5, Eigen::Vector3f::Ones().normalized()).toRotationMatrix() * Eigen::UniformScaling<float>(15.0f);
-    viewer->update_drawable("coord", glk::Primitives::coordinate_system(), guik::VertexColor(model_matrix).add("dynamic_object", 255));
-  }
+  viewer->spin();
 
   return 0;
 }
