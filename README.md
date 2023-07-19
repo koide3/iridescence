@@ -42,6 +42,11 @@ sudo make install
 # [Optional] Build and install python bindings
 cd ..
 sudo python3 setup.py install
+
+# [Optional2] Install stubs for autocomplete
+pip install pybind11-stubgen
+cd ~/.local/lib/python3.10/site-packages
+pybind11-stubgen -o . --ignore-invalid=all pyridescence
 ```
 
 ### Docker

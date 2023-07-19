@@ -101,6 +101,10 @@ inline std::shared_ptr<LightViewer> viewer(const Eigen::Vector2i& size = Eigen::
   return LightViewer::instance(size, background);
 }
 
+inline void destroy() {
+  LightViewer::destroy();
+}
+
 }  // namespace guik
 
 #endif

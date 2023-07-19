@@ -21,7 +21,7 @@ using namespace glk::console;
 Application::Application() : window(nullptr) {}
 
 Application ::~Application() {
-  if(!window) {
+  if (!window) {
     return;
   }
 
@@ -41,9 +41,8 @@ void fb_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background) {
-  glfwSetErrorCallback(
-      [](int err, const char* desc) { std::cerr << bold_red << "glfw error " << err << ": " << desc << reset << std::endl; });
-  if(!glfwInit()) {
+  glfwSetErrorCallback([](int err, const char* desc) { std::cerr << bold_red << "glfw error " << err << ": " << desc << reset << std::endl; });
+  if (!glfwInit()) {
     std::cerr << bold_red << "failed to initialize GLFW" << reset << std::endl;
     return false;
   }
@@ -51,12 +50,12 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-  if(background) {
+  if (background) {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   }
 
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
-  if(window == nullptr) {
+  if (window == nullptr) {
     return false;
   }
   appmap[window] = this;
@@ -66,7 +65,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1);
 
-  if(gl3wInit()) {
+  if (gl3wInit()) {
     std::cerr << bold_red << "failed to initialize GL3W" << reset << std::endl;
     return false;
   }
@@ -102,6 +101,14 @@ void Application::framebuffer_size_callback(const Eigen::Vector2i& size) {
   std::cout << "FB:" << size.transpose() << std::endl;
 }
 
+void Application::enable_docking() {
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+}
+
+void Application::disable_docking() {
+  ImGui::GetIO().ConfigFlags ^= ImGuiConfigFlags_DockingEnable;
+}
+
 bool Application::ok() const {
   return !glfwWindowShouldClose(window);
 }
@@ -130,7 +137,7 @@ void Application::resize(const Eigen::Vector2i& size) {
 
 void Application::spin() {
   glfwSetWindowShouldClose(window, GLFW_FALSE);
-  while(spin_once()) {
+  while (spin_once()) {
   }
 }
 
@@ -152,7 +159,7 @@ bool Application::spin_once() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   draw_gl();
-  
+
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   glfwSwapBuffers(window);
 
