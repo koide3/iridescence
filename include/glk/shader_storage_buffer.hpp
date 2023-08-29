@@ -21,7 +21,7 @@ public:
   template <typename T>
   void clear_data(const T& data);
 
-  void copy_to(ShaderStorageBuffer& dst, size_t size = 0);
+  void copy_to(ShaderStorageBuffer& dst, size_t size = 0) const;
 
   void bind(int index = 0);
   void unbind(int index = 0);

@@ -115,7 +115,7 @@ void ShaderStorageBuffer::clear_data(const Eigen::Vector4f& data) {
   glClearNamedBufferData(ssbo, GL_RGBA32F, GL_RGBA, GL_FLOAT, &data);
 }
 
-void ShaderStorageBuffer::copy_to(ShaderStorageBuffer& dst, size_t size) {
+void ShaderStorageBuffer::copy_to(ShaderStorageBuffer& dst, size_t size) const {
   if (size == 0) {
     size = buffer_size;
   }
