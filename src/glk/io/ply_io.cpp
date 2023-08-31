@@ -191,7 +191,7 @@ std::shared_ptr<PLYData> load_ply_body_binary(std::ifstream& ifs, const PLYMetaD
   }
 
   if (meta_data.num_faces && meta_data.face_properties.empty()) {
-    std::cerr << console::yellow << "warning: face properties dont exist!!" << console::reset << std::endl;
+    // std::cerr << console::yellow << "warning: face properties dont exist!!" << console::reset << std::endl;
   }
 
   if (meta_data.face_properties.size() == 2) {
