@@ -32,7 +32,7 @@ template void LightViewerContext::update_normal_dists(const std::string&, const 
 template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<double, 4, 1>*, const Eigen::Matrix<double, 4, 4>*, int, float, const ShaderSetting&);
 
 // ThinLines
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const float* vertices,
   const float* colors,
@@ -41,7 +41,9 @@ void LightViewerContext::update_thin_lines(
   int num_indices,
   bool line_strip,
   const ShaderSetting& shader_setting) {
-  update_drawable(name, std::make_shared<glk::ThinLines>(vertices, colors, num_vertices, indices, num_indices, line_strip), shader_setting);
+  auto thin_lines = std::make_shared<glk::ThinLines>(vertices, colors, num_vertices, indices, num_indices, line_strip);
+  update_drawable(name, thin_lines, shader_setting);
+  return thin_lines;
 }
 
 // Primitives

@@ -18,6 +18,7 @@
 #include <guik/viewer/anonymous.hpp>
 
 namespace glk {
+class ThinLines;
 class PointCloudBuffer;
 }
 
@@ -134,7 +135,7 @@ public:
     const ShaderSetting& shader_setting);
 
   // ThinLines
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
     const float* vertices,
     const float* colors,
@@ -145,10 +146,11 @@ public:
     const ShaderSetting& shader_setting);
 
   template <typename Scalar, int Dim>
-  void update_thin_lines(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, bool line_strip, const ShaderSetting& shader_setting);
+  std::shared_ptr<glk::ThinLines>
+  update_thin_lines(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, bool line_strip, const ShaderSetting& shader_setting);
 
   template <typename ScalarV, int DimV, typename ScalarC, int DimC>
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
     const Eigen::Matrix<ScalarV, DimV, 1>* points,
     const Eigen::Matrix<ScalarC, DimC, 1>* colors,
@@ -157,7 +159,7 @@ public:
     const ShaderSetting& shader_setting);
 
   template <typename ScalarV, int DimV, typename ScalarC, int DimC>
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
     const Eigen::Matrix<ScalarV, DimV, 1>* points,
     const Eigen::Matrix<ScalarC, DimC, 1>* colors,
@@ -168,10 +170,10 @@ public:
     const ShaderSetting& shader_setting);
 
   template <typename Point, typename Alloc>
-  void update_thin_lines(const std::string& name, const std::vector<Point, Alloc>& points, bool line_strip, const ShaderSetting& shader_setting);
+  std::shared_ptr<glk::ThinLines> update_thin_lines(const std::string& name, const std::vector<Point, Alloc>& points, bool line_strip, const ShaderSetting& shader_setting);
 
   template <typename Point, typename Alloc>
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines>update_thin_lines(
     const std::string& name,
     const std::vector<Point, Alloc>& points,
     const std::vector<unsigned int>& indices,
@@ -179,7 +181,7 @@ public:
     const ShaderSetting& shader_setting);
 
   template <typename Point, typename AllocP, typename Color, typename AllocC>
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
     const std::vector<Point, AllocP>& points,
     const std::vector<Color, AllocC>& colors,
@@ -187,7 +189,7 @@ public:
     const ShaderSetting& shader_setting);
 
   template <typename Point, typename AllocP, typename Color, typename AllocC>
-  void update_thin_lines(
+  std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
     const std::vector<Point, AllocP>& points,
     const std::vector<Color, AllocC>& colors,
@@ -260,22 +262,18 @@ void LightViewerContext::update_normal_dists(
 
 // ThinLines
 template <typename Scalar, int Dim>
-void LightViewerContext::update_thin_lines(
-  const std::string& name,
-  const Eigen::Matrix<Scalar, Dim, 1>* points,
-  int num_points,
-  bool line_strip,
-  const ShaderSetting& shader_setting) {
+std::shared_ptr<glk::ThinLines>
+LightViewerContext::update_thin_lines(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, bool line_strip, const ShaderSetting& shader_setting) {
   if constexpr (std::is_same<Scalar, float>::value && Dim == 3) {
-    update_thin_lines(name, reinterpret_cast<const float*>(points), nullptr, num_points, nullptr, 0, line_strip, shader_setting);
+    return update_thin_lines(name, reinterpret_cast<const float*>(points), nullptr, num_points, nullptr, 0, line_strip, shader_setting);
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
-    update_thin_lines(name, points_3f.data(), num_points, line_strip, shader_setting);
+    return update_thin_lines(name, points_3f.data(), num_points, line_strip, shader_setting);
   }
 }
 
 template <typename ScalarV, int DimV, typename ScalarC, int DimC>
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const Eigen::Matrix<ScalarV, DimV, 1>* points,
   const Eigen::Matrix<ScalarC, DimC, 1>* colors,
@@ -283,16 +281,16 @@ void LightViewerContext::update_thin_lines(
   bool line_strip,
   const ShaderSetting& shader_setting) {
   if constexpr (std::is_same<ScalarV, float>::value && DimV == 3 && std::is_same<ScalarC, float>::value && DimC == 4) {
-    update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, nullptr, 0, line_strip, shader_setting);
+    return update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, nullptr, 0, line_strip, shader_setting);
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     const auto colors_4f = glk::convert_to_vector<float, 4, 1>(colors, num_points);
-    update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, line_strip, shader_setting);
+    return update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, line_strip, shader_setting);
   }
 }
 
 template <typename ScalarV, int DimV, typename ScalarC, int DimC>
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const Eigen::Matrix<ScalarV, DimV, 1>* points,
   const Eigen::Matrix<ScalarC, DimC, 1>* colors,
@@ -302,48 +300,49 @@ void LightViewerContext::update_thin_lines(
   bool line_strip,
   const ShaderSetting& shader_setting) {
   if constexpr (std::is_same<ScalarV, float>::value && DimV == 3 && std::is_same<ScalarC, float>::value && DimC == 4) {
-    update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, indices, num_indices, line_strip, shader_setting);
+    return update_thin_lines(name, reinterpret_cast<const float*>(points), reinterpret_cast<const float*>(colors), num_points, indices, num_indices, line_strip, shader_setting);
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     const auto colors_4f = glk::convert_to_vector<float, 4, 1>(colors, num_points);
-    update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, indices, num_indices, line_strip, shader_setting);
+    return update_thin_lines(name, points_3f.data(), colors_4f.data(), num_points, indices, num_indices, line_strip, shader_setting);
   }
 }
 
 template <typename Point, typename Alloc>
-void LightViewerContext::update_thin_lines(const std::string& name, const std::vector<Point, Alloc>& points, bool line_strip, const ShaderSetting& shader_setting) {
-  update_thin_lines(name, points.data(), points.size(), line_strip, shader_setting);
+std::shared_ptr<glk::ThinLines>
+LightViewerContext::update_thin_lines(const std::string& name, const std::vector<Point, Alloc>& points, bool line_strip, const ShaderSetting& shader_setting) {
+  return update_thin_lines(name, points.data(), points.size(), line_strip, shader_setting);
 }
 
 template <typename Point, typename Alloc>
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const std::vector<Point, Alloc>& points,
   const std::vector<unsigned int>& indices,
   bool line_strip,
   const ShaderSetting& shader_setting) {
-  update_thin_lines(name, points.data(), static_cast<const Eigen::Vector4f*>(nullptr), points.size(), indices.data(), indices.size(), line_strip, shader_setting);
+  return update_thin_lines(name, points.data(), static_cast<const Eigen::Vector4f*>(nullptr), points.size(), indices.data(), indices.size(), line_strip, shader_setting);
 }
 
 template <typename Point, typename AllocP, typename Color, typename AllocC>
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const std::vector<Point, AllocP>& points,
   const std::vector<Color, AllocC>& colors,
   bool line_strip,
   const ShaderSetting& shader_setting) {
-  update_thin_lines(name, points.data(), colors.data(), points.size(), line_strip, shader_setting);
+  return update_thin_lines(name, points.data(), colors.data(), points.size(), line_strip, shader_setting);
 }
 
 template <typename Point, typename AllocP, typename Color, typename AllocC>
-void LightViewerContext::update_thin_lines(
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::string& name,
   const std::vector<Point, AllocP>& points,
   const std::vector<Color, AllocC>& colors,
   const std::vector<unsigned int>& indices,
   bool line_strip,
   const ShaderSetting& shader_setting) {
-  update_thin_lines(name, points.data(), colors.data(), points.size(), indices.data(), indices.size(), line_strip, shader_setting);
+  return update_thin_lines(name, points.data(), colors.data(), points.size(), indices.data(), indices.size(), line_strip, shader_setting);
 }
 
 }  // namespace guik
