@@ -41,6 +41,11 @@ public:
   ~ScreenCapture();
 
   /**
+   * @brief Image encoding queue size
+  */
+  size_t queue_size() const;
+
+  /**
    * @brief Capture the viewer main canvas and save it as a image file.
    * @param dst_filename  Filename (must end with ".png" or ".jpg")
   */

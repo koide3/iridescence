@@ -47,6 +47,10 @@ ScreenCapture::~ScreenCapture() {
   }
 }
 
+size_t ScreenCapture::queue_size() const {
+  return input_queue->size();
+}
+
 void ScreenCapture::capture(const std::string& dst_filename) {
   auto viewer = guik::viewer();
   capture(dst_filename, viewer->color_buffer());
@@ -97,8 +101,16 @@ void ScreenCapture::encode_task() {
         memcpy(row_b, row_buffer.data(), sizeof(unsigned char) * 4 * image_size[0]);
       }
 
-      if (!glk::save_png(dst_filename, image_size[0], image_size[1], *pixels)) {
-        std::cerr << glk::console::yellow << "warning: failed to save " << dst_filename << glk::console::reset << std::endl;
+      if (dst_filename.substr(dst_filename.size() - 4) == ".png") {
+        if (!glk::save_png(dst_filename, image_size[0], image_size[1], *pixels)) {
+          std::cerr << glk::console::yellow << "warning: failed to save " << dst_filename << glk::console::reset << std::endl;
+        }
+      } else if (dst_filename.substr(dst_filename.size() - 4) == ".jpg") {
+        if (!glk::save_jpeg(dst_filename, image_size[0], image_size[1], *pixels)) {
+          std::cerr << glk::console::yellow << "warning: failed to save " << dst_filename << glk::console::reset << std::endl;
+        }
+      } else {
+        std::cerr << glk::console::yellow << "warning: unknown image file extension " << dst_filename << glk::console::reset << std::endl;
       }
     }
   }
