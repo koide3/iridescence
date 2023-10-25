@@ -72,6 +72,8 @@ public:
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
 
+  std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>>& get_drawables();
+
   std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> find_drawable(const std::string& name);
   void remove_drawable(const std::string& name);
   void remove_drawable(const std::regex& regex);
