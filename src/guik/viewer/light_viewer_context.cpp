@@ -292,6 +292,10 @@ void LightViewerContext::clear_drawables(const std::function<bool(const std::str
   }
 }
 
+std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>>& LightViewerContext::get_drawables() {
+  return drawables;
+}
+
 std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> LightViewerContext::find_drawable(const std::string& name) {
   auto found = drawables.find(name);
   if (found != drawables.end()) {
