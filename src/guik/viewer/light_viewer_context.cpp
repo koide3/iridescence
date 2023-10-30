@@ -46,13 +46,13 @@ void LightViewerContext::set_clear_color(const Eigen::Vector4f& color) {
   canvas->set_clear_color(color);
 }
 
-void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond) {
+void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond, ImGuiWindowFlags flags) {
   int x = pos[0];
   int y = pos[1];
 
   guik::LightViewer::instance()->invoke([=] {
     ImGui::SetNextWindowPos(ImVec2(x, y), cond);
-    ImGui::Begin(context_name.c_str());
+    ImGui::Begin(context_name.c_str(), nullptr, flags);
     ImGui::End();
   });
 }
