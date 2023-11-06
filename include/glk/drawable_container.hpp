@@ -17,15 +17,9 @@ public:
   using Ptr = std::shared_ptr<Drawable>;
   using ConstPtr = std::shared_ptr<const Drawable>;
 
-  DrawableContainer();
+  DrawableContainer(bool skip_model_matrix_setting = true);
 
-  DrawableContainer(std::initializer_list<glk::Drawable::ConstPtr> init);
-
-  template <typename ConstIterator>
-  DrawableContainer(ConstIterator first, ConstIterator last) {
-    drawables.reserve(std::distance(first, last));
-    std::transform(first, last, std::back_inserter(drawables), [](const glk::Drawable::ConstPtr& drawable) { return std::make_pair(std::nullopt, drawable); });
-  }
+  DrawableContainer(std::initializer_list<glk::Drawable::ConstPtr> init, bool skip_model_matrix_setting = true);
 
   virtual ~DrawableContainer();
 
@@ -37,6 +31,7 @@ public:
   virtual void draw(glk::GLSLShader& shader) const override;
 
 public:
+  bool skip_model_matrix;
   std::vector<std::pair<std::optional<guik::ShaderSetting>, glk::Drawable::ConstPtr>> drawables;
 };
 

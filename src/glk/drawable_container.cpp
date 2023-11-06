@@ -4,9 +4,9 @@
 
 namespace glk {
 
-DrawableContainer::DrawableContainer() {}
+DrawableContainer::DrawableContainer(bool skip_model_matrix_setting) : skip_model_matrix(skip_model_matrix_setting) {}
 
-DrawableContainer::DrawableContainer(std::initializer_list<glk::Drawable::ConstPtr> init) {
+DrawableContainer::DrawableContainer(std::initializer_list<glk::Drawable::ConstPtr> init, bool skip_model_matrix_setting) : skip_model_matrix(skip_model_matrix_setting) {
   drawables.resize(init.size());
   std::transform(init.begin(), init.end(), drawables.begin(), [](const glk::Drawable::ConstPtr& drawable) { return std::make_pair(std::nullopt, drawable); });
 }
@@ -32,7 +32,14 @@ void DrawableContainer::push_back(const glk::Drawable::ConstPtr& drawable, const
 void DrawableContainer::draw(glk::GLSLShader& shader) const {
   for (const auto& drawable : drawables) {
     if (drawable.first) {
-      drawable.first->set(shader);
+      const auto& params = drawable.first->params;
+      for (int i = 0; i < params.size(); i++) {
+        if (skip_model_matrix && i == 2) {
+          continue;
+        }
+
+        params[i]->set(shader);
+      }
     }
 
     drawable.second->draw(shader);

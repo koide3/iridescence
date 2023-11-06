@@ -145,6 +145,9 @@ public:
 
   void set(glk::GLSLShader& shader) const {
     for (const auto& param : params) {
+      if(!param) {
+        continue;
+      }
       param->set(shader);
     }
   }
@@ -157,6 +160,12 @@ public:
   ShaderSetting& set_point_scale(float scaling) {
     auto p = static_cast<ShaderParameter<float>*>(params[1].get());
     p->value = scaling;
+    return *this;
+  }
+
+  // Calling `remove_model_matrix` invalidates model matrix operations (translate, rotate, and scale)
+  ShaderSetting& remove_model_matrix() {
+    params[2] = nullptr;
     return *this;
   }
 
