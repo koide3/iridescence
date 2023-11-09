@@ -13,6 +13,7 @@ public:
 
   StaticCameraControl();
   StaticCameraControl(const Eigen::Isometry3f& T_world_camera, const Eigen::Vector2f& depth = Eigen::Vector2f(1e-3, 1e3));
+  StaticCameraControl(const Eigen::Vector3f& eye, const Eigen::Vector3f& center, const Eigen::Vector3f& up, const Eigen::Vector2f& depth = Eigen::Vector2f(1e-3, 1e3));
   virtual ~StaticCameraControl() override;
 
   virtual Eigen::Vector2f depth_range() const override;
