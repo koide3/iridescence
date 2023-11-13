@@ -36,7 +36,7 @@ public:
 
   void set_size(const Eigen::Vector2i& size);
   void set_clear_color(const Eigen::Vector4f& color);
-  void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver);
+  void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver, ImGuiWindowFlags = 0);
 
   virtual void clear();
   virtual void clear_text();
