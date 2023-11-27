@@ -90,14 +90,14 @@ std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
         normals.emplace_back(n.x, n.y, n.z);
       }
     }
-    if (mesh->mColors && mesh->mColors[0]) {
+    if (mesh->mColors[0]) {
       colors.reserve(mesh->mNumVertices);
       for (int i = 0; i < mesh->mNumVertices; i++) {
         const auto& c = mesh->mColors[0][i];
         colors.emplace_back(c.r, c.g, c.b, c.a);
       }
     }
-    if (mesh->mTextureCoords && mesh->mTextureCoords[0]) {
+    if (mesh->mTextureCoords[0]) {
       tex_coords.reserve(mesh->mNumVertices);
       for (int i = 0; i < mesh->mNumVertices; i++) {
         const auto& t = mesh->mTextureCoords[0][i];

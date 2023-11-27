@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool background) {
+std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   static bool is_first = true;
   if (is_first) {
     py::gil_scoped_acquire acquire;
@@ -24,7 +24,7 @@ std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool ba
     is_first = false;
   }
 
-  static std::shared_ptr<guik::LightViewer> inst = guik::LightViewer::instance(size, background);
+  static std::shared_ptr<guik::LightViewer> inst = guik::LightViewer::instance(size, background, title);
   return inst;
 }
 
@@ -207,9 +207,10 @@ void define_guik(py::module_& m) {
   py::class_<guik::LightViewer, guik::LightViewerContext, std::shared_ptr<guik::LightViewer>>(guik_, "LightViewer")
     .def_static(
       "instance",
-      [](const Eigen::Vector2i& size, bool background) { return instance(size, background); },
+      [](const Eigen::Vector2i& size, bool background, const std::string& title) { return instance(size, background, title); },
       py::arg("size") = Eigen::Vector2i(1920, 1080),
-      py::arg("background") = false)
+      py::arg("background") = false,
+      py::arg("title") = "screen")
     .def("sub_viewer", [](guik::LightViewer& viewer, const std::string& name) { return viewer.sub_viewer(name); })
     .def(
       "sub_viewer",
@@ -279,9 +280,10 @@ void define_guik(py::module_& m) {
   guik_.def("anon", &guik::anon, "");
   guik_.def(
     "viewer",
-    [](const Eigen::Vector2i& size, bool background) { return instance(size, background); },
+    [](const Eigen::Vector2i& size, bool background, const std::string& title) { return instance(size, background, title); },
     "",
     py::arg("size") = Eigen::Vector2i(1920, 1080),
-    py::arg("background") = false);
+    py::arg("background") = false,
+    py::arg("title") = "screen");
   guik_.def("destroy", &guik::destroy, "");
 }

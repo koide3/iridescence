@@ -14,7 +14,7 @@ public:
   Application();
   virtual ~Application();
 
-  virtual bool init(const Eigen::Vector2i& size, const char* glsl_version = "#version 330", bool background = false);
+  virtual bool init(const Eigen::Vector2i& size, const char* glsl_version = "#version 330", bool background = false, const std::string& title = "screen");
 
   bool ok() const;
 
@@ -29,6 +29,8 @@ public:
   virtual void hide_window();
   virtual void maximize_window();
   virtual void resize(const Eigen::Vector2i& size);
+
+  void set_title(const std::string& title);
 
   Eigen::Vector2i framebuffer_size() const;
   virtual void framebuffer_size_callback(const Eigen::Vector2i& size);
