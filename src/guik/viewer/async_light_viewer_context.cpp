@@ -26,6 +26,10 @@ void AsyncLightViewerContext::append_text(const std::string& text) {
   guik::viewer()->invoke([=] { context->append_text(text); });
 }
 
+void AsyncLightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
+  guik::viewer()->invoke([=] { context->register_ui_callback(name, callback); });
+}
+
 void AsyncLightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   guik::viewer()->invoke([=] { context->set_draw_xy_grid(draw_xy_grid); });
 }

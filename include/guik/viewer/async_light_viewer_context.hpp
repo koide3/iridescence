@@ -19,6 +19,7 @@ public:
   void clear();
   void clear_text();
   void append_text(const std::string& text);
+  void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
 
   void disable_xy_grid() { set_draw_xy_grid(false); }
   void enable_xy_grid() { set_draw_xy_grid(true); }

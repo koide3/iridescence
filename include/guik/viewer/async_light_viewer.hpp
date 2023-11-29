@@ -15,8 +15,13 @@ private:
 public:
   virtual ~AsyncLightViewer();
 
+  /// @brief Create and run the viewer in a background thread
   static AsyncLightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen");
+
+  /// @brief Destroy the viewer in the background thread
   static void destroy();
+
+  /// @brief Wait for the viewer to be closed
   static void wait();
 
   void invoke(const std::function<void()>& func);

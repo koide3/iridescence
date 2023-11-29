@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
+guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   static bool is_first = true;
   if (is_first) {
     py::gil_scoped_acquire acquire;
@@ -24,7 +24,7 @@ std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool ba
     is_first = false;
   }
 
-  static std::shared_ptr<guik::LightViewer> inst = guik::LightViewer::instance(size, background, title);
+  static guik::LightViewer* inst = guik::LightViewer::instance(size, background, title);
   return inst;
 }
 
@@ -163,7 +163,7 @@ void define_guik(py::module_& m) {
   py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
 
   // LightViewerContext
-  py::class_<guik::LightViewerContext, std::shared_ptr<guik::LightViewerContext>>(guik_, "LightViewerContext")
+  py::class_<guik::LightViewerContext, std::unique_ptr<guik::LightViewerContext, py::nodelete>>(guik_, "LightViewerContext")
     .def("set_size", &guik::LightViewerContext::set_size)
     .def("set_clear_color", &guik::LightViewerContext::set_clear_color)
     .def("set_pos", &guik::LightViewerContext::set_pos, "", py::arg("pos"), py::arg("cond") = static_cast<int>(ImGuiCond_FirstUseEver), py::arg("flags") = 0)
@@ -204,7 +204,7 @@ void define_guik(py::module_& m) {
     .def("set_projection_control", &guik::LightViewerContext::set_projection_control, "");
 
   // LightViewer
-  py::class_<guik::LightViewer, guik::LightViewerContext, std::shared_ptr<guik::LightViewer>>(guik_, "LightViewer")
+  py::class_<guik::LightViewer, guik::LightViewerContext, std::unique_ptr<guik::LightViewer, py::nodelete>>(guik_, "LightViewer")
     .def_static(
       "instance",
       [](const Eigen::Vector2i& size, bool background, const std::string& title) { return instance(size, background, title); },
