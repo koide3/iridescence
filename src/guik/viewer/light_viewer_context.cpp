@@ -6,6 +6,7 @@
 #include <glk/primitives/primitives.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
+#include <guik/viewer/async_light_viewer_context.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
@@ -411,6 +412,10 @@ std::optional<Eigen::Vector3f> LightViewerContext::pick_point(int button, int wi
   }
 
   return unproject({io.MousePos.x, io.MousePos.y}, depth);
+}
+
+AsyncLightViewerContext LightViewerContext::async() {
+  return AsyncLightViewerContext(this);
 }
 
 }  // namespace guik

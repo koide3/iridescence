@@ -130,6 +130,8 @@ add_library(iridescence SHARED
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
   src/guik/viewer/light_viewer_context_util.cpp
+  src/guik/viewer/async_light_viewer.cpp
+  src/guik/viewer/async_light_viewer_context.cpp
   src/guik/viewer/viewer_ui.cpp
   src/guik/viewer/info_window.cpp
   src/guik/viewer/anonymous.cpp

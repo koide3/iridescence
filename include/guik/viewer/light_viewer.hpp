@@ -19,26 +19,8 @@ public:
   LightViewer();
   virtual ~LightViewer();
 
-  static std::shared_ptr<LightViewer> instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
-    if (!inst) {
-      Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
-      inst.reset(new LightViewer());
-      inst->init(init_size, "#version 330", background, title);
-    } else {
-      if ((size.array() > 0).all() && inst->window_size() != size) {
-        inst->resize(size);
-      }
-    }
-
-    return inst;
-  }
-
-  static void destroy() {
-    if (inst) {
-      inst->clear();
-      inst.reset();
-    }
-  }
+  static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen");
+  static void destroy();
 
   bool spin_until_click();
   bool toggle_spin_once();
@@ -75,7 +57,7 @@ private:
   virtual void draw_gl() override;
 
 private:
-  static std::shared_ptr<LightViewer> inst;
+  static std::unique_ptr<LightViewer> inst;
 
   std::unique_ptr<ViewerUI> viewer_ui;
   std::unique_ptr<InfoWindow> info_window;
@@ -97,11 +79,11 @@ private:
   std::deque<std::function<void()>> post_render_invoke_requests;
 };
 
-inline std::shared_ptr<LightViewer> viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
+inline LightViewer* viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
   return LightViewer::instance(size, background, title);
 }
 
-inline std::shared_ptr<LightViewer> viewer(const std::string& title, const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
+inline LightViewer* viewer(const std::string& title, const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
   return LightViewer::instance(size, background, title);
 }
 
