@@ -38,8 +38,8 @@ private:
   std::thread thread;
 };
 
-inline AsyncLightViewer* async_viewer() {
-  return AsyncLightViewer::instance();
+inline AsyncLightViewer* async_viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1,  -1), bool background = false, const std::string& title = "screen") {
+  return AsyncLightViewer::instance(size, background, title);
 }
 
 inline void async_destroy() {

@@ -9,6 +9,7 @@
 #include <glk/drawable.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/imgui_application.hpp>
+#include <guik/viewer/plot_data.hpp>
 #include <guik/viewer/shader_setting.hpp>
 #include <guik/viewer/light_viewer_context.hpp>
 
@@ -37,6 +38,14 @@ public:
   void clear_images();
   void remove_image(const std::string& name);
   void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0);
+
+  void clear_plots();
+  void remove_plot(const std::string& plot_name, const std::string& label = "");
+  void setup_plot(const std::string& plot_name, int width, int height, int flags = 0);
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int x_flags = 0, int y_flags = 0);
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int x_flags = 0, int y_flags = 0);
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, int x_flags = 0, int y_flags = 0);
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int x_flags = 0, int y_flags = 0);
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
@@ -69,6 +78,9 @@ private:
 
   std::unordered_map<std::string, std::pair<double, std::shared_ptr<glk::Texture>>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
+
+  std::unordered_map<std::string, std::tuple<int, int, int>> plot_settings;
+  std::unordered_map<std::string, std::vector<PlotData::ConstPtr>> plot_data;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 

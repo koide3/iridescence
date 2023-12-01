@@ -5,9 +5,11 @@
 
 #include <regex>
 #include <chrono>
-#include <future>
+#include <numeric>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <implot.h>
 
 #include <glk/io/png_io.hpp>
 #include <glk/glsl_shader.hpp>
@@ -221,6 +223,70 @@ void LightViewer::draw_ui() {
     ImGui::End();
   }
 
+  // plots
+  if (!plot_data.empty()) {
+    std::cout << "---" << std::endl;
+    ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    std::unordered_map<std::string, std::vector<std::string>> groups;
+    for (const auto& plot : plot_data) {
+      const size_t separator_loc = plot.first.find_first_of('/');
+      const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
+      groups[group].push_back(plot.first);
+    }
+
+    const bool grouping = groups.size() > 1;
+
+    if (grouping) {
+      ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+      ImGui::BeginTabBar("plottab", tab_bar_flags);
+    }
+
+    for (auto& group : groups) {
+      if (grouping) {
+        if (!ImGui::BeginTabItem(group.first.c_str())) {
+          continue;
+        }
+      }
+
+      for (const auto& plot_name : group.second) {
+        auto found = plot_settings.find(plot_name);
+        if (found == plot_settings.end()) {
+          found = plot_settings.emplace_hint(found, plot_name, std::make_tuple(512, 512, 0));
+        }
+        const auto setting = found->second;
+
+        std::cout << "BeginPlot " << plot_name << std::endl;
+        ImPlot::BeginPlot(plot_name.c_str(), ImVec2(std::get<0>(setting), std::get<1>(setting)), std::get<2>(setting));
+
+        const auto& plots = plot_data[plot_name];
+        if (!plots.empty()) {
+          const auto& plot = plots.front();
+          std::cout << "SetupAxes " << plot->label << std::endl;
+          ImPlot::SetupAxes(plot->x_label.c_str(), plot->y_label.c_str(), plot->x_flags, plot->y_flags);
+        }
+
+        for (const auto& plot : plots) {
+          std::cout << "PlotLine " << plot->label << std::endl;
+          ImPlot::PlotLine(plot->label.c_str(), plot->xs.data(), plot->ys.data(), plot->xs.size());
+        }
+
+        std::cout << "EndPlot " << plot_name << std::endl;
+        ImPlot::EndPlot();
+      }
+
+      if (grouping) {
+        ImGui::EndTabItem();
+      }
+    }
+
+    if (grouping) {
+      ImGui::EndTabBar();
+    }
+
+    ImGui::End();
+  }
+
   // mouse control
   if (!ImGui::GetIO().WantCaptureMouse) {
     canvas->mouse_control();
@@ -299,6 +365,85 @@ void LightViewer::update_image(const std::string& name, const std::shared_ptr<gl
 
   images[name] = std::make_pair(scale, image);
 }
+
+void LightViewer::clear_plots() {
+  plot_settings.clear();
+  plot_data.clear();
+}
+
+void LightViewer::remove_plot(const std::string& plot_name, const std::string& label) {
+  auto found = plot_data.find(plot_name);
+  if (found == plot_data.end()) {
+    return;
+  }
+
+  if (label.empty()) {
+    plot_data.erase(found);
+    return;
+  }
+
+  auto& data = found->second;
+  data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p->label == label; }));
+}
+
+void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int flags) {
+  plot_settings[plot_name] = std::make_tuple(width, height, flags);
+}
+
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int x_flags, int y_flags) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_line(plot_name, label, xs, ys, x_flags, y_flags);
+}
+
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int x_flags, int y_flags) {
+  //
+  if (xs.size() != ys.size()) {
+    std::cerr << "warning: the length of xs must be the same as the length of ys (" << xs.size() << " vs " << ys.size() << ")" << std::endl;
+    return;
+  }
+
+  auto p = std::make_shared<PlotData>();
+  p->label = label;
+  p->x_flags = x_flags;
+  p->y_flags = y_flags;
+
+  const int max_size = 4096;
+
+  if (xs.size() <= max_size) {
+    p->xs = xs;
+    p->ys = ys;
+  } else {
+    p->xs.resize(max_size);
+    p->ys.resize(max_size);
+
+    for (int i = 0; i < max_size; i++) {
+      const double t = static_cast<double>(i) / max_size;
+      const size_t j = std::min<size_t>(t * xs.size(), xs.size() - 1);
+
+      p->xs[i] = xs[j];
+      p->ys[i] = ys[j];
+    }
+  }
+
+  auto& data = plot_data[plot_name];
+  auto found = std::find_if(data.begin(), data.end(), [&](const PlotData::ConstPtr& p_) { return p_->label == p->label; });
+  if (found == data.end()) {
+    data.emplace_back(p);
+  } else {
+    *found = p;
+  }
+}
+
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, int x_flags, int y_flags) {}
+
+void LightViewer::update_plot_scatter(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int x_flags,
+  int y_flags) {}
 
 bool LightViewer::spin_until_click() {
   bool kill_switch = false;
