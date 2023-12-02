@@ -15,6 +15,7 @@
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/console_colors.hpp>
+#include <guik/viewer/plot_data.hpp>
 #include <guik/viewer/viewer_ui.hpp>
 #include <guik/viewer/info_window.hpp>
 
@@ -225,7 +226,6 @@ void LightViewer::draw_ui() {
 
   // plots
   if (!plot_data.empty()) {
-    std::cout << "---" << std::endl;
     ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     std::unordered_map<std::string, std::vector<std::string>> groups;
@@ -249,30 +249,25 @@ void LightViewer::draw_ui() {
         }
       }
 
+      std::sort(group.second.begin(), group.second.end(), [this](const auto& lhs, const auto& rhs) { return plot_settings[lhs].order < plot_settings[rhs].order; });
+
       for (const auto& plot_name : group.second) {
-        auto found = plot_settings.find(plot_name);
-        if (found == plot_settings.end()) {
-          found = plot_settings.emplace_hint(found, plot_name, std::make_tuple(512, 512, 0));
+        const auto& plot_setting = plot_settings[plot_name];
+
+        if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
+          const auto& plots = plot_data[plot_name];
+
+          if (!plots.empty()) {
+            const auto& plot = plots.front();
+            ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
+          }
+
+          for (const auto& plot : plots) {
+            plot->plot();
+          }
+
+          ImPlot::EndPlot();
         }
-        const auto setting = found->second;
-
-        std::cout << "BeginPlot " << plot_name << std::endl;
-        ImPlot::BeginPlot(plot_name.c_str(), ImVec2(std::get<0>(setting), std::get<1>(setting)), std::get<2>(setting));
-
-        const auto& plots = plot_data[plot_name];
-        if (!plots.empty()) {
-          const auto& plot = plots.front();
-          std::cout << "SetupAxes " << plot->label << std::endl;
-          ImPlot::SetupAxes(plot->x_label.c_str(), plot->y_label.c_str(), plot->x_flags, plot->y_flags);
-        }
-
-        for (const auto& plot : plots) {
-          std::cout << "PlotLine " << plot->label << std::endl;
-          ImPlot::PlotLine(plot->label.c_str(), plot->xs.data(), plot->ys.data(), plot->xs.size());
-        }
-
-        std::cout << "EndPlot " << plot_name << std::endl;
-        ImPlot::EndPlot();
       }
 
       if (grouping) {
@@ -386,39 +381,49 @@ void LightViewer::remove_plot(const std::string& plot_name, const std::string& l
   data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p->label == label; }));
 }
 
-void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int flags) {
-  plot_settings[plot_name] = std::make_tuple(width, height, flags);
+void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
+  auto& setting = plot_settings[plot_name];
+  setting.width = width;
+  setting.height = height;
+  setting.plot_flags = plot_flags;
+  setting.x_flags = x_flags;
+  setting.y_flags = y_flags;
+  setting.order = order >= 0 ? order : 8192 + plot_settings.size();
 }
 
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int x_flags, int y_flags) {
+void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
+  auto& data = plot_data[plot_name];
+  auto found = std::find_if(data.begin(), data.end(), [&](const PlotData::ConstPtr& p_) { return p_->label == plot->label; });
+  if (found == data.end()) {
+    data.emplace_back(plot);
+  } else {
+    *found = plot;
+  }
+}
+
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, size_t max_num_data) {
   std::vector<double> xs(ys.size());
   std::iota(xs.begin(), xs.end(), 0.0);
-  update_plot_line(plot_name, label, xs, ys, x_flags, y_flags);
+  update_plot_line(plot_name, label, xs, ys, max_num_data);
 }
 
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int x_flags, int y_flags) {
-  //
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, size_t max_num_data) {
   if (xs.size() != ys.size()) {
     std::cerr << "warning: the length of xs must be the same as the length of ys (" << xs.size() << " vs " << ys.size() << ")" << std::endl;
     return;
   }
 
-  auto p = std::make_shared<PlotData>();
-  p->label = label;
-  p->x_flags = x_flags;
-  p->y_flags = y_flags;
+  auto p = std::make_shared<LinePlotData>(label);
 
-  const int max_size = 4096;
-
-  if (xs.size() <= max_size) {
+  if (xs.size() <= max_num_data) {
     p->xs = xs;
     p->ys = ys;
   } else {
-    p->xs.resize(max_size);
-    p->ys.resize(max_size);
+    p->xs.resize(max_num_data);
+    p->ys.resize(max_num_data);
 
-    for (int i = 0; i < max_size; i++) {
-      const double t = static_cast<double>(i) / max_size;
+    for (int i = 0; i < max_num_data; i++) {
+      const double t = static_cast<double>(i) / max_num_data;
       const size_t j = std::min<size_t>(t * xs.size(), xs.size() - 1);
 
       p->xs[i] = xs[j];
@@ -426,24 +431,36 @@ void LightViewer::update_plot_line(const std::string& plot_name, const std::stri
     }
   }
 
-  auto& data = plot_data[plot_name];
-  auto found = std::find_if(data.begin(), data.end(), [&](const PlotData::ConstPtr& p_) { return p_->label == p->label; });
-  if (found == data.end()) {
-    data.emplace_back(p);
-  } else {
-    *found = p;
-  }
+  update_plot(plot_name, label, p);
 }
 
-void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, int x_flags, int y_flags) {}
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_scatter(plot_name, label, xs, ys);
+}
 
-void LightViewer::update_plot_scatter(
-  const std::string& plot_name,
-  const std::string& label,
-  const std::vector<double>& xs,
-  const std::vector<double>& ys,
-  int x_flags,
-  int y_flags) {}
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+  auto p = std::make_shared<ScatterPlotData>(label);
+  p->xs = xs;
+  p->ys = ys;
+
+  update_plot(plot_name, label, p);
+}
+
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_stairs(plot_name, label, xs, ys);
+}
+
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+  auto p = std::make_shared<StairsPlotData>(label);
+  p->xs = xs;
+  p->ys = ys;
+
+  update_plot(plot_name, label, p);
+}
 
 bool LightViewer::spin_until_click() {
   bool kill_switch = false;

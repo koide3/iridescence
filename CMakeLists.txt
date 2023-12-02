@@ -51,6 +51,7 @@ add_library(gl_imgui SHARED
   thirdparty/ImGuizmo/ImGuizmo.cpp
   thirdparty/ImGuizmo/ImSequencer.cpp
   thirdparty/implot/implot.cpp
+  thirdparty/implot/implot_demo.cpp
   thirdparty/implot/implot_items.cpp
   thirdparty/imgui/backends/imgui_impl_glfw.cpp
   thirdparty/imgui/backends/imgui_impl_opengl3.cpp
@@ -127,6 +128,7 @@ add_library(iridescence SHARED
   src/guik/camera/static_camera_control.cpp
   src/guik/camera/projection_control.cpp
   src/guik/camera/basic_projection_control.cpp
+  src/guik/viewer/plot_data.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
   src/guik/viewer/light_viewer_context_util.cpp
