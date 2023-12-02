@@ -14,6 +14,18 @@ BasicProjectionControl::BasicProjectionControl(const Eigen::Vector2i& size) : si
 
 BasicProjectionControl::~BasicProjectionControl() {}
 
+void BasicProjectionControl::set_projection_mode(int mode) {
+  this->projection_mode = mode;
+}
+
+void BasicProjectionControl::set_fovy(double fovy_deg) {
+  this->fovy = fovy_deg;
+}
+
+void BasicProjectionControl::set_ortho_width(double width) {
+  this->width = width;
+}
+
 void BasicProjectionControl::set_depth_range(const Eigen::Vector2f& range) {
   this->near = range[0];
   this->far = range[1];

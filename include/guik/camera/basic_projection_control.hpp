@@ -16,6 +16,12 @@ public:
 
   virtual void set_depth_range(const Eigen::Vector2f& range) override;
 
+  void set_projection_mode(int mode);  // 0 = perspective, 1 = orthogonal
+
+  void set_fovy(double fovy_deg);
+
+  void set_ortho_width(double width);
+
   virtual Eigen::Matrix4f projection_matrix() const override;
 
   virtual void draw_ui() override;
@@ -30,10 +36,10 @@ private:
 
   int projection_mode;
 
-  float fovy;
-  float width;
-  float near;
-  float far;
+  float fovy;   // Perstictive projection FoV (vertical)
+  float width;  // Orthogonal perojection width
+  float near;   // Near clipping plane distance
+  float far;    // Far clipping plane distance
 };
 
 }  // namespace guik
