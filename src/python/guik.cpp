@@ -245,7 +245,7 @@ void define_guik(py::module_& m) {
 
     .def("clear_images", &guik::LightViewer::clear_images)
     .def("remove_image", &guik::LightViewer::remove_image)
-    .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0)
+    .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0, py::arg("order") = -1)
 
     .def(
       "update_points",
