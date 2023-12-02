@@ -39,7 +39,7 @@ public:
 
   void clear_images();
   void remove_image(const std::string& name);
-  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0);
+  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0, int order = -1);
 
   void clear_plots();
   void remove_plot(const std::string& plot_name, const std::string& label = "");
@@ -81,7 +81,7 @@ private:
   std::deque<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 
-  std::unordered_map<std::string, std::pair<double, std::shared_ptr<glk::Texture>>> images;
+  std::unordered_map<std::string, std::tuple<double, std::shared_ptr<glk::Texture>, int>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
 
   std::unordered_map<std::string, PlotSetting> plot_settings;

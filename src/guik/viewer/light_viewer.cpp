@@ -180,7 +180,7 @@ void LightViewer::draw_ui() {
       const size_t separator_loc = image.first.find_first_of('/');
       const std::string group = separator_loc == std::string::npos ? "default" : image.first.substr(0, separator_loc);
       groups[group].push_back(image.first);
-      images_in_rendering.emplace_back(image.second.second);
+      images_in_rendering.emplace_back(std::get<1>(image.second));
     }
 
     const bool grouping = groups.size() > 1;
@@ -199,12 +199,12 @@ void LightViewer::draw_ui() {
 
       const auto& group_name = group.first;
       auto& image_names = group.second;
-      std::sort(image_names.begin(), image_names.end());
+      std::sort(image_names.begin(), image_names.end(), [this](const auto& lhs, const auto& rhs) { return std::get<2>(images[lhs]) < std::get<2>(images[rhs]); });
 
       for (const auto& name : image_names) {
         const auto& image = images[name];
-        const double scale = image.first;
-        const auto& texture = image.second;
+        const double scale = std::get<0>(image);
+        const auto& texture = std::get<1>(image);
 
         Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
 
@@ -346,7 +346,7 @@ void LightViewer::remove_image(const std::string& name) {
   }
 }
 
-void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale) {
+void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale, int order) {
   if (!image) {
     remove_image(name);
     return;
@@ -358,7 +358,7 @@ void LightViewer::update_image(const std::string& name, const std::shared_ptr<gl
     scale = std::min(scale_x, scale_y);
   }
 
-  images[name] = std::make_pair(scale, image);
+  images[name] = std::make_tuple(scale, image, order >= 0 ? order  : 8192 + images.size());
 }
 
 void LightViewer::clear_plots() {
