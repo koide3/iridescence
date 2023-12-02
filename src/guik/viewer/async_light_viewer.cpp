@@ -55,6 +55,61 @@ void AsyncLightViewer::invoke_after_rendering(const std::function<void()>& func)
   guik::viewer()->invoke_after_rendering(func);
 }
 
+void AsyncLightViewer::clear_images() {
+  guik::viewer()->invoke([] { guik::viewer()->clear_images(); });
+}
+
+void AsyncLightViewer::remove_image(const std::string& name) {
+  guik::viewer()->invoke([=] { guik::viewer()->remove_image(name); });
+}
+
+void AsyncLightViewer::update_image(const std::string& name, int width, int height, const std::vector<unsigned char>& rgba_bytes, double scale, int order) {
+  guik::viewer()->invoke([=] {
+    auto texture = std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba_bytes.data());
+    guik::viewer()->update_image(name, texture, scale, order);
+  });
+}
+
+void AsyncLightViewer::clear_plots() {
+  guik::viewer()->invoke([] { guik::viewer()->clear_plots(); });
+}
+
+void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::string& label) {
+  guik::viewer()->invoke([=] { guik::viewer()->remove_plot(plot_name, label); });
+}
+
+void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
+  guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
+}
+
+void AsyncLightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot(plot_name, label, plot); });
+}
+
+void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, size_t max_num_data) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, ys, max_num_data); });
+}
+
+void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, size_t max_num_data) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, xs, ys, max_num_data); });
+}
+
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, ys); });
+}
+
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, xs, ys); });
+}
+
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, ys); });
+}
+
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, xs, ys); });
+}
+
 AsyncLightViewerContext AsyncLightViewer::async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   std::shared_ptr<guik::LightViewerContext> sub_viewer;
   guik::viewer()->invoke([&] { sub_viewer = guik::viewer()->sub_viewer(context_name, canvas_size); });
