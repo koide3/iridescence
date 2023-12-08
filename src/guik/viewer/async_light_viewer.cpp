@@ -28,7 +28,9 @@ AsyncLightViewer::AsyncLightViewer(const Eigen::Vector2i& size, bool background,
 
 AsyncLightViewer::~AsyncLightViewer() {
   kill_switch = true;
-  thread.join();
+  if (thread.joinable()) {
+    thread.join();
+  }
 }
 
 AsyncLightViewer* AsyncLightViewer::instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
@@ -43,7 +45,9 @@ void AsyncLightViewer::destroy() {
 }
 
 void AsyncLightViewer::wait() {
-  inst->thread.join();
+  if (inst->thread.joinable()) {
+    inst->thread.join();
+  }
   inst.reset();
 }
 
