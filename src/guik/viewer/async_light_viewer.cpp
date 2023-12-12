@@ -90,28 +90,39 @@ void AsyncLightViewer::update_plot(const std::string& plot_name, const std::stri
   guik::viewer()->invoke([=] { guik::viewer()->update_plot(plot_name, label, plot); });
 }
 
-void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, size_t max_num_data) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, ys, max_num_data); });
+void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags, size_t max_num_data) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, ys, line_flags, max_num_data); });
 }
 
-void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, size_t max_num_data) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, xs, ys, max_num_data); });
+void AsyncLightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int line_flags,
+  size_t max_num_data) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data); });
 }
 
-void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, ys); });
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, ys, scatter_flags); });
 }
 
-void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, xs, ys); });
+void AsyncLightViewer::update_plot_scatter(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int scatter_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_scatter(plot_name, label, xs, ys, scatter_flags); });
 }
 
-void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, ys); });
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, ys, stairs_flags); });
 }
 
-void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
-  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, xs, ys); });
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, xs, ys, stairs_flags); });
 }
 
 AsyncLightViewerContext AsyncLightViewer::async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {

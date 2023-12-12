@@ -47,3 +47,37 @@ int main(int argc, char** argv) {
 viewer->append_text("test");
 viewer->clear_text();
 ```
+
+## AsyncViewer
+
+If you want to keep the viewer interactive while your program is doing some blocking operations, `guik::AsyncLightViewer` would be helpful. This class creates the viewer instance in a background thread and performs visualization tasks in a way thread safe. See `06_light_viewer_async.cpp`.
+
+```cpp
+#include <guik/viewer/async_light_viewer.hpp>
+
+int main(int argc, char** argv) {
+  // AsyncViewer creates and runs the viewer in a background thread.
+  auto async_viewer = guik::async_viewer();
+
+  // Use AsyncViewer interfaces for safe viewer data manipulation.
+  // AsyncViewer will be kept interactive even while the main thread is sleeping.
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  async_viewer->update_wire_sphere("sphere1", guik::FlatRed().translate(0.0f, 0.0f, 0.0f));
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  async_viewer->update_wire_sphere("sphere2", guik::FlatGreen().translate(2.0f, 0.0f, 0.0f));
+
+  // Wait for the viewer to be closed.
+  guik::async_wait();
+}
+```
+
+!!! warning
+    Because AsyncViewer runs the viewer in another thread, calling the standard viewer functions in this main thread is unsafe.
+
+    ```cpp
+      auto async_viewer = guik::async_viewer();
+
+      // The below line may cause segfaults and program crashes.
+      // guik::viewer()->update_sphere("sphere0", guik::FlatBlue());
+    ```
