@@ -341,3 +341,31 @@ viewer->update_image("group1/image0", texture);
 ```
 
 ![Screenshot_20230101_011918](https://user-images.githubusercontent.com/31344317/210149509-c096fdcb-7337-44bf-833d-ce369378bbe1.png)
+
+
+## Plots (ImPlot)
+
+```cpp
+#include <implot.h>
+#include <guik/viewer/light_viewer.hpp>
+
+
+std::vector<double> xs = ...;
+std::vector<double> ys = ...;
+
+// Basic plotting
+viewer->setup_plot("curves_y", 1024, 256);
+viewer->update_plot_line("curves_y", "sin", ys_sin);  // When only Y values are given, X values become index IDs
+viewer->update_plot_stairs("curves_y", "sin_stairs", ys_sin);
+
+
+std::vector<double> xs_circle = ...;
+std::vector<double> ys_circle = ...;
+
+// If a plot name contains "/", the string before the slash is recognized as a group name.
+// Plots with the same group name are displayed in the same tab.
+viewer->setup_plot("group02/circle", 1024, 1024, ImPlotFlags_Equal);
+viewer->update_plot_line("group02/circle", "circle", xs_circle, ys_circle, ImPlotLineFlags_Loop);
+```
+
+![Screenshot_20231212_103830](https://github.com/koide3/iridescence/assets/31344317/0036c0ab-63bb-451f-8f0f-e8931c820f71)

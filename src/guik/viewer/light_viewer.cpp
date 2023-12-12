@@ -5,20 +5,44 @@
 
 #include <regex>
 #include <chrono>
-#include <future>
+#include <numeric>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <implot.h>
 
 #include <glk/io/png_io.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/console_colors.hpp>
+#include <guik/viewer/plot_data.hpp>
 #include <guik/viewer/viewer_ui.hpp>
 #include <guik/viewer/info_window.hpp>
 
 namespace guik {
 
-std::shared_ptr<LightViewer> LightViewer::inst;
+std::unique_ptr<LightViewer> LightViewer::inst;
+
+LightViewer* LightViewer::instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
+  if (!inst) {
+    Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
+    inst.reset(new LightViewer());
+    inst->init(init_size, "#version 330", background, title);
+  } else {
+    if ((size.array() > 0).all() && inst->window_size() != size) {
+      inst->resize(size);
+    }
+  }
+
+  return inst.get();
+}
+
+void LightViewer::destroy() {
+  if (inst) {
+    inst->clear();
+    inst.reset();
+  }
+}
 
 LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
 
@@ -29,7 +53,7 @@ bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   // GL::Renderer::setClearColor(0x474747_rgbf); // lightwave
   // GL::Renderer::setClearColor(0x3a3a3a_rgbf); // blender
 
-  if(!LightViewerContext::init_canvas(size)) {
+  if (!LightViewerContext::init_canvas(size)) {
     close();
     return false;
   }
@@ -47,7 +71,7 @@ void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
 
 void LightViewer::draw_ui() {
   std::unique_lock<std::mutex> lock(invoke_requests_mutex);
-  while(!invoke_requests.empty()) {
+  while (!invoke_requests.empty()) {
     invoke_requests.front()();
     invoke_requests.pop_front();
   }
@@ -63,24 +87,24 @@ void LightViewer::draw_ui() {
   }
 
   // viewer UI
-  if(viewer_ui) {
-    if(!viewer_ui->draw_ui()) {
+  if (viewer_ui) {
+    if (!viewer_ui->draw_ui()) {
       viewer_ui.reset();
     }
-  } else if(ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
+  } else if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
     viewer_ui.reset(new ViewerUI(this));
   }
 
   // point scale
   bool decrease_point_size = ImGui::GetIO().KeysDown[GLFW_KEY_MINUS];
   bool increase_point_size = ImGui::GetIO().KeyShift && ImGui::GetIO().KeysDown[GLFW_KEY_SEMICOLON];
-  if(decrease_point_size || increase_point_size) {
+  if (decrease_point_size || increase_point_size) {
     auto point_size = global_shader_setting.get<float>("point_size");
-    if(!point_size) {
+    if (!point_size) {
       point_size = 10.0f;
     }
 
-    if(decrease_point_size) {
+    if (decrease_point_size) {
       *point_size = point_size.get() - ImGui::GetIO().DeltaTime * 10.0f;
     } else {
       *point_size = point_size.get() + ImGui::GetIO().DeltaTime * 10.0f;
@@ -92,25 +116,24 @@ void LightViewer::draw_ui() {
   }
 
   // screen shot
-  if(ImGui::GetIO().KeysDown[GLFW_KEY_J]) {
+  if (ImGui::GetIO().KeysDown[GLFW_KEY_J]) {
     invoke_after_rendering([this] {
       auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
       std::vector<unsigned char> flipped(bytes.size(), 255);
 
       Eigen::Vector2i size = canvas->frame_buffer->color().size();
-      for(int y = 0; y < size[1]; y++) {
+      for (int y = 0; y < size[1]; y++) {
         int y_ = size[1] - y - 1;
-        for(int x = 0; x < size[0]; x++) {
-          for(int k = 0; k < 3; k++) {
+        for (int x = 0; x < size[0]; x++) {
+          for (int k = 0; k < 3; k++) {
             flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
           }
         }
       }
 
-      double time =
-          std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
+      double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
       std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
-      if(glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
+      if (glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
         std::cout << "screen shot saved:" << filename << std::endl;
       } else {
         std::cout << "failed to save screen shot" << std::endl;
@@ -118,8 +141,8 @@ void LightViewer::draw_ui() {
     });
   }
 
-  if(info_window) {
-    if(!info_window->draw_ui()) {
+  if (info_window) {
+    if (!info_window->draw_ui()) {
       info_window.reset();
     }
   }
@@ -131,54 +154,57 @@ void LightViewer::draw_ui() {
     std::vector<std::string>(texts.begin(), texts.end()).swap(texts_);
   }
 
-  if(!texts_.empty()) {
-    ImGui::Begin("texts", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
-    for(int i = std::max<int>(0, texts_.size() - max_texts_size); i < texts_.size(); i++) {
+  if (!texts_.empty()) {
+    ImGui::Begin(
+      "texts",
+      nullptr,
+      ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
+    for (int i = std::max<int>(0, texts_.size() - max_texts_size); i < texts_.size(); i++) {
       const auto& text = texts_[i];
       ImGui::Text("%s", text.c_str());
     }
 
-    if(ImGui::Button("clear")) {
+    if (ImGui::Button("clear")) {
       clear_text();
     }
     ImGui::End();
   }
 
   // images
-  if(!images.empty()) {
+  if (!images.empty()) {
     ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     images_in_rendering.clear();
     std::unordered_map<std::string, std::vector<std::string>> groups;
-    for(const auto& image: images) {
+    for (const auto& image : images) {
       const size_t separator_loc = image.first.find_first_of('/');
       const std::string group = separator_loc == std::string::npos ? "default" : image.first.substr(0, separator_loc);
       groups[group].push_back(image.first);
-      images_in_rendering.emplace_back(image.second.second);
+      images_in_rendering.emplace_back(std::get<1>(image.second));
     }
 
     const bool grouping = groups.size() > 1;
 
-    if(grouping) {
+    if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
       ImGui::BeginTabBar("imagetab", tab_bar_flags);
     }
 
-    for(auto& group: groups) {
-      if(grouping) {
-        if(!ImGui::BeginTabItem(group.first.c_str())) {
+    for (auto& group : groups) {
+      if (grouping) {
+        if (!ImGui::BeginTabItem(group.first.c_str())) {
           continue;
         }
       }
 
       const auto& group_name = group.first;
       auto& image_names = group.second;
-      std::sort(image_names.begin(), image_names.end());
+      std::sort(image_names.begin(), image_names.end(), [this](const auto& lhs, const auto& rhs) { return std::get<2>(images[lhs]) < std::get<2>(images[rhs]); });
 
-      for(const auto& name: image_names) {
+      for (const auto& name : image_names) {
         const auto& image = images[name];
-        const double scale = image.first;
-        const auto& texture = image.second;
+        const double scale = std::get<0>(image);
+        const auto& texture = std::get<1>(image);
 
         Eigen::Vector2i size = (texture->size().cast<double>() * scale).cast<int>();
 
@@ -186,12 +212,70 @@ void LightViewer::draw_ui() {
         ImGui::Image(reinterpret_cast<void*>(texture->id()), ImVec2(size[0], size[1]), ImVec2(0, 0), ImVec2(1, 1));
       }
 
-      if(grouping) {
+      if (grouping) {
         ImGui::EndTabItem();
       }
     }
 
-    if(grouping) {
+    if (grouping) {
+      ImGui::EndTabBar();
+    }
+
+    ImGui::End();
+  }
+
+  // plots
+  if (!plot_data.empty()) {
+    ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    std::unordered_map<std::string, std::vector<std::string>> groups;
+    for (const auto& plot : plot_data) {
+      const size_t separator_loc = plot.first.find_first_of('/');
+      const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
+      groups[group].push_back(plot.first);
+    }
+
+    const bool grouping = groups.size() > 1;
+
+    if (grouping) {
+      ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+      ImGui::BeginTabBar("plottab", tab_bar_flags);
+    }
+
+    for (auto& group : groups) {
+      if (grouping) {
+        if (!ImGui::BeginTabItem(group.first.c_str())) {
+          continue;
+        }
+      }
+
+      std::sort(group.second.begin(), group.second.end(), [this](const auto& lhs, const auto& rhs) { return plot_settings[lhs].order < plot_settings[rhs].order; });
+
+      for (const auto& plot_name : group.second) {
+        const auto& plot_setting = plot_settings[plot_name];
+
+        if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
+          const auto& plots = plot_data[plot_name];
+
+          if (!plots.empty()) {
+            const auto& plot = plots.front();
+            ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
+          }
+
+          for (const auto& plot : plots) {
+            plot->plot();
+          }
+
+          ImPlot::EndPlot();
+        }
+      }
+
+      if (grouping) {
+        ImGui::EndTabItem();
+      }
+    }
+
+    if (grouping) {
       ImGui::EndTabBar();
     }
 
@@ -199,11 +283,11 @@ void LightViewer::draw_ui() {
   }
 
   // mouse control
-  if(!ImGui::GetIO().WantCaptureMouse) {
+  if (!ImGui::GetIO().WantCaptureMouse) {
     canvas->mouse_control();
   }
 
-  for(const auto& context : sub_contexts) {
+  for (const auto& context : sub_contexts) {
     context.second->draw_gl();
     context.second->draw_ui();
   }
@@ -214,7 +298,7 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 
   std::unique_lock<std::mutex> lock(post_render_invoke_requests_mutex);
-  while(!post_render_invoke_requests.empty()) {
+  while (!post_render_invoke_requests.empty()) {
     post_render_invoke_requests.front()();
     post_render_invoke_requests.pop_front();
   }
@@ -257,24 +341,134 @@ void LightViewer::clear_images() {
 
 void LightViewer::remove_image(const std::string& name) {
   auto found = images.find(name);
-  if(found != images.end()) {
+  if (found != images.end()) {
     images.erase(found);
   }
 }
 
-void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale) {
+void LightViewer::update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale, int order) {
   if (!image) {
     remove_image(name);
     return;
   }
 
-  if(scale < 0.0) {
+  if (scale < 0.0) {
     double scale_x = 640.0 / image->size()[0];
     double scale_y = 480.0 / image->size()[1];
     scale = std::min(scale_x, scale_y);
   }
 
-  images[name] = std::make_pair(scale, image);
+  images[name] = std::make_tuple(scale, image, order >= 0 ? order : 8192 + images.size());
+}
+
+void LightViewer::clear_plots() {
+  plot_settings.clear();
+  plot_data.clear();
+}
+
+void LightViewer::remove_plot(const std::string& plot_name, const std::string& label) {
+  auto found = plot_data.find(plot_name);
+  if (found == plot_data.end()) {
+    return;
+  }
+
+  if (label.empty()) {
+    plot_data.erase(found);
+    return;
+  }
+
+  auto& data = found->second;
+  data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p->label == label; }));
+}
+
+void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
+  auto& setting = plot_settings[plot_name];
+  setting.width = width;
+  setting.height = height;
+  setting.plot_flags = plot_flags;
+  setting.x_flags = x_flags;
+  setting.y_flags = y_flags;
+  setting.order = order >= 0 ? order : 8192 + plot_settings.size();
+}
+
+void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
+  auto& data = plot_data[plot_name];
+  auto found = std::find_if(data.begin(), data.end(), [&](const PlotData::ConstPtr& p_) { return p_->label == plot->label; });
+  if (found == data.end()) {
+    data.emplace_back(plot);
+  } else {
+    *found = plot;
+  }
+}
+
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags, size_t max_num_data) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+}
+
+void LightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int line_flags,
+  size_t max_num_data) {
+  if (xs.size() != ys.size()) {
+    std::cerr << "warning: the length of xs must be the same as the length of ys (" << xs.size() << " vs " << ys.size() << ")" << std::endl;
+    return;
+  }
+
+  auto p = std::make_shared<LinePlotData>(label);
+  p->line_flags = line_flags;
+
+  if (xs.size() <= max_num_data) {
+    p->xs = xs;
+    p->ys = ys;
+  } else {
+    p->xs.resize(max_num_data);
+    p->ys.resize(max_num_data);
+
+    for (int i = 0; i < max_num_data; i++) {
+      const double t = static_cast<double>(i) / max_num_data;
+      const size_t j = std::min<size_t>(t * xs.size(), xs.size() - 1);
+
+      p->xs[i] = xs[j];
+      p->ys[i] = ys[j];
+    }
+  }
+
+  update_plot(plot_name, label, p);
+}
+
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+}
+
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags) {
+  auto p = std::make_shared<ScatterPlotData>(label);
+  p->scatter_flags = scatter_flags;
+  p->xs = xs;
+  p->ys = ys;
+
+  update_plot(plot_name, label, p);
+}
+
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags) {
+  std::vector<double> xs(ys.size());
+  std::iota(xs.begin(), xs.end(), 0.0);
+  update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
+}
+
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags) {
+  auto p = std::make_shared<StairsPlotData>(label);
+  p->stairs_flags = stairs_flags;
+  p->xs = xs;
+  p->ys = ys;
+
+  update_plot(plot_name, label, p);
 }
 
 bool LightViewer::spin_until_click() {
@@ -282,8 +476,8 @@ bool LightViewer::spin_until_click() {
 
   register_ui_callback("kill_switch", [&]() { kill_switch = ImGui::Button("break"); });
 
-  while(!kill_switch) {
-    if(!spin_once()) {
+  while (!kill_switch) {
+    if (!spin_once()) {
       return false;
     }
   }
@@ -299,7 +493,7 @@ bool LightViewer::toggle_spin_once() {
   register_ui_callback("kill_switch", [&]() { ImGui::Checkbox("break", &stop); });
 
   do {
-    if(!spin_once()) {
+    if (!spin_once()) {
       return false;
     }
   } while (stop);
@@ -310,7 +504,7 @@ bool LightViewer::toggle_spin_once() {
 }
 
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
-  if(!callback) {
+  if (!callback) {
     ui_callbacks.erase(name);
     return;
   }
@@ -319,13 +513,13 @@ void LightViewer::register_ui_callback(const std::string& name, const std::funct
 }
 
 void LightViewer::show_viewer_ui() {
-  if(viewer_ui == nullptr) {
+  if (viewer_ui == nullptr) {
     viewer_ui.reset(new ViewerUI(this));
   }
 }
 
 void LightViewer::show_info_window() {
-  if(info_window == nullptr) {
+  if (info_window == nullptr) {
     info_window.reset(new InfoWindow());
   }
 }
@@ -344,14 +538,14 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
   using namespace glk::console;
 
   auto found = sub_contexts.find(context_name);
-  if(found == sub_contexts.end()) {
+  if (found == sub_contexts.end()) {
     Eigen::Vector2i init_canvas_size = canvas_size;
-    if(canvas_size[0] <= 0 || canvas_size[1] <= 0) {
+    if (canvas_size[0] <= 0 || canvas_size[1] <= 0) {
       init_canvas_size = Eigen::Vector2i(512, 512);
     }
 
     std::shared_ptr<LightViewerContext> context(new LightViewerContext(context_name));
-    if(!context->init_canvas(init_canvas_size)) {
+    if (!context->init_canvas(init_canvas_size)) {
       std::cerr << bold_red << "error: failed to create sub viewer context!!" << reset << std::endl;
       return nullptr;
     }
@@ -360,8 +554,8 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
     return context;
   }
 
-  if((canvas_size.array() > 0).all() && found->second->canvas_size() != canvas_size) {
-    if(!found->second->init_canvas(canvas_size)) {
+  if ((canvas_size.array() > 0).all() && found->second->canvas_size() != canvas_size) {
+    if (!found->second->init_canvas(canvas_size)) {
       std::cerr << bold_red << "error: failed to resize the canvas of " << context_name << "!!" << reset << std::endl;
       close();
     }
@@ -395,7 +589,7 @@ std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
   for (int y = 0; y < size[1]; y++) {
     int y_ = size[1] - y - 1;
     for (int x = 0; x < size[0]; x++) {
-        flipped[y_ * size[0] + x] = floats[y * size[0] + x];
+      flipped[y_ * size[0] + x] = floats[y * size[0] + x];
     }
   }
 

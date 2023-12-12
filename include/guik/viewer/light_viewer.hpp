@@ -9,36 +9,21 @@
 #include <glk/drawable.hpp>
 #include <guik/gl_canvas.hpp>
 #include <guik/imgui_application.hpp>
+#include <guik/viewer/plot_setting.hpp>
 #include <guik/viewer/shader_setting.hpp>
 #include <guik/viewer/light_viewer_context.hpp>
 
 namespace guik {
+
+struct PlotData;
 
 class LightViewer : public guik::Application, public guik::LightViewerContext {
 public:
   LightViewer();
   virtual ~LightViewer();
 
-  static std::shared_ptr<LightViewer> instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
-    if (!inst) {
-      Eigen::Vector2i init_size = (size.array() > 0).all() ? size : Eigen::Vector2i(1920, 1080);
-      inst.reset(new LightViewer());
-      inst->init(init_size, "#version 330", background, title);
-    } else {
-      if ((size.array() > 0).all() && inst->window_size() != size) {
-        inst->resize(size);
-      }
-    }
-
-    return inst;
-  }
-
-  static void destroy() {
-    if (inst) {
-      inst->clear();
-      inst.reset();
-    }
-  }
+  static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen");
+  static void destroy();
 
   bool spin_until_click();
   bool toggle_spin_once();
@@ -54,7 +39,24 @@ public:
 
   void clear_images();
   void remove_image(const std::string& name);
-  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0);
+  void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0, int order = -1);
+
+  void clear_plots();
+  void remove_plot(const std::string& plot_name, const std::string& label = "");
+  void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 2048);
+  void update_plot_line(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<double>& xs,
+    const std::vector<double>& ys,
+    int line_flags = 0,
+    size_t max_num_data = 2048);
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags = 0);
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags = 0);
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags = 0);
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
@@ -75,7 +77,7 @@ private:
   virtual void draw_gl() override;
 
 private:
-  static std::shared_ptr<LightViewer> inst;
+  static std::unique_ptr<LightViewer> inst;
 
   std::unique_ptr<ViewerUI> viewer_ui;
   std::unique_ptr<InfoWindow> info_window;
@@ -85,8 +87,11 @@ private:
   std::deque<std::string> texts;
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 
-  std::unordered_map<std::string, std::pair<double, std::shared_ptr<glk::Texture>>> images;
+  std::unordered_map<std::string, std::tuple<double, std::shared_ptr<glk::Texture>, int>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
+
+  std::unordered_map<std::string, PlotSetting> plot_settings;
+  std::unordered_map<std::string, std::vector<std::shared_ptr<const PlotData>>> plot_data;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 
@@ -97,11 +102,11 @@ private:
   std::deque<std::function<void()>> post_render_invoke_requests;
 };
 
-inline std::shared_ptr<LightViewer> viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
+inline LightViewer* viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
   return LightViewer::instance(size, background, title);
 }
 
-inline std::shared_ptr<LightViewer> viewer(const std::string& title, const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
+inline LightViewer* viewer(const std::string& title, const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false) {
   return LightViewer::instance(size, background, title);
 }
 

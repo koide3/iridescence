@@ -4,7 +4,7 @@
 namespace guik {
 
 struct HoveredDrawingsData {
-  std::shared_ptr<guik::LightViewerContext> context;
+  guik::LightViewerContext* context;
 
   std::vector<std::string> drawable_names;
   std::vector<std::shared_ptr<HoveredDrawing>> drawable_drawings;
@@ -13,7 +13,7 @@ struct HoveredDrawingsData {
   std::vector<std::shared_ptr<HoveredDrawing>> drawings;
 };
 
-HoveredDrawings::HoveredDrawings(const std::shared_ptr<guik::LightViewerContext>& context) : data(new HoveredDrawingsData{context}) {}
+HoveredDrawings::HoveredDrawings(guik::LightViewerContext* context) : data(new HoveredDrawingsData{context}) {}
 
 HoveredDrawings::~HoveredDrawings() {}
 

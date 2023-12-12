@@ -15,7 +15,7 @@ public:
 
 class HoveredDrawings {
 public:
-  HoveredDrawings(const std::shared_ptr<guik::LightViewerContext>& context = guik::LightViewer::instance());
+  HoveredDrawings(guik::LightViewerContext* context = guik::LightViewer::instance());
   ~HoveredDrawings();
 
   void add(const Eigen::Vector3f& pt, const std::shared_ptr<HoveredDrawing>& drawing);

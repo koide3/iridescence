@@ -10,11 +10,13 @@
 #include <guik/recent_files.hpp>
 #include <guik/model_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
+#include <guik/viewer/async_light_viewer.hpp>
 
 namespace py = pybind11;
 
-std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
-  static bool is_first = true;
+static bool is_first = true;
+
+guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   if (is_first) {
     py::gil_scoped_acquire acquire;
     py::object pyridescence = py::module::import("pyridescence");
@@ -24,8 +26,21 @@ std::shared_ptr<guik::LightViewer> instance(const Eigen::Vector2i& size, bool ba
     is_first = false;
   }
 
-  static std::shared_ptr<guik::LightViewer> inst = guik::LightViewer::instance(size, background, title);
+  static guik::LightViewer* inst = guik::LightViewer::instance(size, background, title);
   return inst;
+}
+
+guik::AsyncLightViewer* async_instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
+  if (is_first) {
+    py::gil_scoped_acquire acquire;
+    py::object pyridescence = py::module::import("pyridescence");
+    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+
+    glk::set_data_path(path.parent_path().string() + "/data");
+    is_first = false;
+  }
+
+  return guik::AsyncLightViewer::instance(size, background, title);
 }
 
 void define_guik(py::module_& m) {
@@ -163,7 +178,7 @@ void define_guik(py::module_& m) {
   py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
 
   // LightViewerContext
-  py::class_<guik::LightViewerContext, std::shared_ptr<guik::LightViewerContext>>(guik_, "LightViewerContext")
+  py::class_<guik::LightViewerContext, std::unique_ptr<guik::LightViewerContext, py::nodelete>>(guik_, "LightViewerContext")
     .def("set_size", &guik::LightViewerContext::set_size)
     .def("set_clear_color", &guik::LightViewerContext::set_clear_color)
     .def("set_pos", &guik::LightViewerContext::set_pos, "", py::arg("pos"), py::arg("cond") = static_cast<int>(ImGuiCond_FirstUseEver), py::arg("flags") = 0)
@@ -204,19 +219,20 @@ void define_guik(py::module_& m) {
     .def("set_projection_control", &guik::LightViewerContext::set_projection_control, "");
 
   // LightViewer
-  py::class_<guik::LightViewer, guik::LightViewerContext, std::shared_ptr<guik::LightViewer>>(guik_, "LightViewer")
+  py::class_<guik::LightViewer, guik::LightViewerContext, std::unique_ptr<guik::LightViewer, py::nodelete>>(guik_, "LightViewer")
     .def_static(
       "instance",
       [](const Eigen::Vector2i& size, bool background, const std::string& title) { return instance(size, background, title); },
       py::arg("size") = Eigen::Vector2i(1920, 1080),
       py::arg("background") = false,
       py::arg("title") = "screen")
-    .def("sub_viewer", [](guik::LightViewer& viewer, const std::string& name) { return viewer.sub_viewer(name); })
     .def(
       "sub_viewer",
       [](guik::LightViewer& viewer, const std::string& name, const std::tuple<int, int>& size) {
         return viewer.sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size)));
-      })
+      },
+      py::arg("name"),
+      py::arg("size") = std::make_tuple(-1, -1))
 
     .def("close", &guik::LightViewer::close)
     .def("spin", &guik::LightViewer::spin)
@@ -229,7 +245,17 @@ void define_guik(py::module_& m) {
 
     .def("clear_images", &guik::LightViewer::clear_images)
     .def("remove_image", &guik::LightViewer::remove_image)
-    .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0)
+    .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0, py::arg("order") = -1)
+
+    .def(
+      "update_points",
+      [](guik::LightViewer& context, const std::string& name, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points, const guik::ShaderSetting& shader_setting) {
+        if (points.cols() != 3 && points.cols() != 4) {
+          std::cerr << "warning: points must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+        context.update_points(name, points.data(), sizeof(float) * points.cols(), points.rows(), shader_setting);
+      })
 
     // LightViewerContext methods
     .def("clear", &guik::LightViewer::clear)
@@ -264,6 +290,73 @@ void define_guik(py::module_& m) {
     .def("pick_depth", &guik::LightViewer::pick_depth, py::arg("p"), py::arg("window") = 2)
     .def("unproject", &guik::LightViewer::unproject, py::arg("p"), py::arg("depth"));
 
+  // AsyncLightViewerContext
+  py::class_<guik::AsyncLightViewerContext, std::shared_ptr<guik::AsyncLightViewerContext>>(guik_, "AsyncLightViewerContext")
+    .def("clear", &guik::AsyncLightViewerContext::clear)
+    .def("clear_text", &guik::AsyncLightViewerContext::clear_text)
+    .def("append_text", &guik::AsyncLightViewerContext::append_text)
+    .def(
+      "remove_drawable",
+      [](guik::AsyncLightViewerContext& context, const std::string& pattern, bool regex) {
+        if (regex) {
+          context.remove_drawable(std::regex(pattern));
+        } else {
+          context.remove_drawable(pattern);
+        }
+      },
+      py::arg("pattern"),
+      py::arg("regex") = false)
+    .def("reset_center", &guik::AsyncLightViewerContext::reset_center)
+    .def("lookat", &guik::AsyncLightViewerContext::lookat)
+    .def("set_draw_xy_grid", &guik::AsyncLightViewerContext::set_draw_xy_grid, "")
+    .def(
+      "use_orbit_camera_control",
+      &guik::AsyncLightViewerContext::use_orbit_camera_control,
+      "",
+      py::arg("distance") = 80.0,
+      py::arg("theta") = 0.0,
+      py::arg("phi") = -60.0 * M_PI / 180.0)
+    .def("use_orbit_camera_control_xz", &guik::AsyncLightViewerContext::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
+    .def("use_topdown_camera_control", &guik::AsyncLightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0);
+
+  // AsyncLightViewer
+  py::class_<guik::AsyncLightViewer, std::unique_ptr<guik::AsyncLightViewer, py::nodelete>>(guik_, "AsyncLightViewer")
+    .def_static(
+      "instance",
+      [](const Eigen::Vector2i& size, bool background, const std::string& title) { return instance(size, background, title); },
+      py::arg("size") = Eigen::Vector2i(1920, 1080),
+      py::arg("background") = false,
+      py::arg("title") = "screen")
+    .def(
+      "async_sub_viewer",
+      [](guik::AsyncLightViewer& viewer, const std::string& name, const std::tuple<int, int>& size) {
+        return viewer.async_sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size)));
+      })
+
+    // LightViewerContext methods
+    .def("clear", &guik::AsyncLightViewer::clear)
+    .def("clear_text", &guik::AsyncLightViewer::clear_text)
+    .def("append_text", &guik::AsyncLightViewer::append_text, py::arg("text"))
+    .def("register_ui_callback", &guik::AsyncLightViewer::register_ui_callback, py::arg("callback_name"), py::arg("callback"))
+
+    .def(
+      "remove_drawable",
+      [](guik::AsyncLightViewer& context, const std::string& pattern, bool regex) {
+        if (regex) {
+          context.remove_drawable(std::regex(pattern));
+        } else {
+          context.remove_drawable(pattern);
+        }
+      },
+      py::arg("pattern"),
+      py::arg("regex") = false)
+    .def("reset_center", &guik::AsyncLightViewer::reset_center)
+    .def("lookat", &guik::AsyncLightViewer::lookat, py::arg("pt"))
+    .def("set_draw_xy_grid", &guik::AsyncLightViewer::set_draw_xy_grid, py::arg("enable"))
+    .def("use_orbit_camera_control", &guik::AsyncLightViewer::use_orbit_camera_control, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = -60.0 * M_PI / 180.0)
+    .def("use_orbit_camera_control_xz", &guik::AsyncLightViewer::use_orbit_camera_control_xz, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
+    .def("use_topdown_camera_control", &guik::AsyncLightViewer::use_topdown_camera_control, py::arg("distance") = 80.0, py::arg("theta") = 0.0);
+
   // guik::RecentFiles
   py::class_<guik::RecentFiles>(guik_, "RecentFiles")
     .def(py::init<const std::string&>())
@@ -286,4 +379,13 @@ void define_guik(py::module_& m) {
     py::arg("background") = false,
     py::arg("title") = "screen");
   guik_.def("destroy", &guik::destroy, "");
+  guik_.def(
+    "async_viewer",
+    [](const Eigen::Vector2i& size, bool background, const std::string& title) { return async_instance(size, background, title); },
+    "",
+    py::arg("size") = Eigen::Vector2i(1920, 1080),
+    py::arg("background") = false,
+    py::arg("title") = "screen");
+  guik_.def("async_destroy", &guik::async_destroy, "");
+  guik_.def("async_wait", &guik::async_wait, "");
 }
