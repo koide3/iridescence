@@ -358,7 +358,7 @@ void LightViewer::update_image(const std::string& name, const std::shared_ptr<gl
     scale = std::min(scale_x, scale_y);
   }
 
-  images[name] = std::make_tuple(scale, image, order >= 0 ? order  : 8192 + images.size());
+  images[name] = std::make_tuple(scale, image, order >= 0 ? order : 8192 + images.size());
 }
 
 void LightViewer::clear_plots() {
@@ -401,19 +401,26 @@ void LightViewer::update_plot(const std::string& plot_name, const std::string& l
   }
 }
 
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, size_t max_num_data) {
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags, size_t max_num_data) {
   std::vector<double> xs(ys.size());
   std::iota(xs.begin(), xs.end(), 0.0);
-  update_plot_line(plot_name, label, xs, ys, max_num_data);
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
 }
 
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, size_t max_num_data) {
+void LightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int line_flags,
+  size_t max_num_data) {
   if (xs.size() != ys.size()) {
     std::cerr << "warning: the length of xs must be the same as the length of ys (" << xs.size() << " vs " << ys.size() << ")" << std::endl;
     return;
   }
 
   auto p = std::make_shared<LinePlotData>(label);
+  p->line_flags = line_flags;
 
   if (xs.size() <= max_num_data) {
     p->xs = xs;
@@ -434,28 +441,30 @@ void LightViewer::update_plot_line(const std::string& plot_name, const std::stri
   update_plot(plot_name, label, p);
 }
 
-void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags) {
   std::vector<double> xs(ys.size());
   std::iota(xs.begin(), xs.end(), 0.0);
-  update_plot_scatter(plot_name, label, xs, ys);
+  update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
 }
 
-void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags) {
   auto p = std::make_shared<ScatterPlotData>(label);
+  p->scatter_flags = scatter_flags;
   p->xs = xs;
   p->ys = ys;
 
   update_plot(plot_name, label, p);
 }
 
-void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys) {
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags) {
   std::vector<double> xs(ys.size());
   std::iota(xs.begin(), xs.end(), 0.0);
-  update_plot_stairs(plot_name, label, xs, ys);
+  update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
 }
 
-void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys) {
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags) {
   auto p = std::make_shared<StairsPlotData>(label);
+  p->stairs_flags = stairs_flags;
   p->xs = xs;
   p->ys = ys;
 
