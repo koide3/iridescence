@@ -170,6 +170,38 @@ if (!path.empty()) {
 
 ![Screenshot_20230103_003820](https://user-images.githubusercontent.com/31344317/210252758-45787529-1a65-4f67-8c73-030e467448a0.png)
 
+## Logging (spdlog)
+
+```cpp
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/ringbuffer_sink.h>
+
+#include <guik/spdlog_sink.hpp>
+#include <guik/viewer/light_viewer.hpp>
+
+
+// Setup a ringbuffer sink for the default spdlog logger
+const int ringbuffer_size = 100;
+auto ringbuffer_sink = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(ringbuffer_size);
+
+auto logger = spdlog::default_logger();
+logger->sinks().emplace_back(ringbuffer_sink);
+logger->set_level(spdlog::level::trace);
+
+spdlog::trace("trace");
+spdlog::debug("debug");
+spdlog::info("info");
+spdlog::warn("warning");
+spdlog::error("error");
+
+
+// Create a logger UI to display ringbuffer contents
+const double bg_alpha = 0.7;
+viewer->register_ui_callback("logging", guik::create_logger_ui(ringbuffer_sink, bg_alpha));
+```
+
+![Screenshot_20231212_111403](https://github.com/koide3/iridescence/assets/31344317/98ce4f8d-f009-44b8-9b37-490ec88e90f6)
+
 ## Image and 3D model IO
 
 ### PNG
