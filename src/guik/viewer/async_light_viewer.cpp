@@ -74,8 +74,8 @@ void AsyncLightViewer::update_image(const std::string& name, int width, int heig
   });
 }
 
-void AsyncLightViewer::clear_plots() {
-  guik::viewer()->invoke([] { guik::viewer()->clear_plots(); });
+void AsyncLightViewer::clear_plots(bool clear_settings) {
+  guik::viewer()->invoke([=] { guik::viewer()->clear_plots(clear_settings); });
 }
 
 void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::string& label) {
@@ -84,6 +84,14 @@ void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::stri
 
 void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
   guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
+}
+
+void AsyncLightViewer::fit_plot(const std::string& plot_name) {
+  guik::viewer()->invoke([=] { guik::viewer()->fit_plot(plot_name); });
+}
+
+void AsyncLightViewer::fit_all_plots() {
+  guik::viewer()->invoke([=] { guik::viewer()->fit_all_plots(); });
 }
 
 void AsyncLightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {

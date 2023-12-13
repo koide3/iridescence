@@ -31,9 +31,11 @@ public:
   void remove_image(const std::string& name);
   void update_image(const std::string& name, int width, int height, const std::vector<unsigned char>& rgba_bytes, double scale = -1.0, int order = -1);
 
-  void clear_plots();
+  void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  void fit_plot(const std::string& plot_name);
+  void fit_all_plots();
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
   void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 2048);
   void update_plot_line(
