@@ -91,8 +91,15 @@ void LightViewer::draw_ui() {
     if (!viewer_ui->draw_ui()) {
       viewer_ui.reset();
     }
-  } else if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
-    viewer_ui.reset(new ViewerUI(this));
+  } else {
+    if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
+      viewer_ui.reset(new ViewerUI(this));
+    }
+  }
+
+  // Fit plots
+  if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_F]) {
+    fit_all_plots();
   }
 
   // point scale
@@ -255,17 +262,15 @@ void LightViewer::draw_ui() {
 
       for (const auto& plot_name : group.second) {
         auto& plot_setting = plot_settings[plot_name];
+        if (plot_setting.set_axes_to_fit) {
+          ImPlot::SetNextAxesToFit();
+          plot_setting.set_axes_to_fit = false;
+        }
 
+        const auto& plots = plot_data[plot_name];
         if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
-          const auto& plots = plot_data[plot_name];
-
           if (!plots.empty()) {
             const auto& plot = plots.front();
-            if (plot_setting.set_axes_to_fit) {
-              ImPlot::SetNextAxesToFit();
-              plot_setting.set_axes_to_fit = false;
-            }
-
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
           }
 
