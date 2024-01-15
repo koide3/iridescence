@@ -543,6 +543,65 @@ private:
   int view_mode;
 };
 
+/**
+ * PlotSettingWindow
+ */
+class LightViewer::ViewerUI::PlotSettingWindow {
+public:
+  PlotSettingWindow(guik::LightViewer* viewer) : viewer(viewer) {
+    show_window = false;
+  }
+
+  ~PlotSettingWindow() {}
+
+  void menu_item() {
+    // ImGui::MenuItem("Setting", nullptr, &show_window);
+
+    if (ImGui::MenuItem("Fit plots (Ctrl+F)")) {
+      viewer->fit_all_plots();
+    }
+
+    if (ImGui::MenuItem("Clear plots")) {
+      viewer->clear_plots(true);
+    }
+  }
+
+  void draw_ui() {
+    if (!show_window) {
+      return;
+    }
+
+    /*
+    ImGui::Begin("camera", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
+
+    std::vector<const char*> view_modes = {"Orbit(XY)", "Orbit(XZ)", "TOPDOWN", "ARCBALL"};
+    if (ImGui::Combo("View mode", &view_mode, view_modes.data(), view_modes.size())) {
+      if (view_modes[view_mode] == std::string("Orbit(XY)")) {
+        viewer->set_camera_control(std::shared_ptr<OrbitCameraControlXY>(new OrbitCameraControlXY()));
+      }
+      if (view_modes[view_mode] == std::string("Orbit(XZ)")) {
+        viewer->set_camera_control(std::shared_ptr<OrbitCameraControlXZ>(new OrbitCameraControlXZ()));
+      }
+      if (view_modes[view_mode] == std::string("TOPDOWN")) {
+        viewer->set_camera_control(std::shared_ptr<TopDownCameraControl>(new TopDownCameraControl()));
+      }
+      if (view_modes[view_mode] == std::string("ARCBALL")) {
+        viewer->set_camera_control(std::shared_ptr<ArcBallCameraControl>(new ArcBallCameraControl()));
+      }
+    }
+
+    viewer->get_projection_control()->draw_ui();
+
+    ImGui::End();
+    */
+  }
+
+private:
+  LightViewer* viewer;
+
+  bool show_window;
+};
+
 class LightViewer::ViewerUI::PointPickingWindow {
 public:
   PointPickingWindow(guik::LightViewer* viewer) : viewer(viewer) {
@@ -596,6 +655,7 @@ LightViewer::ViewerUI::ViewerUI(guik::LightViewer* viewer) : viewer(viewer) {
   drawable_filter_window.reset(new DrawableFilterWindow(viewer));
   drawable_editor_window.reset(new DrawableEditorWindow(viewer));
   camera_setting_window.reset(new CameraSettingWindow(viewer));
+  plot_setting_window.reset(new PlotSettingWindow(viewer));
   point_picking_window.reset(new PointPickingWindow(viewer));
 }
 /**
@@ -667,6 +727,11 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
 
   if (ImGui::BeginMenu("Camera")) {
     camera_setting_window->menu_item();
+    ImGui::EndMenu();
+  }
+
+  if (ImGui::BeginMenu("Plot")) {
+    plot_setting_window->menu_item();
     ImGui::EndMenu();
   }
 

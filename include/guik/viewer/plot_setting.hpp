@@ -9,7 +9,7 @@ namespace guik {
 
 struct PlotSetting {
 public:
-  PlotSetting() : width(512), height(256), plot_flags(0), x_flags(0), y_flags(0), order(0) {}
+  PlotSetting() : width(512), height(256), plot_flags(0), x_flags(0), y_flags(0), order(0), set_axes_to_fit(false) {}
   ~PlotSetting() {}
 
 public:
@@ -24,6 +24,8 @@ public:
   int y_flags;
 
   int order;
+
+  bool set_axes_to_fit;
 };
 }  // namespace guik
 

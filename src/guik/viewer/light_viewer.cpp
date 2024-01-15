@@ -91,8 +91,15 @@ void LightViewer::draw_ui() {
     if (!viewer_ui->draw_ui()) {
       viewer_ui.reset();
     }
-  } else if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
-    viewer_ui.reset(new ViewerUI(this));
+  } else {
+    if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_M]) {
+      viewer_ui.reset(new ViewerUI(this));
+    }
+  }
+
+  // Fit plots
+  if (ImGui::GetIO().KeyCtrl && ImGui::GetIO().KeysDown[GLFW_KEY_F]) {
+    fit_all_plots();
   }
 
   // point scale
@@ -174,16 +181,17 @@ void LightViewer::draw_ui() {
   if (!images.empty()) {
     ImGui::Begin("images", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
+    bool grouping = false;
     images_in_rendering.clear();
     std::unordered_map<std::string, std::vector<std::string>> groups;
     for (const auto& image : images) {
       const size_t separator_loc = image.first.find_first_of('/');
+      grouping |= (separator_loc != std::string::npos);
+
       const std::string group = separator_loc == std::string::npos ? "default" : image.first.substr(0, separator_loc);
       groups[group].push_back(image.first);
       images_in_rendering.emplace_back(std::get<1>(image.second));
     }
-
-    const bool grouping = groups.size() > 1;
 
     if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -228,14 +236,15 @@ void LightViewer::draw_ui() {
   if (!plot_data.empty()) {
     ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
+    bool grouping = false;
     std::unordered_map<std::string, std::vector<std::string>> groups;
     for (const auto& plot : plot_data) {
       const size_t separator_loc = plot.first.find_first_of('/');
+      grouping |= (separator_loc != std::string::npos);
+
       const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
       groups[group].push_back(plot.first);
     }
-
-    const bool grouping = groups.size() > 1;
 
     if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -252,11 +261,14 @@ void LightViewer::draw_ui() {
       std::sort(group.second.begin(), group.second.end(), [this](const auto& lhs, const auto& rhs) { return plot_settings[lhs].order < plot_settings[rhs].order; });
 
       for (const auto& plot_name : group.second) {
-        const auto& plot_setting = plot_settings[plot_name];
+        auto& plot_setting = plot_settings[plot_name];
+        if (plot_setting.set_axes_to_fit) {
+          ImPlot::SetNextAxesToFit();
+          plot_setting.set_axes_to_fit = false;
+        }
 
+        const auto& plots = plot_data[plot_name];
         if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
-          const auto& plots = plot_data[plot_name];
-
           if (!plots.empty()) {
             const auto& plot = plots.front();
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
@@ -361,8 +373,10 @@ void LightViewer::update_image(const std::string& name, const std::shared_ptr<gl
   images[name] = std::make_tuple(scale, image, order >= 0 ? order : 8192 + images.size());
 }
 
-void LightViewer::clear_plots() {
-  plot_settings.clear();
+void LightViewer::clear_plots(bool clear_settings) {
+  if (clear_settings) {
+    plot_settings.clear();
+  }
   plot_data.clear();
 }
 
@@ -389,6 +403,16 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.x_flags = x_flags;
   setting.y_flags = y_flags;
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
+}
+
+void LightViewer::fit_plot(const std::string& plot_name) {
+  plot_settings[plot_name].set_axes_to_fit = true;
+}
+
+void LightViewer::fit_all_plots() {
+  for (auto setting = plot_settings.begin(); setting != plot_settings.end(); setting++) {
+    setting->second.set_axes_to_fit = true;
+  }
 }
 
 void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {

@@ -9,10 +9,15 @@ std::unique_ptr<AsyncLightViewer> AsyncLightViewer::inst;
 AsyncLightViewer::AsyncLightViewer(const Eigen::Vector2i& size, bool background, const std::string& title) {
   std::atomic_bool initiated = false;
 
+  toggle_count = 0;
+  show_toggle = false;
+  toggle_state = false;
+
   kill_switch = false;
   thread = std::thread([this, size, background, title, &initiated] {
     auto viewer = guik::viewer(size, background, title);
     context = viewer;
+    context->register_ui_callback("async_viewer_ui_callback", [this] { ui_callback(); });
 
     initiated = true;
 
@@ -51,6 +56,44 @@ void AsyncLightViewer::wait() {
   inst.reset();
 }
 
+void AsyncLightViewer::ui_callback() {
+  if (toggle_count || show_toggle) {
+    bool toggle = toggle_state;
+    ImGui::Checkbox("wait", &toggle);
+
+    ImGui::SameLine();
+    if (ImGui::Button("hide")) {
+      show_toggle = false;
+    }
+
+    toggle_state = toggle;
+  }
+}
+
+void AsyncLightViewer::wait_until_click() {
+  auto clicked = std::make_shared<std::atomic_bool>(false);
+  const auto callback_name = "async_wait_until_click_" + guik::anon();
+
+  inst->register_ui_callback(callback_name, [=] { *clicked = *clicked || ImGui::Button("break"); });
+
+  while (!*clicked) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  inst->register_ui_callback(callback_name);
+}
+
+void AsyncLightViewer::toggle_wait() {
+  inst->show_toggle = true;
+  inst->toggle_count++;
+
+  while (inst->toggle_state) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  inst->toggle_count--;
+}
+
 void AsyncLightViewer::invoke(const std::function<void()>& func) {
   guik::viewer()->invoke(func);
 }
@@ -74,8 +117,8 @@ void AsyncLightViewer::update_image(const std::string& name, int width, int heig
   });
 }
 
-void AsyncLightViewer::clear_plots() {
-  guik::viewer()->invoke([] { guik::viewer()->clear_plots(); });
+void AsyncLightViewer::clear_plots(bool clear_settings) {
+  guik::viewer()->invoke([=] { guik::viewer()->clear_plots(clear_settings); });
 }
 
 void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::string& label) {
@@ -84,6 +127,14 @@ void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::stri
 
 void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
   guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
+}
+
+void AsyncLightViewer::fit_plot(const std::string& plot_name) {
+  guik::viewer()->invoke([=] { guik::viewer()->fit_plot(plot_name); });
+}
+
+void AsyncLightViewer::fit_all_plots() {
+  guik::viewer()->invoke([=] { guik::viewer()->fit_all_plots(); });
 }
 
 void AsyncLightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
