@@ -24,6 +24,12 @@ public:
   /// @brief Wait for the viewer to be closed
   static void wait();
 
+  /// @brief Wait for a break button to be clicked
+  static void wait_until_click();
+
+  /// @brief Wait while a toggle checkbox is checked
+  static void toggle_wait();
+
   void invoke(const std::function<void()>& func);
   void invoke_after_rendering(const std::function<void()>& func);
 
@@ -55,10 +61,17 @@ public:
   AsyncLightViewerContext async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
 private:
+  void ui_callback();
+
+private:
   static std::unique_ptr<AsyncLightViewer> inst;
 
   std::atomic_bool kill_switch;
   std::thread thread;
+
+  std::atomic_bool toggle_state;
+  std::atomic_bool show_toggle;
+  std::atomic_uint64_t toggle_count;
 };
 
 inline AsyncLightViewer* async_viewer(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen") {
@@ -71,6 +84,14 @@ inline void async_destroy() {
 
 inline void async_wait() {
   AsyncLightViewer::wait();
+}
+
+inline void async_wait_until_click() {
+  AsyncLightViewer::wait_until_click();
+}
+
+inline void async_toggle_wait() {
+  AsyncLightViewer::toggle_wait();
 }
 
 }  // namespace guik
