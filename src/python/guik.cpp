@@ -185,6 +185,7 @@ void define_guik(py::module_& m) {
     .def("clear", &guik::LightViewerContext::clear)
     .def("clear_text", &guik::LightViewerContext::clear_text)
     .def("append_text", &guik::LightViewerContext::append_text)
+    .def("register_ui_callback", &guik::LightViewerContext::register_ui_callback, py::arg("callback_name"), py::arg("callback"))
     .def(
       "remove_drawable",
       [](guik::LightViewerContext& context, const std::string& pattern, bool regex) {
@@ -213,6 +214,11 @@ void define_guik(py::module_& m) {
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::LightViewerContext::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
     .def("use_topdown_camera_control", &guik::LightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+
+    .def("pick_info", &guik::LightViewerContext::pick_info, py::arg("p"), py::arg("window") = 2)
+    .def("pick_depth", &guik::LightViewerContext::pick_depth, py::arg("p"), py::arg("window") = 2)
+    .def("unproject", &guik::LightViewerContext::unproject, py::arg("p"), py::arg("depth"))
+
     .def("get_camera_control", &guik::LightViewerContext::get_camera_control, "")
     .def("set_camera_control", &guik::LightViewerContext::set_camera_control, "")
     .def("get_projection_control", &guik::LightViewerContext::get_projection_control, "")

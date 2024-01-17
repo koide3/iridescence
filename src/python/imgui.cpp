@@ -12,7 +12,7 @@
 namespace py = pybind11;
 
 void define_imgui(py::module_& m) {
-    // imgui
+  // imgui
   py::module_ imgui_ = m.def_submodule("imgui", "");
 
   // enums
@@ -40,6 +40,10 @@ void define_imgui(py::module_& m) {
   imgui_.attr("ButtonFlags_MouseButtonRight") = py::int_(static_cast<int>(ImGuiButtonFlags_MouseButtonRight));
   imgui_.attr("ButtonFlags_MouseButtonMiddle") = py::int_(static_cast<int>(ImGuiButtonFlags_MouseButtonMiddle));
 
+  imgui_.attr("MouseButton_Right") = py::int_(static_cast<int>(ImGuiMouseButton_Right));
+  imgui_.attr("MouseButton_Middle") = py::int_(static_cast<int>(ImGuiMouseButton_Middle));
+  imgui_.attr("MouseButton_Left") = py::int_(static_cast<int>(ImGuiMouseButton_Left));
+
   imgui_.attr("DockNodeFlags_None") = py::int_(static_cast<int>(ImGuiDockNodeFlags_None));
   imgui_.attr("DockNodeFlags_KeepAliveOnly") = py::int_(static_cast<int>(ImGuiDockNodeFlags_KeepAliveOnly));
   imgui_.attr("DockNodeFlags_NoDockingInCentralNode") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoDockingInCentralNode));
@@ -49,7 +53,13 @@ void define_imgui(py::module_& m) {
   imgui_.attr("DockNodeFlags_AutoHideTabBar") = py::int_(static_cast<int>(ImGuiDockNodeFlags_AutoHideTabBar));
 
   // macros
-  imgui_.def("IM_COL32", [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); }, py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"));
+  imgui_.def(
+    "IM_COL32",
+    [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); },
+    py::arg("r"),
+    py::arg("g"),
+    py::arg("b"),
+    py::arg("a"));
 
   // structs
   py::class_<ImVec2>(imgui_, "ImVec2", py::buffer_protocol())
@@ -68,9 +78,15 @@ void define_imgui(py::module_& m) {
     py::arg("open") = true,
     py::arg("flags") = 0);
   imgui_.def("end", [] { ImGui::End(); });
-  imgui_.def("get_id", [](const std::string& name) { return ImGui::GetID(name.c_str()); }, py::arg("name"));
+  imgui_.def(
+    "get_id",
+    [](const std::string& name) { return ImGui::GetID(name.c_str()); },
+    py::arg("name"));
 
-  imgui_.def("open_popup", [](const std::string& name) { ImGui::OpenPopup(name.c_str()); }, py::arg("name"));
+  imgui_.def(
+    "open_popup",
+    [](const std::string& name) { ImGui::OpenPopup(name.c_str()); },
+    py::arg("name"));
   imgui_.def("begin_popup", &ImGui::BeginPopup, py::arg("id"), py::arg("flags"));
   imgui_.def(
     "begin_popup_modal",
@@ -100,14 +116,22 @@ void define_imgui(py::module_& m) {
   imgui_.def("newline", &ImGui::NewLine);
   imgui_.def("spacing", &ImGui::Spacing);
 
-  imgui_.def("text", [](const std::string& text) { ImGui::Text("%s", text.c_str()); }, py::arg("text"));
-  imgui_.def("input_text",
-    [](const std::string& label, const std::string& text, int flags, int buffer_size) { 
+  imgui_.def(
+    "text",
+    [](const std::string& text) { ImGui::Text("%s", text.c_str()); },
+    py::arg("text"));
+  imgui_.def(
+    "input_text",
+    [](const std::string& label, const std::string& text, int flags, int buffer_size) {
       std::vector<char> buffer(buffer_size, 0);
       std::copy(text.begin(), text.end(), buffer.begin());
       return std::make_pair(ImGui::InputText(label.c_str(), buffer.data(), buffer_size, flags), std::string(buffer.data()));
-    }, "", py::arg("label"), py::arg("text"), py::arg("flags") = 0, py::arg("buffer_size") = 256
-  );
+    },
+    "",
+    py::arg("label"),
+    py::arg("text"),
+    py::arg("flags") = 0,
+    py::arg("buffer_size") = 256);
   imgui_.def(
     "button",
     [](const std::string& label) { return ImGui::Button(label.c_str()); },
@@ -129,7 +153,8 @@ void define_imgui(py::module_& m) {
     py::arg("v"));
   imgui_.def(
     "drag_int",
-    [](const std::string& label, int v, int v_speed, int v_min, int v_max, const std::string& format) { return std::make_tuple(ImGui::DragInt(label.c_str(), &v, v_speed, v_min, v_max, format.c_str()), v);
+    [](const std::string& label, int v, int v_speed, int v_min, int v_max, const std::string& format) {
+      return std::make_tuple(ImGui::DragInt(label.c_str(), &v, v_speed, v_min, v_max, format.c_str()), v);
     },
     "",
     py::arg("label"),
@@ -138,10 +163,19 @@ void define_imgui(py::module_& m) {
     py::arg("v_min") = 0,
     py::arg("v_max") = 0,
     py::arg("format") = "%d");
-  imgui_.def("drag_float", [](const std::string& label, float v, float v_speed, float v_min, float v_max, const std::string& format, float power)
-    { return std::make_tuple(ImGui::DragFloat(label.c_str(), &v, v_speed, v_min, v_max, format.c_str(), power), v); }, "",
-    py::arg("label"), py::arg("v"), py::arg("v_speed") = 1.0f, py::arg("v_min") = 0.0f, py::arg("v_max") = 0.0f, py::arg("format") = "%.3f", py::arg("power") = 1.0f
-  );
+  imgui_.def(
+    "drag_float",
+    [](const std::string& label, float v, float v_speed, float v_min, float v_max, const std::string& format, float power) {
+      return std::make_tuple(ImGui::DragFloat(label.c_str(), &v, v_speed, v_min, v_max, format.c_str(), power), v);
+    },
+    "",
+    py::arg("label"),
+    py::arg("v"),
+    py::arg("v_speed") = 1.0f,
+    py::arg("v_min") = 0.0f,
+    py::arg("v_max") = 0.0f,
+    py::arg("format") = "%.3f",
+    py::arg("power") = 1.0f);
 
   imgui_.def("push_button_repeat", &ImGui::PushButtonRepeat, py::arg("repeat"));
   imgui_.def("pop_button_repeat", &ImGui::PopButtonRepeat);
@@ -174,7 +208,10 @@ void define_imgui(py::module_& m) {
   // Tab bars
   imgui_.def("begin_tab_bar", &ImGui::BeginTabBar, py::arg("id"), py::arg("flags") = 0);
   imgui_.def("end_tab_bar", &ImGui::EndTabBar);
-  imgui_.def("begin_tab_item", [](const char* label) { return ImGui::BeginTabItem(label); }, py::arg("label"));
+  imgui_.def(
+    "begin_tab_item",
+    [](const char* label) { return ImGui::BeginTabItem(label); },
+    py::arg("label"));
   imgui_.def("end_tab_item", &ImGui::EndTabItem);
   imgui_.def("tab_item_button", &ImGui::TabItemButton, py::arg("label"), py::arg("flags") = 0);
 
@@ -281,6 +318,7 @@ void define_imgui(py::module_& m) {
 
     .def_property_readonly("mouse_pos", [](const ImGuiIO& io) { return py::array(2, &io.MousePos.x); })
     .def_property_readonly("mouse_down", [](const ImGuiIO& io) { return py::array(5, io.MouseDown); })
+    .def_property_readonly("mouse_clicked", [](const ImGuiIO& io) { return py::array(5, io.MouseClicked); })
 
     .def_readonly("mouse_wheel", &ImGuiIO::MouseWheel)
     .def_readonly("mouse_wheel_h", &ImGuiIO::MouseWheelH)
@@ -301,6 +339,11 @@ void define_imgui(py::module_& m) {
 
   imgui_.def("get_mouse_pos", [] {
     auto pos = ImGui::GetMousePos();
+    return Eigen::Vector2f(pos[0], pos[1]);
+  });
+
+  imgui_.def("get_window_pos", [] {
+    auto pos = ImGui::GetWindowPos();
     return Eigen::Vector2f(pos[0], pos[1]);
   });
 
