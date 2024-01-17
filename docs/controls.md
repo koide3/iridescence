@@ -28,6 +28,16 @@ viewer->lookat(center_pos);
 <iframe width="560" height="315" src="https://www.youtube.com/embed/TarRKF_Xd2E?start=13" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ```lookat``` example (0:13 ~)
 
+### Keyboard shortcut
+
+| Key                    | Description                                    |
+| ---------------------- | ---------------------------------------------- |
+| Ctrl + Arrow           | Move camera                                    |
+| Ctrl + Page UP / Down  | Zoom in/out                                    |
+| Ctrl + Home / End      | Increase / decrease moving speed (permanently) |
+| Shift                  | Increase moving speed (while holding)          |
+
+
 ## Model matrix control (ImGuizmo)
 
 ```cpp
