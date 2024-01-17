@@ -273,3 +273,25 @@ By pressing "Ctrl+M", a hidden menu bar appears. Via the manu bar, you can:
 - Get 3D positions of objects via point picking
 
 ![Screenshot_20230102_202624](https://user-images.githubusercontent.com/31344317/210225203-e6edf5d8-d495-413b-b554-15fb61294923.png)
+
+
+## Keyboard shortcut
+
+### General
+
+| Key                   | Description                     |
+| --------------------- | ------------------------------- |
+| Ctrl + M              | Show viewer menu                |
+| Ctrl + J              | Save screenshot                 |
+| Ctrl + F              | Fit all plots to data           |
+| Ctrl + MINUX / PLUS   | Increase / decrease point scale |
+
+### Camera control
+
+| Key                    | Description                                    |
+| ---------------------- | ---------------------------------------------- |
+| Ctrl + Arrow           | Move camera                                    |
+| Ctrl + Page UP / Down  | Zoom in/out                                    |
+| Ctrl + Home / End      | Increase / decrease moving speed (permanently) |
+| Shift                  | Increase moving speed (while holding)          |
+
