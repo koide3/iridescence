@@ -79,6 +79,8 @@ public:
   double partial_rendering_clear_thresh;
   Eigen::Matrix4f last_projection_view_matrix;
 
+  double keyboard_control_speed;
+
   std::unique_ptr<glk::GLSLShader> shader;
   std::unique_ptr<glk::GLSLShader> texture_shader;
   std::unique_ptr<glk::GLSLShader> partial_clear_shader;
