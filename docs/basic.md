@@ -36,6 +36,18 @@ There is also a shorthand function ```guik::viewer()``` that is equivalent to ``
 auto viewer =  guik::viewer();  // Equivalent to guik::LightViewer::instance()
 ```
 
+
+With these convenient functions, the minimum example can be rewritten in a shorter form.
+
+```cpp
+#include <guik/viewer/light_viewer.hpp>
+
+int main(int argc, char** argv) {
+  auto viewer = guik::viewer();
+  viewer->spin();
+}
+```
+
 ## Registering drawables to the viewer
 
 3D objects to be drawn are called **drawables** and managed with unique names (or IDs). The following code shows a minimum example to register a wire sphere to the viewer.
@@ -45,7 +57,7 @@ auto viewer =  guik::viewer();  // Equivalent to guik::LightViewer::instance()
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
-  auto viewer = guik::LightViewer::instance();
+  auto viewer = guik::viewer();
 
   // Register a wire sphere drawable with the name "sphere"
   // and the flat red coloring setting.
@@ -78,8 +90,25 @@ viewer->update_drawable("sphere2", glk::Primitives::wire_sphere(), setting2);
 
 ![Screenshot_20230102_235102](https://user-images.githubusercontent.com/31344317/210247287-5f51f5c7-58a2-4c55-bed0-b1245bad6bde.png)
 
-
 See [Shader setting](shader.md) for more details.
+
+
+!!!tip
+    There are shorthand functions (e.g., ```update_sphere```) for frequently used drawable types that allow registering drawables without including additional headers.
+
+    ```cpp
+    // Register a solid sphere
+    viewer->update_sphere("sphere", guik::FlatRed());
+    ```
+
+!!!tip
+    ShaderSetting class has several utility methods for handy manipulation of the model matrix.
+
+    ```cpp
+    // Register a solid sphere with translation and scaling
+    viewer->update_sphere("sphere", guik::FlatRed()).translate({1.0, 2.0, 3.0}).scale(0.1);
+    ``` 
+
 
 ## Registering UI callbacks (Dear ImGui)
 
@@ -92,7 +121,7 @@ To create a ImGui-based GUI, register a callback function for UI rendering event
 #include <guik/viewer/light_viewer.hpp>
 
 int main(int argc, char** argv) {
-  auto viewer = guik::LightViewer::instance();
+  auto viewer = guik::viewer();
 
   float angle = 0.0f;
 

@@ -79,6 +79,8 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   alpha_blend_sfactor = GL_SRC_ALPHA;
   alpha_blend_dfactor = GL_ONE_MINUS_SRC_ALPHA;
   blend_depth_write = true;
+
+  keyboard_control_speed = 5.0;
 }
 
 /**
@@ -445,17 +447,20 @@ void GLCanvas::mouse_control() {
     }
 
     if (io.KeyCtrl) {
+      const double speed_factor = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT] ? 4.0 : 1.0;
+      const double speed = keyboard_control_speed * speed_factor;
+
       Eigen::Vector2i arrow(0, 0);
       if (io.KeysDown[GLFW_KEY_LEFT]) {
-        arrow[0] = 1;
+        arrow[0] = speed;
       } else if (io.KeysDown[GLFW_KEY_RIGHT]) {
-        arrow[0] = -1;
+        arrow[0] = -speed;
       }
 
       if (io.KeysDown[GLFW_KEY_UP]) {
-        arrow[1] = 1;
+        arrow[1] = speed;
       } else if (io.KeysDown[GLFW_KEY_DOWN]) {
-        arrow[1] = -1;
+        arrow[1] = -speed;
       }
 
       if (!arrow.isZero()) {
@@ -464,12 +469,20 @@ void GLCanvas::mouse_control() {
 
       int updown = 0;
       if (io.KeysDown[GLFW_KEY_PAGE_UP]) {
-        updown = 1;
+        updown = speed;
       } else if (io.KeysDown[GLFW_KEY_PAGE_DOWN]) {
-        updown = -1;
+        updown = -speed;
       }
 
       camera_control->updown(updown);
+
+      if (io.KeysDown[GLFW_KEY_HOME]) {
+        keyboard_control_speed *= 1.01;
+      } else if (io.KeysDown[GLFW_KEY_END]) {
+        keyboard_control_speed *= 0.99;
+      }
+
+      keyboard_control_speed = std::max(1.0, keyboard_control_speed);
     }
 
     camera_control->scroll(Eigen::Vector2f(io.MouseWheel, io.MouseWheelH));

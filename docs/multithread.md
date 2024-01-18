@@ -43,6 +43,8 @@ int main(int argc, char** argv) {
 
 ## Thread-safe operations
 
+```append_text``` and ```clear_text``` are thread-safe.
+
 ```cpp
 viewer->append_text("test");
 viewer->clear_text();
@@ -73,7 +75,7 @@ int main(int argc, char** argv) {
 ```
 
 !!! warning
-    Because AsyncViewer runs the viewer in another thread, calling the standard viewer functions in this main thread is unsafe.
+    Because AsyncViewer runs the viewer in a background thread, calling the standard viewer functions in this main thread is unsafe.
 
     ```cpp
       auto async_viewer = guik::async_viewer();
