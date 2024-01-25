@@ -495,6 +495,46 @@ void LightViewer::update_plot_stairs(const std::string& plot_name, const std::st
   update_plot(plot_name, label, p);
 }
 
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  int bins,
+  const Eigen::Vector2d& range,
+  int histogram_flags) {
+  //
+  auto p = std::make_shared<HistogramPlotData>(label);
+  p->histogram_flags = histogram_flags;
+  p->x_bins = bins;
+  p->x_range_min = range[0];
+  p->x_range_max = range[1];
+  p->xs = xs;
+
+  update_plot(plot_name, label, p);
+}
+
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  //
+  auto p = std::make_shared<HistogramPlotData>(label);
+  p->histogram_flags = histogram_flags;
+  p->x_bins = x_bins;
+  p->y_bins = y_bins;
+  p->x_range_min = x_range[0];
+  p->x_range_max = x_range[1];
+  p->xs = xs;
+
+  update_plot(plot_name, label, p);
+}
+
 bool LightViewer::spin_until_click() {
   bool kill_switch = false;
 

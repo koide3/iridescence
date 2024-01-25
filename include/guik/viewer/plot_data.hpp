@@ -60,6 +60,33 @@ public:
   std::vector<double> ys;
 };
 
+struct HistogramPlotData : public PlotData {
+public:
+  HistogramPlotData(const std::string& label)
+  : PlotData(label),
+    histogram_flags(0),
+    x_bins(-2),
+    y_bins(-2),
+    x_range_min(0.0),
+    x_range_max(0.0),
+    y_range_min(0.0),
+    y_range_max(0.0) {}
+  ~HistogramPlotData() {}
+
+  virtual void plot() const override;
+
+public:
+  int histogram_flags;
+  int x_bins;
+  int y_bins;
+  double x_range_min;
+  double x_range_max;
+  double y_range_min;
+  double y_range_max;
+  std::vector<double> xs;
+  std::vector<double> ys;
+};
+
 }  // namespace guik
 
 #endif

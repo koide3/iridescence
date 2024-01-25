@@ -176,6 +176,29 @@ void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const st
   guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, xs, ys, stairs_flags); });
 }
 
+void AsyncLightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  int bins,
+  const Eigen::Vector2d& range,
+  int histogram_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_histogram(plot_name, label, xs, bins, range, histogram_flags); });
+}
+
+void AsyncLightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->update_plot_histogram(plot_name, label, xs, ys, x_bins, y_bins, x_range, y_range, histogram_flags); });
+}
+
 AsyncLightViewerContext AsyncLightViewer::async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   std::shared_ptr<guik::LightViewerContext> sub_viewer;
   guik::viewer()->invoke([&] { sub_viewer = guik::viewer()->sub_viewer(context_name, canvas_size); });

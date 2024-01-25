@@ -55,6 +55,23 @@ public:
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags = 0);
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<double>& xs,
+    int bins = -2,
+    const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<double>& xs,
+    const std::vector<double>& ys,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
 
   // This method causes synchronization with the visualization thread.
   // Do not call this frequently.
