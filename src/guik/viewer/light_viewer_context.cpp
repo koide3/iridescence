@@ -11,6 +11,7 @@
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
+#include <guik/camera/fps_camera_control.hpp>
 
 namespace guik {
 
@@ -380,8 +381,14 @@ void LightViewerContext::use_topdown_camera_control(double distance, double thet
 
 void LightViewerContext::use_arcball_camera_control(double distance, double theta, double phi) {
   Eigen::Quaternionf quat(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY()));
-
   canvas->camera_control.reset(new guik::ArcBallCameraControl(distance, quat));
+}
+
+void LightViewerContext::use_fps_camera_control(double fovy_deg) {
+  auto fps_camera_control = std::make_shared<guik::FPSCameraControl>(canvas->size);
+  fps_camera_control->set_fovy(fovy_deg);
+  canvas->camera_control = fps_camera_control;
+  canvas->projection_control = fps_camera_control;
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

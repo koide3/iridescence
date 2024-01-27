@@ -16,6 +16,9 @@ viewer->use_topdown_camera_control();
 
 // Use an arcball-like camera control that can make an arbitrary pose
 viewer->use_arcball_camera_control();
+
+// Use an FPS-like camera control with keyboard (WASD) control
+viewer->use_fps_camera_control();
 ```
 
 A useful method to let the camera keep focusing on a moving object is ```lookat()``` that moves the camera such that the specified position comes to the center of the camera view.
@@ -28,7 +31,7 @@ viewer->lookat(center_pos);
 <iframe width="560" height="315" src="https://www.youtube.com/embed/TarRKF_Xd2E?start=13" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ```lookat``` example (0:13 ~)
 
-### Keyboard shortcut
+### Keyboard control
 
 | Key                    | Description                                    |
 | ---------------------- | ---------------------------------------------- |
@@ -36,6 +39,39 @@ viewer->lookat(center_pos);
 | Ctrl + Page UP / Down  | Zoom in/out                                    |
 | Ctrl + Home / End      | Increase / decrease moving speed (permanently) |
 | Shift                  | Increase moving speed (while holding)          |
+
+### FPS-camera control
+
+| Key                    | Description                                    |
+| ---------------------- | ---------------------------------------------- |
+| W / A / S / D          | Forward / Left / Backward / Right              |
+| R / F                  | Up / Down                                      |
+| E / Q                  | Heading (Yaw rotation)                         |
+
+| Mouse                  | Description                                    |
+| ---------------------- | ---------------------------------------------- |
+| Hold left button       | Yaw / Pitch rotation                           |
+| Hold right button      | Up / Down                                      |
+| Hold scroll button     | Forward / Backward / Left/ Right               |
+| Scroll                 | Change FOV                                     |
+
+
+## Implementing custom camera control
+
+In case you want to directly control the camera properties, use `StaticCameraControl` and `StaticProjectionControl`. This  combination enables, for example, AR-like visualization through direct manipulation of camera pose and projection.
+
+```cpp
+Eigen::Isometry3f T_world_camera = ...;   // Camera pose (X = right, Y = down, Z = forward)
+auto static_camera = std::make_shared<guik::StaticCameraControl>(T_world_camera);
+viewer->set_camera_control(static_camera);
+
+Eigen::Vector2i canvas_size = viewer->canvas_size();
+Eigen::Matrix3f camera_matrix = ...;  // OpenCV camera intrinsic matrix [[fx, 0, cx], [0, fy, cy], [0, 0, 1]]
+auto static_projection = std::make_shared<guik::StaticProjectionControl>(canvas_size, camera_matrix);
+viewer->set_projection_control(static_projection);
+```
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BI42gZO-IEY?si=fFFv46eZN9ge-Y3d" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 
 ## Model matrix control (ImGuizmo)

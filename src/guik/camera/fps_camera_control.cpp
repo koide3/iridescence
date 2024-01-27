@@ -40,6 +40,10 @@ void FPSCameraControl::set_size(const Eigen::Vector2i& size) {
   this->size = size;
 }
 
+void FPSCameraControl::set_fovy(double fovy) {
+  this->fovy = fovy;
+}
+
 void FPSCameraControl::set_depth_range(const Eigen::Vector2f& range) {}
 
 Eigen::Matrix4f FPSCameraControl::projection_matrix() const {
@@ -48,6 +52,12 @@ Eigen::Matrix4f FPSCameraControl::projection_matrix() const {
   glm::mat4 proj = glm::perspective<float>(fovy * M_PI / 180.0, aspect_ratio, near, far);
 
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(proj));
+}
+
+void FPSCameraControl::set_pose(const Eigen::Vector3f& pos, double yaw_deg, double pitch_deg) {
+  this->pos = pos * M_PI / 180.0;
+  this->yaw = yaw * M_PI / 180.0;
+  this->pitch = pitch;
 }
 
 void FPSCameraControl::reset_center() {}

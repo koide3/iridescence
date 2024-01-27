@@ -18,10 +18,12 @@ public:
 
   // ProjectionControl
   void set_size(const Eigen::Vector2i& size) override;
+  void set_fovy(double fovy);
   void set_depth_range(const Eigen::Vector2f& range) override;
   Eigen::Matrix4f projection_matrix() const override;
 
   // ViewMatrixControl
+  void set_pose(const Eigen::Vector3f& pos, double yaw_deg, double pitch_deg);
   void reset_center() override;
   void lookat(const Eigen::Vector3f& pt) override;
 
