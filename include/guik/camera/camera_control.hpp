@@ -21,6 +21,7 @@ public:
   virtual void drag(const Eigen::Vector2i& p, int button) {}
   virtual void scroll(const Eigen::Vector2f& rel) {}
 
+  virtual void update() {}
   virtual void updown(int p) {}
   virtual void arrow(const Eigen::Vector2i& p) {}
 
