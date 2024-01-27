@@ -125,7 +125,8 @@ void define_imgui(py::module_& m) {
     [](const std::string& label, const std::string& text, int flags, int buffer_size) {
       std::vector<char> buffer(buffer_size, 0);
       std::copy(text.begin(), text.end(), buffer.begin());
-      return std::make_pair(ImGui::InputText(label.c_str(), buffer.data(), buffer_size, flags), std::string(buffer.data()));
+      const bool changed = ImGui::InputText(label.c_str(), buffer.data(), buffer_size, flags);
+      return std::make_pair(changed, std::string(buffer.data()));
     },
     "",
     py::arg("label"),
