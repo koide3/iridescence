@@ -56,6 +56,16 @@ public:
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags = 0);
 
+  void set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style);
+  void set_scatter_style(
+    const std::string& plot_name,
+    const std::string& label,
+    int marker = 0,
+    float size = -1,
+    const Eigen::Vector4f& fill = Eigen::Vector4f(0, 0, 0, -1),
+    float weight = -1,
+    const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
+
   // This method causes synchronization with the visualization thread.
   // Do not call this frequently.
   AsyncLightViewerContext async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));

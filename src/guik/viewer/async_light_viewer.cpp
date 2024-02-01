@@ -176,6 +176,21 @@ void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const st
   guik::viewer()->invoke([=] { guik::viewer()->update_plot_stairs(plot_name, label, xs, ys, stairs_flags); });
 }
 
+void AsyncLightViewer::set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style) {
+  guik::viewer()->invoke([=] { guik::viewer()->set_plot_style(plot_name, label, style); });
+}
+
+void AsyncLightViewer::set_scatter_style(
+  const std::string& plot_name,
+  const std::string& label,
+  int marker,
+  float size,
+  const Eigen::Vector4f& fill,
+  float weight,
+  const Eigen::Vector4f& outline) {
+  guik::viewer()->invoke([=] { guik::viewer()->set_scatter_style(plot_name, label, marker, size, fill, weight, outline); });
+}
+
 AsyncLightViewerContext AsyncLightViewer::async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   std::shared_ptr<guik::LightViewerContext> sub_viewer;
   guik::viewer()->invoke([&] { sub_viewer = guik::viewer()->sub_viewer(context_name, canvas_size); });

@@ -275,7 +275,14 @@ void LightViewer::draw_ui() {
           }
 
           for (const auto& plot : plots) {
-            plot->plot();
+            if (!plot.second) {
+              continue;
+            }
+
+            if (plot.first) {
+              plot.first->apply();
+            }
+            plot.second->plot();
           }
 
           ImPlot::EndPlot();
@@ -392,7 +399,7 @@ void LightViewer::remove_plot(const std::string& plot_name, const std::string& l
   }
 
   auto& data = found->second;
-  data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p->label == label; }));
+  data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p.second->label == label; }));
 }
 
 void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
@@ -417,11 +424,11 @@ void LightViewer::fit_all_plots() {
 
 void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
   auto& data = plot_data[plot_name];
-  auto found = std::find_if(data.begin(), data.end(), [&](const PlotData::ConstPtr& p_) { return p_->label == plot->label; });
+  auto found = std::find_if(data.begin(), data.end(), [&](const auto& p_) { return p_.second->label == plot->label; });
   if (found == data.end()) {
-    data.emplace_back(plot);
+    data.emplace_back(nullptr, plot);
   } else {
-    *found = plot;
+    (*found).second = plot;
   }
 }
 
@@ -493,6 +500,34 @@ void LightViewer::update_plot_stairs(const std::string& plot_name, const std::st
   p->ys = ys;
 
   update_plot(plot_name, label, p);
+}
+
+void LightViewer::set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style) {
+  auto& data = plot_data[plot_name];
+  auto found = std::find_if(data.begin(), data.end(), [&](const auto& p_) { return p_.second->label == label; });
+  if (found == data.end()) {
+    data.emplace_back(style, std::make_shared<PlotData>(label));
+  } else {
+    (*found).first = style;
+  }
+}
+
+void LightViewer::set_scatter_style(
+  const std::string& plot_name,
+  const std::string& label,
+  int marker,
+  float size,
+  const Eigen::Vector4f& fill,
+  float weight,
+  const Eigen::Vector4f& outline) {
+  auto s = std::make_shared<ScatterPlotStyle>();
+  s->marker = marker;
+  s->size = size;
+  s->fill = fill;
+  s->weight = weight;
+  s->outline = outline;
+
+  set_plot_style(plot_name, label, s);
 }
 
 bool LightViewer::spin_until_click() {
