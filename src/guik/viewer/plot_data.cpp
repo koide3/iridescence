@@ -24,6 +24,10 @@ void HistogramPlotData::plot() const {
   }
 }
 
+void LinePlotStyle::apply() const {
+  ImPlot::SetNextLineStyle(ImVec4(col[0], col[1], col[2], col[3]), weight);
+}
+
 void ScatterPlotStyle::apply() const {
   ImPlot::SetNextMarkerStyle(marker, size, ImVec4(fill[0], fill[1], fill[2], fill[3]), weight, ImVec4(outline[0], outline[1], outline[2], outline[3]));
 }

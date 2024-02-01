@@ -502,6 +502,46 @@ void LightViewer::update_plot_stairs(const std::string& plot_name, const std::st
   update_plot(plot_name, label, p);
 }
 
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  int bins,
+  const Eigen::Vector2d& range,
+  int histogram_flags) {
+  //
+  auto p = std::make_shared<HistogramPlotData>(label);
+  p->histogram_flags = histogram_flags;
+  p->x_bins = bins;
+  p->x_range_min = range[0];
+  p->x_range_max = range[1];
+  p->xs = xs;
+
+  update_plot(plot_name, label, p);
+}
+
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<double>& xs,
+  const std::vector<double>& ys,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  //
+  auto p = std::make_shared<HistogramPlotData>(label);
+  p->histogram_flags = histogram_flags;
+  p->x_bins = x_bins;
+  p->y_bins = y_bins;
+  p->x_range_min = x_range[0];
+  p->x_range_max = x_range[1];
+  p->xs = xs;
+
+  update_plot(plot_name, label, p);
+}
+
 void LightViewer::set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style) {
   auto& data = plot_data[plot_name];
   auto found = std::find_if(data.begin(), data.end(), [&](const auto& p_) { return p_.second->label == label; });
@@ -510,6 +550,14 @@ void LightViewer::set_plot_style(const std::string& plot_name, const std::string
   } else {
     (*found).first = style;
   }
+}
+
+void LightViewer::set_line_style(const std::string& plot_name, const std::string& label, const Eigen::Vector4f& color, float weight) {
+  auto s = std::make_shared<LinePlotStyle>();
+  s->col = color;
+  s->weight = weight;
+
+  set_plot_style(plot_name, label, s);
 }
 
 void LightViewer::set_scatter_style(

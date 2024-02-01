@@ -95,6 +95,17 @@ public:
   virtual void apply() const = 0;
 };
 
+struct LinePlotStyle : public PlotStyle {
+public:
+  LinePlotStyle() : col(0, 0, 0, -1), weight(-1) {}
+
+  virtual void apply() const override;
+
+public:
+  Eigen::Vector4f col;
+  float weight;
+};
+
 struct ScatterPlotStyle : public PlotStyle {
 public:
   ScatterPlotStyle() : marker(0), size(-1), fill(0, 0, 0, -1), weight(-1), outline(0, 0, 0, -1) {}
