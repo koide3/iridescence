@@ -16,6 +16,11 @@ FrameBuffer::FrameBuffer(const Eigen::Vector2i& size, int num_color_buffers, boo
     color_attachments.push_back(attachments[i]);
     color_buffers.push_back(std::make_shared<Texture>(size, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE));
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i], GL_TEXTURE_2D, color_buffers[i]->id(), 0);
+
+    color_buffers.back()->bind();
+    const GLint swizzle[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ONE};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
+    color_buffers.back()->unbind();
   }
 
   if(use_depth) {
