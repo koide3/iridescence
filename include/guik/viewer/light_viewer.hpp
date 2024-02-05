@@ -16,6 +16,9 @@
 namespace guik {
 
 struct PlotData;
+struct PlotStyle;
+using PlotDataConstPtr = std::shared_ptr<const PlotData>;
+using PlotStyleConstPtr = std::shared_ptr<const PlotStyle>;
 
 class LightViewer : public guik::Application, public guik::LightViewerContext {
 public:
@@ -59,6 +62,34 @@ public:
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags = 0);
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<double>& xs,
+    int bins = -2,
+    const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<double>& xs,
+    const std::vector<double>& ys,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+
+  void set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style);
+  void set_line_style(const std::string& plot_name, const std::string& label, const Eigen::Vector4f& color = Eigen::Vector4f(0, 0, 0, -1), float weight = -1);
+  void set_scatter_style(
+    const std::string& plot_name,
+    const std::string& label,
+    int marker = 0,
+    float size = -1,
+    const Eigen::Vector4f& fill = Eigen::Vector4f(0, 0, 0, -1),
+    float weight = -1,
+    const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
@@ -93,7 +124,7 @@ private:
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
 
   std::unordered_map<std::string, PlotSetting> plot_settings;
-  std::unordered_map<std::string, std::vector<std::shared_ptr<const PlotData>>> plot_data;
+  std::unordered_map<std::string, std::vector<std::pair<PlotStyleConstPtr, PlotDataConstPtr>>> plot_data;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 
