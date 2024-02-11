@@ -27,12 +27,12 @@ public:
   void reset_center() override;
   void lookat(const Eigen::Vector3f& pt) override;
 
-  void mouse(const Eigen::Vector2i& p, int button, bool down) override;
-  void drag(const Eigen::Vector2i& p, int button) override;
+  void mouse(const Eigen::Vector2f& p, int button, bool down) override;
+  void drag(const Eigen::Vector2f& p, int button) override;
   void scroll(const Eigen::Vector2f& rel) override;
 
-  void updown(int p) override;
-  void arrow(const Eigen::Vector2i& p) override;
+  void updown(double p) override;
+  void arrow(const Eigen::Vector2f& p) override;
   void update() override;
 
   Eigen::Vector2f depth_range() const override;
@@ -56,7 +56,7 @@ private:
   bool left_button_down;
   bool right_button_down;
   bool middle_button_down;
-  Eigen::Vector2i drag_last_pos;
+  Eigen::Vector2f drag_last_pos;
 };
 
 }  // namespace  guik

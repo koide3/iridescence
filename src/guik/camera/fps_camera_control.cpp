@@ -67,7 +67,7 @@ void FPSCameraControl::lookat(const Eigen::Vector3f& pt) {
   pos = pt - 3.0f * view_vector;
 }
 
-void FPSCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
+void FPSCameraControl::mouse(const Eigen::Vector2f& p, int button, bool down) {
   if (button == 0) {
     left_button_down = down;
   }
@@ -81,8 +81,8 @@ void FPSCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
   drag_last_pos = p;
 }
 
-void FPSCameraControl::drag(const Eigen::Vector2i& p, int button) {
-  Eigen::Vector2i rel = p - drag_last_pos;
+void FPSCameraControl::drag(const Eigen::Vector2f& p, int button) {
+  Eigen::Vector2f rel = p - drag_last_pos;
   if (left_button_down) {
     yaw -= rel[0] * mouse_sensitivity_yaw;
     pitch -= rel[1] * mouse_sensitivity_pitch;
@@ -107,12 +107,12 @@ void FPSCameraControl::scroll(const Eigen::Vector2f& rel) {
   fovy = std::max(1.0, std::min(170.0, fovy));
 }
 
-void FPSCameraControl::updown(int p) {
+void FPSCameraControl::updown(double p) {
   const Eigen::Matrix3f rotation = (Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitY())).toRotationMatrix();
   pos += rotation.col(2) * p * translation_speed * 0.1;
 }
 
-void FPSCameraControl::arrow(const Eigen::Vector2i& p) {
+void FPSCameraControl::arrow(const Eigen::Vector2f& p) {
   const Eigen::Matrix3f rotation = (Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitY())).toRotationMatrix();
   yaw += p[0] * mouse_sensitivity_yaw * 0.5;
   pos += rotation.col(0) * p[1] * translation_speed * 0.1;
@@ -120,32 +120,33 @@ void FPSCameraControl::arrow(const Eigen::Vector2i& p) {
 
 void FPSCameraControl::update() {
   const auto& io = ImGui::GetIO();
+  const double dt = io.DeltaTime * 60.0;
 
   const Eigen::Matrix3f rotation = (Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(-pitch, Eigen::Vector3f::UnitY())).toRotationMatrix();
 
   if (io.KeysDown[GLFW_KEY_W]) {
-    pos += rotation.col(0) * translation_speed;
+    pos += rotation.col(0) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_S]) {
-    pos -= rotation.col(0) * translation_speed;
+    pos -= rotation.col(0) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_D]) {
-    pos -= rotation.col(1) * translation_speed;
+    pos -= rotation.col(1) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_A]) {
-    pos += rotation.col(1) * translation_speed;
+    pos += rotation.col(1) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_R]) {
-    pos += rotation.col(2) * translation_speed;
+    pos += rotation.col(2) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_F]) {
-    pos -= rotation.col(2) * translation_speed;
+    pos -= rotation.col(2) * translation_speed * dt;
   }
   if (io.KeysDown[GLFW_KEY_E]) {
-    yaw -= mouse_sensitivity_yaw * 2.0;
+    yaw -= mouse_sensitivity_yaw * 2.0 * dt;
   }
   if (io.KeysDown[GLFW_KEY_Q]) {
-    yaw += mouse_sensitivity_yaw * 2.0;
+    yaw += mouse_sensitivity_yaw * 2.0 * dt;
   }
 }
 

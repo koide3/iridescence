@@ -33,7 +33,7 @@ void OrbitCameraControlXY::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;
 }
 
-void OrbitCameraControlXY::mouse(const Eigen::Vector2i& p, int button, bool down) {
+void OrbitCameraControlXY::mouse(const Eigen::Vector2f& p, int button, bool down) {
   if(button == 0) {
     left_button_down = down;
   }
@@ -43,8 +43,8 @@ void OrbitCameraControlXY::mouse(const Eigen::Vector2i& p, int button, bool down
   drag_last_pos = p;
 }
 
-void OrbitCameraControlXY::drag(const Eigen::Vector2i& p, int button) {
-  Eigen::Vector2i rel = p - drag_last_pos;
+void OrbitCameraControlXY::drag(const Eigen::Vector2f& p, int button) {
+  Eigen::Vector2f rel = p - drag_last_pos;
 
   if(left_button_down) {
     theta -= rel[0] * 0.01f;
@@ -70,7 +70,7 @@ void OrbitCameraControlXY::scroll(const Eigen::Vector2f& rel) {
   distance = std::max(0.1, distance);
 }
 
-void OrbitCameraControlXY::updown(int p) {
+void OrbitCameraControlXY::updown(double p) {
   if(p > 0) {
     distance = distance * 0.998f;
   } else if(p < 0) {
@@ -80,7 +80,7 @@ void OrbitCameraControlXY::updown(int p) {
   distance = std::max(0.1, distance);
 }
 
-void OrbitCameraControlXY::arrow(const Eigen::Vector2i& p) {
+void OrbitCameraControlXY::arrow(const Eigen::Vector2f& p) {
   center += Eigen::AngleAxisf(theta + M_PI_2, Eigen::Vector3f::UnitZ()) * Eigen::Vector3f(-p[0], p[1], 0.0f) * distance * 0.0001f;
 }
 

@@ -23,8 +23,8 @@ OrbitCameraControlXZ::OrbitCameraControlXZ(double distance, double theta, double
 
 OrbitCameraControlXZ::~OrbitCameraControlXZ() {}
 
-void OrbitCameraControlXZ::drag(const Eigen::Vector2i& p, int button) {
-  Eigen::Vector2i rel = p - drag_last_pos;
+void OrbitCameraControlXZ::drag(const Eigen::Vector2f& p, int button) {
+  Eigen::Vector2f rel = p - drag_last_pos;
 
   if(left_button_down) {
     theta -= rel[0] * 0.01f;

@@ -28,7 +28,7 @@ void TopDownCameraControl::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;
 }
 
-void TopDownCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
+void TopDownCameraControl::mouse(const Eigen::Vector2f& p, int button, bool down) {
   if(button == 0) {
     left_button_down = down;
   }
@@ -38,8 +38,8 @@ void TopDownCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down
   drag_last_pos = p;
 }
 
-void TopDownCameraControl::drag(const Eigen::Vector2i& p, int button) {
-  Eigen::Vector2i rel = p - drag_last_pos;
+void TopDownCameraControl::drag(const Eigen::Vector2f& p, int button) {
+  Eigen::Vector2f rel = p - drag_last_pos;
 
   if(left_button_down) {
     theta -= rel[0] * 0.01f;
