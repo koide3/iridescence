@@ -37,11 +37,14 @@ public:
   void remove_image(const std::string& name);
   void update_image(const std::string& name, int width, int height, const std::vector<unsigned char>& rgba_bytes, double scale = -1.0, int order = -1);
 
+  // Plotting methods
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
+
+  // Update plot methods
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
   void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 2048);
   void update_plot_line(
@@ -73,6 +76,46 @@ public:
     const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
     int histogram_flags = 0);
 
+  // Update plot template methods
+  template <typename T>
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  template <typename T1, typename T2>
+  void update_plot_line(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T1>& xs,
+    const std::vector<T2>& ys,
+    int line_flags = 0,
+    size_t max_num_data = 8192 * 12);
+  template <typename T>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags = 0);
+  template <typename T>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int stairs_flags = 0);
+  template <typename T>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& xs,
+    int bins = -2,
+    const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T1>& xs,
+    const std::vector<T2>& ys,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+
+  // Set plot style methods
   void set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style);
   void set_line_style(const std::string& plot_name, const std::string& label, const Eigen::Vector4f& color = Eigen::Vector4f(0, 0, 0, -1), float weight = -1);
   void set_scatter_style(
@@ -120,6 +163,95 @@ inline void async_wait_until_click() {
 
 inline void async_toggle_wait() {
   AsyncLightViewer::toggle_wait();
+}
+
+// Template methods
+
+template <typename T>
+void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_line(plot_name, label, ys_, line_flags, max_num_data);
+}
+
+template <typename T1, typename T2>
+void AsyncLightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T1>& xs,
+  const std::vector<T2>& ys,
+  int line_flags,
+  size_t max_num_data) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_line(plot_name, label, xs_, ys_, line_flags, max_num_data);
+}
+
+template <typename T>
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_scatter(plot_name, label, ys_, scatter_flags);
+}
+
+template <typename T1, typename T2>
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_scatter(plot_name, label, xs_, ys_, scatter_flags);
+}
+
+template <typename T>
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_stairs(plot_name, label, ys_, stairs_flags);
+}
+
+template <typename T1, typename T2>
+void AsyncLightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int stairs_flags) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_stairs(plot_name, label, xs_, ys_, stairs_flags);
+}
+
+template <typename T>
+void AsyncLightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T>& xs,
+  int bins,
+  const Eigen::Vector2d& range,
+  int histogram_flags) {
+  //
+  std::vector<double> xs_(xs.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  update_plot_histogram(plot_name, label, xs_, bins, range, histogram_flags);
+}
+
+template <typename T1, typename T2>
+void AsyncLightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T1>& xs,
+  const std::vector<T2>& ys,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  //
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_histogram(plot_name, label, xs_, ys_, x_bins, y_bins, x_range, y_range, histogram_flags);
 }
 
 }  // namespace guik

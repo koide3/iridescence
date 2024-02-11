@@ -44,20 +44,25 @@ public:
   void remove_image(const std::string& name);
   void update_image(const std::string& name, const std::shared_ptr<glk::Texture>& image, double scale = -1.0, int order = -1);
 
+  std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
+
+  // Plotting methods
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
-  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 2048);
+
+  // Plotting update methods
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
   void update_plot_line(
     const std::string& plot_name,
     const std::string& label,
     const std::vector<double>& xs,
     const std::vector<double>& ys,
     int line_flags = 0,
-    size_t max_num_data = 2048);
+    size_t max_num_data = 8192 * 12);
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags = 0);
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags = 0);
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
@@ -80,6 +85,88 @@ public:
     const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
     int histogram_flags = 0);
 
+  // Plotting update template methods
+  template <typename T>
+  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  template <typename T1, typename T2>
+  void update_plot_line(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T1>& xs,
+    const std::vector<T2>& ys,
+    int line_flags = 0,
+    size_t max_num_data = 8192 * 12);
+  template <typename T, int D, typename Alloc>
+  void update_plot_line(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
+    int line_flags = 0,
+    size_t max_num_data = 8192 * 12);
+  template <typename T, typename Func>
+  void
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12);
+
+  template <typename T>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags = 0);
+  template <typename T, int D, typename Alloc>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags = 0);
+  template <typename T, typename Func>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int scatter_flags = 0);
+
+  template <typename T>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int stairs_flags = 0);
+  template <typename T, int D, typename Alloc>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int stairs_flags = 0);
+  template <typename T, typename Func>
+  void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int stairs_flags = 0);
+
+  template <typename T>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& xs,
+    int bins = -2,
+    const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  template <typename T1, typename T2>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T1>& xs,
+    const std::vector<T2>& ys,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  template <typename T, int D, typename Alloc>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+  template <typename T, typename Func>
+  void update_plot_histogram(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& data,
+    const Func& transform,
+    int x_bins = -2,
+    int y_bins = -2,
+    const Eigen::Vector2d& x_range = Eigen::Vector2d(0.0, 0.0),
+    const Eigen::Vector2d& y_range = Eigen::Vector2d(0.0, 0.0),
+    int histogram_flags = 0);
+
+  // Plotting style methods
   void set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style);
   void set_line_style(const std::string& plot_name, const std::string& label, const Eigen::Vector4f& color = Eigen::Vector4f(0, 0, 0, -1), float weight = -1);
   void set_scatter_style(
@@ -91,8 +178,7 @@ public:
     float weight = -1,
     const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
 
-  std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
-
+  // Buffer read methods
   std::vector<unsigned char> read_color_buffer();
   std::vector<float> read_depth_buffer(bool real_scale = true);
 
@@ -145,6 +231,199 @@ inline LightViewer* viewer(const std::string& title, const Eigen::Vector2i& size
 
 inline void destroy() {
   LightViewer::destroy();
+}
+
+// Template methods
+
+template <typename T>
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_line(plot_name, label, ys_, line_flags, max_num_data);
+}
+
+template <typename T1, typename T2>
+void LightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T1>& xs,
+  const std::vector<T2>& ys,
+  int line_flags,
+  size_t max_num_data) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_line(plot_name, label, xs_, ys_, line_flags, max_num_data);
+}
+
+template <typename T, int D, typename Alloc>
+void LightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
+  int line_flags,
+  size_t max_num_data) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+}
+
+template <typename T, typename Func>
+void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto pt = transform(data[i], xs[i], ys[i]);
+    xs[i] = pt[0];
+    ys[i] = pt[1];
+  }
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+}
+
+template <typename T>
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_scatter(plot_name, label, ys_, scatter_flags);
+}
+
+template <typename T1, typename T2>
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_scatter(plot_name, label, xs_, ys_, scatter_flags);
+}
+
+template <typename T, int D, typename Alloc>
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
+  update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+}
+
+template <typename T, typename Func>
+void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int scatter_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto pt = transform(data[i], xs[i], ys[i]);
+    xs[i] = pt[0];
+    ys[i] = pt[1];
+  }
+  update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+}
+
+template <typename T>
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags) {
+  std::vector<double> ys_(ys.size());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_stairs(plot_name, label, ys_, stairs_flags);
+}
+
+template <typename T1, typename T2>
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int stairs_flags) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_stairs(plot_name, label, xs_, ys_, stairs_flags);
+}
+
+template <typename T, int D, typename Alloc>
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int stairs_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
+  update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
+}
+
+template <typename T, typename Func>
+void LightViewer::update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int stairs_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto pt = transform(data[i], xs[i], ys[i]);
+    xs[i] = pt[0];
+    ys[i] = pt[1];
+  }
+  update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
+}
+
+template <typename T>
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T>& xs,
+  int bins,
+  const Eigen::Vector2d& range,
+  int histogram_flags) {
+  std::vector<double> xs_(xs.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  update_plot_histogram(plot_name, label, xs_, bins, range, histogram_flags);
+}
+
+template <typename T1, typename T2>
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T1>& xs,
+  const std::vector<T2>& ys,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  std::vector<double> xs_(xs.size());
+  std::vector<double> ys_(ys.size());
+  std::copy(xs.begin(), xs.end(), xs_.begin());
+  std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_histogram(plot_name, label, xs_, ys_, x_bins, y_bins, x_range, y_range, histogram_flags);
+}
+
+template <typename T, int D, typename Alloc>
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
+  update_plot_histogram(plot_name, label, xs, ys, x_bins, y_bins, x_range, y_range, histogram_flags);
+}
+
+template <typename T, typename Func>
+void LightViewer::update_plot_histogram(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T>& data,
+  const Func& transform,
+  int x_bins,
+  int y_bins,
+  const Eigen::Vector2d& x_range,
+  const Eigen::Vector2d& y_range,
+  int histogram_flags) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto pt = transform(data[i], xs[i], ys[i]);
+    xs[i] = pt[0];
+    ys[i] = pt[1];
+  }
+  update_plot_histogram(plot_name, label, xs, ys, x_bins, y_bins, x_range, y_range, histogram_flags);
 }
 
 }  // namespace guik

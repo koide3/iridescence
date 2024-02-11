@@ -113,7 +113,7 @@ public:
   // Async
   AsyncLightViewerContext async();
 
-  // utility methods to directly create and update drawables
+  // Utility methods to directly create and update drawables
   // PointCloudBuffer
   std::shared_ptr<glk::PointCloudBuffer> update_points(const std::string& name, const float* data, int stride, int num_points, const ShaderSetting& shader_setting);
   template <typename Scalar, int Dim>
