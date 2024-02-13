@@ -16,12 +16,12 @@ public:
   virtual void reset_center() override;
   virtual void lookat(const Eigen::Vector3f& pt) override;
 
-  virtual void mouse(const Eigen::Vector2i& p, int button, bool down) override;
-  virtual void drag(const Eigen::Vector2i& p, int button) override;
+  virtual void mouse(const Eigen::Vector2f& p, int button, bool down) override;
+  virtual void drag(const Eigen::Vector2f& p, int button) override;
   virtual void scroll(const Eigen::Vector2f& rel) override;
 
-  virtual void updown(int p) override;
-  virtual void arrow(const Eigen::Vector2i& p) override;
+  virtual void updown(double p) override;
+  virtual void arrow(const Eigen::Vector2f& p) override;
 
   virtual Eigen::Vector2f depth_range() const override;
 
@@ -37,7 +37,7 @@ protected:
   Eigen::Vector3f center;
   double distance;
 
-  Eigen::Vector2i drag_last_pos;
+  Eigen::Vector2f drag_last_pos;
 
   bool left_button_down;
   double theta;

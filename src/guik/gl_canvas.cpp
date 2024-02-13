@@ -429,11 +429,12 @@ void GLCanvas::render_to_screen(int color_buffer_id) {
  *
  */
 void GLCanvas::mouse_control() {
-  ImGuiIO& io = ImGui::GetIO();
+  const ImGuiIO& io = ImGui::GetIO();
+  const double dt = 60.0 * io.DeltaTime;
   auto mouse_pos = ImGui::GetMousePos();
   auto drag_delta = ImGui::GetMouseDragDelta();
 
-  Eigen::Vector2i p(mouse_pos.x, mouse_pos.y);
+  Eigen::Vector2f p(mouse_pos.x, mouse_pos.y);
 
   for (int i = 0; i < 3; i++) {
     if (ImGui::IsMouseClicked(i)) {
@@ -450,36 +451,36 @@ void GLCanvas::mouse_control() {
       const double speed_factor = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT] ? 4.0 : 1.0;
       const double speed = keyboard_control_speed * speed_factor;
 
-      Eigen::Vector2i arrow(0, 0);
+      Eigen::Vector2f arrow(0, 0);
       if (io.KeysDown[GLFW_KEY_LEFT]) {
-        arrow[0] = speed;
+        arrow[0] = speed * dt;
       } else if (io.KeysDown[GLFW_KEY_RIGHT]) {
-        arrow[0] = -speed;
+        arrow[0] = -speed * dt;
       }
 
       if (io.KeysDown[GLFW_KEY_UP]) {
-        arrow[1] = speed;
+        arrow[1] = speed * dt;
       } else if (io.KeysDown[GLFW_KEY_DOWN]) {
-        arrow[1] = -speed;
+        arrow[1] = -speed * dt;
       }
 
       if (!arrow.isZero()) {
         camera_control->arrow(arrow);
       }
 
-      int updown = 0;
+      double updown = 0;
       if (io.KeysDown[GLFW_KEY_PAGE_UP]) {
-        updown = speed;
+        updown = speed * dt;
       } else if (io.KeysDown[GLFW_KEY_PAGE_DOWN]) {
-        updown = -speed;
+        updown = -speed * dt;
       }
 
       camera_control->updown(updown);
 
       if (io.KeysDown[GLFW_KEY_HOME]) {
-        keyboard_control_speed *= 1.01;
+        keyboard_control_speed *= std::pow(1.01, dt);
       } else if (io.KeysDown[GLFW_KEY_END]) {
-        keyboard_control_speed *= 0.99;
+        keyboard_control_speed *= std::pow(0.99, dt);
       }
 
       keyboard_control_speed = std::max(1.0, keyboard_control_speed);
@@ -488,6 +489,8 @@ void GLCanvas::mouse_control() {
     camera_control->scroll(Eigen::Vector2f(io.MouseWheel, io.MouseWheelH));
     projection_control->set_depth_range(camera_control->depth_range());
   }
+
+  camera_control->update();
 }
 
 /**

@@ -11,6 +11,7 @@
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
+#include <guik/camera/fps_camera_control.hpp>
 
 namespace guik {
 
@@ -366,22 +367,37 @@ void LightViewerContext::reset_center() {
   canvas->camera_control->reset_center();
 }
 
-void LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
-  canvas->camera_control.reset(new guik::OrbitCameraControlXY(distance, theta, phi));
+std::shared_ptr<OrbitCameraControlXY> LightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
+  auto camera = std::make_shared<guik::OrbitCameraControlXY>(distance, theta, phi);
+  canvas->camera_control = camera;
+  return camera;
 }
 
-void LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
-  canvas->camera_control.reset(new guik::OrbitCameraControlXZ(distance, theta, phi));
+std::shared_ptr<OrbitCameraControlXZ> LightViewerContext::use_orbit_camera_control_xz(double distance, double theta, double phi) {
+  auto camera = std::make_shared<guik::OrbitCameraControlXZ>(distance, theta, phi);
+  canvas->camera_control = camera;
+  return camera;
 }
 
-void LightViewerContext::use_topdown_camera_control(double distance, double theta) {
-  canvas->camera_control.reset(new guik::TopDownCameraControl(distance, theta));
+std::shared_ptr<TopDownCameraControl> LightViewerContext::use_topdown_camera_control(double distance, double theta) {
+  auto camera = std::make_shared<guik::TopDownCameraControl>(distance, theta);
+  canvas->camera_control = camera;
+  return camera;
 }
 
-void LightViewerContext::use_arcball_camera_control(double distance, double theta, double phi) {
+std::shared_ptr<ArcBallCameraControl> LightViewerContext::use_arcball_camera_control(double distance, double theta, double phi) {
   Eigen::Quaternionf quat(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitZ()) * Eigen::AngleAxisf(phi, Eigen::Vector3f::UnitY()));
+  auto camera = std::make_shared<guik::ArcBallCameraControl>(distance, quat);
+  canvas->camera_control = camera;
+  return camera;
+}
 
-  canvas->camera_control.reset(new guik::ArcBallCameraControl(distance, quat));
+std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(double fovy_deg) {
+  auto fps_camera_control = std::make_shared<guik::FPSCameraControl>(canvas->size);
+  fps_camera_control->set_fovy(fovy_deg);
+  canvas->camera_control = fps_camera_control;
+  canvas->projection_control = fps_camera_control;
+  return fps_camera_control;
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

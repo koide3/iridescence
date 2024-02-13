@@ -9,6 +9,11 @@
 #include <glk/texture.hpp>
 #include <guik/recent_files.hpp>
 #include <guik/model_control.hpp>
+#include <guik/camera/orbit_camera_control_xy.hpp>
+#include <guik/camera/orbit_camera_control_xz.hpp>
+#include <guik/camera/arcball_camera_control.hpp>
+#include <guik/camera/topdown_camera_control.hpp>
+#include <guik/camera/fps_camera_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
@@ -173,6 +178,16 @@ void define_guik(py::module_& m) {
 
   // guik::CameraControl
   py::class_<guik::CameraControl, std::shared_ptr<guik::CameraControl>>(guik_, "CameraControl");
+  py::class_<guik::OrbitCameraControlXY, std::shared_ptr<guik::OrbitCameraControlXY>>(guik_, "OrbitCameraControlXY");
+  py::class_<guik::OrbitCameraControlXZ, std::shared_ptr<guik::OrbitCameraControlXZ>>(guik_, "OrbitCameraControlXZ");
+  py::class_<guik::ArcBallCameraControl, std::shared_ptr<guik::ArcBallCameraControl>>(guik_, "ArcBallCameraControl");
+  py::class_<guik::TopDownCameraControl, std::shared_ptr<guik::TopDownCameraControl>>(guik_, "TopDownCameraControl");
+  py::class_<guik::FPSCameraControl, std::shared_ptr<guik::FPSCameraControl>>(guik_, "FPSCameraControl")
+    .def("set_fovy", &guik::FPSCameraControl::set_fovy)
+    .def("set_depth_range", &guik::FPSCameraControl::set_depth_range)
+    .def("set_pose", &guik::FPSCameraControl::set_pose)
+    .def("set_mouse_senstivity", &guik::FPSCameraControl::set_mouse_senstivity)
+    .def("set_translation_speed", &guik::FPSCameraControl::set_translation_speed);
 
   // guik::ProjectionControl
   py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
@@ -214,6 +229,7 @@ void define_guik(py::module_& m) {
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::LightViewerContext::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
     .def("use_topdown_camera_control", &guik::LightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+    .def("use_fps_camera_control", &guik::LightViewerContext::use_fps_camera_control, "", py::arg("fovy_deg") = 60.0)
 
     .def("pick_info", &guik::LightViewerContext::pick_info, py::arg("p"), py::arg("window") = 2)
     .def("pick_depth", &guik::LightViewerContext::pick_depth, py::arg("p"), py::arg("window") = 2)
@@ -291,6 +307,7 @@ void define_guik(py::module_& m) {
     .def("use_orbit_camera_control", &guik::LightViewer::use_orbit_camera_control, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::LightViewer::use_orbit_camera_control_xz, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
     .def("use_topdown_camera_control", &guik::LightViewer::use_topdown_camera_control, py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+    .def("use_fps_camera_control", &guik::LightViewer::use_fps_camera_control, "", py::arg("fovy_deg") = 60.0)
 
     .def("pick_info", &guik::LightViewer::pick_info, py::arg("p"), py::arg("window") = 2)
     .def("pick_depth", &guik::LightViewer::pick_depth, py::arg("p"), py::arg("window") = 2)
@@ -323,7 +340,8 @@ void define_guik(py::module_& m) {
       py::arg("theta") = 0.0,
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::AsyncLightViewerContext::use_orbit_camera_control_xz, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
-    .def("use_topdown_camera_control", &guik::AsyncLightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0);
+    .def("use_topdown_camera_control", &guik::AsyncLightViewerContext::use_topdown_camera_control, "", py::arg("distance") = 80.0, py::arg("theta") = 0.0)
+    .def("use_fps_camera_control", &guik::AsyncLightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0);
 
   // AsyncLightViewer
   py::class_<guik::AsyncLightViewer, std::unique_ptr<guik::AsyncLightViewer, py::nodelete>>(guik_, "AsyncLightViewer")

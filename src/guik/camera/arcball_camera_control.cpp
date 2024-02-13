@@ -83,7 +83,7 @@ void ArcBallCameraControl::lookat(const Eigen::Vector3f& pt) {
   center_offset = pt;
 }
 
-void ArcBallCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down) {
+void ArcBallCameraControl::mouse(const Eigen::Vector2f& p, int button, bool down) {
   if(button == 0) {
     left_button_down = down;
   }
@@ -104,16 +104,16 @@ void ArcBallCameraControl::mouse(const Eigen::Vector2i& p, int button, bool down
   drag_last_pos = p;
 }
 
-void ArcBallCameraControl::drag(const Eigen::Vector2i& p, int button) {
+void ArcBallCameraControl::drag(const Eigen::Vector2f& p, int button) {
   if(left_button_down) {
-    Eigen::Vector2i diff = p - mouse_down_pos;
+    Eigen::Vector2f diff = p - mouse_down_pos;
     Eigen::Vector2d vel = diff.cast<double>() / 1024.0;
 
     delta_orientation = so3_exp(Eigen::Vector3d(0.0, -vel[1], -vel[0])).cast<float>();
   }
 
   if(middle_button_down) {
-    Eigen::Vector2i diff = p - mouse_down_pos;
+    Eigen::Vector2f diff = p - mouse_down_pos;
     Eigen::Vector2d vel = diff.cast<double>() / 1024.0;
 
     delta_trans = orientation * Eigen::Vector3f(0.0f, -vel[0], vel[1]) * distance / 5.0;
@@ -132,7 +132,7 @@ void ArcBallCameraControl::scroll(const Eigen::Vector2f& rel) {
   distance = std::max(0.1, distance);
 }
 
-void ArcBallCameraControl::updown(int p) {
+void ArcBallCameraControl::updown(double p) {
   if(p > 0) {
     distance = distance * 0.998f;
   } else if(p < 0) {
@@ -142,7 +142,7 @@ void ArcBallCameraControl::updown(int p) {
   distance = std::max(0.1, distance);
 }
 
-void ArcBallCameraControl::arrow(const Eigen::Vector2i& p) {
+void ArcBallCameraControl::arrow(const Eigen::Vector2f& p) {
   center += orientation * Eigen::Vector3f(0.0, -p[0], p[1]) * distance * 1e-5;
 }
 

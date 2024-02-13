@@ -14,7 +14,7 @@ public:
 
   virtual ~OrbitCameraControlXZ() override;
 
-  virtual void drag(const Eigen::Vector2i& p, int button) override;
+  virtual void drag(const Eigen::Vector2f& p, int button) override;
 
   virtual Eigen::Quaternionf rotation() const override;
   virtual Eigen::Matrix4f view_matrix() const override;

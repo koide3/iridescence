@@ -25,6 +25,11 @@ class PointCloudBuffer;
 namespace guik {
 
 class AsyncLightViewerContext;
+class OrbitCameraControlXY;
+class OrbitCameraControlXZ;
+class TopDownCameraControl;
+class ArcBallCameraControl;
+class FPSCameraControl;
 
 class LightViewerContext {
 public:
@@ -93,10 +98,12 @@ public:
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
-  void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
-  void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
-  void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
-  void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
+
+  std::shared_ptr<OrbitCameraControlXY> use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
+  std::shared_ptr<OrbitCameraControlXZ> use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
+  std::shared_ptr<TopDownCameraControl> use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
+  std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
+  std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
 
   guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }

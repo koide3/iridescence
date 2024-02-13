@@ -17,12 +17,13 @@ public:
 
   virtual void lookat(const Eigen::Vector3f& pt) {}
 
-  virtual void mouse(const Eigen::Vector2i& p, int button, bool down) {}
-  virtual void drag(const Eigen::Vector2i& p, int button) {}
+  virtual void mouse(const Eigen::Vector2f& p, int button, bool down) {}
+  virtual void drag(const Eigen::Vector2f& p, int button) {}
   virtual void scroll(const Eigen::Vector2f& rel) {}
 
-  virtual void updown(int p) {}
-  virtual void arrow(const Eigen::Vector2i& p) {}
+  virtual void update() {}
+  virtual void updown(double p) {}
+  virtual void arrow(const Eigen::Vector2f& p) {}
 
   virtual Eigen::Vector2f depth_range() const {
     return Eigen::Vector2f(0.0f, 1.0f);
