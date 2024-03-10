@@ -11,10 +11,14 @@ namespace guik {
 
 FPSCameraControl::FPSCameraControl(const Eigen::Vector2i& canvas_size)
 : pos(0.0f, 0.0f, 1.0),
-  pitch(0.0),
   yaw(0.0),
+  pitch(0.0),
+  min_fovy(1.0),
+  max_fovy(170.0),
+  default_fovy(60.0),
+  fovy_locked(false),
   size(canvas_size),
-  fovy(60.0),
+  fovy(default_fovy),
   near(0.1),
   far(1000.0),
   mouse_sensitivity_yaw(0.01),
@@ -40,8 +44,26 @@ void FPSCameraControl::set_size(const Eigen::Vector2i& size) {
   this->size = size;
 }
 
+void FPSCameraControl::set_fovy_range(double min_fovy, double max_fovy, double default_fovy) {
+  this->min_fovy = min_fovy;
+  this->max_fovy = max_fovy;
+  this->default_fovy = default_fovy;
+}
+
+void FPSCameraControl::reset_fovy() {
+  this->fovy = this->default_fovy;
+}
+
 void FPSCameraControl::set_fovy(double fovy) {
   this->fovy = fovy;
+}
+
+void FPSCameraControl::lock_fovy() {
+  fovy_locked = true;
+}
+
+void FPSCameraControl::unlock_fovy() {
+  fovy_locked = false;
 }
 
 void FPSCameraControl::set_depth_range(const Eigen::Vector2f& range) {}
@@ -86,6 +108,7 @@ void FPSCameraControl::drag(const Eigen::Vector2f& p, int button) {
   if (left_button_down) {
     yaw -= rel[0] * mouse_sensitivity_yaw;
     pitch -= rel[1] * mouse_sensitivity_pitch;
+    pitch = std::max(-M_PI_2 + 1e-3, std::min(M_PI_2 - 1e-3, pitch));
   }
 
   if (right_button_down) {
@@ -103,8 +126,11 @@ void FPSCameraControl::drag(const Eigen::Vector2f& p, int button) {
 }
 
 void FPSCameraControl::scroll(const Eigen::Vector2f& rel) {
+  if (fovy_locked) {
+    return;
+  }
   fovy -= rel[0];
-  fovy = std::max(1.0, std::min(170.0, fovy));
+  fovy = std::max(min_fovy, std::min(max_fovy, fovy));
 }
 
 void FPSCameraControl::updown(double p) {

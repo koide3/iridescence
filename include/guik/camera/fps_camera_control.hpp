@@ -18,7 +18,14 @@ public:
 
   // ProjectionControl
   void set_size(const Eigen::Vector2i& size) override;
-  void set_fovy(double fovy);
+
+  // FOV
+  void set_fovy_range(double min_fovy_deg, double max_fovy_deg, double default_fovy_deg = 60.0);
+  void reset_fovy();
+  void lock_fovy();
+  void unlock_fovy();
+  void set_fovy(double fovy_deg);
+
   void set_depth_range(const Eigen::Vector2f& range) override;
   Eigen::Matrix4f projection_matrix() const override;
 
@@ -42,7 +49,11 @@ private:
   Eigen::Vector3f pos;
   double yaw;
   double pitch;
-  double distance;
+
+  bool fovy_locked;
+  double min_fovy;
+  double max_fovy;
+  double default_fovy;
 
   Eigen::Vector2i size;
   double fovy;
