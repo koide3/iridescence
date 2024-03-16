@@ -16,6 +16,14 @@ struct ColorMode {
   enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2, TEXTURE_COLOR = 3 };
 };
 
+struct PointScaleMode {
+  enum MODE { SCREENSPACE = 0, METRIC = 1 };
+};
+
+struct PointShapeMode {
+  enum MODE { RECTANGLE = 0, CIRCLE = 1 };
+};
+
 struct ShaderParameterInterface {
 public:
   using Ptr = std::shared_ptr<ShaderParameterInterface>;

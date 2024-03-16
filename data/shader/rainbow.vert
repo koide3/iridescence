@@ -1,9 +1,18 @@
 #version 330
 uniform bool normal_enabled;
 
+// point_scale_mode = 0 : screen space scale
+// point_scale_mode = 1 : metric scale
+// point_shape_mode = 0 : rectangle
+// point_shape_mode = 1 : circle
+uniform int point_scale_mode;
+uniform int point_shape_mode;
 uniform float point_size;
 uniform float point_scale;
 uniform float point_size_offset;
+uniform float point_radius;
+
+uniform vec2 viewport_size;
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
@@ -65,7 +74,11 @@ void main() {
         frag_normal = vec3(0.0, 0.0, 0.0);
     }
 
-    vec3 ndc = gl_Position.xyz / gl_Position.w;
-    float z_dist = 1.0 - ndc.z;
-    gl_PointSize = point_scale * point_size * z_dist + point_size_offset;
+    if (point_scale_mode == 0) {
+        vec3 ndc = gl_Position.xyz / gl_Position.w;
+        float z_dist = 1.0 - ndc.z;
+        gl_PointSize = point_scale * point_size * z_dist + point_size_offset;
+    } else {
+        gl_PointSize = viewport_size[1] * projection_matrix[1][1] * point_radius / gl_Position.w;
+    }
 }
