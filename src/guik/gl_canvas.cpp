@@ -42,10 +42,14 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
 
   shader->use();
 
+  shader->set_uniform("point_scale_mode", 0);
+  shader->set_uniform("point_shape_mode", 0);
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
+  shader->set_uniform("point_radius", 0.1f);
 
+  shader->set_uniform("viewport_size", size.cast<float>().eval());
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 
   shader->set_uniform("color_mode", 0);
@@ -105,10 +109,14 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->use();
 
+  shader->set_uniform("point_scale_mode", 0);
+  shader->set_uniform("point_shape_mode", 0);
   shader->set_uniform("point_size", 10.0f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
+  shader->set_uniform("point_radius", 0.1f);
 
+  shader->set_uniform("viewport_size", size.cast<float>().eval());
   shader->set_uniform("model_matrix", Eigen::Matrix4f::Identity().eval());
 
   shader->set_uniform("color_mode", 0);
@@ -260,6 +268,14 @@ void GLCanvas::bind() {
   }
 
   shader->use();
+  shader->set_uniform("point_scale_mode", 0);
+  shader->set_uniform("point_shape_mode", 0);
+  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale", 1.0f);
+  shader->set_uniform("point_size_offset", 0.0f);
+  shader->set_uniform("point_radius", 0.1f);
+
+  shader->set_uniform("viewport_size", size.cast<float>().eval());
   shader->set_uniform("view_matrix", view_matrix);
   shader->set_uniform("inv_view_matrix", view_matrix.inverse().eval());
   shader->set_uniform("projection_matrix", projection_matrix);

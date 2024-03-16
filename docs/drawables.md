@@ -221,6 +221,45 @@ std::vector<unsigned int> indices = ...;
 auto indexed_buffer = std::make_shared<glk::IndexedPointCloudBuffer>(cloud_buffer, indices);
 ```
 
+### Point shape
+
+The point shape (rectangles by default) can be changed to circles by setting `point_shape_mode=PointShapeMode::CIRCLE`.
+
+```cpp
+auto viewer = guik::viewer();
+guik::ShaderSetting& global_setting = viewer->shader_setting();
+global_setting.add("point_shape_mode", guik::PointScaleMode::RECTANGLE); // Set default point shape mode to RECTANGLE
+global_setting.add("point_shape_mode", guik::PointScaleMode::CIRCLE);    // Set default point shape mode to CIRCLE
+```
+
+### Point scale
+
+**Screen space scaling (default)**  
+The size of points is computed as `width_pix = point_scale * point_size * nz + point_size_offset`, where `nz` is the fragment screen space depth in [0, 1]. By default `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0`, and they can be updated by setting values to `guik::ShaderSetting`.
+
+```cpp
+auto viewer = guik::viewer();
+guik::ShaderSetting& global_setting = viewer->shader_setting();
+global_setting.add("point_scale_mode", guik::PointScaleMode::SCREENSPACE);
+global_setting.add("point_size", 5.0f);  // Set default point size to 5.0
+```
+
+**Metric space scaling**  
+The size of points is computed based on the physical size specified by `point_radius`, which is set to `0.1` by default.
+
+```cpp
+auto viewer = guik::viewer();
+guik::ShaderSetting& global_setting = viewer->shader_setting();
+global_setting.add("point_shape_mode", guik::PointScaleMode::CIRCLE);
+global_setting.add("point_scale_mode", guik::PointScaleMode::METRIC);
+global_setting.add("point_radius", 0.5f);  // Set default point radius to 0.5
+
+auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
+viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().add("point_radius", 0.5f));   // Set point radius to 0.5
+```
+
+![ss_1710604595 779500](https://github.com/koide3/iridescence/assets/31344317/f13f8c91-8dcc-4cc0-8dfa-9e4edcb2f518)
+Red : Wire spheres (radius=0.5), Blue : Points rendered with PointCloudBuffer (`point_shape_mode=CIRCLE`, `point_scale_mode=METRIC`, `point_radius=0.5`).
 
 
 ## Normal distributions
