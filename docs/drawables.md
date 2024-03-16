@@ -78,55 +78,6 @@ glk::Primitives::wire_frustum();
 
 ![Screenshot_20221231_182844](https://user-images.githubusercontent.com/31344317/210131821-42071de7-3ace-433b-9cb4-d39d9444ee85.png)
 
-## 2D drawings
-
-**guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives on the projected positions.
-
-```cpp
-#include <guik/hovered_drawings.hpp>
-
-// Create hovered drawings renderer and register it to the viewer
-auto hovered = std::make_shared<guik::HoveredDrawings>();
-viewer->register_ui_callback("hovered", hovered->create_callback());
-
-// Draw a text at a fixed 3D position (1.0, 2.0, 3.0)
-std::uint32_t fg_color = IM_COL32(255, 255, 255, 255);
-std::uint32_t bg_color = IM_COL32(0, 0, 0, 128);
-hovered->add_text({1.0f, 2.0f, 3.0f}, "text1", fg_color, bg_color);
-
-// Instead of directly giving a 3D position, a drawable name can be 
-// used to draw a 2D drawing on the drawable position
-hovered->add_text_on("drawable_name", "text2", fg_color, bg_color);
-
-
-// Cross
-Eigen::Vector3f position = {1.0f, 2.0f, 3.0f};
-std::uint32_t color = IM_COL32(255, 255, 255, 255);
-float size = 10.0f;
-hovered->add_cross(position, color, size);
-
-// Circle
-float radius = 10.0f;
-hovered->add_circle(position, color, radius);
-
-// Triangle
-float height = 20.0f;
-hovered->add_triangle(position, color, height);
-hovered->add_filled_triangle(position, color, height);
-
-// Rectangle
-Eigen::Vector2f size = {10.0f, 10.0f};
-Eigen::Vector2f offset = {0.0f, 0.0f};
-hovered->add_rect(position, color, size, offset);
-hovered->add_filled_rect(position, color, size, offset);
-
-// Image (glk::Texture)
-std::make_shared<glk::Texture> texture = ...;
-hovered->add_image(position, texture, size, offset);
-```
-
-![Screenshot_20221231_183315](https://user-images.githubusercontent.com/31344317/210131927-75c87acf-a85d-4c8c-a877-1ae8d18e15ad.png)
-
 ## Lines
 
 **glk::ThinLines** draws lines with GL_LINES. 
@@ -158,7 +109,7 @@ lines->set_line_width(2.0f);
 ```
 
 
-**glk::Lines** draws lines with polygons. The thickness of lines changes depending on the viewpoint.
+**glk::Lines** draws lines with polygons. The thickness of lines changes depending on the viewpoint and perspective.
 ```cpp
 #include <glk/thin_lines.hpp>
 
@@ -241,7 +192,10 @@ The size of points is computed as `radius_pix = point_scale * point_size * nz + 
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
 global_setting.add("point_scale_mode", guik::PointScaleMode::SCREENSPACE);
-global_setting.add("point_size", 5.0f);  // Set default point size to 5.0
+global_setting.add("point_size", 5.0f);  // Set the base point size to 5.0
+
+auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
+viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().add("point_scale", 2.0f));   // Make the size of points as twice large as the base point size
 ```
 
 **Metric space scaling**  
@@ -342,6 +296,55 @@ auto mesh = std::make_shared<glk::Mesh>(
 std::shared_ptr<glk::Texture> texture = ...;
 mesh->set_texture(texture);
 ```
+
+## 2D Drawings
+
+**guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives on the projected positions.
+
+```cpp
+#include <guik/hovered_drawings.hpp>
+
+// Create hovered drawings renderer and register it to the viewer
+auto hovered = std::make_shared<guik::HoveredDrawings>();
+viewer->register_ui_callback("hovered", hovered->create_callback());
+
+// Draw a text at a fixed 3D position (1.0, 2.0, 3.0)
+std::uint32_t fg_color = IM_COL32(255, 255, 255, 255);
+std::uint32_t bg_color = IM_COL32(0, 0, 0, 128);
+hovered->add_text({1.0f, 2.0f, 3.0f}, "text1", fg_color, bg_color);
+
+// Instead of directly giving a 3D position, a drawable name can be 
+// used to draw a 2D drawing on the drawable position
+hovered->add_text_on("drawable_name", "text2", fg_color, bg_color);
+
+
+// Cross
+Eigen::Vector3f position = {1.0f, 2.0f, 3.0f};
+std::uint32_t color = IM_COL32(255, 255, 255, 255);
+float size = 10.0f;
+hovered->add_cross(position, color, size);
+
+// Circle
+float radius = 10.0f;
+hovered->add_circle(position, color, radius);
+
+// Triangle
+float height = 20.0f;
+hovered->add_triangle(position, color, height);
+hovered->add_filled_triangle(position, color, height);
+
+// Rectangle
+Eigen::Vector2f size = {10.0f, 10.0f};
+Eigen::Vector2f offset = {0.0f, 0.0f};
+hovered->add_rect(position, color, size, offset);
+hovered->add_filled_rect(position, color, size, offset);
+
+// Image (glk::Texture)
+std::make_shared<glk::Texture> texture = ...;
+hovered->add_image(position, texture, size, offset);
+```
+
+![Screenshot_20221231_183315](https://user-images.githubusercontent.com/31344317/210131927-75c87acf-a85d-4c8c-a877-1ae8d18e15ad.png)
 
 
 ## Image (2D texture)
