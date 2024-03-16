@@ -703,6 +703,9 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
     if (ImGui::MenuItem("Show Info Window")) {
       viewer->show_info_window();
     }
+    if (ImGui::MenuItem("Show Sub Viewers")) {
+      viewer->show_sub_viewers();
+    }
     if (ImGui::MenuItem("Enable vsync")) {
       viewer->enable_vsync();
     }

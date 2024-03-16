@@ -46,6 +46,7 @@ public:
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
+  void show_sub_viewers();                                                                // Set all sub viewer windows to be opened
   std::shared_ptr<LightViewerContext> find_sub_viewer(const std::string& context_name);   // Returns nullptr if sub viewer does not exist
   bool remove_sub_viewer(const std::string& context_name);                                // Returns false if sub viwewer does not exist
 

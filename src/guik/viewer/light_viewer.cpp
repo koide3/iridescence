@@ -671,6 +671,12 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
   return found->second;
 }
 
+void LightViewer::show_sub_viewers() {
+  for (auto& sub: sub_contexts) {
+    sub.second->show();
+  }
+}
+
 std::shared_ptr<LightViewerContext> LightViewer::find_sub_viewer(const std::string& context_name) {
   auto found = sub_contexts.find(context_name);
   return found == sub_contexts.end() ? found->second : nullptr;
