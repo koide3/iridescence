@@ -235,7 +235,7 @@ global_setting.add("point_shape_mode", guik::PointScaleMode::CIRCLE);    // Set 
 ### Point scale
 
 **Screen space scaling (default)**  
-The size of points is computed as `width_pix = point_scale * point_size * nz + point_size_offset`, where `nz` is the fragment screen space depth in [0, 1]. By default `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0`, and they can be updated by setting values to `guik::ShaderSetting`.
+The size of points is computed as `radius_pix = point_scale * point_size * nz + point_size_offset`, where `nz` is the fragment screen space depth in [0, 1]. By default `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0`, and they can be updated by setting values to `guik::ShaderSetting`.
 
 ```cpp
 auto viewer = guik::viewer();
