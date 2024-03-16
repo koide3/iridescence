@@ -43,7 +43,10 @@ public:
 
   void set_size(const Eigen::Vector2i& size);
   void set_clear_color(const Eigen::Vector4f& color);
+
   void set_pos(const Eigen::Vector2i& pos, ImGuiCond cond = ImGuiCond_FirstUseEver, ImGuiWindowFlags = 0);
+  void show();
+  void hide();
 
   virtual void clear();
   virtual void clear_text();
@@ -231,6 +234,7 @@ protected:
   std::unique_ptr<guik::GLCanvas> canvas;
   guik::ShaderSetting global_shader_setting;
 
+  bool show_window;
   bool draw_xy_grid;
   bool decimal_rendering;
 

@@ -3,6 +3,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <ImGuizmo.h>
+#include <glk/console_colors.hpp>
 #include <glk/primitives/primitives.hpp>
 
 #include <guik/viewer/light_viewer.hpp>
@@ -16,6 +17,7 @@
 namespace guik {
 
 LightViewerContext::LightViewerContext(const std::string& context_name) : context_name(context_name) {
+  show_window = true;
   draw_xy_grid = true;
   decimal_rendering = false;
   last_projection_view_matrix.setIdentity();
@@ -49,6 +51,11 @@ void LightViewerContext::set_clear_color(const Eigen::Vector4f& color) {
 }
 
 void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond, ImGuiWindowFlags flags) {
+  using namespace glk::console;
+  if (context_name == "main") {
+    std::cout << yellow << "warning: calling set_pos() is valid for only sub viewers" << reset << std::endl;
+  }
+
   int x = pos[0];
   int y = pos[1];
 
@@ -57,6 +64,24 @@ void LightViewerContext::set_pos(const Eigen::Vector2i& pos, ImGuiCond cond, ImG
     ImGui::Begin(context_name.c_str(), nullptr, flags);
     ImGui::End();
   });
+}
+
+void LightViewerContext::show() {
+  using namespace glk::console;
+  if (context_name == "main") {
+    std::cout << yellow << "warning: calling show() is valid for only sub viewers" << reset << std::endl;
+  }
+
+  show_window = true;
+}
+
+void LightViewerContext::hide() {
+  using namespace glk::console;
+  if (context_name == "main") {
+    std::cout << yellow << "warning: calling hide() is valid for only sub viewers" << reset << std::endl;
+  }
+
+  show_window = false;
 }
 
 void LightViewerContext::clear() {
@@ -91,7 +116,11 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
 }
 
 void LightViewerContext::draw_ui() {
-  ImGui::Begin(context_name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
+  if (!show_window) {
+    return;
+  }
+
+  ImGui::Begin(context_name.c_str(), &show_window, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_ChildWindow | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
                            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus;
