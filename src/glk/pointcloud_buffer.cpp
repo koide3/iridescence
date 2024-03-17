@@ -4,6 +4,7 @@
 #include <numeric>
 #include <iostream>
 #include <glk/colormap.hpp>
+#include <glk/console_colors.hpp>
 #include <glk/type_conversion.hpp>
 #include <glk/async_buffer_copy.hpp>
 
@@ -136,6 +137,104 @@ void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, co
   }
 
   aux_buffers.push_back(AuxBufferData{attribute_name, dim, stride, buffer_id});
+}
+
+void PointCloudBuffer::update_buffer_with_indices(GLuint buffer, const float* data_, int stride, const unsigned int* indices, int num_indices) {
+  if (num_indices == 0) {
+    return;
+  }
+
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+  const char* data = reinterpret_cast<const char*>(data_);
+  const unsigned int* index_begin = indices;
+
+  const auto& update_sub = [&](const unsigned int* begin, const unsigned int* end) {
+    const char* src = data + stride * std::distance(indices, begin);
+    const size_t offset = stride * (*begin);
+    const size_t size = stride * (*(end - 1) - (*begin) + 1);
+    glBufferSubData(GL_ARRAY_BUFFER, offset, size, src);
+  };
+
+  for (const unsigned int* index_itr = indices + 1; index_itr != indices + num_indices; index_itr++) {
+    const unsigned int last_index = *(index_itr - 1);
+    const unsigned int curr_index = *index_itr;
+
+    if (static_cast<int>(curr_index) - static_cast<int>(last_index) != 1) {
+      update_sub(index_begin, index_itr);
+      index_begin = index_itr;
+    }
+  }
+
+  update_sub(index_begin, indices + num_indices);
+}
+
+void PointCloudBuffer::update_buffer_with_indices(const std::string& attribute_name, int dim, const float* data_, int stride, const unsigned int* indices, int num_indices) {
+  using namespace glk::console;
+
+  if (num_indices == 0) {
+    return;
+  }
+
+  auto found = std::find_if(aux_buffers.begin(), aux_buffers.end(), [&](const AuxBufferData& aux) { return aux.attribute_name == attribute_name; });
+  if (found == aux_buffers.end()) {
+    std::cerr << yellow << "warning: attribute_name=" << attribute_name << " does not exist!!" << reset << std::endl;
+    add_buffer(attribute_name, dim, nullptr, stride, num_points);
+    return update_buffer_with_indices(attribute_name, dim, data_, stride, indices, num_indices);
+  }
+
+  if (found->dim != dim) {
+    std::cerr << yellow << "warning: point attribute (" << attribute_name << ") dim mismatch!!" << reset << std::endl;
+    return;
+  }
+
+  if (found->stride != stride) {
+    std::cerr << yellow << "warning: point attribute (" << attribute_name << ") stride mismatch!!" << reset << std::endl;
+    return;
+  }
+
+  update_buffer_with_indices(found->buffer, data_, stride, indices, num_indices);
+}
+
+void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3f* points, const unsigned int* indices, int num_indices) {
+  update_points_with_indices(points[0].data(), sizeof(float) * 3, indices, num_indices);
+}
+
+void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4f* points, const unsigned int* indices, int num_indices) {
+  update_points_with_indices(points[0].data(), sizeof(float) * 4, indices, num_indices);
+}
+
+void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3d* points, const unsigned int* indices, int num_indices) {
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points_f(num_indices);
+  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template  cast<float>(); });
+  update_points_with_indices(points_f.data(), indices, num_indices);
+}
+
+void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4d* points, const unsigned int* indices, int num_indices) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> points_f(num_indices);
+  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template cast<float>(); });
+  update_points_with_indices(points_f.data(), indices, num_indices);
+}
+
+void PointCloudBuffer::update_points_with_indices(const float* data, int stride, const unsigned int* indices, int num_indices) {
+  using namespace glk::console;
+  if (stride != this->stride) {
+    std::cerr << yellow << "warning: point stride mismatch!! " << stride << " vs " << this->stride << reset << std::endl;
+    return;
+  }
+
+  update_buffer_with_indices(vbo, data, stride, indices, num_indices);
+}
+
+void PointCloudBuffer::update_colors_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices) {
+  update_buffer_with_indices("vert_color", 4, colors[0].data(), sizeof(float) * 4, indices, num_indices);
+}
+
+void PointCloudBuffer::update_colors_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices) {
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(num_indices);
+  std::transform(colors, colors + num_indices, colors_f.begin(), [](const Eigen::Vector4d& c) { return c.cast<float>(); });
+  update_colors_with_indices(colors_f.data(), indices, num_indices);
 }
 
 void PointCloudBuffer::enable_partial_rendering(int points_budget) {
