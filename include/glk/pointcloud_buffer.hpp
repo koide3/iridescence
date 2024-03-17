@@ -4,6 +4,7 @@
 #include <atomic>
 #include <memory>
 #include <vector>
+#include <iostream>
 #include <Eigen/Dense>
 #include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
@@ -76,9 +77,9 @@ public:
   void update_points_with_indices(const float* data, int stride, const unsigned int* indices, int num_indices);
 
   template <typename Scalar, typename Allocator>
-  void update_colors_with_indices(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors, const std::vector<unsigned int>& indices);
-  void update_colors_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices);
-  void update_colors_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices);
+  void update_color_with_indices(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors, const std::vector<unsigned int>& indices);
+  void update_color_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices);
+  void update_color_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices);
 
   void enable_partial_rendering(int points_budget = 8192 * 5);
   void disable_partial_rendering();
@@ -146,12 +147,18 @@ void PointCloudBuffer::add_color(const std::vector<Eigen::Matrix<Scalar, 4, 1>, 
 
 template <typename Scalar, int D, typename Allocator>
 void PointCloudBuffer::update_points_with_indices(const std::vector<Eigen::Matrix<Scalar, D, 1>, Allocator>& points, const std::vector<unsigned int>& indices) {
+  if (points.size() != indices.size()) {
+    std::cerr << "error: points.size() != indices.size() (" << points.size() << " vs " << indices.size() << ")" << std::endl;
+  }
   update_points_with_indices(points.data(), indices.data(), indices.size());
 }
 
 template <typename Scalar, typename Allocator>
-void PointCloudBuffer::update_colors_with_indices(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors, const std::vector<unsigned int>& indices) {
-  update_colors_with_indices(colors.data(), indices.data(), indices.size());
+void PointCloudBuffer::update_color_with_indices(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors, const std::vector<unsigned int>& indices) {
+  if (colors.size() != indices.size()) {
+    std::cerr << "error: colors.size() != indices.size() (" << colors.size() << " vs " << indices.size() << ")" << std::endl;
+  }
+  update_color_with_indices(colors.data(), indices.data(), indices.size());
 }
 
 }  // namespace glk

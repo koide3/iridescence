@@ -227,14 +227,14 @@ void PointCloudBuffer::update_points_with_indices(const float* data, int stride,
   update_buffer_with_indices(vbo, data, stride, indices, num_indices);
 }
 
-void PointCloudBuffer::update_colors_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices) {
+void PointCloudBuffer::update_color_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices) {
   update_buffer_with_indices("vert_color", 4, colors[0].data(), sizeof(float) * 4, indices, num_indices);
 }
 
-void PointCloudBuffer::update_colors_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices) {
+void PointCloudBuffer::update_color_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices) {
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(num_indices);
   std::transform(colors, colors + num_indices, colors_f.begin(), [](const Eigen::Vector4d& c) { return c.cast<float>(); });
-  update_colors_with_indices(colors_f.data(), indices, num_indices);
+  update_color_with_indices(colors_f.data(), indices, num_indices);
 }
 
 void PointCloudBuffer::enable_partial_rendering(int points_budget) {
