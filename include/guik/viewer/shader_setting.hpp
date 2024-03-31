@@ -160,6 +160,7 @@ public:
     }
   }
 
+  // Point size and scale
   float point_scale() const {
     auto p = static_cast<ShaderParameter<float>*>(params[1].get());
     return p->value;
@@ -170,6 +171,19 @@ public:
     p->value = scaling;
     return *this;
   }
+
+  ShaderSetting& set_point_size(float size) { return add("point_size", size); }
+  ShaderSetting& set_point_size_offset(float offset) { return add("point_size_offset", offset); }
+
+  // Point shape mode
+  ShaderSetting& set_point_shape_mode(guik::PointShapeMode::MODE mode) { return add("point_shape_mode", mode); }
+  ShaderSetting& set_point_shape_circle() { return set_point_shape_mode(guik::PointShapeMode::CIRCLE); }
+  ShaderSetting& set_point_shape_rectangle() { return set_point_shape_mode(guik::PointShapeMode::RECTANGLE); }
+
+  // Point scale mode
+  ShaderSetting& set_point_scale_mode(guik::PointScaleMode::MODE mode) { return add("point_scale_mode", mode); }
+  ShaderSetting& set_point_scale_screenspace() { return set_point_scale_mode(guik::PointScaleMode::SCREENSPACE); }
+  ShaderSetting& set_point_scale_metric() { return set_point_scale_mode(guik::PointScaleMode::METRIC); }
 
   // Calling `remove_model_matrix` invalidates model matrix operations (translate, rotate, and scale)
   ShaderSetting& remove_model_matrix() {
@@ -250,6 +264,7 @@ public:
     p->value.col(2) *= scaling[2];
     return *this;
   }
+
 
 public:
   bool transparent;

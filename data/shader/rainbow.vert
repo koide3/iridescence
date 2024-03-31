@@ -10,7 +10,6 @@ uniform int point_shape_mode;
 uniform float point_size;
 uniform float point_scale;
 uniform float point_size_offset;
-uniform float point_radius;
 
 uniform vec2 viewport_size;
 uniform mat4 model_matrix;
@@ -79,6 +78,7 @@ void main() {
         float z_dist = 1.0 - ndc.z;
         gl_PointSize = point_scale * point_size * z_dist + point_size_offset;
     } else {
+        float point_radius = point_scale * point_size + point_size_offset;
         gl_PointSize = viewport_size[1] * projection_matrix[1][1] * point_radius / gl_Position.w;
     }
 }

@@ -179,8 +179,8 @@ The point shape (rectangles by default) can be changed to circles by setting `po
 ```cpp
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
-global_setting.add("point_shape_mode", guik::PointScaleMode::RECTANGLE); // Set default point shape mode to RECTANGLE
-global_setting.add("point_shape_mode", guik::PointScaleMode::CIRCLE);    // Set default point shape mode to CIRCLE
+global_setting.set_point_shape_mode(guik::PointShapeMode::RECTANGLE);  // Set default point shape mode to RECTANGLE. Alternatively, global_setting.set_point_shape_rectangle() can be used.
+global_setting.set_point_shape_mode(guik::PointShapeMode::CIRCLE);     // Set default point shape mode to CIRCLE. Alternatively, global_setting.set_point_shape_circle() can be used.
 ```
 
 ### Point scale
@@ -191,29 +191,31 @@ The size of points is computed as `radius_pix = point_scale * point_size * nz + 
 ```cpp
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
-global_setting.add("point_scale_mode", guik::PointScaleMode::SCREENSPACE);
-global_setting.add("point_size", 5.0f);  // Set the base point size to 5.0
+  global_setting.set_point_scale_screenspace();   // Set the point scale mode to screenspace
+  global_setting.set_point_size(5.0f);            // Set the base point size to 5.0
 
 auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
-viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().add("point_scale", 2.0f));   // Make the size of points as twice large as the base point size
+// Make the size of points as twice large as the base point size
+viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().set_point_scale(2.0f));
 ```
 
 **Metric space scaling**  
-The size of points is computed based on the physical size specified by `point_radius`, which is set to `0.1` by default.
+The size of points is computed based on the physical size specified as `radius_m = point_scale * point_size + point_size_offset`.
 
 ```cpp
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
-global_setting.add("point_shape_mode", guik::PointScaleMode::CIRCLE);
-global_setting.add("point_scale_mode", guik::PointScaleMode::METRIC);
-global_setting.add("point_radius", 0.5f);  // Set default point radius to 0.5
+  global_setting.set_point_shape_circle();
+  global_setting.set_point_scale_metric();
+  global_setting.set_point_size(0.5f);  // Set default point radius to 0.5
 
 auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
-viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().add("point_radius", 0.5f));   // Set point radius to 0.5
+// Set point radius to 0.5
+viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().set_point_size(0.5f));
 ```
 
 ![ss_1710604595 779500](https://github.com/koide3/iridescence/assets/31344317/f13f8c91-8dcc-4cc0-8dfa-9e4edcb2f518)
-Red : Wire spheres (radius=0.5), Blue : Points rendered with PointCloudBuffer (`point_shape_mode=CIRCLE`, `point_scale_mode=METRIC`, `point_radius=0.5`).
+Red : Wire spheres (radius=0.5), Blue : Points rendered with PointCloudBuffer (`point_shape_mode=CIRCLE`, `point_scale_mode=METRIC`, `point_size=0.5`).
 
 
 ## Normal distributions
