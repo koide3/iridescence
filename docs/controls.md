@@ -94,3 +94,26 @@ viewer->register_ui_callback("model_control_ui", [&]{
 Note: ImGuizmo cannot be shown twice or more in one rendering frame.
 
 ![guizmo](https://user-images.githubusercontent.com/31344317/210159001-58b69d32-70b2-4fd1-9885-d40af93514d4.gif)
+
+Guizmo can be drawn on subviewers.
+
+```cpp
+auto sub = viewer->sub_viewer("sub");
+
+auto model_control = std::make_shared<guik::ModelControl>("model_control");
+sub->register_ui_callback("model_control", [=] {
+  const ImVec2 canvas_rect_min = ImGui::GetItemRectMin();
+  const ImVec2 canvas_rect_max = ImGui::GetItemRectMax();
+  const int win_x = canvas_rect_min.x;
+  const int win_y = canvas_rect_min.y;
+  const int win_w = canvas_rect_max.x - canvas_rect_min.x;
+  const int win_h = canvas_rect_max.y - canvas_rect_min.y;
+
+  const Eigen::Matrix4f view_matrix = sub->get_camera_control()->view_matrix();
+  const Eigen::Matrix4f projection_matrix = sub->get_projection_control()->projection_matrix();
+
+  model_control->draw_gizmo(win_x, win_y, win_w, win_h, view_matrix, projection_matrix, true);
+
+  sub->update_coord("coord", guik::VertexColor(model_control->model_matrix()));
+});
+```
