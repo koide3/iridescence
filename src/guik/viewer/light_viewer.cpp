@@ -671,6 +671,29 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
   return found->second;
 }
 
+void LightViewer::show_sub_viewers() {
+  for (auto& sub: sub_contexts) {
+    sub.second->show();
+  }
+}
+
+std::shared_ptr<LightViewerContext> LightViewer::find_sub_viewer(const std::string& context_name) {
+  auto found = sub_contexts.find(context_name);
+  return found == sub_contexts.end() ? found->second : nullptr;
+}
+
+bool LightViewer::remove_sub_viewer(const std::string& context_name) {
+  using namespace glk::console;
+
+  auto found = sub_contexts.find(context_name);
+  if (found == sub_contexts.end()) {
+    std::cerr << yellow << "warning: sub viewer (context_name=" << context_name << ") not found!" << reset << std::endl;
+    return false;
+  }
+  sub_contexts.erase(found);
+  return true;
+}
+
 std::vector<unsigned char> LightViewer::read_color_buffer() {
   auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
   std::vector<unsigned char> flipped(bytes.size(), 255);
