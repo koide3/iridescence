@@ -127,6 +127,15 @@ hovered->add_image(position, texture, size, offset);
 
 ![Screenshot_20221231_183315](https://user-images.githubusercontent.com/31344317/210131927-75c87acf-a85d-4c8c-a877-1ae8d18e15ad.png)
 
+**guik::HoveredDrawings** can be drawn on subviewers.
+
+```cpp
+auto sub = viewer->sub_viewer("sub");
+auto hovered = std::make_shared<guik::HoveredDrawings>(sub);
+hovered->add_rect_on("coord", IM_COL32(0, 255, 0, 255));
+sub->register_ui_callback("hovered", hovered->create_callback());
+```
+
 ## Lines
 
 **glk::ThinLines** draws lines with GL_LINES. 
