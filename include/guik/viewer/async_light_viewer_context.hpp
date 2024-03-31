@@ -133,6 +133,7 @@ public:
   void update_sphere(const std::string& name, const ShaderSetting& shader_setting);
   void update_cube(const std::string& name, const ShaderSetting& shader_setting);
   void update_cone(const std::string& name, const ShaderSetting& shader_setting);
+  void update_frustum(const std::string& name, const ShaderSetting& shader_setting);
   void update_coord(const std::string& name, const ShaderSetting& shader_setting);
 
   void update_wire_icosahedron(const std::string& name, const ShaderSetting& shader_setting);
