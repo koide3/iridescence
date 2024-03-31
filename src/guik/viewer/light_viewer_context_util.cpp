@@ -59,6 +59,9 @@ void LightViewerContext::update_cube(const std::string& name, const ShaderSettin
 void LightViewerContext::update_cone(const std::string& name, const ShaderSetting& shader_setting) {
   update_drawable(name, glk::Primitives::cone(), shader_setting);
 }
+void LightViewerContext::update_frustum(const std::string& name, const ShaderSetting& shader_setting) {
+  update_drawable(name, glk::Primitives::frustum(), shader_setting);
+}
 void LightViewerContext::update_coord(const std::string& name, const ShaderSetting& shader_setting) {
   update_drawable(name, glk::Primitives::coordinate_system(), shader_setting);
 }

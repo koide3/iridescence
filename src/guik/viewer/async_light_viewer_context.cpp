@@ -151,6 +151,9 @@ void AsyncLightViewerContext::update_cube(const std::string& name, const ShaderS
 void AsyncLightViewerContext::update_cone(const std::string& name, const ShaderSetting& shader_setting) {
   guik::viewer()->invoke([=] { context->update_drawable(name, glk::Primitives::cone(), shader_setting); });
 }
+void AsyncLightViewerContext::update_frustum(const std::string& name, const ShaderSetting& shader_setting) {
+  guik::viewer()->invoke([=] { context->update_drawable(name, glk::Primitives::frustum(), shader_setting); });
+}
 void AsyncLightViewerContext::update_coord(const std::string& name, const ShaderSetting& shader_setting) {
   guik::viewer()->invoke([=] { context->update_drawable(name, glk::Primitives::coordinate_system(), shader_setting); });
 }
