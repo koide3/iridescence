@@ -90,6 +90,7 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
   shader->set_uniform("projection_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>("projection_matrix"));
   shader->set_uniform("material_color", shader_.get_uniform_cache<Eigen::Vector4f>("material_color"));
 
+  const bool cull_was_enabled = glIsEnabled(GL_CULL_FACE);
   glDisable(GL_CULL_FACE);
 
   if (texture) {
@@ -104,7 +105,9 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
 
   shader_.use();
 
-  glEnable(GL_CULL_FACE);
+  if (cull_was_enabled) {
+    glEnable(GL_CULL_FACE);
+  }
 }
 
 }  // namespace glk

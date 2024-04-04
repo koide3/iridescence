@@ -111,8 +111,10 @@ void Mesh::draw(glk::GLSLShader& shader) const {
     texture->bind(texture_target);
   }
 
+  const bool cull_was_enabled = glIsEnabled(GL_CULL_FACE);
   if (wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDisable(GL_CULL_FACE);
   }
 
   glBindVertexArray(vao);
@@ -169,6 +171,9 @@ void Mesh::draw(glk::GLSLShader& shader) const {
 
   if (wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if(cull_was_enabled) {
+      glEnable(GL_CULL_FACE);
+    }
   }
 
   if (texture) {
