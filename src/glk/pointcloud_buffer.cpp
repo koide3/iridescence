@@ -207,7 +207,7 @@ void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4f* points,
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3d* points, const unsigned int* indices, int num_indices) {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points_f(num_indices);
-  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template  cast<float>(); });
+  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template cast<float>(); });
   update_points_with_indices(points_f.data(), indices, num_indices);
 }
 

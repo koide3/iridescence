@@ -113,8 +113,7 @@ private:
 
 // template methods
 template <typename Scalar, int Dim, typename Allocator>
-PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points)
-: PointCloudBuffer(points.data(), points.size()) {}
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points) : PointCloudBuffer(points.data(), points.size()) {}
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {
@@ -142,7 +141,7 @@ void PointCloudBuffer::add_normals(const Eigen::Matrix<double, N, 1>* normals, i
 
 template <typename Scalar, typename Allocator>
 void PointCloudBuffer::add_color(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors) {
-  add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+  add_color(colors.data(), colors.size());
 }
 
 template <typename Scalar, int D, typename Allocator>
