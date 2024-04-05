@@ -8,7 +8,7 @@
 
 namespace guik {
 
-AsyncLightViewerContext::AsyncLightViewerContext() {}
+AsyncLightViewerContext::AsyncLightViewerContext() : context(nullptr) {}
 
 AsyncLightViewerContext::AsyncLightViewerContext(LightViewerContext* context) : context(context) {}
 
