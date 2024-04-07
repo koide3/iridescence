@@ -111,4 +111,13 @@ const std::string& ModelControl::model_name() const { return name; }
 
 Eigen::Matrix4f ModelControl::model_matrix() const { return pose.matrix(); }
 
+void ModelControl::set_gizmo_operation(int operation) {
+  if (operation < 0 || operation > ImGuizmo::OPERATION::BOUNDS) {
+    std::cerr << "warning: invalid gizmo operation " << operation << std::endl;
+    return;
+  }
+
+  gizmo_operation = operation;
+}
+
 }  // namespace guik
