@@ -31,14 +31,19 @@ public:
   template<typename Scalar, int Mode>
   void set_model_matrix(const Eigen::Transform<Scalar, 3, Mode>& matrix) { pose = Eigen::Affine3f(matrix.template cast<float>()); }
 
+  void set_gizmo_enabled(bool enabled);
+  void enable_gizmo();
+  void disable_gizmo();
+
   // Set ImGuizmo operation (TRANSLATE = 0, ROTATE = 1, SCALE = 2, BOUNDS = 3)
   // Recommend including ImGuizmo.h and using ImGuizmo::OPERATION enum to avoid magic numbers
   void set_gizmo_operation(int operation);
 
 private:
   std::string name;
-  Eigen::Affine3f pose; 
+  Eigen::Affine3f pose;
 
+  bool gizmo_enabled;
   int gizmo_operation;
 };
 

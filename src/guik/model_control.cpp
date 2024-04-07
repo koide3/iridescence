@@ -89,7 +89,7 @@ void ModelControl::draw_gizmo() {
 }
 
 void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window) {
-  ImGuizmo::Enable(true);
+  ImGuizmo::Enable(gizmo_enabled);
   if(on_window) {
     ImGuizmo::SetDrawlist();
   }
@@ -111,8 +111,20 @@ const std::string& ModelControl::model_name() const { return name; }
 
 Eigen::Matrix4f ModelControl::model_matrix() const { return pose.matrix(); }
 
+void ModelControl::set_gizmo_enabled(bool enabled) {
+  gizmo_enabled = enabled;
+}
+
+void ModelControl::enable_gizmo() {
+  set_gizmo_enabled(true);
+}
+
+void ModelControl::disable_gizmo() {
+  set_gizmo_enabled(false);
+}
+
 void ModelControl::set_gizmo_operation(int operation) {
-  if (operation < 0 || operation > ImGuizmo::OPERATION::BOUNDS) {
+  if (operation < 0 || operation >= ImGuizmo::OPERATION::BOUNDS) {
     std::cerr << "warning: invalid gizmo operation " << operation << std::endl;
     return;
   }
