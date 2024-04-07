@@ -26,20 +26,26 @@ public:
   const std::string& model_name() const;
   Eigen::Matrix4f model_matrix() const;
 
-  template <typename Scalar>
-  void set_model_matrix(const Eigen::Matrix<Scalar, 4, 4>& matrix) { pose = Eigen::Affine3f(matrix.template cast<float>()); }
-  template<typename Scalar, int Mode>
-  void set_model_matrix(const Eigen::Transform<Scalar, 3, Mode>& matrix) { pose = Eigen::Affine3f(matrix.template cast<float>()); }
+  void set_model_matrix(const Eigen::Matrix4f& matrix) { pose = Eigen::Affine3f(matrix); }
+  void set_model_matrix(const Eigen::Matrix4d& matrix) { pose = Eigen::Affine3f(matrix.cast<float>()); }
+  template <typename Scalar, int Mode>
+  void set_model_matrix(const Eigen::Transform<Scalar, 3, Mode>& matrix) {
+    pose = Eigen::Affine3f(matrix.template cast<float>());
+  }
 
   void set_gizmo_enabled(bool enabled);
   void enable_gizmo();
   void disable_gizmo();
 
-  // ImGuizmo operation (TRANSLATE = 0, ROTATE = 1, SCALE = 2, BOUNDS = 3)
-  // Recommend including ImGuizmo.h and using ImGuizmo::OPERATION enum to avoid magic numbers
+  // "TRANSLATE", "ROTATE", "SCALE", "SCALEU", or "UNIVERSAL"
+  void set_gizmo_operation(const std::string& operation);
   void set_gizmo_operation(int operation);
+
   // ImGuizmo mode (LOCAL = 0, WORLD = 1)
   void set_gizmo_mode(int mode);
+
+  // Change the gizmo size (default = 0.1f)
+  void set_gizmo_clip_scale(float space = 0.1f);
 
 private:
   std::string name;
@@ -48,6 +54,7 @@ private:
   bool gizmo_enabled;
   int gizmo_operation;
   int gizmo_mode;
+  float gizmo_clip_space;
 };
 
 }  // namespace guik
