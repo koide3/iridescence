@@ -174,7 +174,16 @@ void define_guik(py::module_& m) {
         control.draw_gizmo(0, 0, viewer->canvas_size().x(), viewer->canvas_size().y(), viewer->view_matrix(), viewer->projection_matrix());
       })
     .def("model_matrix", &guik::ModelControl::model_matrix)
-    .def("set_model_matrix", &guik::ModelControl::set_model_matrix, py::arg("model_matrix"));
+    .def(
+      "set_model_matrix",
+      [](guik::ModelControl& model_control, const Eigen::Matrix4f& mat) { model_control.set_model_matrix(mat); },
+      py::arg("model_matrix"))
+    .def("set_gizmo_enabled", &guik::ModelControl::set_gizmo_enabled)
+    .def("enable_gizmo", &guik::ModelControl::enable_gizmo)
+    .def("disable_gizmo", &guik::ModelControl::disable_gizmo)
+    .def("set_gizmo_operation", [](guik::ModelControl& model_control, const std::string& op) { model_control.set_gizmo_operation(op); })
+    .def("set_gizmo_mode", &guik::ModelControl::set_gizmo_mode)
+    .def("set_gizmo_clip_scale", &guik::ModelControl::set_gizmo_clip_scale);
 
   // guik::CameraControl
   py::class_<guik::CameraControl, std::shared_ptr<guik::CameraControl>>(guik_, "CameraControl");
