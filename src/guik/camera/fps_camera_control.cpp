@@ -77,9 +77,9 @@ Eigen::Matrix4f FPSCameraControl::projection_matrix() const {
 }
 
 void FPSCameraControl::set_pose(const Eigen::Vector3f& pos, double yaw_deg, double pitch_deg) {
-  this->pos = pos * M_PI / 180.0;
+  this->pos = pos;
   this->yaw = yaw * M_PI / 180.0;
-  this->pitch = pitch;
+  this->pitch = pitch * M_PI / 180.0;
 }
 
 void FPSCameraControl::reset_center() {}
