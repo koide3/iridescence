@@ -35,9 +35,11 @@ public:
   void enable_gizmo();
   void disable_gizmo();
 
-  // Set ImGuizmo operation (TRANSLATE = 0, ROTATE = 1, SCALE = 2, BOUNDS = 3)
+  // ImGuizmo operation (TRANSLATE = 0, ROTATE = 1, SCALE = 2, BOUNDS = 3)
   // Recommend including ImGuizmo.h and using ImGuizmo::OPERATION enum to avoid magic numbers
   void set_gizmo_operation(int operation);
+  // ImGuizmo mode (LOCAL = 0, WORLD = 1)
+  void set_gizmo_mode(int mode);
 
 private:
   std::string name;
@@ -45,6 +47,7 @@ private:
 
   bool gizmo_enabled;
   int gizmo_operation;
+  int gizmo_mode;
 };
 
 }  // namespace guik

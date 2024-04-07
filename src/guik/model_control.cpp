@@ -12,7 +12,12 @@
 
 namespace guik {
 
-ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix) : name(name), pose(init_model_matrix), gizmo_operation(ImGuizmo::OPERATION::ROTATE) {}
+ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix)
+: name(name),
+  pose(init_model_matrix),
+  gizmo_enabled(true),
+  gizmo_operation(ImGuizmo::OPERATION::ROTATE),
+  gizmo_mode(ImGuizmo::MODE::LOCAL) {}
 
 void ModelControl::draw_ui() {
   ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -97,8 +102,7 @@ void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const 
 
   Eigen::Matrix4f model = pose.matrix();
   Eigen::Matrix4f delta = Eigen::Matrix4f::Identity();
-  ImGuizmo::Manipulate(view.data(), projection.data(), static_cast<ImGuizmo::OPERATION>(gizmo_operation), ImGuizmo::MODE::LOCAL,
-                       model.data(), delta.data());
+  ImGuizmo::Manipulate(view.data(), projection.data(), static_cast<ImGuizmo::OPERATION>(gizmo_operation), static_cast<ImGuizmo::MODE>(gizmo_mode), model.data(), delta.data());
 
   pose = Eigen::Affine3f(model);
 }
@@ -130,6 +134,15 @@ void ModelControl::set_gizmo_operation(int operation) {
   }
 
   gizmo_operation = operation;
+}
+
+void ModelControl::set_gizmo_mode(int mode) {
+  if (mode < 0 || mode > ImGuizmo::MODE::WORLD) {
+    std::cerr << "warning: invalid gizmo mode " << mode << std::endl;
+    return;
+  }
+
+  gizmo_mode = mode;
 }
 
 }  // namespace guik
