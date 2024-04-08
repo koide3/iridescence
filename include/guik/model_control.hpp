@@ -29,7 +29,7 @@ public:
 
 private:
   std::string name;
-  Eigen::Affine3f pose;
+  Eigen::Affine3f pose; 
 
   int gizmo_operation;
 };

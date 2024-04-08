@@ -47,6 +47,7 @@ private:
   Mesh& operator=(const Mesh&);
 
 private:
+  float line_width;
   bool wireframe;
 
   int vertex_stride;

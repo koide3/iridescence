@@ -91,5 +91,7 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glLineWidth(1.0);
 }
 }  // namespace glk
