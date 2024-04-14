@@ -92,6 +92,7 @@ public:
 
   void clear_drawable_filters();
   void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
+  void remove_drawable_filter(const std::string& filter_name);
 
   void clear_partial_rendering();
 
