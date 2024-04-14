@@ -115,6 +115,10 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
   sub_ui_callbacks[name] = callback;
 }
 
+void LightViewerContext::remove_ui_callback(const std::string& name) {
+  register_ui_callback(name, 0);
+}
+
 void LightViewerContext::draw_ui() {
   if (!show_window) {
     return;

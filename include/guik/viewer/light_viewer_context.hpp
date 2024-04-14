@@ -52,6 +52,7 @@ public:
   virtual void clear_text();
   virtual void append_text(const std::string& text);
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+  void remove_ui_callback(const std::string& name);
 
   guik::ShaderSetting& shader_setting() { return global_shader_setting; }
   const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
