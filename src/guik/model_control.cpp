@@ -12,7 +12,13 @@
 
 namespace guik {
 
-ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix) : name(name), pose(init_model_matrix), gizmo_operation(ImGuizmo::OPERATION::ROTATE) {}
+ModelControl::ModelControl(const std::string& name, const Eigen::Matrix4f& init_model_matrix)
+: name(name),
+  pose(init_model_matrix),
+  gizmo_enabled(true),
+  gizmo_operation(ImGuizmo::OPERATION::TRANSLATE | ImGuizmo::OPERATION::ROTATE),
+  gizmo_mode(ImGuizmo::MODE::LOCAL),
+  gizmo_clip_space(0.1f) {}
 
 void ModelControl::draw_ui() {
   ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -75,10 +81,35 @@ void ModelControl::draw_ui() {
 }
 
 void ModelControl::draw_gizmo_ui() {
-  int op = static_cast<int>(gizmo_operation);
-  std::vector<const char*> operations = {"TRANSLATE", "ROTATE", "SCALE"};
-  ImGui::Combo("Gizmo mode", &op, operations.data(), operations.size());
-  gizmo_operation = static_cast<ImGuizmo::OPERATION>(op);
+  bool trans = gizmo_operation & ImGuizmo::TRANSLATE;
+  bool rotate = gizmo_operation & ImGuizmo::ROTATE;
+  bool scale = gizmo_operation & ImGuizmo::SCALEU;
+
+  if (ImGui::Checkbox("Translate", &trans)) {
+    if (trans) {
+      gizmo_operation |= ImGuizmo::TRANSLATE;
+    } else {
+      gizmo_operation &= ~ImGuizmo::TRANSLATE;
+    }
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Checkbox("Rotate", &rotate)) {
+    if (rotate) {
+      gizmo_operation |= ImGuizmo::ROTATE;
+    } else {
+      gizmo_operation &= ~ImGuizmo::ROTATE;
+    }
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Checkbox("Scale", &scale)) {
+    if (scale) {
+      gizmo_operation |= ImGuizmo::SCALEU;
+    } else {
+      gizmo_operation &= ~ImGuizmo::SCALEU;
+    }
+  }
 }
 
 void ModelControl::draw_gizmo() {
@@ -89,7 +120,7 @@ void ModelControl::draw_gizmo() {
 }
 
 void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const Eigen::Matrix4f& view, const Eigen::Matrix4f& projection, bool on_window) {
-  ImGuizmo::Enable(true);
+  ImGuizmo::Enable(gizmo_enabled);
   if(on_window) {
     ImGuizmo::SetDrawlist();
   }
@@ -97,8 +128,7 @@ void ModelControl::draw_gizmo(int win_x, int win_y, int win_w, int win_h, const 
 
   Eigen::Matrix4f model = pose.matrix();
   Eigen::Matrix4f delta = Eigen::Matrix4f::Identity();
-  ImGuizmo::Manipulate(view.data(), projection.data(), static_cast<ImGuizmo::OPERATION>(gizmo_operation), ImGuizmo::MODE::LOCAL,
-                       model.data(), delta.data());
+  ImGuizmo::Manipulate(view.data(), projection.data(), static_cast<ImGuizmo::OPERATION>(gizmo_operation), static_cast<ImGuizmo::MODE>(gizmo_mode), model.data(), delta.data());
 
   pose = Eigen::Affine3f(model);
 }
@@ -110,5 +140,50 @@ bool ModelControl::is_guizmo_using() const {
 const std::string& ModelControl::model_name() const { return name; }
 
 Eigen::Matrix4f ModelControl::model_matrix() const { return pose.matrix(); }
+
+void ModelControl::set_gizmo_enabled(bool enabled) {
+  gizmo_enabled = enabled;
+}
+
+void ModelControl::enable_gizmo() {
+  set_gizmo_enabled(true);
+}
+
+void ModelControl::disable_gizmo() {
+  set_gizmo_enabled(false);
+}
+
+void ModelControl::set_gizmo_operation(const std::string& operation) {
+  if(operation == "TRANSLATE") {
+    gizmo_operation = ImGuizmo::OPERATION::TRANSLATE;
+  } else if (operation == "ROTATE") {
+    gizmo_operation = ImGuizmo::OPERATION::ROTATE;
+  } else if (operation == "SCALE") {
+    gizmo_operation = ImGuizmo::OPERATION::SCALE;
+  } else if (operation == "SCALEU") {
+    gizmo_operation = ImGuizmo::OPERATION::SCALEU;
+  } else if (operation == "UNIVERSAL") {
+    gizmo_operation = ImGuizmo::OPERATION::UNIVERSAL;
+  } else {
+    std::cerr << "warning: invalid gizmo operation " << operation << std::endl;
+  }
+}
+
+void ModelControl::set_gizmo_operation(int operation) {
+  gizmo_operation = operation;
+}
+
+void ModelControl::set_gizmo_mode(int mode) {
+  if (mode < 0 || mode > ImGuizmo::MODE::WORLD) {
+    std::cerr << "warning: invalid gizmo mode " << mode << std::endl;
+    return;
+  }
+
+  gizmo_mode = mode;
+}
+
+void ModelControl::set_gizmo_clip_scale(float space) {
+  ImGuizmo::SetGizmoSizeClipSpace(space);
+}
 
 }  // namespace guik
