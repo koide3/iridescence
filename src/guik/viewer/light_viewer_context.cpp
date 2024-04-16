@@ -115,6 +115,10 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
   sub_ui_callbacks[name] = callback;
 }
 
+void LightViewerContext::remove_ui_callback(const std::string& name) {
+  register_ui_callback(name, 0);
+}
+
 void LightViewerContext::draw_ui() {
   if (!show_window) {
     return;
@@ -370,6 +374,10 @@ void LightViewerContext::register_drawable_filter(const std::string& filter_name
   }
 
   drawable_filters[filter_name] = filter;
+}
+
+void LightViewerContext::remove_drawable_filter(const std::string& filter_name) {
+  register_drawable_filter(filter_name, 0);
 }
 
 void LightViewerContext::clear_partial_rendering() {
