@@ -19,7 +19,7 @@ public:
   GLuint id() const;
   Eigen::Vector2i size() const;
   void set_size(const Eigen::Vector2i& size);
-  void set_color(const void* pixels) ;
+  void set_color(const void* pixels);
 
   void bind() const;
   void bind(GLenum target) const;
@@ -30,7 +30,7 @@ public:
   const Texture& set_filer_mode(GLenum mode) const;
   const Texture& set_clamp_mode(GLenum mode) const;
 
-  template<typename T>
+  template <typename T>
   std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE, int num_elements = 4) const;
 
 private:

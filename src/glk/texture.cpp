@@ -2,7 +2,12 @@
 
 namespace glk {
 
-Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels) : width(size[0]), height(size[1]), internal_format(internal_format), format(format), type(type) {
+Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels)
+: width(size[0]),
+  height(size[1]),
+  internal_format(internal_format),
+  format(format),
+  type(type) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, pixels);
@@ -90,7 +95,7 @@ const Texture& Texture::set_clamp_mode(GLenum mode) const {
   return *this;
 }
 
-template<typename T>
+template <typename T>
 std::vector<T> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const {
   std::vector<T> pixels(width * height * num_elements);
   glBindTexture(GL_TEXTURE_2D, texture);
