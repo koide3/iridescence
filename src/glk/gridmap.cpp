@@ -4,7 +4,7 @@
 
 namespace glk {
 
-GridMap::GridMap(double resolution, int width, int height, const unsigned char* values, int alpha, ColorMode mode) {
+GridMap::GridMap(double resolution, int width, int height, const unsigned char* values, int alpha, ColorMode mode) : mode(mode){
   std::vector<unsigned char> rgba(width * height * 4);
   for(int i = 0; i < width * height; i++) {
     unsigned char x = values[i];
@@ -40,7 +40,7 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
   init_vao(resolution, width, height);
 }
 
-GridMap::GridMap(double resolution, int width, int height, float scale, const float* values, float alpha, ColorMode mode) {
+GridMap::GridMap(double resolution, int width, int height, float scale, const float* values, float alpha, ColorMode mode) : mode(mode){
   std::vector<float> rgba(width * height * 4);
   for(int i = 0; i < width * height; i++) {
     float x = scale * values[i];
@@ -70,6 +70,35 @@ GridMap::GridMap(double resolution, int width, int height, float scale, const fl
   texture->unbind();
 
   init_vao(resolution, width, height);
+}
+
+//WIP APIがわかればいけそう
+void GridMap::update_color(const unsigned char* values, int alpha = 255, ColorMode mode = ColorMode::PROB){
+  // std::vector<unsigned char> rgba(texture->width() * texture->height() * 4);
+  // for(int i = 0; i < texture->width() * texture->height(); i++) {
+  //   unsigned char x = values[i];
+  //   Eigen::Map<Eigen::Matrix<unsigned char, 3, 1>> rgb(rgba.data() + i * 4);
+
+  //   switch(mode) {
+  //     case ColorMode::RAW:
+  //       rgb.setConstant(x);
+  //       break;
+  //     case ColorMode::TURBO:
+  //       rgb = glk::colormap(glk::COLORMAP::TURBO, x).cast<unsigned char>().head<3>();
+  //       break;
+  //     case ColorMode::PROB:
+  //       rgb.setConstant(100 - x);
+  //       break;
+  //     case ColorMode::PROB_TURBO:
+  //       rgb = glk::colormap(glk::COLORMAP::TURBO, (100 - x) * 255.0 / 100.0).cast<unsigned char>().head<3>();
+  //       break;
+  //     case ColorMode::RGBA:
+  //       std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
+  //       break;
+  //   }
+  //   if (mode != ColorMode::RGBA)
+  //     rgba[i * 4 + 3] = alpha;
+  // }
 }
 
 GridMap::~GridMap() {
