@@ -41,6 +41,19 @@ void Texture::set_size(const Eigen::Vector2i& size) {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Texture::set_color(const void* pixels) {
+  glDeleteTextures(1, &texture);
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, type, pixels);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::unbind() const {
   glBindTexture(GL_TEXTURE_2D, 0);
 }

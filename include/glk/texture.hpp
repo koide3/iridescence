@@ -19,6 +19,7 @@ public:
   GLuint id() const;
   Eigen::Vector2i size() const;
   void set_size(const Eigen::Vector2i& size);
+  void set_color(const void* pixels) ;
 
   void bind() const;
   void bind(GLenum target) const;
