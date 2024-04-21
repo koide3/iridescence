@@ -1,7 +1,7 @@
 #include <glk/io/png_io.hpp>
 
 #include <iostream>
-#include <libpng/png.h>
+#include <png.h>
 #include <glk/console_colors.hpp>
 
 namespace glk {
