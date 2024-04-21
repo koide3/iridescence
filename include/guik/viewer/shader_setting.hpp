@@ -119,7 +119,7 @@ public:
   }
 
   template <typename T>
-  boost::optional<T> get(const std::string& name) {
+  boost::optional<T> get(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -137,7 +137,7 @@ public:
   }
 
   template <typename T>
-  const T& cast(const std::string& name) {
+  const T& cast(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -158,6 +158,11 @@ public:
       }
       param->set(shader);
     }
+  }
+
+  int color_mode() const {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    return p->value;
   }
 
   // Point size and scale
@@ -189,6 +194,10 @@ public:
   ShaderSetting& remove_model_matrix() {
     params[2] = nullptr;
     return *this;
+  }
+
+  bool has_model_matrix() const {
+    return params[2] != nullptr;
   }
 
   Eigen::Matrix4f model_matrix() const {
