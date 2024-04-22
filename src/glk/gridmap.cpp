@@ -5,12 +5,27 @@
 namespace glk {
 
 GridMap::GridMap(double resolution, int width, int height, const unsigned char* values, int alpha, ColorMode mode) {
+  update_color(width, height, values, alpha, mode);
+  init_vao(resolution, width, height);
+}
+
+GridMap::GridMap(double resolution, int width, int height, float scale, const float* values, float alpha, ColorMode mode) {
+  update_color(width, height, scale, values, alpha, mode);
+  init_vao(resolution, width, height);
+}
+
+void GridMap::update_color(const unsigned char* values, int alpha, ColorMode mode) {
+  if (texture == nullptr) return;
+  update_color(texture->size().x(), texture->size().y(), values, alpha, mode);
+}
+
+void GridMap::update_color(int width, int height, const unsigned char* values, int alpha, ColorMode mode) {
   std::vector<unsigned char> rgba(width * height * 4);
-  for(int i = 0; i < width * height; i++) {
+  for (int i = 0; i < width * height; i++) {
     unsigned char x = values[i];
     Eigen::Map<Eigen::Matrix<unsigned char, 3, 1>> rgb(rgba.data() + i * 4);
 
-    switch(mode) {
+    switch (mode) {
       case ColorMode::RAW:
         rgb.setConstant(x);
         break;
@@ -27,8 +42,7 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
         std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
         break;
     }
-    if (mode != ColorMode::RGBA)
-      rgba[i * 4 + 3] = alpha;
+    if (mode != ColorMode::RGBA) rgba[i * 4 + 3] = alpha;
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
@@ -36,17 +50,20 @@ GridMap::GridMap(double resolution, int width, int height, const unsigned char* 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   texture->unbind();
-
-  init_vao(resolution, width, height);
 }
 
-GridMap::GridMap(double resolution, int width, int height, float scale, const float* values, float alpha, ColorMode mode) {
+void GridMap::update_color(float scale, const float* values, float alpha, ColorMode mode) {
+  if (texture == nullptr) return;
+  update_color(texture->size().x(), texture->size().y(), scale, values, alpha, mode);
+}
+
+void GridMap::update_color(int width, int height, float scale, const float* values, float alpha, ColorMode mode) {
   std::vector<float> rgba(width * height * 4);
-  for(int i = 0; i < width * height; i++) {
+  for (int i = 0; i < width * height; i++) {
     float x = scale * values[i];
     Eigen::Map<Eigen::Vector3f> rgb(rgba.data() + i * 4);
 
-    switch(mode) {
+    switch (mode) {
       case ColorMode::RAW:
         rgb.setConstant(x);
         break;
@@ -68,8 +85,6 @@ GridMap::GridMap(double resolution, int width, int height, float scale, const fl
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   texture->unbind();
-
-  init_vao(resolution, width, height);
 }
 
 GridMap::~GridMap() {

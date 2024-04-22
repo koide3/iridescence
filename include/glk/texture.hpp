@@ -29,7 +29,7 @@ public:
   const Texture& set_filer_mode(GLenum mode) const;
   const Texture& set_clamp_mode(GLenum mode) const;
 
-  template<typename T>
+  template <typename T>
   std::vector<T> read_pixels(GLuint format = GL_RGBA, GLuint type = GL_UNSIGNED_BYTE, int num_elements = 4) const;
 
 private:
