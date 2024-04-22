@@ -18,7 +18,9 @@ public:
 
   virtual void draw(glk::GLSLShader& shader) const override;
 
+  void update_color(int width, int height, const unsigned char* values, int alpha = 255, ColorMode mode = ColorMode::PROB);
   void update_color(const unsigned char* values, int alpha = 255, ColorMode mode = ColorMode::PROB);
+  void update_color(int width, int height, float scale, const float* values, float alpha = 1.0f, ColorMode mode = ColorMode::PROB);
   void update_color(float scale, const float* values, float alpha = 1.0f, ColorMode mode = ColorMode::PROB);
 
 private:
@@ -32,7 +34,6 @@ private:
   GLuint vbo;
   GLuint tbo;
   std::unique_ptr<Texture> texture;
-  const ColorMode mode;
 };
 
 }  // namespace glk
