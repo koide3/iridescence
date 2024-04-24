@@ -112,6 +112,7 @@ void define_guik(py::module_& m) {
   // Flat colors
   py::class_<guik::FlatRed, guik::FlatColor, std::shared_ptr<guik::FlatRed>>(guik_, "FlatRed")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -125,6 +126,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatGreen, guik::FlatColor, std::shared_ptr<guik::FlatGreen>>(guik_, "FlatGreen")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -138,6 +140,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatBlue, guik::FlatColor, std::shared_ptr<guik::FlatBlue>>(guik_, "FlatBlue")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -151,6 +154,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatOrange, guik::FlatColor, std::shared_ptr<guik::FlatOrange>>(guik_, "FlatOrange")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
