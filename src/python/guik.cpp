@@ -272,6 +272,7 @@ void define_guik(py::module_& m) {
     .def("spin_until_click", &guik::LightViewer::spin_until_click)
 
     .def("enable_vsync", &guik::LightViewer::enable_vsync)
+    .def("disable_vsync", &guik::LightViewer::disable_vsync)
     .def("enable_docking", &guik::LightViewer::enable_docking)
 
     .def("clear_images", &guik::LightViewer::clear_images)
