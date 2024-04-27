@@ -3,7 +3,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <glk/path.hpp>
 #include <glk/texture.hpp>
@@ -25,7 +25,7 @@ guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const 
   if (is_first) {
     py::gil_scoped_acquire acquire;
     py::object pyridescence = py::module::import("pyridescence");
-    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
     glk::set_data_path(path.parent_path().string() + "/data");
     is_first = false;
@@ -39,7 +39,7 @@ guik::AsyncLightViewer* async_instance(const Eigen::Vector2i& size, bool backgro
   if (is_first) {
     py::gil_scoped_acquire acquire;
     py::object pyridescence = py::module::import("pyridescence");
-    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
     glk::set_data_path(path.parent_path().string() + "/data");
     is_first = false;

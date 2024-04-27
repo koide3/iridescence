@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include <GL/gl3w.h>
 
@@ -49,10 +49,10 @@ public:
       double time_msec = result / 1e6;
       sum_time_msec += time_msec;
 
-      std::cout << boost::format(label_format) % labels[i] << boost::format(":%.3f[msec] (%.3f[msec])") % time_msec % sum_time_msec << std::endl;
+      std::cout << fmt::format("-{} : {:.3f}[msec] ({:.3f[msec]})", labels[i], time_msec, sum_time_msec) << std::endl;
     }
     std::cout << "***" << std::endl;
-    std::cout << boost::format(label_format) % "total(approx):" << boost::format("%.3f") % sum_time_msec << "[msec]" << std::endl;
+    std::cout << fmt::format("-total(approx) : {:.3f}[msec]", sum_time_msec) << std::endl;
 
     glDeleteQueries(queries.size(), queries.data());
   }
@@ -112,12 +112,13 @@ public:
     for(int i = 0; i < labels.size() - 1; i++) {
       double time_msec = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times[i]).count() / 1e6;
       double sum_time_msec = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times.front()).count() / 1e6;
-      std::cout << boost::format(label_format) % labels[i] << boost::format(":%.3f[msec] (%.3f[msec])") % time_msec % sum_time_msec << std::endl;
+
+      std::cout << fmt::format("- {} : {:.3f}[msec] ({:.3f[msec]})", labels[i], time_msec, sum_time_msec) << std::endl;
     }
 
     std::cout << "***" << std::endl;
     double sum_time_msec = std::chrono::duration_cast<std::chrono::nanoseconds>(times.back() - times.front()).count() / 1e6;
-    std::cout << boost::format(label_format) % "total(approx):" << boost::format("%.3f") % sum_time_msec << "[msec]" << std::endl;
+    std::cout << fmt::format("- total(approx) : {:.3f}[msec]", sum_time_msec) << std::endl;
   }
 
   void add(const std::string& label) {
@@ -179,11 +180,11 @@ public:
       double time_msec_real = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times[i]).count() / 1e6;
       double sum_time_msec_real = std::chrono::duration_cast<std::chrono::nanoseconds>(times[i + 1] - times.front()).count() / 1e6;
 
-      std::cout << boost::format(label_format) % labels[i] << boost::format(":%.3f[msec] r%.3f[msec] (%.3f[msec] r%.3f[msec])") % time_msec_gl % time_msec_real % sum_time_msec_gl % sum_time_msec_real << std::endl;
+      std::cout << fmt::format("- {} : {:.3f}[msec] r{:.3f[msec]} ({:.3f[msec] r{:.3f[msec]})", labels[i], time_msec_gl, time_msec_real, sum_time_msec_gl, sum_time_msec_real) << std::endl;
     }
     std::cout << "***" << std::endl;
     double sum_time_msec_real = std::chrono::duration_cast<std::chrono::nanoseconds>(times.back() - times.front()).count() / 1e6;
-    std::cout << boost::format(label_format) % "total:" << boost::format("%.3f[msec] r%.3f[msec]") % sum_time_msec_gl % sum_time_msec_real << std::endl;
+    std::cout << fmt::format("- {} : {:.3f}[msec] r{:.3f[msec] ({:.3f[msec] r{:.3f[msec]})", labels.back(), 0.0, 0.0, sum_time_msec_gl, sum_time_msec_real) << std::endl;
 
     glDeleteQueries(queries.size(), queries.data());
   }

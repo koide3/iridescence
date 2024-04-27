@@ -25,10 +25,10 @@ find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # find_package(PCL)
-find_package(Boost REQUIRED filesystem program_options)
 find_package(Eigen3 REQUIRED)
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
+find_package(fmt REQUIRED)
+find_package(PNG)
+find_package(JPEG)
 find_package(assimp QUIET)
 
 ###########
@@ -69,11 +69,22 @@ target_link_libraries(gl_imgui
   ${OPENGL_LIBRARIES}
   glfw
   dl
+  fmt::fmt
 )
 
 if(${assimp_FOUND})
   list(APPEND EXTRA_LIBRARIES assimp)
   list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
+endif()
+
+if(${PNG_FOUND})
+  list(APPEND EXTRA_LIBRARIES PNG::PNG)
+  list(APPEND EXTRA_SOURCE src/glk/io/png_io.cpp)
+endif()
+
+if(${JPEG_FOUND})
+  list(APPEND EXTRA_LIBRARIES JPEG::JPEG)
+  list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io.cpp)
 endif()
 
 add_library(iridescence SHARED
@@ -105,8 +116,6 @@ add_library(iridescence SHARED
   src/glk/primitives/primitives.cpp
   src/glk/io/ascii_io.cpp
   src/glk/io/ply_io.cpp
-  src/glk/io/png_io.cpp
-  src/glk/io/jpeg_io.cpp
   src/glk/io/image_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_splatting.cpp
@@ -148,18 +157,13 @@ target_include_directories(iridescence PUBLIC
   thirdparty/ImGuizmo
   thirdparty/portable-file-dialogs
   thirdparty/gl3w
-  ${PNG_INCLUDE_DIRS}
-  ${JPEG_INCLUDE_DIRS}
   ${GLM_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
   pthread
-  ${PNG_LIBRARIES}
-  ${JPEG_LIBRARIES}
-  ${Boost_LIBRARIES}
+  fmt::fmt
   ${EXTRA_LIBRARIES}
 )
 

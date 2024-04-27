@@ -2,8 +2,8 @@
 #define GLK_TEXTURE_RENDERER_INPUT_HPP
 
 #include <array>
+#include <optional>
 #include <unordered_map>
-#include <boost/optional.hpp>
 
 #include <Eigen/Core>
 
@@ -20,7 +20,7 @@ struct TextureRendererInput {
   void set(const std::string& name, const T& value);
 
   template<typename T>
-  boost::optional<T> get(const std::string& name) const;
+  std::optional<T> get(const std::string& name) const;
 
 private:
   std::unordered_map<std::string, unsigned int> params_int;
@@ -32,11 +32,11 @@ inline void TextureRendererInput::set(const std::string& name, const Eigen::Matr
   std::copy(value.data(), value.data() + 16, params_16f[name].begin());
 }
 
-template<>
-inline boost::optional<Eigen::Matrix4f> TextureRendererInput::get(const std::string& name) const {
+template <>
+inline std::optional<Eigen::Matrix4f> TextureRendererInput::get(const std::string& name) const {
   auto found = params_16f.find(name);
   if(found == params_16f.end()) {
-    return boost::none;
+    return std::nullopt;
   }
 
   return Eigen::Map<const Eigen::Matrix4f>(found->second.data()).eval();
@@ -48,10 +48,10 @@ inline void TextureRendererInput::set(const std::string& name, const unsigned in
 }
 
 template<>
-inline boost::optional<unsigned int> TextureRendererInput::get(const std::string& name) const {
+inline std::optional<unsigned int> TextureRendererInput::get(const std::string& name) const {
   auto found = params_int.find(name);
   if(found == params_int.end()) {
-    return boost::none;
+    return std::nullopt;
   }
 
   return found->second;
