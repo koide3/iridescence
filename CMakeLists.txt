@@ -162,6 +162,7 @@ target_include_directories(iridescence PUBLIC
 )
 target_link_libraries(iridescence
   gl_imgui
+  pthread
   fmt::fmt
   ${EXTRA_LIBRARIES}
 )
