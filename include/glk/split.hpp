@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GLK_SPLIT_HPP
+#define GLK_SPLIT_HPP
+
 
 #include <vector>
 #include <string>
@@ -27,3 +29,5 @@ inline std::string trim(std::string str) {
   return str;
 }
 }
+
+#endif
