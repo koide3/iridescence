@@ -6,6 +6,10 @@ option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
@@ -39,7 +43,7 @@ find_package(assimp QUIET)
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
-add_library(gl_imgui SHARED
+add_library(gl_imgui
   thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -87,7 +91,7 @@ if(${JPEG_FOUND})
   list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io.cpp)
 endif()
 
-add_library(iridescence SHARED
+add_library(iridescence
   src/glk/path_std.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
