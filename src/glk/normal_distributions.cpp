@@ -129,6 +129,12 @@ NormalDistributions::~NormalDistributions() {
 }
 
 void NormalDistributions::draw(glk::GLSLShader& shader) const {
+
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
   glBindVertexArray(vao);
 
   GLint position_loc = shader.attrib("vert_position");
@@ -144,6 +150,9 @@ void NormalDistributions::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
 }
 
 template <typename T, int D>

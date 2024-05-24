@@ -22,6 +22,10 @@ IndexedPointCloudBuffer::~IndexedPointCloudBuffer() {
 }
 
 void IndexedPointCloudBuffer::draw(glk::GLSLShader& shader) const {
+  glEnable(GL_BLEND);
+  glDepthFunc(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   cloud_buffer->bind(shader);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -29,6 +33,8 @@ void IndexedPointCloudBuffer::draw(glk::GLSLShader& shader) const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   cloud_buffer->unbind(shader);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
 }
 
 GLuint IndexedPointCloudBuffer::ebo_id() const {

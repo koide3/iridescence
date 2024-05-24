@@ -111,6 +111,10 @@ void Mesh::draw(glk::GLSLShader& shader) const {
   if (texture) {
     texture->bind(texture_target);
   }
+  
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   const bool cull_was_enabled = glIsEnabled(GL_CULL_FACE);
   if (wireframe) {
@@ -182,6 +186,9 @@ void Mesh::draw(glk::GLSLShader& shader) const {
   if (texture) {
     texture->unbind(texture_target);
   }
+
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
 }
 
 }  // namespace glk

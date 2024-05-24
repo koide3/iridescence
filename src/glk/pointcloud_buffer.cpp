@@ -310,6 +310,9 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
   if (num_points == 0) {
     return;
   }
+  glEnable(GL_BLEND);
+  glDepthFunc(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   bind(shader);
 
@@ -325,6 +328,10 @@ void PointCloudBuffer::draw(glk::GLSLShader& shader) const {
   }
 
   unbind(shader);
+
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+
 }
 
 GLuint PointCloudBuffer::vba_id() const {

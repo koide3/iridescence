@@ -61,6 +61,10 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
   GLint position_loc = shader.attrib("vert_position");
   GLint color_loc = shader.attrib("vert_color");
 
+  glEnable(GL_BLEND);
+  glDepthFunc(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   glLineWidth(line_width);
 
   glBindVertexArray(vao);
@@ -93,5 +97,8 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
   glBindVertexArray(0);
 
   glLineWidth(1.0);
+
+  glDepthFunc(GL_TRUE);
+  glDisable(GL_BLEND);
 }
 }  // namespace glk

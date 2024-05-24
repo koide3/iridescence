@@ -40,11 +40,18 @@ void TransformFeedback::read_data(intptr_t offset, size_t size, void* data) {
 
 void TransformFeedback::draw(glk::GLSLShader& shader) const {
   GLint position_loc = shader.attrib("vert_position");
+  glEnable(GL_BLEND);
+  glDepthFunc(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   glBindBuffer(GL_ARRAY_BUFFER, tbo);
   glEnableVertexAttribArray(position_loc);
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
   glDrawTransformFeedback(GL_POINTS, feedback);
+
+  glDisable(GL_BLEND);
+  glDepthFunc(GL_TRUE);
 }
 
 }  // namespace glk

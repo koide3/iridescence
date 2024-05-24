@@ -120,6 +120,11 @@ void GridMap::init_vao(double resolution, int width, int height) {
 }
 
 void GridMap::draw(glk::GLSLShader& shader) const {
+
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texture->id());
   glActiveTexture(GL_TEXTURE0);
@@ -143,6 +148,9 @@ void GridMap::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
 
   // texture->unbind(GL_TEXTURE1);
 }

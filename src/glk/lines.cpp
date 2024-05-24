@@ -141,6 +141,9 @@ void Lines::draw(glk::GLSLShader& shader) const {
   GLint position_loc = shader.attrib("vert_position");
   GLint color_loc = 0;
   GLint info_loc = 0;
+  glEnable(GL_BLEND);
+  glDepthMask(GL_FALSE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glBindVertexArray(vao);
 
@@ -177,5 +180,8 @@ void Lines::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glDisable(GL_BLEND);
+  glDepthMask(GL_TRUE);
 }
 }  // namespace glk
