@@ -26,8 +26,10 @@ public:
   const std::string& model_name() const;
   Eigen::Matrix4f model_matrix() const;
 
-  void set_model_matrix(const Eigen::Matrix4f& matrix) { pose = Eigen::Affine3f(matrix); }
-  void set_model_matrix(const Eigen::Matrix4d& matrix) { pose = Eigen::Affine3f(matrix.cast<float>()); }
+  template <typename Derived>
+  void set_model_matrix(const Eigen::DenseBase<Derived>& matrix) {
+    pose = Eigen::Affine3f(matrix.template cast<float>());
+  }
   template <typename Scalar, int Mode>
   void set_model_matrix(const Eigen::Transform<Scalar, 3, Mode>& matrix) {
     pose = Eigen::Affine3f(matrix.template cast<float>());
