@@ -171,8 +171,7 @@ target_link_libraries(iridescence
 )
 
 if(BUILD_PYTHON_BINDINGS)
-  find_package(Python COMPONENTS Interpreter Development)
-  find_package(pybind11 CONFIG REQUIRED)
+  add_subdirectory(thirdparty/pybind11)
 
   pybind11_add_module(pyridescence
     src/python/main.cpp
