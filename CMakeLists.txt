@@ -28,7 +28,6 @@ endif()
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-# find_package(PCL)
 find_package(Eigen3 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(PNG)
@@ -172,7 +171,9 @@ target_link_libraries(iridescence
 )
 
 if(BUILD_PYTHON_BINDINGS)
-  add_subdirectory(thirdparty/pybind11)
+  find_package(Python COMPONENTS Interpreter Development)
+  find_package(pybind11 CONFIG REQUIRED)
+
   pybind11_add_module(pyridescence
     src/python/main.cpp
     src/python/glk.cpp
