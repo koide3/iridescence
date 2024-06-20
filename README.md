@@ -7,10 +7,12 @@
 ## Features
 
 What this library provides:
+
 - An easy-to-use 3D visualization framework (inpaticular suitable for rendering point clouds)
 - Tightly integrated Dear ImGui interfaces for rapid UI design
 
 What this library does NOT provide:
+
 - Realistic rendering and shading
 - Rich textured 3D mesh rendering
 
@@ -31,6 +33,13 @@ See **[documentation](https://koide3.github.io/iridescence/)** for details.
 ```bash
 # Install dependencies
 sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev libfmt-dev
+# For ubuntu 20.04 or below, install fmt by
+git clone https://github.com/fmtlib/fmt/ --branch 9.1.0
+mkdir fmt/build && cd fmt/build
+cmake -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE ..
+make
+sudo make install
+sudo ldconfig
 
 # Build and install Iridescence
 git clone https://github.com/koide3/iridescence --recursive
@@ -61,7 +70,6 @@ pybind11-stubgen -o . --ignore-invalid=all pyridescence
 wget -P path/to/your_project/cmake/ https://github.com/koide3/iridescence/raw/master/cmake/FindIridescence.cmake
 ```
 
-
 ```cmake
 # Make FindIridescence.cmake visible to your cmake project
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -78,10 +86,10 @@ target_link_libraries(your_program
 )
 ```
 
-
 ## Minimum example
 
 C++:
+
 ```cpp
 #include <glk/primitives/primitives.hpp>
 #include <guik/viewer/light_viewer.hpp>
@@ -157,8 +165,8 @@ while viewer.spin_once():
   viewer.update_drawable('wire_sphere', glk.primitives.wire_sphere(), guik.FlatColor(0.1, 0.7, 1.0, 1.0, transform))
 
 ```
-</details>
 
+</details>
 
 ![example_01](https://user-images.githubusercontent.com/31344317/210127177-31630466-f8a1-45b6-8bc7-2fdd2e4c9548.gif)
 
