@@ -286,6 +286,9 @@ See also [ext_light_viewer_partial_rendering.cpp](https://github.com/koide3/irid
 
 ![partial_rendering](https://github.com/koide3/iridescence/assets/31344317/1a54035f-3faf-4910-8a3a-97d0cfb71a1e)
 
+!!!note
+    This feature may not work well on non-NVIDIA GPUs.
+
 ## Viewer menu
 
 By pressing "Ctrl+M", a hidden menu bar appears. Via the manu bar, you can:
