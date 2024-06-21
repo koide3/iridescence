@@ -217,6 +217,7 @@ if(BUILD_EXT_TESTS)
       ${test_src}
     )
     target_link_libraries(${test_name}
+      fmt
       spdlog
       iridescence
     )
