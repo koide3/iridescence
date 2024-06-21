@@ -142,7 +142,7 @@ void PointCloudBuffer::add_normals(const Eigen::Matrix<double, N, 1>* normals, i
 
 template <typename Scalar, typename Allocator>
 void PointCloudBuffer::add_color(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors) {
-  add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+  add_color(colors.data(), colors.size());
 }
 
 template <typename Scalar, int D, typename Allocator>
