@@ -29,7 +29,6 @@ find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
 find_package(Eigen3 REQUIRED)
-find_package(fmt REQUIRED)
 find_package(PNG)
 find_package(JPEG)
 find_package(assimp QUIET)
@@ -72,7 +71,6 @@ target_link_libraries(gl_imgui
   ${OPENGL_LIBRARIES}
   glfw
   dl
-  fmt::fmt
 )
 
 if(${assimp_FOUND})
@@ -166,7 +164,6 @@ target_include_directories(iridescence PUBLIC
 target_link_libraries(iridescence
   gl_imgui
   pthread
-  fmt::fmt
   ${EXTRA_LIBRARIES}
 )
 
@@ -220,7 +217,6 @@ if(BUILD_EXT_TESTS)
       ${test_src}
     )
     target_link_libraries(${test_name}
-      fmt
       spdlog
       iridescence
     )
