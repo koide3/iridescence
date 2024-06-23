@@ -24,8 +24,7 @@ RUN CC=clang CXX=clang++ cmake .. -DBUILD_EXAMPLES=ON -DBUILD_EXT_TESTS=ON
 RUN make -j$(nproc)
 
 WORKDIR /root/iridescence
-# RUN python3 setup.py build
-# RUN python3 setup.py install --user
+RUN pip install . --user
 
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
