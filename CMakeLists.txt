@@ -5,6 +5,8 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -39,7 +41,7 @@ find_package(assimp QUIET)
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
-add_library(gl_imgui SHARED
+add_library(gl_imgui
   thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -76,7 +78,7 @@ if(${assimp_FOUND})
   list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
 endif()
 
-add_library(iridescence SHARED
+add_library(iridescence
   src/glk/path_std.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
@@ -229,3 +231,15 @@ install(FILES thirdparty/implot/implot.h thirdparty/implot/implot_internal.h DES
 install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION include/iridescence)
 install(FILES thirdparty/ImGuizmo/ImGuizmo.h DESTINATION include/iridescence)
 install(DIRECTORY data/ DESTINATION share/iridescence/data)
+
+if(BUILD_PYTHON_BINDINGS)
+  if(DEFINED SKBUILD_PROJECT_NAME)
+    set(PYTHON_INSTALL_DIR .)
+  elseif(NOT DEFINED PYTHON_INSTALL_DIR)
+    set(PYTHON_INSTALL_DIR lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+  endif()
+  install(TARGETS pyridescence
+    LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
+    COMPONENT python
+  )
+endif()
