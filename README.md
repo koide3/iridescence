@@ -56,25 +56,16 @@ pybind11-stubgen -o . --ignore-invalid=all pyridescence
 
 ## Use Iridescence in your cmake project
 
-```bash
-# Add FindIridescence.cmake to your project
-wget -P path/to/your_project/cmake/ https://github.com/koide3/iridescence/raw/master/cmake/FindIridescence.cmake
-```
-
-
 ```cmake
-# Make FindIridescence.cmake visible to your cmake project
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
-
 # Find package
 find_package(Iridescence REQUIRED)
 
 # Add include dirs and link libraries
-target_include_directories(your_program PUBLIC
-  ${Iridescence_INCLUDE_DIRS}
+add_executable(your_program
+  src/your_program.cpp
 )
 target_link_libraries(your_program
-  ${Iridescence_LIBRARIES}
+  Iridescence::Iridescence
 )
 ```
 

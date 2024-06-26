@@ -264,7 +264,7 @@ set(CMAKE_CONFIG_INSTALL_DIR
 include(CMakePackageConfigHelpers)
 install(EXPORT iridescence-targets
   FILE iridescence-targets.cmake
-  NAMESPACE iridescence::
+  NAMESPACE Iridescence::
   DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
 )
 configure_package_config_file(

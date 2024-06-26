@@ -1,9 +1,9 @@
-# Config file for the iridescence package
+# Config file for the Iridescence package
 #
 # Usage from an external project:
 #
-#  find_package(iridescence REQUIRED)
-#  target_link_libraries(MY_TARGET_NAME iridescence::iridescence)
+#  find_package(Iridescence REQUIRED)
+#  target_link_libraries(MY_TARGET_NAME Iridescence::Iridescence)
 #
 @PACKAGE_INIT@
 
@@ -16,3 +16,4 @@ find_dependency(PNG)
 find_dependency(JPEG)
 
 include("${CMAKE_CURRENT_LIST_DIR}/iridescence-targets.cmake")
+add_library(Iridescence::Iridescence ALIAS Iridescence::iridescence)
