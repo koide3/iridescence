@@ -173,7 +173,7 @@ void Mesh::draw(glk::GLSLShader& shader) const {
 
   if (wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if(cull_was_enabled) {
+    if (cull_was_enabled) {
       glEnable(GL_CULL_FACE);
     }
     glLineWidth(1.0f);

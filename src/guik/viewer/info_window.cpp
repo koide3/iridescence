@@ -2,7 +2,7 @@
 
 #include <regex>
 #include <chrono>
-#include <fmt/format.h>
+#include <iomanip>
 #include <glk/split.hpp>
 
 namespace guik {
@@ -84,7 +84,9 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
     double mem_percent = 100 * (mem_active) / static_cast<double>(mem_free + mem_inact + mem_active);
     int cpu_idle = values[14];
 
-    sst << fmt::format("CPU {:02d} % Memory {:02d} % ({:5d} Mb / {:5d} Mb)", 100 - cpu_idle, static_cast<int>(mem_percent), mem_active, mem_free + mem_inact + mem_active);
+    sst << "CPU " << std::setfill('0') << std::setw(2) << 100 - cpu_idle << " % ";
+    sst << "Memory " << std::setfill('0') << std::setw(2) << static_cast<int>(mem_percent) << " % ";
+    sst << "(" << std::setfill(' ') << std::setw(5) << mem_active << " Mb / " << std::setfill(' ') << std::setw(5) << mem_free + mem_inact + mem_active << " Mb)";
   }
 
   pclose(fp);
@@ -115,7 +117,10 @@ std::string LightViewer::InfoWindow::get_gpu_info() const {
       continue;
     }
 
-    sst << fmt::format("{:3s} {:20s} : GPU {:5s}    Memory ({:10s} / {:10s})", tokens[0], tokens[1], tokens[2], tokens[4], tokens[5]);
+    sst << std::setfill(' ') << std::setw(3) << tokens[0] << " ";
+    sst << std::setfill(' ') << std::setw(20) << tokens[1] << " : ";
+    sst << "GPU " << std::setfill(' ') << std::setw(5) << tokens[2] << "    ";
+    sst << "Memory (" << std::setfill(' ') << std::setw(10) << tokens[4] << " / " << std::setfill(' ') << std::setw(10) << tokens[5] << ")";
   }
 
   if (sst.str().empty()) {

@@ -30,7 +30,7 @@ See **[documentation](https://koide3.github.io/iridescence/)** for details.
 
 ```bash
 # Install dependencies
-sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev libfmt-dev
+sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev
 
 # Build and install Iridescence
 git clone https://github.com/koide3/iridescence --recursive
