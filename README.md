@@ -51,8 +51,16 @@ pybind11-stubgen -o . --ignore-invalid=all pyridescence
 
 ### Docker
 
-* Build: `docker build -t iridescence -f docker/ubuntu/Dockerfile .`
-* Run: `bash docker/run.sh iridescence`
+* Build:  
+`docker build -t iridescence -f docker/ubuntu/Dockerfile .`
+* Run with gpu:  
+`bash docker/run.sh`
+* Run without gpu:  
+`NO_GPU=1 bash docker/run.sh`
+* Run if you don't approve the permission for docker:  
+`sudo bash docker/run.sh`
+* Example of running `01_light_viewer_basic` with a specific option:  
+`NO_GPU=1 DOCKER_IMAGE="iridescence" DOCKER_CONTAINER="iridescence" bash docker/run.sh /root/iridescence/build/01_light_viewer_basic`
 
 ## Use Iridescence in your cmake project
 
