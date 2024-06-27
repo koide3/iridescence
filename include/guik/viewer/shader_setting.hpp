@@ -2,8 +2,8 @@
 #define GUIK_SHADER_SETTING_HPP
 
 #include <memory>
+#include <optional>
 #include <unordered_map>
-#include <boost/optional.hpp>
 
 #include <glk/drawable.hpp>
 #include <glk/make_shared.hpp>
@@ -119,7 +119,7 @@ public:
   }
 
   template <typename T>
-  boost::optional<T> get(const std::string& name) {
+  std::optional<T> get(const std::string& name) {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -133,7 +133,7 @@ public:
       return p->value;
     }
 
-    return boost::none;
+    return std::nullopt;
   }
 
   template <typename T>

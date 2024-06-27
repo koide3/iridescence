@@ -1,11 +1,11 @@
 #include <glk/io/mesh_io.hpp>
 
+#include <filesystem>
 #include <glk/mesh.hpp>
 #include <glk/mesh_model.hpp>
 #include <glk/io/image_io.hpp>
 #include <glk/texture.hpp>
 #include <guik/viewer/shader_setting.hpp>
-#include <boost/filesystem.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -46,7 +46,7 @@ std::shared_ptr<MeshModel> load_mesh_model(const std::string& path) {
         return s.size() < suffix.size() ? false : std::equal(std::rbegin(suffix), std::rend(suffix), std::rbegin(s));
       };
 
-      const std::string filename = boost::filesystem::path(path).parent_path().string() + "/" + std::string(tex_path.C_Str());
+      const std::string filename = std::filesystem::path(path).parent_path().string() + "/" + std::string(tex_path.C_Str());
 
       int width, height;
       std::vector<unsigned char> pixels;

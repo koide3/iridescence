@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
-project(iridescence)
+project(iridescence VERSION 0.1.0 LANGUAGES CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
+
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -24,12 +28,13 @@ endif()
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 
-# find_package(PCL)
-find_package(Boost REQUIRED filesystem program_options)
 find_package(Eigen3 REQUIRED)
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
+find_package(PNG)
+find_package(JPEG)
 find_package(assimp QUIET)
+
+include(GNUInstallDirs)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/iridescence CACHE PATH "Location of header files" )
 
 ###########
 ## Build ##
@@ -39,7 +44,7 @@ find_package(assimp QUIET)
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
-add_library(gl_imgui SHARED
+add_library(gl_imgui
   thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -57,13 +62,13 @@ add_library(gl_imgui SHARED
   thirdparty/imgui/backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(gl_imgui PUBLIC
-  include
-  thirdparty/imgui
-  thirdparty/imgui/backends
-  thirdparty/ImGuizmo
-  thirdparty/implot
-  thirdparty/portable-file-dialogs
-  thirdparty/gl3w
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui/backends>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ImGuizmo>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
 )
 target_link_libraries(gl_imgui
   ${OPENGL_LIBRARIES}
@@ -76,7 +81,17 @@ if(${assimp_FOUND})
   list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
 endif()
 
-add_library(iridescence SHARED
+if(${PNG_FOUND})
+  list(APPEND EXTRA_LIBRARIES PNG::PNG)
+  list(APPEND EXTRA_SOURCE src/glk/io/png_io.cpp)
+endif()
+
+if(${JPEG_FOUND})
+  list(APPEND EXTRA_LIBRARIES JPEG::JPEG)
+  list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io.cpp)
+endif()
+
+add_library(iridescence
   src/glk/path_std.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
@@ -105,8 +120,6 @@ add_library(iridescence SHARED
   src/glk/primitives/primitives.cpp
   src/glk/io/ascii_io.cpp
   src/glk/io/ply_io.cpp
-  src/glk/io/png_io.cpp
-  src/glk/io/jpeg_io.cpp
   src/glk/io/image_io.cpp
   src/glk/effects/plain_rendering.cpp
   src/glk/effects/screen_space_splatting.cpp
@@ -142,29 +155,25 @@ add_library(iridescence SHARED
   ${EXTRA_SOURCE}
 )
 target_include_directories(iridescence PUBLIC
-  include
-  thirdparty/imgui
-  thirdparty/imgui/examples
-  thirdparty/ImGuizmo
-  thirdparty/portable-file-dialogs
-  thirdparty/gl3w
-  ${PNG_INCLUDE_DIRS}
-  ${JPEG_INCLUDE_DIRS}
+  $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui/examples>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ImGuizmo>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
   ${GLM_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
   pthread
-  ${PNG_LIBRARIES}
-  ${JPEG_LIBRARIES}
-  ${Boost_LIBRARIES}
   ${EXTRA_LIBRARIES}
 )
 
 if(BUILD_PYTHON_BINDINGS)
   add_subdirectory(thirdparty/pybind11)
+
   pybind11_add_module(pyridescence
     src/python/main.cpp
     src/python/glk.cpp
@@ -220,12 +229,57 @@ if(BUILD_EXT_TESTS)
 endif()
 
 # install
-file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
-install(TARGETS gl_imgui iridescence DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include/iridescence)
-install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION include/iridescence/GL)
-install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h thirdparty/imgui/imgui_internal.h thirdparty/imgui/imstb_textedit.h DESTINATION include/iridescence)
-install(FILES thirdparty/implot/implot.h thirdparty/implot/implot_internal.h DESTINATION include/iridescence)
-install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION include/iridescence)
-install(FILES thirdparty/ImGuizmo/ImGuizmo.h DESTINATION include/iridescence)
-install(DIRECTORY data/ DESTINATION share/iridescence/data)
+# file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+# install(TARGETS gl_imgui iridescence DESTINATION lib)
+# install(DIRECTORY include/ DESTINATION include/iridescence)
+# install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION include/iridescence/GL)
+# install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h thirdparty/imgui/imgui_internal.h thirdparty/imgui/imstb_textedit.h DESTINATION include/iridescence)
+# install(FILES thirdparty/implot/implot.h thirdparty/implot/implot_internal.h DESTINATION include/iridescence)
+# install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION include/iridescence)
+# install(FILES thirdparty/ImGuizmo/ImGuizmo.h DESTINATION include/iridescence)
+# install(DIRECTORY data/ DESTINATION share/iridescence/data)
+
+#############
+## Install ##
+#############
+
+install(DIRECTORY include/ DESTINATION ${INCLUDE_INSTALL_DIR})
+install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION ${INCLUDE_INSTALL_DIR}/GL)
+install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h thirdparty/imgui/imgui_internal.h thirdparty/imgui/imstb_textedit.h DESTINATION  ${INCLUDE_INSTALL_DIR})
+install(FILES thirdparty/implot/implot.h thirdparty/implot/implot_internal.h DESTINATION  ${INCLUDE_INSTALL_DIR})
+install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION  ${INCLUDE_INSTALL_DIR})
+install(FILES thirdparty/ImGuizmo/ImGuizmo.h DESTINATION  ${INCLUDE_INSTALL_DIR})
+install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iridescence/data)
+
+install(TARGETS gl_imgui iridescence
+  EXPORT iridescence-targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+set(CMAKE_CONFIG_INSTALL_DIR
+  "${CMAKE_INSTALL_LIBDIR}/cmake/iridescence"
+  CACHE PATH "Install directory for CMake config files"
+)
+include(CMakePackageConfigHelpers)
+install(EXPORT iridescence-targets
+  FILE iridescence-targets.cmake
+  NAMESPACE Iridescence::
+  DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
+)
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/iridescence-config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/iridescence-config.cmake"
+  INSTALL_DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
+  PATH_VARS INCLUDE_INSTALL_DIR
+)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/iridescence-config-version.cmake"
+  VERSION ${VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/iridescence-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/iridescence-config-version.cmake"
+  DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
+)

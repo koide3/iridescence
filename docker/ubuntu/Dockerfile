@@ -6,8 +6,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get install -y --no-install-recommends wget nano build-essential cmake git clang lld \
-  libpng-dev libjpeg-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev ca-certificates \
-  libfmt-dev libspdlog-dev libassimp-dev zenity python3-pip \
+  libpng-dev libjpeg-dev libeigen3-dev libglm-dev libglfw3-dev ca-certificates \
+  libfmt-dev libspdlog-dev libassimp-dev zenity python3-dev python3-pip python3-pybind11 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
