@@ -6,12 +6,11 @@
 #include <regex>
 #include <chrono>
 #include <numeric>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <implot.h>
 
 #include <glk/io/png_io.hpp>
+#include <glk/split.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/console_colors.hpp>
@@ -112,12 +111,12 @@ void LightViewer::draw_ui() {
     }
 
     if (decrease_point_size) {
-      *point_size = point_size.get() - ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() - ImGui::GetIO().DeltaTime * 10.0f;
     } else {
-      *point_size = point_size.get() + ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() + ImGui::GetIO().DeltaTime * 10.0f;
     }
 
-    *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
+    *point_size = std::max(0.1f, std::min(1e6f, point_size.value()));
 
     global_shader_setting.add("point_size", *point_size);
   }
@@ -139,7 +138,7 @@ void LightViewer::draw_ui() {
       }
 
       double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
-      std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
+      std::string filename = "/tmp/ss_" + std::to_string(static_cast<int>(time)) + ".png";
       if (glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
         std::cout << "screen shot saved:" << filename << std::endl;
       } else {
@@ -343,8 +342,7 @@ void LightViewer::clear_text() {
 }
 
 void LightViewer::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  std::vector<std::string> texts = glk::split_lines(text);
 
   std::lock_guard<std::mutex> lock(texts_mutex);
   this->texts.insert(this->texts.end(), texts.begin(), texts.end());

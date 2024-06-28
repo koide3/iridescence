@@ -3,8 +3,6 @@
 
 #include <array>
 #include <unordered_map>
-#include <boost/any.hpp>
-#include <boost/optional.hpp>
 
 #include <GL/gl3w.h>
 #include <glk/glsl_shader.hpp>
