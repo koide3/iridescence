@@ -1,4 +1,5 @@
 #include <numeric>
+#include <gtest/gtest.h>
 
 #include <glk/io/png_io.hpp>
 #include <glk/lines.hpp>
@@ -389,7 +390,7 @@ double pixel_error(const std::vector<unsigned char>& reference, const std::vecto
   return sum / reference.size();
 }
 
-int main(int argc, char** argv) {
+TEST(ViewerTest, Primitives) {
   auto viewer = guik::viewer("viewer_test", {-1, -1}, false);
   viewer->disable_vsync();
 
@@ -417,6 +418,7 @@ int main(int argc, char** argv) {
       auto pixels = viewer->read_color_buffer();
       const double error = pixel_error(reference, pixels);
       std::cout << i << " : error=" << error << std::endl;
+      EXPECT_LE(error, 0.1) << i << " : error=" << error;
 
       if (error > 0.1) {
         for (int j = 0; j < tests.size(); j++) {
@@ -433,9 +435,7 @@ int main(int argc, char** argv) {
           viewer->spin_once();
           auto pixels = viewer->read_color_buffer();
           const double error = pixel_error(reference, pixels);
-          if (error > 0.1) {
-            std::cout << "failure on trial " << i << " for " << tests[j].first << " : error=" << error << std::endl;
-          }
+          EXPECT_LE(error, 0.1) << "failure on trial " << i << " for " << tests[j].first << " : error=" << error;
         }
       }
     }
@@ -444,6 +444,4 @@ int main(int argc, char** argv) {
       break;
     }
   }
-
-  return 0;
 }

@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get install -y --no-install-recommends wget nano build-essential cmake git clang lld \
-  libpng-dev libjpeg-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev ca-certificates \
+  libpng-dev libjpeg-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev libgtest-dev ca-certificates \
   libfmt-dev libspdlog-dev libassimp-dev zenity xvfb libgl1-mesa-dri python3-pip \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
@@ -21,13 +21,11 @@ WORKDIR /root/iridescence/build
 RUN cmake .. -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_EXT_TESTS=ON
 RUN make -j$(nproc)
 
-WORKDIR /root/iridescence
-RUN pip install . --user
-
 ENV XVFB_RES="1920x1080x24"
 ENV XVFB_ARGS=""
 
-RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
+RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS & \
+  sleep 1 && export DISPLAY=:99 && ctest
 
 WORKDIR /
 

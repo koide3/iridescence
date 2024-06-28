@@ -215,6 +215,9 @@ endif()
 if(BUILD_EXT_TESTS)
   find_package(spdlog REQUIRED)
   find_package(assimp REQUIRED)
+  find_package(GTest REQUIRED)
+
+  enable_testing()
 
   file(GLOB test_sources "src/test/*.cpp")
   foreach(test_src IN LISTS test_sources)
@@ -223,10 +226,13 @@ if(BUILD_EXT_TESTS)
       ${test_src}
     )
     target_link_libraries(${test_name}
-      fmt
-      spdlog
       iridescence
+      fmt::fmt
+      spdlog::spdlog
+      GTest::gtest_main
     )
+
+    gtest_discover_tests(${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
   endforeach()
 
 #############
