@@ -213,6 +213,7 @@ if(BUILD_EXAMPLES)
 endif()
 
 if(BUILD_EXT_TESTS)
+  find_package(fmt REQUIRED)
   find_package(spdlog REQUIRED)
   find_package(assimp REQUIRED)
   find_package(GTest REQUIRED)
