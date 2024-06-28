@@ -153,7 +153,7 @@ public:
 
   void set(glk::GLSLShader& shader) const {
     for (const auto& param : params) {
-      if(!param) {
+      if (!param) {
         continue;
       }
       param->set(shader);
@@ -225,6 +225,12 @@ public:
     return *this;
   }
 
+  ShaderSetting& rotate(const double angle, const Eigen::Vector3d& axis) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisd(angle, axis).cast<float>()).matrix();
+    return *this;
+  }
+
   template <typename Scalar>
   ShaderSetting& rotate(const Eigen::Quaternion<Scalar>& quat) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
@@ -264,7 +270,6 @@ public:
     p->value.col(2) *= scaling[2];
     return *this;
   }
-
 
 public:
   bool transparent;
