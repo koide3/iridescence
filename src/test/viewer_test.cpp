@@ -97,11 +97,15 @@ bool test_transform(int i) {
     } break;
     case 8: {
       setting = guik::Rainbow().translate(trans).rotate(rot.angle(), rot.axis());
-      setting2 = guik::Rainbow().translate(trans2).rotate(rot2.angle(), rot2.axis());
+      setting2 = guik::Rainbow().translate(trans2).rotate(rot.angle(), rot.axis());
     } break;
     case 9: {
-      setting = guik::Rainbow().translate(Eigen::Vector4f(trans.x(), trans.y(), trans.z(), 1.0f)).rotate(rot.angle(), rot.axis());
-      setting2 = guik::Rainbow().translate(Eigen::Vector4d(trans2.x(), trans2.y(), trans2.z(), 1.0f)).rotate(rot2.angle(), rot2.axis());
+      setting = guik::Rainbow().translate(Eigen::Vector4f(trans.x(), trans.y(), trans.z(), 1.0f)).rotate(rot.toRotationMatrix());
+      setting2 = guik::Rainbow().translate(Eigen::Vector4d(trans2.x(), trans2.y(), trans2.z(), 1.0f)).rotate(rot.toRotationMatrix());
+    } break;
+    case 10: {
+      setting = guik::Rainbow().translate(Eigen::Vector4f(trans.x(), trans.y(), trans.z(), 1.0f)).rotate(Eigen::Quaternionf(rot));
+      setting2 = guik::Rainbow().translate(Eigen::Vector4d(trans2.x(), trans2.y(), trans2.z(), 1.0f)).rotate(Eigen::Quaterniond(rot2));
     } break;
   }
 
