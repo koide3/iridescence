@@ -23,10 +23,14 @@ public:
   Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip);
 
   template <template <class> class Allocator>
+  Lines(float line_width, const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices, bool line_strip = false)
+  : Lines(line_width, vertices.data(), nullptr, nullptr, vertices.size(), line_strip) {}
+
+  template <template <class> class Allocator>
   Lines(
     float line_width,
     const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
-    const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors = std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>(),
+    const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors,
     bool line_strip = false)
   : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), nullptr, vertices.size(), line_strip) {}
 
