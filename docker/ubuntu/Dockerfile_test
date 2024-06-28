@@ -31,8 +31,9 @@ RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS & \
 WORKDIR /root/iridescence
 RUN pip install . --user
 
+RUN rm /tmp/.X99-lock || true
 RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS & \
-  sleep 1 && export DISPLAY=:99 && python3 src/test/viewer_test.py
+  export DISPLAY=:99 && python3 src/test/viewer_test.py
 
 WORKDIR /
 
