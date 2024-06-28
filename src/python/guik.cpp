@@ -25,7 +25,7 @@ guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const 
   if (is_first) {
     py::gil_scoped_acquire acquire;
     py::object pyridescence = py::module::import("pyridescence_data");
-    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
     glk::set_data_path(path.parent_path().string());
     is_first = false;
