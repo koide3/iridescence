@@ -44,10 +44,15 @@ extern "C" {
 #define GL3W_ERROR_LIBRARY_OPEN -2
 #define GL3W_ERROR_OPENGL_VERSION -3
 
-#ifdef GL3W_EXPORTS
-    #define GL3W_API __declspec(dllexport)
+
+#ifndef _WIN32
+  #define GL3W_API
 #else
-    #define GL3W_API __declspec(dllimport)
+	#ifdef GL3W_EXPORTS
+		#define GL3W_API __declspec(dllexport)
+	#else
+		#define GL3W_API __declspec(dllimport)
+	#endif
 #endif
 
 typedef void (*GL3WglProc)(void);
