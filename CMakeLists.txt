@@ -234,6 +234,7 @@ if(BUILD_EXT_TESTS)
 
     gtest_discover_tests(${test_name} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
   endforeach()
+endif()
 
 #############
 ## Install ##
@@ -279,8 +280,6 @@ install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/iridescence-config-version.cmake"
   DESTINATION ${CMAKE_CONFIG_INSTALL_DIR}
 )
-
-endif()
 
 if(BUILD_PYTHON_BINDINGS)
   if(DEFINED SKBUILD_PROJECT_NAME)
