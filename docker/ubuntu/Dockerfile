@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p ~/.config/pip
+RUN echo "[global]\nbreak-system-packages=true" > ~/.config/pip/pip.conf
+
 COPY . /root/iridescence
 WORKDIR /root/iridescence
 RUN rm -rf /root/iridescence/build

@@ -27,7 +27,7 @@ if(BUILD_WITH_MARCH_NATIVE)
   set(CMAKE_CXX_FLAGS "-march=native ${CMAKE_CXX_FLAGS}")
 endif()
 
-find_package(GLM REQUIRED)
+find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
@@ -76,6 +76,7 @@ target_include_directories(gl_imgui PUBLIC
 target_link_libraries(gl_imgui
   OpenGL::GL
   glfw
+  dl
 )
 
 if(${assimp_FOUND})
@@ -164,10 +165,10 @@ target_include_directories(iridescence PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ImGuizmo>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
-  ${GLM_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
+  glm::glm
   Eigen3::Eigen
   ${EXTRA_LIBRARIES}
 )
