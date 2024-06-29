@@ -29,6 +29,7 @@ endif()
 
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 find_package(PNG)
@@ -73,9 +74,8 @@ target_include_directories(gl_imgui PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
 )
 target_link_libraries(gl_imgui
-  ${OPENGL_LIBRARIES}
+  OpenGL::GL
   glfw
-  dl
 )
 
 if(${assimp_FOUND})
@@ -165,11 +165,10 @@ target_include_directories(iridescence PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
   ${GLM_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
 )
 target_link_libraries(iridescence
   gl_imgui
-  pthread
+  Eigen3::Eigen
   ${EXTRA_LIBRARIES}
 )
 

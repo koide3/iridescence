@@ -18,7 +18,9 @@ jobs:
           { "ubuntu": "focal", "file": "ubuntu" },
           { "ubuntu": "focal", "file": "ubuntu_llvm" },
           { "ubuntu": "jammy", "file": "ubuntu" },
-          { "ubuntu": "jammy", "file": "ubuntu_llvm" }
+          { "ubuntu": "jammy", "file": "ubuntu_llvm" },
+          { "ubuntu": "noble", "file": "ubuntu" },
+          { "ubuntu": "noble", "file": "ubuntu_llvm" }
         ]
 
     steps:
