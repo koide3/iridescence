@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on:
   push:
@@ -10,18 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        DISTRO: [
-          { "ubuntu": "focal", "file": "ubuntu" },
-          { "ubuntu": "focal", "file": "ubuntu_llvm" },
-          { "ubuntu": "jammy", "file": "ubuntu" },
-          { "ubuntu": "jammy", "file": "ubuntu_llvm" },
-          { "ubuntu": "noble", "file": "ubuntu" },
-          { "ubuntu": "noble", "file": "ubuntu_llvm" }
-        ]
 
     steps:
       - uses: actions/checkout@v2
@@ -38,8 +28,8 @@ jobs:
       - name: Docker build
         uses: docker/build-push-action@v2
         with:
-          file: ${{github.workspace}}/docker/${{ matrix.DISTRO.file }}/Dockerfile
+          file: ${{github.workspace}}/docker/ubuntu/Dockerfile_test
           build-args: |
-            BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
+            BASE_IMAGE=ubuntu:jammy
           context: .
           push: false

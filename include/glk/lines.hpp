@@ -8,6 +8,7 @@
 
 #include <glk/drawable.hpp>
 #include <glk/glsl_shader.hpp>
+#include <glk/type_conversion.hpp>
 
 namespace glk {
 
@@ -17,27 +18,38 @@ namespace glk {
  */
 class Lines : public Drawable {
 public:
-  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, const Eigen::Vector4i* infos, int num_points, bool line_strip);
+  Lines(float line_width, const Eigen::Vector3f* vertices, int num_points, bool line_strip = false);
+  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip = false);
+  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, const Eigen::Vector4i* infos, int num_points, bool line_strip = false);
 
-  Lines(float line_width, const Eigen::Vector3f* vertices, int num_points, bool line_strip);
-  Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip);
-
-  template <template <class> class Allocator>
+  template <typename T1, int D1>
+  Lines(float line_width, const Eigen::Matrix<T1, D1, 1>* vertices, int num_vertices, bool line_strip = false);
+  template <typename T1, int D1, typename T2, int D2>
+  Lines(float line_width, const Eigen::Matrix<T1, D1, 1>* vertices, const Eigen::Matrix<T2, D2, 1>* colors, int num_vertices, bool line_strip = false);
+  template <typename T1, int D1, typename T2, int D2>
   Lines(
     float line_width,
-    const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
-    const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors = std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>(),
-    bool line_strip = false)
-  : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), nullptr, vertices.size(), line_strip) {}
+    const Eigen::Matrix<T1, D1, 1>* vertices,
+    const Eigen::Matrix<T2, D2, 1>* colors,
+    const Eigen::Vector4i* infos,
+    int num_vertices,
+    bool line_strip = false);
 
-  template <template <class> class Allocator>
+  template <typename T1, int D1, typename Allocator>
+  Lines(float line_width, const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, bool line_strip = false);
+  template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2>
   Lines(
     float line_width,
-    const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
-    const std::vector<Eigen::Vector4f, Allocator<Eigen::Vector4f>>& colors,
-    const std::vector<Eigen::Vector4i, Allocator<Eigen::Vector4i>>& infos,
-    bool line_strip = false)
-  : Lines(line_width, vertices.data(), colors.empty() ? nullptr : colors.data(), infos.empty() ? nullptr : infos.data(), vertices.size(), line_strip) {}
+    const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator1>& vertices,
+    const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
+    bool line_strip = false);
+  template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2, typename Allocator3>
+  Lines(
+    float line_width,
+    const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator1>& vertices,
+    const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
+    const std::vector<Eigen::Vector4i, Allocator3>& infos,
+    bool line_strip = false);
 
   virtual ~Lines() override;
 
@@ -57,6 +69,38 @@ private:
   GLuint ibo;  // infos
   GLuint ebo;  // elements
 };
+
+// template methods
+
+template <typename T1, int D1>
+Lines::Lines(float line_width, const Eigen::Matrix<T1, D1, 1>* vertices, int num_vertices, bool line_strip)
+: Lines(line_width, convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), num_vertices, line_strip) {}
+
+template <typename T1, int D1, typename T2, int D2>
+Lines::Lines(float line_width, const Eigen::Matrix<T1, D1, 1>* vertices, const Eigen::Matrix<T2, D2, 1>* colors, int num_vertices, bool line_strip)
+: Lines(line_width, convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), convert_to_vector<float, 4, 1>(colors, num_vertices).data(), num_vertices, line_strip) {}
+
+template <typename T1, int D1, typename T2, int D2>
+Lines::Lines(float line_width, const Eigen::Matrix<T1, D1, 1>* vertices, const Eigen::Matrix<T2, D2, 1>* colors, const Eigen::Vector4i* infos, int num_vertices, bool line_strip)
+: Lines(line_width, convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), convert_to_vector<float, 4, 1>(colors, num_vertices).data(), infos, num_vertices, line_strip) {}
+
+template <typename T1, int D1, typename Allocator>
+Lines::Lines(float line_width, const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, bool line_strip)
+: Lines(line_width, vertices.data(), vertices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2>
+Lines::Lines(float line_width, const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator1>& vertices, const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors, bool line_strip)
+: Lines(line_width, vertices.data(), colors.data(), vertices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2, typename Allocator3>
+Lines::Lines(
+  float line_width,
+  const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator1>& vertices,
+  const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
+  const std::vector<Eigen::Vector4i, Allocator3>& infos,
+  bool line_strip)
+: Lines(line_width, vertices.data(), colors.data(), infos.data(), vertices.size(), line_strip) {}
+
 }  // namespace glk
 
 #endif

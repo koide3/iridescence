@@ -41,7 +41,7 @@ public:
     for (const auto& label : labels) {
       max_name_length = std::max<int>(max_name_length, label.size());
     }
-    std::string label_format = "\%-" + std::to_string(max_name_length) + "s";
+    std::string label_format = "%-" + std::to_string(max_name_length) + "s";
 
     double sum_time_msec = 0.0;
     for (int i = 0; i < labels.size(); i++) {
@@ -175,7 +175,7 @@ public:
     for (const auto& label : labels) {
       max_name_length = std::max<int>(max_name_length, label.size());
     }
-    std::string label_format = "\%-" + std::to_string(max_name_length) + "s";
+    std::string label_format = "%-" + std::to_string(max_name_length) + "s";
 
     double sum_time_msec_gl = 0.0;
     for (int i = 0; i < labels.size(); i++) {

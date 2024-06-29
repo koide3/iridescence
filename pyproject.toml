@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools", "scikit-build>=0.13", "scikit-build-core >=0.4.3", "pybind11 >2.10.0"]
+build-backend = "scikit_build_core.setuptools.build_meta"
+
+[tool.scikit-build.cmake.define]
+BUILD_PYTHON_BINDINGS = true
+BUILD_SHARED_LIBS = false

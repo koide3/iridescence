@@ -835,7 +835,7 @@ static const char *proc_names[] = {
 	"glWaitSync",
 };
 
-union GL3WProcs gl3wProcs;
+GL3W_API union GL3WProcs gl3wProcs;
 
 static void load_procs(GL3WGetProcAddressProc proc)
 {
