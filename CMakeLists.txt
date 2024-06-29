@@ -91,6 +91,9 @@ if(MSVC)
   add_compile_definitions(_USE_MATH_DEFINES)
   add_compile_options(/wd4018 /wd4244 /wd4267 /wd4305 /wd4312)
   add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+else()
+  list(APPEND EXTRA_LIBRARIES dl)
+  list(APPEND EXTRA_LIBRARIES pthread)
 endif()
 
 if(${assimp_FOUND})
@@ -214,11 +217,6 @@ target_compile_definitions(iridescence PRIVATE
   GL3W_EXPORTS
   GLK_EXPORTS
 )
-
-if(NOT MSVC)
-  target_link_libraries(iridescence dl pthread)
-endif()
-
 
 if(BUILD_PYTHON_BINDINGS)
   add_subdirectory(thirdparty/pybind11)
