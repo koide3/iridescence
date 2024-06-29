@@ -38,8 +38,8 @@ private:
 
   float fovy;   // Perstictive projection FoV (vertical)
   float width;  // Orthogonal perojection width
-  float near;   // Near clipping plane distance
-  float far;    // Far clipping plane distance
+  float near_;  // Near clipping plane distance (near, far are reserved in MSVC!!)
+  float far_;   // Far clipping plane distance
 };
 
 }  // namespace guik

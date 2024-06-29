@@ -10,7 +10,7 @@ option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "ON" CACHE STRING "Export global symbols" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -27,14 +27,53 @@ if(BUILD_WITH_MARCH_NATIVE)
   set(CMAKE_CXX_FLAGS "-march=native ${CMAKE_CXX_FLAGS}")
 endif()
 
-find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
 
-find_package(Eigen3 REQUIRED)
+find_package(glm)
+find_package(glfw3)
+find_package(Eigen3)
 find_package(PNG)
 find_package(JPEG)
 find_package(assimp QUIET)
+
+if(NOT glm_FOUND)
+  message(STATUS "System GLM not found. Download GLM 1.0.1.")
+  include(FetchContent)
+  FetchContent_Populate(
+    glm
+    URL https://github.com/g-truc/glm/archive/refs/tags/1.0.1.tar.gz
+  )
+  add_library(glm::glm INTERFACE IMPORTED GLOBAL)
+  set_target_properties(glm::glm PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${glm_SOURCE_DIR}"
+  )
+endif()
+
+if(NOT glfw3_FOUND)
+  message(STATUS "System GLFW3 not found. Download GLFW 3.4.")
+  include(FetchContent)
+  FetchContent_Populate(
+    glfw3
+    URL https://github.com/glfw/glfw/archive/refs/tags/3.4.tar.gz
+  )
+  add_subdirectory("${glfw3_SOURCE_DIR}")
+  # set_target_properties(glm PROPERTIES
+  #   INTERFACE_INCLUDE_DIRECTORIES "${glm_SOURCE_DIR}"
+  # )
+endif()
+
+if(NOT Eigen3_FOUND)
+  message(STATUS "System Eigen not found. Download Eigen 3.4.0.")
+  include(FetchContent)
+  FetchContent_Populate(
+    Eigen3
+    URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+  )
+  add_library(Eigen3::Eigen INTERFACE IMPORTED GLOBAL)
+  set_target_properties(Eigen3::Eigen PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${eigen3_SOURCE_DIR}"
+  )
+endif()
 
 include(GNUInstallDirs)
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/iridescence CACHE PATH "Location of header files" )
@@ -47,7 +86,34 @@ set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/iridescence CACHE PATH "Loca
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
-add_library(gl_imgui
+if(MSVC)
+  add_compile_definitions(NOMINMAX)
+  add_compile_definitions(_USE_MATH_DEFINES)
+  add_compile_options(/wd4018 /wd4244 /wd4267 /wd4305 /wd4312)
+  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+endif()
+
+if(${assimp_FOUND})
+  list(APPEND EXTRA_LIBRARIES assimp)
+  list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
+endif()
+
+if(${PNG_FOUND})
+  list(APPEND EXTRA_LIBRARIES PNG::PNG)
+  list(APPEND EXTRA_SOURCE src/glk/io/png_io.cpp)
+else()
+  list(APPEND EXTRA_SOURCE src/glk/io/png_io_dummy.cpp)
+endif()
+
+if(${JPEG_FOUND})
+  list(APPEND EXTRA_LIBRARIES JPEG::JPEG)
+  list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io.cpp)
+else()
+  list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io_dummy.cpp)
+endif()
+
+add_library(iridescence SHARED
+  # GL and IMGUI
   thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
   thirdparty/imgui/imgui_demo.cpp
@@ -63,38 +129,7 @@ add_library(gl_imgui
   thirdparty/implot/implot_items.cpp
   thirdparty/imgui/backends/imgui_impl_glfw.cpp
   thirdparty/imgui/backends/imgui_impl_opengl3.cpp
-)
-target_include_directories(gl_imgui PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui/backends>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ImGuizmo>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
-)
-target_link_libraries(gl_imgui
-  OpenGL::GL
-  glfw
-  dl
-)
-
-if(${assimp_FOUND})
-  list(APPEND EXTRA_LIBRARIES assimp)
-  list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
-endif()
-
-if(${PNG_FOUND})
-  list(APPEND EXTRA_LIBRARIES PNG::PNG)
-  list(APPEND EXTRA_SOURCE src/glk/io/png_io.cpp)
-endif()
-
-if(${JPEG_FOUND})
-  list(APPEND EXTRA_LIBRARIES JPEG::JPEG)
-  list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io.cpp)
-endif()
-
-add_library(iridescence
+  # glk
   src/glk/path_std.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
@@ -130,6 +165,7 @@ add_library(iridescence
   src/glk/effects/screen_space_ambient_occlusion.cpp
   src/glk/effects/screen_space_attribute_estimation.cpp
   src/glk/effects/naive_screen_space_ambient_occlusion.cpp
+  # guik
   src/guik/gl_canvas.cpp
   src/guik/model_control.cpp
   src/guik/hovered_drawings.cpp
@@ -158,20 +194,31 @@ add_library(iridescence
   ${EXTRA_SOURCE}
 )
 target_include_directories(iridescence PUBLIC
-  $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui/examples>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/imgui/backends>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/ImGuizmo>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
 )
-target_link_libraries(iridescence
-  gl_imgui
+target_link_libraries(iridescence PUBLIC
+  OpenGL::GL
+  glfw
   glm::glm
   Eigen3::Eigen
   ${EXTRA_LIBRARIES}
 )
+target_compile_definitions(iridescence PRIVATE
+  GL3W_EXPORTS
+  GLK_EXPORTS
+)
+
+if(NOT MSVC)
+  target_link_libraries(iridescence dl pthread)
+endif()
+
 
 if(BUILD_PYTHON_BINDINGS)
   add_subdirectory(thirdparty/pybind11)
@@ -249,7 +296,7 @@ install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATI
 install(FILES thirdparty/ImGuizmo/ImGuizmo.h DESTINATION  ${INCLUDE_INSTALL_DIR})
 install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_DATADIR}/iridescence/data)
 
-install(TARGETS gl_imgui iridescence
+install(TARGETS iridescence
   EXPORT iridescence-targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

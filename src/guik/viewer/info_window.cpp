@@ -53,12 +53,13 @@ bool LightViewer::InfoWindow::draw_ui() {
 std::string LightViewer::InfoWindow::get_cpu_info() const {
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
+  std::stringstream sst;
+
+#ifndef _MSC_VER
   FILE* fp = popen("vmstat 1 2 --unit M -a", "r");
   if (fp == nullptr) {
     return "Failed to retrieve CPU info";
   }
-
-  std::stringstream sst;
 
   std::vector<char> buffer(1024);
   while (fgets(buffer.data(), buffer.size(), fp) != nullptr) {
@@ -90,6 +91,7 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
   }
 
   pclose(fp);
+#endif
 
   if (sst.str().empty()) {
     return "Failed to retrieve CPU info";
@@ -101,12 +103,13 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
 std::string LightViewer::InfoWindow::get_gpu_info() const {
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
+  std::stringstream sst;
+
+#ifndef _MSC_VER
   FILE* fp = popen("nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader", "r");
   if (fp == nullptr) {
     return "Failed to retrieve GPU info";
   }
-
-  std::stringstream sst;
 
   std::vector<char> buffer(1024);
   while (fgets(buffer.data(), buffer.size(), fp) != nullptr) {
@@ -122,6 +125,7 @@ std::string LightViewer::InfoWindow::get_gpu_info() const {
     sst << "GPU " << std::setfill(' ') << std::setw(5) << tokens[2] << "    ";
     sst << "Memory (" << std::setfill(' ') << std::setw(10) << tokens[4] << " / " << std::setfill(' ') << std::setw(10) << tokens[5] << ")";
   }
+#endif
 
   if (sst.str().empty()) {
     return "Failed to retrieve GPU info";

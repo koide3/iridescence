@@ -1,5 +1,6 @@
 #include <guik/recent_files.hpp>
 
+#include <sstream>
 #include <fstream>
 #include <iostream>
 #include <algorithm>

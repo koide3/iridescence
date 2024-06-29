@@ -6,7 +6,7 @@
 #include <imgui.h>
 #include <Eigen/Core>
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace guik {
 class Application {
