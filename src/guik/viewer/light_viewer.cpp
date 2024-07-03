@@ -70,11 +70,12 @@ void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
 
 void LightViewer::draw_ui() {
   std::unique_lock<std::mutex> lock(invoke_requests_mutex);
-  while (!invoke_requests.empty()) {
-    invoke_requests.front()();
-    invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> invoke_requests;
+  invoke_requests.swap(this->invoke_requests);
   lock.unlock();
+  for(auto& request: invoke_requests) {
+    request();
+  }
 
   // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
   std::vector<const std::function<void()>*> callbacks;
@@ -316,11 +317,13 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 
   std::unique_lock<std::mutex> lock(post_render_invoke_requests_mutex);
-  while (!post_render_invoke_requests.empty()) {
-    post_render_invoke_requests.front()();
-    post_render_invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> post_render_invoke_requests;
+  post_render_invoke_requests.swap(this->post_render_invoke_requests);
   lock.unlock();
+
+  for (auto& request : post_render_invoke_requests) {
+    request();
+  }
 }
 
 void LightViewer::clear() {
