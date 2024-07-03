@@ -153,7 +153,7 @@ public:
 
   void set(glk::GLSLShader& shader) const {
     for (const auto& param : params) {
-      if(!param) {
+      if (!param) {
         continue;
       }
       param->set(shader);
@@ -264,7 +264,6 @@ public:
     p->value.col(2) *= scaling[2];
     return *this;
   }
-
 
 public:
   bool transparent;

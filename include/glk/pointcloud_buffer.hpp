@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
+#include <glk/api_export.hpp>
 
 namespace glk {
 

@@ -27,7 +27,7 @@ std::string find_file(const std::string& hint, const std::string& path) {
         return found.substr(0, found.size() - path.size() - 1);
       }
     }
-  } catch (std::exception& e) {
+  } catch (std::exception&) {
     return "";
   }
 
