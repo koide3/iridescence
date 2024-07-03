@@ -7,9 +7,6 @@ option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
-
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-option(CMAKE_POSITION_INDEPENDENT_CODE "Generate position-independent code" ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "ON" CACHE STRING "Export global symbols" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -115,7 +112,7 @@ else()
   list(APPEND EXTRA_SOURCE src/glk/io/jpeg_io_dummy.cpp)
 endif()
 
-add_library(iridescence SHARED
+add_library(iridescence
   # GL and IMGUI
   thirdparty/gl3w/gl3w.cpp
   thirdparty/imgui/imgui.cpp
@@ -231,8 +228,6 @@ if(BUILD_PYTHON_BINDINGS)
   target_link_libraries(pyridescence PRIVATE
     iridescence
   )
-  file(COPY src/example/light_viewer.py DESTINATION .)
-  # target_compile_definitions(pyridescence PRIVATE VERSION_INFO=${IRIDESCENCE_VERSION_INFO})
 endif()
 
 # build examples
