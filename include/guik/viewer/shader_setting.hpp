@@ -52,6 +52,7 @@ public:
   T value;
 };
 
+/// @brief Shader setting class holds rendering settings for the object.
 struct ShaderSetting {
 public:
   using Ptr = std::shared_ptr<ShaderSetting>;
@@ -91,6 +92,10 @@ public:
     return cloned;
   }
 
+  /// @brief Add a new parameter to the shader setting.
+  /// @param name   Parameter name
+  /// @param value  Parameter value
+  /// @return       This object
   template <typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
     for (int i = 0; i < params.size(); i++) {
@@ -109,6 +114,9 @@ public:
     return *this;
   }
 
+  /// @brief Get a parameter value from the shader setting.
+  /// @param name   Parameter name
+  /// @return       Parameter value if found, otherwise std::nullopt
   template <typename T>
   std::optional<T> get(const std::string& name) {
     for (const auto& param : params) {
@@ -127,6 +135,9 @@ public:
     return std::nullopt;
   }
 
+  /// @brief Get a parameter value from the shader setting. This method avoid type checking. Fast but unsafe.
+  /// @param name   Parameter name
+  /// @return       Parameter value
   template <typename T>
   const T& cast(const std::string& name) {
     for (const auto& param : params) {
@@ -142,6 +153,8 @@ public:
     abort();
   }
 
+  /// @brief Set shader parameters to the shader program.
+  /// @param shader  Shader program
   void set(glk::GLSLShader& shader) const {
     for (const auto& param : params) {
       if (!param) {
@@ -309,6 +322,9 @@ inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::A
   return add<Eigen::Matrix4f>(name, value.matrix());
 }
 
+/// @brief Rainbow coloring scheme that assigns colors to the height (z-value) of pixels of the object.
+///        The coloring band can be changed by setting `z_range` param.
+///        The direction for the color mapping can be changed by setting `colormap_axis` param.
 struct Rainbow : public ShaderSetting {
 public:
   Rainbow() : ShaderSetting(ColorMode::RAINBOW) {}
@@ -319,6 +335,8 @@ public:
   virtual ~Rainbow() override {}
 };
 
+/// @brief Flat coloring scheme that assigns a single color to the object.
+///        If the alpha value is less than 0.999f, the object is rendered as transparent.
 struct FlatColor : public ShaderSetting {
 public:
   FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR) {
@@ -349,6 +367,7 @@ public:
 };
 
 /* primitive colors */
+/// @brief Flat red color
 struct FlatRed : public FlatColor {
   FlatRed() : FlatColor(1.0f, 0.0f, 0.0f, 1.0f) {}
 
@@ -356,6 +375,7 @@ struct FlatRed : public FlatColor {
   FlatRed(const Transform& transform) : FlatColor(1.0f, 0.0f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat green color
 struct FlatGreen : public FlatColor {
   FlatGreen() : FlatColor(0.0f, 1.0f, 0.0f, 1.0f) {}
 
@@ -363,6 +383,7 @@ struct FlatGreen : public FlatColor {
   FlatGreen(const Transform& transform) : FlatColor(0.0f, 1.0f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat blue color
 struct FlatBlue : public FlatColor {
   FlatBlue() : FlatColor(0.0f, 0.0f, 1.0f, 1.0f) {}
 
@@ -370,6 +391,7 @@ struct FlatBlue : public FlatColor {
   FlatBlue(const Transform& transform) : FlatColor(0.0f, 0.0f, 1.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat orange color
 struct FlatOrange : public FlatColor {
   FlatOrange() : FlatColor(1.0f, 0.5f, 0.0f, 1.0f) {}
 
@@ -377,6 +399,7 @@ struct FlatOrange : public FlatColor {
   FlatOrange(const Transform& transform) : FlatColor(1.0f, 0.5f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat white color
 struct FlatWhite : public FlatColor {
   FlatWhite() : FlatColor(1.0f, 1.0f, 1.0f, 1.0f) {}
 
@@ -384,6 +407,7 @@ struct FlatWhite : public FlatColor {
   FlatWhite(const Transform& transform) : FlatColor(1.0f, 1.0f, 1.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat light gray color
 struct FlatGray : public FlatColor {
   FlatGray() : FlatColor(0.7f, 0.7f, 0.7f, 1.0f) {}
 
@@ -391,6 +415,7 @@ struct FlatGray : public FlatColor {
   FlatGray(const Transform& transform) : FlatColor(0.7f, 0.7f, 0.7f, 1.0f, transform) {}
 };
 
+/// @brief Flat dark gray color
 struct FlatDarkGray : public FlatColor {
   FlatDarkGray() : FlatColor(0.3f, 0.3f, 0.3f, 1.0f) {}
 
@@ -398,6 +423,7 @@ struct FlatDarkGray : public FlatColor {
   FlatDarkGray(const Transform& transform) : FlatColor(0.3f, 0.3f, 0.3f, 1.0f, transform) {}
 };
 
+/// @brief Flat black color
 struct FlatBlack : public FlatColor {
   FlatBlack() : FlatColor(0.0f, 0.0f, 0.0f, 1.0f) {}
 
@@ -405,6 +431,7 @@ struct FlatBlack : public FlatColor {
   FlatBlack(const Transform& transform) : FlatColor(0.0f, 0.0f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Vertex color scheme that assigns colors based on vertex color attributes.
 struct VertexColor : public ShaderSetting {
 public:
   VertexColor() : ShaderSetting(ColorMode::VERTEX_COLOR) {}
@@ -415,6 +442,7 @@ public:
   virtual ~VertexColor() override {}
 };
 
+/// @brief Texture color scheme that assigns colors based on the binded texture.
 struct TextureColor : public ShaderSetting {
 public:
   TextureColor() : ShaderSetting(ColorMode::TEXTURE_COLOR) {}
