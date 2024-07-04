@@ -202,14 +202,18 @@ target_include_directories(iridescence PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
+  $<INSTALL_INTERFACE:include/iridescence>
 )
 target_link_libraries(iridescence PUBLIC
+  Eigen3::Eigen
   OpenGL::GL
   glfw
-  glm::glm
-  Eigen3::Eigen
   ${EXTRA_LIBRARIES}
 )
+target_link_libraries(iridescence PRIVATE
+  glm::glm
+)
+
 target_compile_definitions(iridescence PRIVATE
   GL3W_EXPORTS
   GLK_EXPORTS
