@@ -7,7 +7,6 @@ on:
 
 jobs:
   dispatch:
-    needs: build
     strategy:
       matrix:
         repo: ['koide3/gtsam_docker']
