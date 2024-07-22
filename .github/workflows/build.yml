@@ -46,10 +46,10 @@ jobs:
           push: false
 
       - name: Extract deb
-        run: docker run -v /root/deb/${{ matrix.DISTRO.label }}:/output iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+        run: docker run -v ${{github.workspace}}/deb/${{ matrix.DISTRO.label }}:/output iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
 
       - name: Upload deb
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.DISTRO.label }}
-          path: /root/deb/${{ matrix.DISTRO.label }}
+          path: ${{github.workspace}}/deb/${{ matrix.DISTRO.label }}
