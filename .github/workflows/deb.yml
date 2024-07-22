@@ -17,6 +17,7 @@ jobs:
           { "ubuntu": "jammy", "label": "ubuntu2204" },
           { "ubuntu": "noble", "label": "ubuntu2404" },
         ]
+        PLATFORM: [ "linux/amd64", "linux/arm64" ]
 
     steps:
       - uses: actions/checkout@v2
@@ -44,7 +45,7 @@ jobs:
           build-args: |
             BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.PLATFORM }}
           push: false
 
       - name: Extract deb (AMD64)
