@@ -46,10 +46,10 @@ jobs:
             BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
           context: .
           platforms: linux/${{ matrix.PLATFORM }}
-          push: true
+          push: false
 
       - name: Extract deb
-        run: docker run -v ${{github.workspace}}/deb/${{ matrix.DISTRO.label }}:/output --platform=linux/${{ matrix.PLATFORM }} koide3/iridescence:${{ matrix.DISTRO.ubuntu }} /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+        run: docker run -v ${{github.workspace}}/${{ matrix.DISTRO.label }}:/output --platform=linux/${{ matrix.PLATFORM }} koide3/iridescence:${{ matrix.DISTRO.ubuntu }} /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
 
       - name: Upload deb
         uses: actions/upload-artifact@v4
