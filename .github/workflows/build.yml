@@ -15,12 +15,12 @@ jobs:
     strategy:
       matrix:
         DISTRO: [
-          { "ubuntu": "focal", "file": "ubuntu" },
-          { "ubuntu": "focal", "file": "ubuntu_llvm" },
-          { "ubuntu": "jammy", "file": "ubuntu" },
-          { "ubuntu": "jammy", "file": "ubuntu_llvm" },
-          { "ubuntu": "noble", "file": "ubuntu" },
-          { "ubuntu": "noble", "file": "ubuntu_llvm" }
+          { "ubuntu": "focal", "file": "ubuntu", "label": "ubuntu2004" },
+          { "ubuntu": "focal", "file": "ubuntu_llvm", "label": "ubuntu2004" },
+          { "ubuntu": "jammy", "file": "ubuntu", "label": "ubuntu2204" },
+          { "ubuntu": "jammy", "file": "ubuntu_llvm", "label": "ubuntu2204" },
+          { "ubuntu": "noble", "file": "ubuntu", "label": "ubuntu2404" },
+          { "ubuntu": "noble", "file": "ubuntu_llvm", "label": "ubuntu2404" }
         ]
 
     steps:
@@ -38,8 +38,18 @@ jobs:
       - name: Docker build
         uses: docker/build-push-action@v2
         with:
+          tags: iridescence:latest
           file: ${{github.workspace}}/docker/${{ matrix.DISTRO.file }}/Dockerfile
           build-args: |
             BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
           context: .
           push: false
+
+      - name: Extract deb
+        run: docker run -v /root/deb/${{ matrix.DISTRO.label }}:/output iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.DISTRO.label }}
+          path: /root/deb/${{ matrix.DISTRO.label }}
