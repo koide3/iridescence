@@ -24,9 +24,9 @@ jobs:
         ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          submodule: true
+          submodules: recursive
 
       - name: Docker login
         continue-on-error: true

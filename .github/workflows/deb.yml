@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodule: recursive
+          submodules: recursive
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
