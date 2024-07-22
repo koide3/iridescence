@@ -47,11 +47,41 @@ jobs:
 
       - name: Extract deb
         if: ${{ !contains(matrix.DISTRO.file, 'llvm') }}
-        run: docker run -v ${{github.workspace}}/deb/${{ matrix.DISTRO.label }}:/output iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+        run: docker run -v ${{github.workspace}}/${{ matrix.DISTRO.label }}:/output iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
 
       - name: Upload deb
         uses: actions/upload-artifact@v4
         with:
           if: ${{ !contains(matrix.DISTRO.file, 'llvm') }}
           name: ${{ matrix.DISTRO.label }}
-          path: ${{github.workspace}}/deb/${{ matrix.DISTRO.label }}
+          path: ${{github.workspace}}/${{ matrix.DISTRO.label }}
+
+  ppa:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: koide3/ppa
+          path: ppa
+          token: ${{ secrets.PPA_PAT }}
+
+      - name: Download deb
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ubuntu*
+          path: ${{github.workspace}}/deb
+          merge-multiple: true
+
+      - name: Copy deb
+        run: cp -R ${{github.workspace}}/deb/*/*.deb ${{github.workspace}}/ppa/deb
+
+      - name: Push
+        run: |
+            git config --global user.name "k.koide"
+            git config --global user.email "k.koide@aist.go.jp"
+            cd external_push_test
+            git add .
+            git commit -m "${{ github.ref_name }}"
+            git push origin main
