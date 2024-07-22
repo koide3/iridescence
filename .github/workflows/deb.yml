@@ -17,7 +17,6 @@ jobs:
           { "ubuntu": "jammy", "label": "ubuntu2204" },
           { "ubuntu": "noble", "label": "ubuntu2404" },
         ]
-        PLATFORM: [ "linux/amd64", "linux/arm64" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -45,12 +44,13 @@ jobs:
           build-args: |
             BASE_IMAGE=ubuntu:${{ matrix.DISTRO.ubuntu }}
           context: .
-          platforms: ${{ matrix.PLATFORM }}
+          platforms: linux/amd64,linux/arm64
           push: false
 
-      - name: Extract deb
+      - name: Extract deb (AMD64)
         run: |
-          docker run -v ${{github.workspace}}/${{ matrix.DISTRO.label }}:/output --platform=${{ matrix.PLATFORM }} iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+          docker run -v ${{github.workspace}}/${{ matrix.DISTRO.label }}:/output --platform=linux/amd64 iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
+          docker run -v ${{github.workspace}}/${{ matrix.DISTRO.label }}:/output --platform=linux/arm64 iridescence:latest /bin/bash -c "cp /root/iridescence/build/*.deb /output/"
 
       - name: Upload deb
         uses: actions/upload-artifact@v4
