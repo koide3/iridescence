@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY . /root/iridescence
 WORKDIR /root/iridescence
 RUN rm -rf /root/iridescence/build
-RUN git submodule init && git submodule update
 
 # build
 WORKDIR /root/iridescence/build
