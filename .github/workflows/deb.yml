@@ -75,7 +75,10 @@ jobs:
           path: deb
 
       - name: Copy deb
-        run: cp -R ${{github.workspace}}/deb/ubuntu* ${{github.workspace}}/ppa/
+        run: |
+          cp -R ${{github.workspace}}/deb/ubuntu2404*/*.deb ${{github.workspace}}/ppa/ubuntu2404/
+          cp -R ${{github.workspace}}/deb/ubuntu2204*/*.deb ${{github.workspace}}/ppa/ubuntu2204/
+          cp -R ${{github.workspace}}/deb/ubuntu2004*/*.deb ${{github.workspace}}/ppa/ubuntu2004/
 
       - name: Push
         run: |
