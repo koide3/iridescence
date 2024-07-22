@@ -17,7 +17,7 @@ jobs:
           { "ubuntu": "jammy", "label": "ubuntu2204" },
           { "ubuntu": "noble", "label": "ubuntu2404" },
         ]
-        PLATFORM: [ "amd64" ]
+        PLATFORM: [ "amd64", "arm64" ]
 
     steps:
       - uses: actions/checkout@v4
