@@ -26,7 +26,7 @@ RUN make -j$(nproc)
 RUN cpack
 
 WORKDIR /root/iridescence
-RUN pip install . --user
+# RUN pip install . --user
 
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics

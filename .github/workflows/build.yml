@@ -71,17 +71,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: ubuntu*
-          path: ${{github.workspace}}/deb
-          merge-multiple: true
+          path: deb
+
+      - name: LS
+        run: ls ${{github.workspace}}
+
+      - name: LS
+        run: ls ${{github.workspace}}/deb
 
       - name: Copy deb
-        run: cp -R ${{github.workspace}}/deb/*/*.deb ${{github.workspace}}/ppa/deb
+        run: cp -R ${{github.workspace}}/deb/ubuntu* ${{github.workspace}}/ppa/
 
       - name: Push
         run: |
             git config --global user.name "k.koide"
             git config --global user.email "k.koide@aist.go.jp"
-            cd external_push_test
+            cd ppa
             git add .
             git commit -m "${{ github.ref_name }}"
             git push origin main
