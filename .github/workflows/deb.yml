@@ -20,9 +20,9 @@ jobs:
         PLATFORM: [ "linux/amd64", "linux/arm64" ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
-          submodule: true
+          submodule: recursive
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
