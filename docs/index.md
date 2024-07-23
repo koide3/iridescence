@@ -28,6 +28,8 @@ What this library does NOT provide:
 
 ## Installation
 
+### Install from source
+
 ```bash
 # Install dependencies
 sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev
@@ -49,10 +51,34 @@ cd ~/.local/lib/python3.10/site-packages
 pybind11-stubgen -o . --ignore-invalid=all pyridescence
 ```
 
-### Docker
+### Install from [PPA](https://github.com/koide3/ppa) [AMD64, ARM64]
 
-* Build: `docker build -t iridescence -f docker/ubuntu/Dockerfile .`
-* Run: `bash docker/run.sh iridescence`
+#### Ubuntu 24.04
+
+```bash
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2404/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2404 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
+```
+
+#### Ubuntu 22.04
+
+```bash
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2204/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2204 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
+```
+
+#### Ubuntu 20.04
+
+```bash
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2004/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2004 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
+```
 
 ## Use Iridescence in your cmake project
 
