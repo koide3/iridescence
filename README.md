@@ -2,7 +2,7 @@
 
 **Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
 
-[![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 18.04 / 20.04 / 22.04
+[![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 20.04 / 22.04 / 24.04
 
 ## Features
 
