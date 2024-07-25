@@ -349,6 +349,7 @@ set(CPACK_DEBIAN_PACKAGE_NAME "libiridescence-dev")
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "k.koide <k.koide@aist.go.jp>")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libglfw3-dev")
 
 set(GNUInstallDirs)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "3D visualization library for rapid prototyping of 3D algorithms")
