@@ -43,6 +43,10 @@ void LightViewer::destroy() {
   }
 }
 
+bool  LightViewer::running() {
+  return inst.get() != nullptr;
+}
+
 LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
 
 LightViewer::~LightViewer() {}
