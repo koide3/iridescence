@@ -3,7 +3,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include <glk/path.hpp>
 #include <glk/texture.hpp>
@@ -24,10 +24,10 @@ static bool is_first = true;
 guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   if (is_first) {
     py::gil_scoped_acquire acquire;
-    py::object pyridescence = py::module::import("pyridescence");
-    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+    py::object pyridescence = py::module::import("pyridescence_data");
+    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
-    glk::set_data_path(path.parent_path().string() + "/data");
+    glk::set_data_path(path.parent_path().string());
     is_first = false;
   }
 
@@ -39,7 +39,7 @@ guik::AsyncLightViewer* async_instance(const Eigen::Vector2i& size, bool backgro
   if (is_first) {
     py::gil_scoped_acquire acquire;
     py::object pyridescence = py::module::import("pyridescence");
-    boost::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
+    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
     glk::set_data_path(path.parent_path().string() + "/data");
     is_first = false;
@@ -112,6 +112,7 @@ void define_guik(py::module_& m) {
   // Flat colors
   py::class_<guik::FlatRed, guik::FlatColor, std::shared_ptr<guik::FlatRed>>(guik_, "FlatRed")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -125,6 +126,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatGreen, guik::FlatColor, std::shared_ptr<guik::FlatGreen>>(guik_, "FlatGreen")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -138,6 +140,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatBlue, guik::FlatColor, std::shared_ptr<guik::FlatBlue>>(guik_, "FlatBlue")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -151,6 +154,7 @@ void define_guik(py::module_& m) {
 
   py::class_<guik::FlatOrange, guik::FlatColor, std::shared_ptr<guik::FlatOrange>>(guik_, "FlatOrange")
     .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
     .def(
       py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
         Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
@@ -174,7 +178,16 @@ void define_guik(py::module_& m) {
         control.draw_gizmo(0, 0, viewer->canvas_size().x(), viewer->canvas_size().y(), viewer->view_matrix(), viewer->projection_matrix());
       })
     .def("model_matrix", &guik::ModelControl::model_matrix)
-    .def("set_model_matrix", &guik::ModelControl::set_model_matrix, py::arg("model_matrix"));
+    .def(
+      "set_model_matrix",
+      [](guik::ModelControl& model_control, const Eigen::Matrix4f& mat) { model_control.set_model_matrix(mat); },
+      py::arg("model_matrix"))
+    .def("set_gizmo_enabled", &guik::ModelControl::set_gizmo_enabled)
+    .def("enable_gizmo", &guik::ModelControl::enable_gizmo)
+    .def("disable_gizmo", &guik::ModelControl::disable_gizmo)
+    .def("set_gizmo_operation", [](guik::ModelControl& model_control, const std::string& op) { model_control.set_gizmo_operation(op); })
+    .def("set_gizmo_mode", &guik::ModelControl::set_gizmo_mode)
+    .def("set_gizmo_clip_scale", &guik::ModelControl::set_gizmo_clip_scale);
 
   // guik::CameraControl
   py::class_<guik::CameraControl, std::shared_ptr<guik::CameraControl>>(guik_, "CameraControl");
@@ -263,6 +276,7 @@ void define_guik(py::module_& m) {
     .def("spin_until_click", &guik::LightViewer::spin_until_click)
 
     .def("enable_vsync", &guik::LightViewer::enable_vsync)
+    .def("disable_vsync", &guik::LightViewer::disable_vsync)
     .def("enable_docking", &guik::LightViewer::enable_docking)
 
     .def("clear_images", &guik::LightViewer::clear_images)

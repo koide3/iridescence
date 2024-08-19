@@ -1,7 +1,5 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <ImGuizmo.h>
 #include <glk/console_colors.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -99,8 +97,22 @@ void LightViewerContext::clear_text() {
 }
 
 void LightViewerContext::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  const auto split_lines = [](const std::string& text) {
+    std::vector<std::string> tokens;
+
+    size_t loc = 0;
+    size_t found = 0;
+
+    do {
+      found = text.find_first_of('\n', loc);
+      tokens.push_back(text.substr(loc, found - loc));
+      loc = found + 1;
+    } while (found != std::string::npos);
+
+    return tokens;
+  };
+
+  std::vector<std::string> texts = split_lines(text);
 
   std::lock_guard<std::mutex> lock(sub_texts_mutex);
   sub_texts.insert(sub_texts.end(), texts.begin(), texts.end());
@@ -113,6 +125,10 @@ void LightViewerContext::register_ui_callback(const std::string& name, const std
   }
 
   sub_ui_callbacks[name] = callback;
+}
+
+void LightViewerContext::remove_ui_callback(const std::string& name) {
+  register_ui_callback(name, 0);
 }
 
 void LightViewerContext::draw_ui() {
@@ -370,6 +386,10 @@ void LightViewerContext::register_drawable_filter(const std::string& filter_name
   }
 
   drawable_filters[filter_name] = filter;
+}
+
+void LightViewerContext::remove_drawable_filter(const std::string& filter_name) {
+  register_drawable_filter(filter_name, 0);
 }
 
 void LightViewerContext::clear_partial_rendering() {

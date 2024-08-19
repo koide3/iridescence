@@ -1,7 +1,7 @@
 #include <glk/path.hpp>
 
 #include <iostream>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 // #include <ros/package.h>
 
 #include <glk/console_colors.hpp>
@@ -18,8 +18,8 @@ void set_data_path(const std::string& path) {
 
 std::string find_file(const std::string& hint, const std::string& path) {
   try {
-    boost::filesystem::recursive_directory_iterator itr(hint);
-    boost::filesystem::recursive_directory_iterator end;
+    std::filesystem::recursive_directory_iterator itr(hint);
+    std::filesystem::recursive_directory_iterator end;
 
     for (; itr != end; itr++) {
       if (itr->path().string().find(path) != std::string::npos) {
@@ -27,7 +27,7 @@ std::string find_file(const std::string& hint, const std::string& path) {
         return found.substr(0, found.size() - path.size() - 1);
       }
     }
-  } catch (boost::filesystem::filesystem_error& e) {
+  } catch (std::exception&) {
     return "";
   }
 

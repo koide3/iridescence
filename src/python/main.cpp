@@ -3,8 +3,6 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 
-#include <boost/filesystem.hpp>
-
 #include <glk/path.hpp>
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/primitives/primitives.hpp>

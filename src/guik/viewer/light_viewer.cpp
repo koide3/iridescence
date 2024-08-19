@@ -6,12 +6,11 @@
 #include <regex>
 #include <chrono>
 #include <numeric>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <implot.h>
 
 #include <glk/io/png_io.hpp>
+#include <glk/split.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/console_colors.hpp>
@@ -44,6 +43,10 @@ void LightViewer::destroy() {
   }
 }
 
+bool  LightViewer::running() {
+  return inst.get() != nullptr;
+}
+
 LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
 
 LightViewer::~LightViewer() {}
@@ -71,11 +74,12 @@ void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
 
 void LightViewer::draw_ui() {
   std::unique_lock<std::mutex> lock(invoke_requests_mutex);
-  while (!invoke_requests.empty()) {
-    invoke_requests.front()();
-    invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> invoke_requests;
+  invoke_requests.swap(this->invoke_requests);
   lock.unlock();
+  for(auto& request: invoke_requests) {
+    request();
+  }
 
   // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
   std::vector<const std::function<void()>*> callbacks;
@@ -112,12 +116,12 @@ void LightViewer::draw_ui() {
     }
 
     if (decrease_point_size) {
-      *point_size = point_size.get() - ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() - ImGui::GetIO().DeltaTime * 10.0f;
     } else {
-      *point_size = point_size.get() + ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() + ImGui::GetIO().DeltaTime * 10.0f;
     }
 
-    *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
+    *point_size = std::max(0.1f, std::min(1e6f, point_size.value()));
 
     global_shader_setting.add("point_size", *point_size);
   }
@@ -139,7 +143,7 @@ void LightViewer::draw_ui() {
       }
 
       double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
-      std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
+      std::string filename = "/tmp/ss_" + std::to_string(static_cast<int>(time)) + ".png";
       if (glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
         std::cout << "screen shot saved:" << filename << std::endl;
       } else {
@@ -317,11 +321,13 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 
   std::unique_lock<std::mutex> lock(post_render_invoke_requests_mutex);
-  while (!post_render_invoke_requests.empty()) {
-    post_render_invoke_requests.front()();
-    post_render_invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> post_render_invoke_requests;
+  post_render_invoke_requests.swap(this->post_render_invoke_requests);
   lock.unlock();
+
+  for (auto& request : post_render_invoke_requests) {
+    request();
+  }
 }
 
 void LightViewer::clear() {
@@ -343,8 +349,7 @@ void LightViewer::clear_text() {
 }
 
 void LightViewer::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  std::vector<std::string> texts = glk::split_lines(text);
 
   std::lock_guard<std::mutex> lock(texts_mutex);
   this->texts.insert(this->texts.end(), texts.begin(), texts.end());
@@ -725,10 +730,10 @@ std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
 
   if (real_scale) {
     const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
-    const float near = depth_range[0];
-    const float far = depth_range[1];
+    const float near_ = depth_range[0];
+    const float far_ = depth_range[1];
     for (auto& depth : flipped) {
-      depth = 2.0 * near * far / (far + near - depth * (far - near));
+      depth = 2.0 * near_ * far_ / (far_ + near_ - depth * (far_ - near_));
     }
   }
 

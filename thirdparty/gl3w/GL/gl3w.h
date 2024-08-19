@@ -44,6 +44,17 @@ extern "C" {
 #define GL3W_ERROR_LIBRARY_OPEN -2
 #define GL3W_ERROR_OPENGL_VERSION -3
 
+
+#ifndef _WIN32
+  #define GL3W_API
+#else
+	#ifdef GL3W_EXPORTS
+		#define GL3W_API __declspec(dllexport)
+	#else
+		#define GL3W_API __declspec(dllimport)
+	#endif
+#endif
+
 typedef void (*GL3WglProc)(void);
 typedef GL3WglProc (*GL3WGetProcAddressProc)(const char *proc);
 
@@ -719,7 +730,7 @@ union GL3WProcs {
 	} gl;
 };
 
-extern union GL3WProcs gl3wProcs;
+GL3W_API extern union GL3WProcs gl3wProcs;
 
 /* OpenGL functions */
 #define glActiveShaderProgram                            gl3wProcs.gl.ActiveShaderProgram

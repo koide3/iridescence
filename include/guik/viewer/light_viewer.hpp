@@ -27,6 +27,7 @@ public:
 
   static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen");
   static void destroy();
+  static bool running();
 
   bool spin_until_click();
   bool toggle_spin_once();
@@ -235,6 +236,10 @@ inline LightViewer* viewer(const std::string& title, const Eigen::Vector2i& size
 
 inline void destroy() {
   LightViewer::destroy();
+}
+
+inline bool running() {
+  return LightViewer::running();
 }
 
 // Template methods

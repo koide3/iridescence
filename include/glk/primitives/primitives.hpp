@@ -2,6 +2,7 @@
 #define GLK_PRIMITIVES_HPP
 
 #include <glk/drawable.hpp>
+#include <glk/api_export.hpp>
 
 namespace glk {
 
@@ -73,7 +74,7 @@ private:
   std::shared_ptr<glk::Drawable> create_primitive_ptr(PrimitiveType type);
 
 private:
-  static Primitives* instance_;
+  GLK_API static Primitives* instance_;
 
   std::vector<std::shared_ptr<glk::Drawable>> meshes;
 };

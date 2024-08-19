@@ -61,7 +61,7 @@ public:
     if (!point_size) {
       point_size = 10.0f;
     }
-    if (ImGui::DragFloat("Point size", point_size.get_ptr(), 0.1f)) {
+    if (ImGui::DragFloat("Point size", &point_size.value(), 0.1f)) {
       viewer->shader_setting().add("point_size", *point_size);
     }
 
@@ -387,7 +387,7 @@ public:
       auto color_mode = shader_setting->get<int>("color_mode");
       if (color_mode) {
         std::vector<const char*> color_modes = {"RAINBOW", "FLAT_COLOR", "VERTEX_COLOR"};
-        if (ImGui::Combo("Color mode", color_mode.get_ptr(), color_modes.data(), color_modes.size())) {
+        if (ImGui::Combo("Color mode", &color_mode.value(), color_modes.data(), color_modes.size())) {
           shader_setting->add("color_mode", *color_mode);
         }
 
