@@ -118,7 +118,7 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value if found, otherwise std::nullopt
   template <typename T>
-  std::optional<T> get(const std::string& name) {
+  std::optional<T> get(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -139,7 +139,7 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value
   template <typename T>
-  const T& cast(const std::string& name) {
+  const T& cast(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -170,6 +170,11 @@ public:
   ShaderSetting& dymamic_object() { return add("dynamic_object", 1); }
 
   // Color
+  int color_mode() const {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    return p->value;
+  }
+
   ShaderSetting& set_color(float r, float g, float b, float a) {
     if (a < 0.999f) {
       transparent = true;
@@ -232,6 +237,8 @@ public:
     params[2] = nullptr;
     return *this;
   }
+
+  bool has_model_matrix() const { return params[2] != nullptr; }
 
   Eigen::Matrix4f model_matrix() const {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
