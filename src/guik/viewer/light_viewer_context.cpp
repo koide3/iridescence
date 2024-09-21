@@ -1,7 +1,5 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #include <ImGuizmo.h>
 #include <glk/console_colors.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -99,8 +97,22 @@ void LightViewerContext::clear_text() {
 }
 
 void LightViewerContext::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  const auto split_lines = [](const std::string& text) {
+    std::vector<std::string> tokens;
+
+    size_t loc = 0;
+    size_t found = 0;
+
+    do {
+      found = text.find_first_of('\n', loc);
+      tokens.push_back(text.substr(loc, found - loc));
+      loc = found + 1;
+    } while (found != std::string::npos);
+
+    return tokens;
+  };
+
+  std::vector<std::string> texts = split_lines(text);
 
   std::lock_guard<std::mutex> lock(sub_texts_mutex);
   sub_texts.insert(sub_texts.end(), texts.begin(), texts.end());

@@ -20,7 +20,7 @@ namespace glk {
 
 using namespace glk::console;
 
-Primitives* Primitives::instance_ = nullptr;
+GLK_API Primitives* Primitives::instance_ = nullptr;
 
 const glk::Drawable& Primitives::create_primitive(PrimitiveType type) {
   if (meshes[type] == nullptr) {

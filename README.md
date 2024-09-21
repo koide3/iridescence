@@ -2,7 +2,7 @@
 
 **Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
 
-[![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 18.04 / 20.04 / 22.04
+[![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 20.04 / 22.04 / 24.04
 
 ## Features
 
@@ -28,9 +28,11 @@ See **[documentation](https://koide3.github.io/iridescence/)** for details.
 
 ## Installation
 
+### Install from source
+
 ```bash
 # Install dependencies
-sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev libboost-filesystem-dev libboost-program-options-dev
+sudo apt-get install -y libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev
 
 # Build and install Iridescence
 git clone https://github.com/koide3/iridescence --recursive
@@ -41,40 +43,56 @@ sudo make install
 
 # [Optional] Build and install python bindings
 cd ..
-sudo python3 setup.py install
+pip install .
 
 # [Optional2] Install stubs for autocomplete
 pip install pybind11-stubgen
-cd ~/.local/lib/python3.10/site-packages
+cd ~/.local/lib/python3.12/site-packages
 pybind11-stubgen -o . --ignore-invalid=all pyridescence
 ```
 
-### Docker
+### Install from [PPA](https://github.com/koide3/ppa) [AMD64, ARM64]
 
-* Build: `docker build -t iridescence -f docker/ubuntu/Dockerfile .`
-* Run: `bash docker/run.sh iridescence`
-
-## Use Iridescence in your cmake project
+#### Ubuntu 24.04
 
 ```bash
-# Add FindIridescence.cmake to your project
-wget -P path/to/your_project/cmake/ https://github.com/koide3/iridescence/raw/master/cmake/FindIridescence.cmake
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2404/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2404 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
+```
+
+#### Ubuntu 22.04
+
+```bash
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2204/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2204 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
+```
+
+#### Ubuntu 20.04
+
+```bash
+curl -s --compressed "https://koide3.github.io/ppa/ubuntu2004/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2004 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
+
+sudo apt update && sudo apt install -y libiridescence-dev
 ```
 
 
-```cmake
-# Make FindIridescence.cmake visible to your cmake project
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
+## Use Iridescence in your cmake project
 
+```cmake
 # Find package
 find_package(Iridescence REQUIRED)
 
 # Add include dirs and link libraries
-target_include_directories(your_program PUBLIC
-  ${Iridescence_INCLUDE_DIRS}
+add_executable(your_program
+  src/your_program.cpp
 )
 target_link_libraries(your_program
-  ${Iridescence_LIBRARIES}
+  Iridescence::Iridescence
 )
 ```
 

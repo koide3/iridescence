@@ -2,16 +2,8 @@
 
 #include <regex>
 #include <chrono>
-#include <boost/format.hpp>
-#if BOOST_VERSION >= 107100
-#include <boost/process.hpp>
-#else
-#include <boost/process/io.hpp>
-#include <boost/process/pipe.hpp>
-#include <boost/process/child.hpp>
-#endif
-
-#include <boost/algorithm/string.hpp>
+#include <iomanip>
+#include <glk/split.hpp>
 
 namespace guik {
 
@@ -33,9 +25,9 @@ bool LightViewer::InfoWindow::draw_ui() {
   ImGui::Separator();
   ImGui::Text("FPS:%.1f", ImGui::GetIO().Framerate);
 
-  if(show_cpu_info) {
+  if (show_cpu_info) {
     ImGui::Separator();
-    if(async_cpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+    if (async_cpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
       cpu_info = async_cpu_info.get();
       async_cpu_info = std::async(std::launch::async, [this]() { return get_cpu_info(); });
     }
@@ -43,9 +35,9 @@ bool LightViewer::InfoWindow::draw_ui() {
     ImGui::Text("%s", cpu_info.c_str());
   }
 
-  if(show_gpu_info) {
+  if (show_gpu_info) {
     ImGui::Separator();
-    if(async_gpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+    if (async_gpu_info.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
       gpu_info = async_gpu_info.get();
       async_gpu_info = std::async(std::launch::async, [this]() { return get_gpu_info(); });
     }
@@ -59,23 +51,30 @@ bool LightViewer::InfoWindow::draw_ui() {
 }
 
 std::string LightViewer::InfoWindow::get_cpu_info() const {
-  boost::process::ipstream pipe_stream;
-  boost::process::child c("vmstat 1 2 --unit M -a", boost::process::std_out > pipe_stream);
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   std::stringstream sst;
 
-  std::string line;
-  while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
+#ifndef _MSC_VER
+  FILE* fp = popen("vmstat 1 2 --unit M -a", "r");
+  if (fp == nullptr) {
+    return "Failed to retrieve CPU info";
+  }
+
+  std::vector<char> buffer(1024);
+  while (fgets(buffer.data(), buffer.size(), fp) != nullptr) {
+    std::string line(buffer.data());
+
     std::regex pattern("([0-9]+)(\\s+[0-9]+){16}");
     std::smatch matched;
 
-    if(!std::regex_search(line, matched, pattern)) {
+    if (!std::regex_search(line, matched, pattern)) {
       continue;
     }
 
     std::stringstream line_sst(line);
     std::vector<int> values(16);
-    for(int i = 0; i < values.size(); i++) {
+    for (int i = 0; i < values.size(); i++) {
       line_sst >> values[i];
     }
 
@@ -86,12 +85,15 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
     double mem_percent = 100 * (mem_active) / static_cast<double>(mem_free + mem_inact + mem_active);
     int cpu_idle = values[14];
 
-    sst << boost::format("CPU %2d %%  Memory %02d %% (%5d Mb / %5d Mb)") % (100 - cpu_idle) % static_cast<int>(mem_percent) % (mem_active) % (mem_free + mem_inact + mem_active);
+    sst << "CPU " << std::setfill('0') << std::setw(2) << 100 - cpu_idle << " % ";
+    sst << "Memory " << std::setfill('0') << std::setw(2) << static_cast<int>(mem_percent) << " % ";
+    sst << "(" << std::setfill(' ') << std::setw(5) << mem_active << " Mb / " << std::setfill(' ') << std::setw(5) << mem_free + mem_inact + mem_active << " Mb)";
   }
-  c.wait();
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-  if(sst.str().empty()) {
+  pclose(fp);
+#endif
+
+  if (sst.str().empty()) {
     return "Failed to retrieve CPU info";
   }
 
@@ -99,26 +101,33 @@ std::string LightViewer::InfoWindow::get_cpu_info() const {
 }
 
 std::string LightViewer::InfoWindow::get_gpu_info() const {
-  boost::process::ipstream pipe_stream;
-  boost::process::child c("nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader", boost::process::std_out > pipe_stream);
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
   std::stringstream sst;
 
-  std::string line;
-  while(pipe_stream && std::getline(pipe_stream, line) && !line.empty()) {
-    std::vector<std::string> tokens;
-    boost::split(tokens, line, boost::is_any_of(","));
+#ifndef _MSC_VER
+  FILE* fp = popen("nvidia-smi --query-gpu=index,name,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader", "r");
+  if (fp == nullptr) {
+    return "Failed to retrieve GPU info";
+  }
 
-    if(tokens.size() != 6) {
+  std::vector<char> buffer(1024);
+  while (fgets(buffer.data(), buffer.size(), fp) != nullptr) {
+    std::string line(glk::trim(buffer.data()));
+
+    std::vector<std::string> tokens = glk::split(line, ',');
+    if (tokens.size() != 6) {
       continue;
     }
 
-    sst << boost::format("%5s %20s : GPU %5s    Memory (%10s / %10s)\n") % tokens[0] % tokens[1] % tokens[2] % tokens[4] % tokens[5];
+    sst << std::setfill(' ') << std::setw(3) << tokens[0] << " ";
+    sst << std::setfill(' ') << std::setw(20) << tokens[1] << " : ";
+    sst << "GPU " << std::setfill(' ') << std::setw(5) << tokens[2] << "    ";
+    sst << "Memory (" << std::setfill(' ') << std::setw(10) << tokens[4] << " / " << std::setfill(' ') << std::setw(10) << tokens[5] << ")";
   }
-  c.wait();
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+#endif
 
-  if(sst.str().empty()) {
+  if (sst.str().empty()) {
     return "Failed to retrieve GPU info";
   }
 

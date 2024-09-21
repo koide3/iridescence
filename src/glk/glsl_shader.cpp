@@ -7,12 +7,11 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 #include <unordered_map>
 
 #include <GL/gl3w.h>
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <glk/console_colors.hpp>
 
@@ -33,7 +32,7 @@ GLSLShader::~GLSLShader() {
 bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type) {
   std::unordered_map<std::string, std::string> include_map;
   for (const auto& include_filename : include_filenames) {
-    const std::string filename = boost::filesystem::path(include_filename).filename().string();
+    const std::string filename = std::filesystem::path(include_filename).filename().string();
     include_map[filename] = include_filename;
   }
 
@@ -278,15 +277,27 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
   std::vector<char> error_message(info_log_length);
   glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
 
+  const auto split_lines = [](const std::string& text) {
+    std::vector<std::string> tokens;
+
+    size_t loc = 0;
+    size_t found = 0;
+
+    do {
+      found = text.find_first_of('\n', loc);
+      tokens.push_back(text.substr(loc, found - loc));
+      loc = found + 1;
+    } while (found != std::string::npos);
+
+    return tokens;
+  };
+
   if (result != GL_TRUE) {
     const std::string error_text(error_message.begin(), error_message.end());
     std::cerr << bold_red << "error : failed to compile shader " << filename << "\033[0m" << std::endl;
 
-    std::vector<std::string> source_lines;
-    boost::split(source_lines, source, boost::is_any_of("\n"));
-
-    std::vector<std::string> error_lines;
-    boost::split(error_lines, std::string(error_message.begin(), error_message.end()), boost::is_any_of("\n"));
+    std::vector<std::string> source_lines = split_lines(source);
+    std::vector<std::string> error_lines = split_lines(std::string(error_message.begin(), error_message.end()));
 
     for (const auto& error_line : error_lines) {
       std::cerr << error_line << std::endl;
