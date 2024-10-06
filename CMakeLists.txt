@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(iridescence VERSION 0.1.3 LANGUAGES CXX)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
 option(BUILD_EXT_TESTS "Build test optional libraries" OFF)
@@ -32,6 +32,7 @@ find_package(Eigen3)
 find_package(PNG)
 find_package(JPEG)
 find_package(assimp QUIET)
+
 
 if(NOT glm_FOUND)
   message(STATUS "System GLM not found. Download GLM 1.0.1.")
@@ -242,9 +243,17 @@ if(BUILD_EXAMPLES)
     get_filename_component(example_name ${example_src} NAME_WE)
 
     if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
+      find_package(PCL 1.11.1 REQUIRED)
       if(NOT PCL_FOUND)
         continue()
       endif()
+      target_link_libraries(iridescence PUBLIC
+        ${PCL_LIBRARIES}
+      )
+      target_include_directories(iridescence PUBLIC
+        ${PCL_INCLUDE_DIRS}
+      )
+
     endif()
 
     add_executable(${example_name}
