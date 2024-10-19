@@ -243,7 +243,7 @@ if(BUILD_EXAMPLES)
     get_filename_component(example_name ${example_src} NAME_WE)
 
     if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
-      find_package(PCL CONFIG REQUIRED)
+      find_package(PCL CONFIG)
       if(NOT PCL_FOUND)
         continue()
       endif()
