@@ -33,6 +33,7 @@ find_package(PNG)
 find_package(JPEG)
 find_package(assimp QUIET)
 
+
 if(NOT glm_FOUND)
   message(STATUS "System GLM not found. Download GLM 1.0.1.")
   include(FetchContent)
@@ -242,9 +243,17 @@ if(BUILD_EXAMPLES)
     get_filename_component(example_name ${example_src} NAME_WE)
 
     if(${example_name} STREQUAL "ext_light_viewer_pointcloud" OR ${example_name} STREQUAL "ext_light_viewer_kitti")
+      find_package(PCL CONFIG REQUIRED)
       if(NOT PCL_FOUND)
         continue()
       endif()
+      target_link_libraries(iridescence PUBLIC
+        ${PCL_LIBRARIES}
+      )
+      target_include_directories(iridescence PUBLIC
+        ${PCL_INCLUDE_DIRS}
+      )
+
     endif()
 
     add_executable(${example_name}
