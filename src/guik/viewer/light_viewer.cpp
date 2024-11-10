@@ -43,7 +43,7 @@ void LightViewer::destroy() {
   }
 }
 
-bool  LightViewer::running() {
+bool LightViewer::running() {
   return inst.get() != nullptr;
 }
 
@@ -77,7 +77,7 @@ void LightViewer::draw_ui() {
   std::deque<std::function<void()>> invoke_requests;
   invoke_requests.swap(this->invoke_requests);
   lock.unlock();
-  for(auto& request: invoke_requests) {
+  for (auto& request : invoke_requests) {
     request();
   }
 
@@ -129,7 +129,7 @@ void LightViewer::draw_ui() {
   // screen shot
   if (ImGui::GetIO().KeysDown[GLFW_KEY_J]) {
     invoke_after_rendering([this] {
-      auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+      auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE, 4);
       std::vector<unsigned char> flipped(bytes.size(), 255);
 
       Eigen::Vector2i size = canvas->frame_buffer->color().size();
@@ -677,7 +677,7 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
 }
 
 void LightViewer::show_sub_viewers() {
-  for (auto& sub: sub_contexts) {
+  for (auto& sub : sub_contexts) {
     sub.second->show();
   }
 }
@@ -700,7 +700,7 @@ bool LightViewer::remove_sub_viewer(const std::string& context_name) {
 }
 
 std::vector<unsigned char> LightViewer::read_color_buffer() {
-  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE, 4);
   std::vector<unsigned char> flipped(bytes.size(), 255);
 
   Eigen::Vector2i size = canvas->frame_buffer->color().size();
@@ -717,10 +717,10 @@ std::vector<unsigned char> LightViewer::read_color_buffer() {
 }
 
 std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
-  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT);
+  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
   std::vector<float> flipped(floats.size());
 
-  Eigen::Vector2i size = canvas->frame_buffer->color().size();
+  Eigen::Vector2i size = canvas->frame_buffer->depth().size();
   for (int y = 0; y < size[1]; y++) {
     int y_ = size[1] - y - 1;
     for (int x = 0; x < size[0]; x++) {

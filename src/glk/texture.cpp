@@ -1,5 +1,8 @@
 #include <glk/texture.hpp>
 
+#include <iostream>
+#include <glk/console_colors.hpp>
+
 namespace glk {
 
 Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels)
@@ -84,6 +87,36 @@ const Texture& Texture::set_clamp_mode(GLenum mode) const {
 
 template <typename T>
 std::vector<T> Texture::read_pixels(GLuint format, GLuint type, int num_elements) const {
+  switch (format) {
+    case GL_DEPTH_COMPONENT:
+    case GL_RED:
+    case GL_GREEN:
+    case GL_BLUE:
+      if (num_elements != 1) {
+        std::cerr << console::bold_yellow << "warning: num_elements should be 1 for format=" << static_cast<size_t>(format) << console::reset << std::endl;
+      }
+      break;
+    case GL_RG:
+      if (num_elements != 2) {
+        std::cerr << console::bold_yellow << "warning: num_elements should be 2 for format=" << static_cast<size_t>(format) << console::reset << std::endl;
+      }
+      break;
+    case GL_RGB:
+    case GL_BGR:
+      if (num_elements != 3) {
+        std::cerr << console::bold_yellow << "warning: num_elements should be 3 for format=" << static_cast<size_t>(format) << console::reset << std::endl;
+      }
+      break;
+    case GL_RGBA:
+    case GL_BGRA:
+      if (num_elements != 4) {
+        std::cerr << console::bold_yellow << "warning: num_elements should be 4 for format=" << static_cast<size_t>(format) << console::reset << std::endl;
+      }
+      break;
+    default:
+      break;
+  }
+
   std::vector<T> pixels(width * height * num_elements);
   glBindTexture(GL_TEXTURE_2D, texture);
   glGetTexImage(GL_TEXTURE_2D, 0, format, type, pixels.data());
