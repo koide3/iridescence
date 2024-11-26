@@ -87,6 +87,10 @@ public:
     const std::vector<T2>& ys,
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
+  template <typename T, typename Func>
+  void
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12);
+
   template <typename T>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
   template <typename T1, typename T2>
@@ -187,6 +191,25 @@ void AsyncLightViewer::update_plot_line(
   std::copy(xs.begin(), xs.end(), xs_.begin());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_line(plot_name, label, xs_, ys_, line_flags, max_num_data);
+}
+
+template <typename T, typename Func>
+void AsyncLightViewer::update_plot_line(
+  const std::string& plot_name,
+  const std::string& label,
+  const std::vector<T>& data,
+  const Func& transform,
+  int line_flags,
+  size_t max_num_data) {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto xy = transform(data[i]);
+    xs[i] = xy[0];
+    ys[i] = xy[1];
+  }
+
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
 }
 
 template <typename T>
