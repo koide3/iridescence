@@ -276,6 +276,7 @@ void LightViewer::draw_ui() {
           if (!plots.empty()) {
             const auto& plot = plots.front();
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
+            ImPlot::SetupLegend(plot_setting.legend_loc, plot_setting.legend_flags);
           }
 
           for (const auto& plot : plots) {
@@ -415,6 +416,12 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.x_flags = x_flags;
   setting.y_flags = y_flags;
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
+}
+
+void LightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
+  auto& setting = plot_settings[plot_name];
+  setting.legend_loc = loc;
+  setting.legend_flags = flags;
 }
 
 void LightViewer::fit_plot(const std::string& plot_name) {
