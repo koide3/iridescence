@@ -41,6 +41,7 @@ public:
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  void link_plot_axes(const std::string& plot_name, int link_id, int axis);
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();

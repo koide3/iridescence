@@ -55,6 +55,7 @@ public:
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  void link_plot_axes(const std::string& plot_name, int link_id, int axis);
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
@@ -215,6 +216,7 @@ private:
   std::unordered_map<std::string, std::tuple<double, std::shared_ptr<glk::Texture>, int>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
 
+  std::unordered_map<int, Eigen::Matrix<double, 6, 2>> plot_linked_axis_limits;
   std::unordered_map<std::string, PlotSetting> plot_settings;
   std::unordered_map<std::string, std::vector<std::pair<PlotStyleConstPtr, PlotDataConstPtr>>> plot_data;
 

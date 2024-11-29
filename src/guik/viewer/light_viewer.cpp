@@ -275,6 +275,17 @@ void LightViewer::draw_ui() {
         if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
           if (!plots.empty()) {
             const auto& plot = plots.front();
+
+            if (plot_setting.axis_link_id >= 0) {
+              auto& limits = plot_linked_axis_limits[plot_setting.axis_link_id];
+
+              for (int axis = 0; axis < ImAxis_COUNT; axis++) {
+                if (plot_setting.linked_axes & (1 << axis)) {
+                  ImPlot::SetupAxisLinks(axis, &limits(axis, 0), &limits(axis, 1));
+                }
+              }
+            }
+
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
             ImPlot::SetupLegend(plot_setting.legend_loc, plot_setting.legend_flags);
           }
@@ -416,6 +427,16 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.x_flags = x_flags;
   setting.y_flags = y_flags;
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
+}
+
+void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes |= (1 << axis);
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
 }
 
 void LightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
