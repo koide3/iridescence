@@ -14,6 +14,8 @@ find_dependency(OpenGL REQUIRED)
 find_dependency(Eigen3 REQUIRED)
 find_dependency(PNG)
 find_dependency(JPEG)
+find_dependency(glm)
+find_dependency(assimp)
 
 include("${CMAKE_CURRENT_LIST_DIR}/iridescence-targets.cmake")
 add_library(Iridescence::Iridescence ALIAS Iridescence::iridescence)

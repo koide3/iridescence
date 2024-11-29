@@ -95,7 +95,7 @@ else()
 endif()
 
 if(${assimp_FOUND})
-  list(APPEND EXTRA_LIBRARIES assimp)
+  list(APPEND EXTRA_LIBRARIES ${ASSIMP_LIBRARIES})
   list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
 endif()
 
