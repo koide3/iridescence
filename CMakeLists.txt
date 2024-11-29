@@ -34,7 +34,7 @@ find_package(JPEG)
 find_package(assimp QUIET)
 
 
-if(NOT glm_FOUND)
+if(NOT GLM_FOUND)
   message(STATUS "System GLM not found. Download GLM 1.0.1.")
   include(FetchContent)
   FetchContent_Populate(
