@@ -284,7 +284,7 @@ void LightViewer::update_plot_line(
 }
 
 template <typename T, typename Func>
-void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data) {
+void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data) {
   std::vector<double> xs(data.size());
   std::vector<double> ys(data.size());
   for (size_t i = 0; i < data.size(); i++) {
