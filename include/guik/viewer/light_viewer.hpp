@@ -111,8 +111,13 @@ public:
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
   template <typename T, typename Func>
-  void
-  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> decltype(transform(data[0])[1], void());
+  template <typename T, typename Func>
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void>;
 
   template <typename T>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
@@ -284,13 +289,27 @@ void LightViewer::update_plot_line(
 }
 
 template <typename T, typename Func>
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data) {
+auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data)
+  -> decltype(transform(data[0])[1], void()) {
   std::vector<double> xs(data.size());
   std::vector<double> ys(data.size());
   for (size_t i = 0; i < data.size(); i++) {
     const auto pt = transform(data[i]);
     xs[i] = pt[0];
     ys[i] = pt[1];
+  }
+  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+}
+
+template <typename T, typename Func>
+auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data)
+  -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+  std::vector<double> xs(data.size());
+  std::vector<double> ys(data.size());
+  for (size_t i = 0; i < data.size(); i++) {
+    const auto pt = transform(data[i]);
+    xs[i] = i;
+    ys[i] = pt;
   }
   update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
 }
