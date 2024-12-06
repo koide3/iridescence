@@ -51,6 +51,9 @@ std::string get_data_path() {
     std::vector<std::string> hints;
     hints.push_back("./data");
     hints.push_back("../data");
+#ifdef DATA_INSTALL_PATH
+    hints.push_back(DATA_INSTALL_PATH);
+#endif
     hints.push_back("/usr/share/iridescence");
     hints.push_back("/usr/local/share/iridescence");
 #ifdef DATA_PATH_GUESS

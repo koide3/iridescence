@@ -82,6 +82,7 @@ set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/iridescence CACHE PATH "Loca
 
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+add_definitions(-DDATA_INSTALL_PATH="${CMAKE_INSTALL_FULL_DATADIR}/iridescence/data")
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
 if(MSVC)
