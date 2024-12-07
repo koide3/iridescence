@@ -94,7 +94,8 @@ public:
 
   // Plotting update template methods
   template <typename T>
-  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
   template <typename T1, typename T2>
   void update_plot_line(
     const std::string& plot_name,
@@ -113,11 +114,29 @@ public:
   template <typename T, typename Func>
   auto
   update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
-    -> decltype(transform(data[0])[1], void());
+    -> std::enable_if_t<!std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = pt[0];
+      ys[i] = pt[1];
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
   template <typename T, typename Func>
   auto
   update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
-    -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void>;
+    -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = i;
+      ys[i] = pt;
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
 
   template <typename T>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
@@ -253,7 +272,8 @@ inline bool running() {
 // Template methods
 
 template <typename T>
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data) {
+auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data)
+  -> std::enable_if_t<std::is_arithmetic_v<T>, void> {
   std::vector<double> ys_(ys.size());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_line(plot_name, label, ys_, line_flags, max_num_data);
@@ -285,32 +305,6 @@ void LightViewer::update_plot_line(
   std::vector<double> ys(data.size());
   std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
   std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
-  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
-}
-
-template <typename T, typename Func>
-auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data)
-  -> decltype(transform(data[0])[1], void()) {
-  std::vector<double> xs(data.size());
-  std::vector<double> ys(data.size());
-  for (size_t i = 0; i < data.size(); i++) {
-    const auto pt = transform(data[i]);
-    xs[i] = pt[0];
-    ys[i] = pt[1];
-  }
-  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
-}
-
-template <typename T, typename Func>
-auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data)
-  -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
-  std::vector<double> xs(data.size());
-  std::vector<double> ys(data.size());
-  for (size_t i = 0; i < data.size(); i++) {
-    const auto pt = transform(data[i]);
-    xs[i] = i;
-    ys[i] = pt;
-  }
   update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
 }
 

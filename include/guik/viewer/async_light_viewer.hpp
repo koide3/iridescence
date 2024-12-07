@@ -80,7 +80,8 @@ public:
 
   // Update plot template methods
   template <typename T>
-  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
   template <typename T1, typename T2>
   void update_plot_line(
     const std::string& plot_name,
@@ -89,9 +90,40 @@ public:
     const std::vector<T2>& ys,
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
+  template <typename T, int D, typename Alloc>
+  void update_plot_line(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
+    int line_flags = 0,
+    size_t max_num_data = 8192 * 12);
+
   template <typename T, typename Func>
-  void
-  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<!std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = pt[0];
+      ys[i] = pt[1];
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
+  template <typename T, typename Func>
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = i;
+      ys[i] = pt;
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
 
   template <typename T>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
@@ -174,7 +206,8 @@ inline void async_toggle_wait() {
 // Template methods
 
 template <typename T>
-void AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data) {
+auto AsyncLightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data)
+  -> std::enable_if_t<std::is_arithmetic_v<T>, void> {
   std::vector<double> ys_(ys.size());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_line(plot_name, label, ys_, line_flags, max_num_data);
@@ -195,23 +228,18 @@ void AsyncLightViewer::update_plot_line(
   update_plot_line(plot_name, label, xs_, ys_, line_flags, max_num_data);
 }
 
-template <typename T, typename Func>
+template <typename T, int D, typename Alloc>
 void AsyncLightViewer::update_plot_line(
   const std::string& plot_name,
   const std::string& label,
-  const std::vector<T>& data,
-  const Func& transform,
+  const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data,
   int line_flags,
   size_t max_num_data) {
-  std::vector<double> xs(data.size());
-  std::vector<double> ys(data.size());
-  for (size_t i = 0; i < data.size(); i++) {
-    const auto xy = transform(data[i]);
-    xs[i] = xy[0];
-    ys[i] = xy[1];
-  }
-
-  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  std::vector<double> xs_(data.size());
+  std::vector<double> ys_(data.size());
+  std::transform(data.begin(), data.end(), xs_.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys_.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
+  update_plot_line(plot_name, label, xs_, ys_, line_flags, max_num_data);
 }
 
 template <typename T>
