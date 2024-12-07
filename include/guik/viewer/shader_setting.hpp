@@ -366,8 +366,13 @@ public:
     transparent = a < 0.999f;
   }
 
+  FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
+  }
+
   template <typename Color>
-  FlatColor(const Color& color) : ShaderSetting(ColorMode::FLAT_COLOR) {  //
+  FlatColor(const Color& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
     const Eigen::Vector4f c = color.eval().template cast<float>();
     params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
     transparent = color.w() < 0.999f;
