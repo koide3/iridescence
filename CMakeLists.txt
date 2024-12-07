@@ -147,6 +147,7 @@ add_library(iridescence
   src/glk/indexed_pointcloud_buffer.cpp
   src/glk/splatting.cpp
   src/glk/colormap.cpp
+  src/glk/html_colors.cpp
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp
