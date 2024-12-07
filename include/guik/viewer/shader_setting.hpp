@@ -139,13 +139,13 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value
   template <typename T>
-  const T& cast(const std::string& name) {
+  const T& cast(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
       }
 
-      auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(param.get());
+      auto p = static_cast<ShaderParameter<T>*>(param.get());
       return p->value;
     }
 
@@ -170,6 +170,8 @@ public:
   ShaderSetting& dymamic_object() { return add("dynamic_object", 1); }
 
   // Color
+  Eigen::Vector4f material_color() const { return cast<Eigen::Vector4f>("material_color"); }
+
   ShaderSetting& set_color(float r, float g, float b, float a) {
     if (a < 0.999f) {
       transparent = true;
@@ -177,7 +179,9 @@ public:
     return add("material_color", Eigen::Vector4f(r, b, g, a));
   }
 
-  ShaderSetting& set_color(const Eigen::Vector4f& color) {
+  template <typename Color>
+  ShaderSetting& set_color(const Color& color_) {
+    const Eigen::Vector4f color = color_.template cast<float>();
     if (color.w() < 0.999f) {
       transparent = true;
     }
@@ -238,6 +242,16 @@ public:
     return p->value;
   }
 
+  Eigen::Vector3f translation() const {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    return p->value.block<3, 1>(0, 3);
+  }
+
+  Eigen::Matrix3f rotation() const {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    return p->value.block<3, 3>(0, 0);
+  }
+
   template <typename Transform>
   ShaderSetting& set_model_matrix(const Transform& transform) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
@@ -254,16 +268,23 @@ public:
 
   ShaderSetting& translate(float tx, float ty, float tz) { return translate(Eigen::Vector3f(tx, ty, tz)); }
 
-  template <typename Scalar, int Dim>
-  ShaderSetting& translate(const Eigen::Matrix<Scalar, Dim, 1>& translation) {
+  template <typename Vector>
+  ShaderSetting& translate(const Vector& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value.block<3, 1>(0, 3) += translation.template cast<float>().template head<3>();
+    const auto trans = translation.eval();
+    p->value.block<3, 1>(0, 3) += trans.template cast<float>().template head<3>();
     return *this;
   }
 
   ShaderSetting& rotate(const float angle, const Eigen::Vector3f& axis) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis)).matrix();
+    return *this;
+  }
+
+  ShaderSetting& rotate(const double angle, const Eigen::Vector3d& axis) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis.cast<float>())).matrix();
     return *this;
   }
 
@@ -298,12 +319,13 @@ public:
     return *this;
   }
 
-  template <typename Scalar, int Dim>
-  ShaderSetting& scale(const Eigen::Matrix<Scalar, Dim, 1>& scaling) {
+  template <typename Vector>
+  ShaderSetting& scale(const Vector& scaling) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value.col(0) *= scaling[0];
-    p->value.col(1) *= scaling[1];
-    p->value.col(2) *= scaling[2];
+    const auto s = scaling.eval();
+    p->value.col(0) *= s[0];
+    p->value.col(1) *= s[1];
+    p->value.col(2) *= s[2];
     return *this;
   }
 
@@ -344,8 +366,10 @@ public:
     transparent = a < 0.999f;
   }
 
-  FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {  //
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+  template <typename Color>
+  FlatColor(const Color& color) : ShaderSetting(ColorMode::FLAT_COLOR) {  //
+    const Eigen::Vector4f c = color.eval().template cast<float>();
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
     transparent = color.w() < 0.999f;
   }
 
@@ -356,10 +380,10 @@ public:
     transparent = a < 0.999f;
   }
 
-  template <typename Transform>
-  FlatColor(const Eigen::Vector4f& color, const Transform& transform)
-  : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+  template <typename Color, typename Transform>
+  FlatColor(const Color& color, const Transform& transform) : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
+    const Eigen::Vector4f c = color.eval().template cast<float>();
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
     transparent = color.w() < 0.999f;
   }
 

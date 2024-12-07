@@ -3,7 +3,7 @@
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
-void plot_api_test() {
+void plot_api_test_async() {
   std::vector<double> xs;
   for (double x = 0.0; x <= 2.0 * M_PI; x += 0.1) {
     xs.emplace_back(x);
@@ -31,7 +31,7 @@ void plot_api_test() {
   std::vector<int> indices(xs.size());
   std::iota(indices.begin(), indices.end(), 0);
 
-  auto viewer = guik::viewer({-1, -1}, false);
+  auto viewer = guik::async_viewer({-1, -1}, false);
 
   viewer->update_plot_line("plots", "line2", xs, ys);
   viewer->update_plot_line("plots", "line3", xys);
@@ -57,12 +57,10 @@ void plot_api_test() {
   viewer->update_plot_line("plots2f", "line1f", ysf);
   viewer->update_plot_scatter("plots2f", "scatter1f", ysf);
 
-  auto now = std::chrono::high_resolution_clock::now();
-  while (std::chrono::high_resolution_clock::now() - now < std::chrono::milliseconds(100)) {
-    viewer->spin_once();
-  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  guik::async_destroy();
 }
 
-TEST(PlotTest, APITest) {
-  plot_api_test();
+TEST(PlotTestAsync, APITest) {
+  plot_api_test_async();
 }
