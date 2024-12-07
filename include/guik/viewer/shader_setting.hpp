@@ -268,6 +268,12 @@ public:
 
   ShaderSetting& translate(float tx, float ty, float tz) { return translate(Eigen::Vector3f(tx, ty, tz)); }
 
+  ShaderSetting& translate(const Eigen::Vector3f& translation) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value.block<3, 1>(0, 3) += translation;
+    return *this;
+  }
+
   template <typename Vector>
   ShaderSetting& translate(const Vector& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
