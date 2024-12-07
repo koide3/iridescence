@@ -126,9 +126,47 @@ public:
   }
 
   template <typename T>
-  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
+  auto update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0)
+    -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
   template <typename T1, typename T2>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags = 0);
+  template <typename T, int D, typename Alloc>
+  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags = 0);
+  template <typename T, typename Func>
+  auto update_plot_scatter(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& data,
+    const Func& transform,
+    int scatter_flags = 0,
+    size_t max_num_data = 8192 * 12) -> std::enable_if_t<!std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = pt[0];
+      ys[i] = pt[1];
+    }
+    update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+  }
+  template <typename T, typename Func>
+  auto update_plot_scatter(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& data,
+    const Func& transform,
+    int scatter_flags = 0,
+    size_t max_num_data = 8192 * 12) -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = i;
+      ys[i] = pt;
+    }
+    update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+  }
+
   template <typename T>
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags = 0);
   template <typename T1, typename T2>
@@ -243,7 +281,8 @@ void AsyncLightViewer::update_plot_line(
 }
 
 template <typename T>
-void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags) {
+auto AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags)
+  -> std::enable_if_t<std::is_arithmetic_v<T>, void> {
   std::vector<double> ys_(ys.size());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_scatter(plot_name, label, ys_, scatter_flags);
@@ -255,6 +294,15 @@ void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const s
   std::vector<double> ys_(ys.size());
   std::copy(xs.begin(), xs.end(), xs_.begin());
   std::copy(ys.begin(), ys.end(), ys_.begin());
+  update_plot_scatter(plot_name, label, xs_, ys_, scatter_flags);
+}
+
+template <typename T, int D, typename Alloc>
+void AsyncLightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags) {
+  std::vector<double> xs_(data.size());
+  std::vector<double> ys_(data.size());
+  std::transform(data.begin(), data.end(), xs_.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
+  std::transform(data.begin(), data.end(), ys_.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
   update_plot_scatter(plot_name, label, xs_, ys_, scatter_flags);
 }
 

@@ -1,10 +1,11 @@
 #include <numeric>
+#include <gtest/gtest.h>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
 void plot_api_test() {
   std::vector<double> xs;
-  for (double x = 0.0; x <= 2.0 * M_PI; x += 0.01) {
+  for (double x = 0.0; x <= 2.0 * M_PI; x += 0.1) {
     xs.emplace_back(x);
   }
 
@@ -32,21 +33,39 @@ void plot_api_test() {
 
   auto viewer = guik::viewer();
 
-  viewer->update_plot_line("plots", "sin", ys);
-  viewer->update_plot_line("plots", "sin", xs, ys);
-  viewer->update_plot_line("plots", "sin2", xys);
-  viewer->update_plot_line("plots", "sin2", xys3);
-  viewer->update_plot_line("plots2", "sin3", indices, [&](int i) { return xys[i].y(); });
-  viewer->update_plot_line("plots", "sin4", indices, [&](int i) { return xys[i]; });
+  viewer->update_plot_line("plots", "line2", xs, ys);
+  viewer->update_plot_line("plots", "line3", xys);
+  viewer->update_plot_line("plots", "line4", xys3);
+  viewer->update_plot_line("plots", "line6", indices, [&](int i) { return xys[i]; });
 
-  viewer->update_plot_line("plots", "sinf", ysf);
-  viewer->update_plot_line("plots", "sinf", xsf, ysf);
-  viewer->update_plot_line("plots", "sin2f", xysf);
+  viewer->update_plot_line("plots2", "line1", ys);
+  viewer->update_plot_line("plots2", "line5", indices, [&](int i) { return xys[i].y(); });
+
+  viewer->update_plot_scatter("plots", "scatter2", xs, ys);
+  viewer->update_plot_scatter("plots", "scatter3", xys);
+  viewer->update_plot_scatter("plots", "scatter4", xys3);
+  viewer->update_plot_scatter("plots", "scatter6", indices, [&](int i) { return xys[i]; });
+
+  viewer->update_plot_scatter("plots2", "scatter1", ys);
+  viewer->update_plot_scatter("plots2", "scatter5", indices, [&](int i) { return xys[i].y(); });
+
+  viewer->update_plot_line("plotsf", "line2f", xsf, ysf);
+  viewer->update_plot_line("plotsf", "line3f", xysf);
+  viewer->update_plot_scatter("plotsf", "scatter2f", xsf, ysf);
+  viewer->update_plot_scatter("plotsf", "scatter3f", xysf);
+
+  viewer->update_plot_line("plots2f", "line1f", ysf);
+  viewer->update_plot_scatter("plots2f", "scatter1f", ysf);
+
+  auto now = std::chrono::high_resolution_clock::now();
+  while (std::chrono::high_resolution_clock::now() - now < std::chrono::milliseconds(100)) {
+    viewer->spin_once();
+  }
 }
 
 void plot_api_test_async() {
   std::vector<double> xs;
-  for (double x = 0.0; x <= 2.0 * M_PI; x += 0.01) {
+  for (double x = 0.0; x <= 2.0 * M_PI; x += 0.1) {
     xs.emplace_back(x);
   }
 
@@ -74,18 +93,34 @@ void plot_api_test_async() {
 
   auto viewer = guik::async_viewer();
 
-  viewer->update_plot_line("plots", "sin", ys);
-  viewer->update_plot_line("plots", "sin", xs, ys);
-  viewer->update_plot_line("plots", "sin2", xys);
-  viewer->update_plot_line("plots", "sin2", xys3);
-  viewer->update_plot_line("plots2", "sin3", indices, [&](int i) { return xys[i].y(); });
-  viewer->update_plot_line("plots", "sin4", indices, [&](int i) { return xys[i]; });
+  viewer->update_plot_line("plots", "line2", xs, ys);
+  viewer->update_plot_line("plots", "line3", xys);
+  viewer->update_plot_line("plots", "line4", xys3);
+  viewer->update_plot_line("plots", "line6", indices, [&](int i) { return xys[i]; });
 
-  viewer->update_plot_line("plots", "sinf", ysf);
-  viewer->update_plot_line("plots", "sinf", xsf, ysf);
-  viewer->update_plot_line("plots", "sin2f", xysf);
+  viewer->update_plot_line("plots2", "line1", ys);
+  viewer->update_plot_line("plots2", "line5", indices, [&](int i) { return xys[i].y(); });
+
+  viewer->update_plot_scatter("plots", "scatter2", xs, ys);
+  viewer->update_plot_scatter("plots", "scatter3", xys);
+  viewer->update_plot_scatter("plots", "scatter4", xys3);
+  viewer->update_plot_scatter("plots", "scatter6", indices, [&](int i) { return xys[i]; });
+
+  viewer->update_plot_scatter("plots2", "scatter1", ys);
+  viewer->update_plot_scatter("plots2", "scatter5", indices, [&](int i) { return xys[i].y(); });
+
+  viewer->update_plot_line("plotsf", "line2f", xsf, ysf);
+  viewer->update_plot_line("plotsf", "line3f", xysf);
+  viewer->update_plot_scatter("plotsf", "scatter2f", xsf, ysf);
+  viewer->update_plot_scatter("plotsf", "scatter3f", xysf);
+
+  viewer->update_plot_line("plots2f", "line1f", ysf);
+  viewer->update_plot_scatter("plots2f", "scatter1f", ysf);
+
+  guik::async_wait();
 }
 
-int main(int argc, char** argv) {
-  return 0;
+TEST(PlotTest, APITest) {
+  // plot_api_test();
+  // plot_api_test_async();
 }
