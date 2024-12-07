@@ -170,6 +170,7 @@ TEST(ShaderSettingTest, ColorTest) {
   const Eigen::Vector4f colorf = color.cast<float>();
 
   // double
+  EXPECT_NEAR((guik::FlatColor({color[0], color[1], color[2], color[3]}).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(color).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(color * 1.0).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(color, Eigen::Isometry3d::Identity()).material_color() - colorf).norm(), 0.0, 1e-6);
@@ -180,6 +181,7 @@ TEST(ShaderSettingTest, ColorTest) {
   EXPECT_NEAR((guik::Rainbow().set_color(color * 1.0).material_color() - colorf).norm(), 0.0, 1e-6);
 
   // float
+  EXPECT_NEAR((guik::FlatColor({colorf[0], colorf[1], colorf[2], colorf[3]}).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(colorf).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(colorf * 1.0).material_color() - colorf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::FlatColor(colorf, Eigen::Isometry3f::Identity()).material_color() - colorf).norm(), 0.0, 1e-6);
