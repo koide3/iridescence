@@ -175,6 +175,7 @@ add_library(iridescence
   src/guik/imgui_application.cpp
   src/guik/screen_capture.cpp
   src/guik/recent_files.cpp
+  src/guik/drawable_tree.cpp
   src/guik/camera/camera_control.cpp
   src/guik/camera/orbit_camera_control_xy.cpp
   src/guik/camera/orbit_camera_control_xz.cpp
@@ -261,6 +262,7 @@ if(BUILD_EXAMPLES)
       ${example_src}
     )
     target_link_libraries(${example_name}
+      fmt
       iridescence
     )
   endforeach()
