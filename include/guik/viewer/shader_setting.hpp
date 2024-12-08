@@ -417,6 +417,23 @@ public:
     transparent = color.w() < 0.999f;
   }
 
+  template <typename T>
+  explicit FlatColor(std::initializer_list<T> i) : ShaderSetting(ColorMode::FLAT_COLOR) {
+    Eigen::Vector4f color = Eigen::Vector4f::Zero();
+    std::copy(i.begin(), i.end(), color.data());
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
+  }
+
+  template <typename T, typename Transform>
+  explicit FlatColor(std::initializer_list<T> i, const Transform& transform)
+  : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
+    Eigen::Vector4f color = Eigen::Vector4f::Zero();
+    std::copy(i.begin(), i.end(), color.data());
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
+  }
+
   virtual ~FlatColor() override {}
 };
 
