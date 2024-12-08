@@ -237,6 +237,17 @@ public:
     return *this;
   }
 
+  int color_mode() const {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    return p->value;
+  }
+
+  ShaderSetting& set_color_mode(int color_mode) {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    p->value = color_mode;
+    return *this;
+  }
+
   Eigen::Matrix4f model_matrix() const {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     return p->value;

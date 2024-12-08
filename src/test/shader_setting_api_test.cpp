@@ -60,6 +60,55 @@ TEST(ShaderSettingTest, ParameterTest) {
   }
 }
 
+TEST(ShaderSettingTest, CloneTest) {
+  const Eigen::Vector2f v2 = Eigen::Vector2f::Random();
+  const Eigen::Vector3f v3 = Eigen::Vector3f::Random();
+  const Eigen::Vector4f v4 = Eigen::Vector4f::Random();
+  const Eigen::Vector2i v2i = Eigen::Vector2i::Random();
+  const Eigen::Vector3i v3i = Eigen::Vector3i::Random();
+  const Eigen::Vector4i v4i = Eigen::Vector4i::Random();
+  const Eigen::Matrix4f m4 = Eigen::Matrix4f::Random();
+
+  const std::vector<float> vf = {1, 2, 3, 4, 5, 6, 7, 8};
+  const std::vector<int> vi = {1, 2, 3, 4, 5, 6, 7, 8};
+
+  auto setting = guik::Rainbow(m4);
+  setting.add("int", 1);
+  setting.add("float", 1.0f);
+  setting.add("v2", v2);
+  setting.add("v3", v3);
+  setting.add("v4", v4);
+  setting.add("v2i", v2i);
+  setting.add("v3i", v3i);
+  setting.add("v4i", v4i);
+  setting.add("m4", m4);
+  setting.add("vf", vf);
+  setting.add("vi", vi);
+
+  auto cloned = setting.clone();
+  EXPECT_EQ(cloned.color_mode(), guik::ColorMode::RAINBOW);
+  EXPECT_EQ(cloned.cast<int>("int"), 1);
+  EXPECT_NEAR(cloned.cast<float>("float"), 1.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector2f>("v2") - v2).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector3f>("v3") - v3).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector4f>("v4") - v4).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector2i>("v2i") - v2i).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector3i>("v3i") - v3i).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Vector4i>("v4i") - v4i).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.cast<Eigen::Matrix4f>("m4") - m4).norm(), 0.0, 1e-6);
+  EXPECT_NEAR((cloned.model_matrix() - m4).norm(), 0.0, 1e-6);
+
+  const auto vf2 = cloned.cast<std::vector<float>>("vf");
+  for (int i = 0; i < vf.size(); i++) {
+    EXPECT_NEAR(vf2[i], vf[i], 1e-6);
+  }
+
+  const auto vi2 = cloned.cast<std::vector<int>>("vi");
+  for (int i = 0; i < vi.size(); i++) {
+    EXPECT_EQ(vi2[i], vi[i]);
+  }
+}
+
 TEST(ShaderSettingTest, TranslationTest) {
   const Eigen::Quaterniond quat = Eigen::Quaterniond::Identity();
   const Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
