@@ -129,6 +129,14 @@ void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int h
   guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
 }
 
+void AsyncLightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+  guik::viewer()->invoke([=] { guik::viewer()->link_plot_axes(plot_name, link_id, axis); });
+}
+
+void AsyncLightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->setup_legend(plot_name, loc, flags); });
+}
+
 void AsyncLightViewer::fit_plot(const std::string& plot_name) {
   guik::viewer()->invoke([=] { guik::viewer()->fit_plot(plot_name); });
 }
