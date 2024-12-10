@@ -6,7 +6,27 @@
 
 namespace glk {
 
-enum class COLORMAP { TURBO = 0, JET, CIVIDIS, OCEAN, SPRING, SUMMER, AUTUMN, WINTER, GREAN_YELLOW, BLUE_RED, PUBUGN, TURBID, PASTEL, HELIX, PHASE, VEGETATION, CURL, COOL_WARM, NUM_COLORMAPS };
+enum class COLORMAP {
+  TURBO = 0,
+  JET,
+  CIVIDIS,
+  OCEAN,
+  SPRING,
+  SUMMER,
+  AUTUMN,
+  WINTER,
+  GREAN_YELLOW,
+  BLUE_RED,
+  PUBUGN,
+  TURBID,
+  PASTEL,
+  HELIX,
+  PHASE,
+  VEGETATION,
+  CURL,
+  COOL_WARM,
+  NUM_COLORMAPS
+};
 
 Eigen::Vector4i colormap(COLORMAP type, int x);
 Eigen::Vector4f colormapf(COLORMAP type, float x);
