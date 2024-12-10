@@ -208,6 +208,10 @@ TEST(ShaderSettingTest, ModelMatrixTest) {
   scale_mat.block<3, 3>(0, 0) = scale.asDiagonal();
   const Eigen::Matrix4f scale_matf = scale_mat.cast<float>();
 
+  guik::Rainbow().scale(1.0f);
+  guik::Rainbow().scale(1.0);
+  guik::Rainbow().scale(2);
+
   EXPECT_NEAR((guik::Rainbow().scale(scale).model_matrix() - scale_matf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::Rainbow().scale(scale * 1.0).model_matrix() - scale_matf).norm(), 0.0, 1e-6);
   EXPECT_NEAR((guik::Rainbow().scale(scalef).model_matrix() - scale_matf).norm(), 0.0, 1e-6);

@@ -348,7 +348,7 @@ public:
   }
 
   template <typename Vector>
-  ShaderSetting& scale(const Vector& scaling) {
+  std::enable_if_t<!std::is_arithmetic_v<Vector>, ShaderSetting&> scale(const Vector& scaling) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     const auto s = scaling.eval();
     p->value.col(0) *= s[0];
