@@ -47,7 +47,7 @@ bool LightViewer::running() {
   return inst.get() != nullptr;
 }
 
-LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
+LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32), toggle_spin_stop_flag(false) {}
 
 LightViewer::~LightViewer() {}
 
@@ -628,15 +628,20 @@ bool LightViewer::spin_until_click() {
 }
 
 bool LightViewer::toggle_spin_once() {
-  bool stop = false;
-
-  register_ui_callback("kill_switch", [&]() { ImGui::Checkbox("break", &stop); });
+  bool step = false;
+  register_ui_callback("kill_switch", [&]() {
+    ImGui::Checkbox("break", &toggle_spin_stop_flag);
+    ImGui::SameLine();
+    if (ImGui::Button("step")) {
+      step = true;
+    }
+  });
 
   do {
     if (!spin_once()) {
       return false;
     }
-  } while (stop);
+  } while (toggle_spin_stop_flag && !step);
 
   register_ui_callback("kill_switch", nullptr);
 

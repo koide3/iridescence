@@ -12,6 +12,7 @@ AsyncLightViewer::AsyncLightViewer(const Eigen::Vector2i& size, bool background,
   toggle_count = 0;
   show_toggle = false;
   toggle_state = false;
+  toggle_step = false;
 
   kill_switch = false;
   thread = std::thread([this, size, background, title, &initiated] {
@@ -62,6 +63,11 @@ void AsyncLightViewer::ui_callback() {
     ImGui::Checkbox("wait", &toggle);
 
     ImGui::SameLine();
+    if (ImGui::Button("step")) {
+      toggle_step = true;
+    }
+
+    ImGui::SameLine();
     if (ImGui::Button("hide")) {
       show_toggle = false;
     }
@@ -87,7 +93,8 @@ void AsyncLightViewer::toggle_wait() {
   inst->show_toggle = true;
   inst->toggle_count++;
 
-  while (inst->toggle_state) {
+  inst->toggle_step = false;
+  while (inst->toggle_state && !inst->toggle_step) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 

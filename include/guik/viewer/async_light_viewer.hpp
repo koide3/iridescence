@@ -217,6 +217,7 @@ private:
   std::thread thread;
 
   std::atomic_bool toggle_state;
+  std::atomic_bool toggle_step;
   std::atomic_bool show_toggle;
   std::atomic_uint64_t toggle_count;
 };
