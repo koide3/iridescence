@@ -120,7 +120,8 @@ void define_glk(py::module_& m) {
       py::arg("y") = Eigen::VectorXf(),
       py::arg("z") = Eigen::VectorXf(),
       py::arg("c") = Eigen::VectorXf(),
-      py::arg("line_strip") = true);
+      py::arg("line_strip") = true)
+    .def("set_line_width", &glk::ThinLines::set_line_width);
 
   // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")

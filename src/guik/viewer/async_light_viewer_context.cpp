@@ -65,6 +65,10 @@ void AsyncLightViewerContext::lookat(const Eigen::Vector3f& pt) {
   guik::viewer()->invoke([=] { context->lookat(pt); });
 }
 
+void AsyncLightViewerContext::lookat(const Eigen::Vector3d& pt) {
+  guik::viewer()->invoke([=] { context->lookat(pt); });
+}
+
 void AsyncLightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
   guik::viewer()->invoke([=] { context->use_orbit_camera_control(distance, theta, phi); });
 }

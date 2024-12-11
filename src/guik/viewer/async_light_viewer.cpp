@@ -12,6 +12,7 @@ AsyncLightViewer::AsyncLightViewer(const Eigen::Vector2i& size, bool background,
   toggle_count = 0;
   show_toggle = false;
   toggle_state = false;
+  toggle_step = false;
 
   kill_switch = false;
   thread = std::thread([this, size, background, title, &initiated] {
@@ -62,6 +63,11 @@ void AsyncLightViewer::ui_callback() {
     ImGui::Checkbox("wait", &toggle);
 
     ImGui::SameLine();
+    if (ImGui::Button("step")) {
+      toggle_step = true;
+    }
+
+    ImGui::SameLine();
     if (ImGui::Button("hide")) {
       show_toggle = false;
     }
@@ -87,7 +93,8 @@ void AsyncLightViewer::toggle_wait() {
   inst->show_toggle = true;
   inst->toggle_count++;
 
-  while (inst->toggle_state) {
+  inst->toggle_step = false;
+  while (inst->toggle_state && !inst->toggle_step) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
@@ -127,6 +134,14 @@ void AsyncLightViewer::remove_plot(const std::string& plot_name, const std::stri
 
 void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
   guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
+}
+
+void AsyncLightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+  guik::viewer()->invoke([=] { guik::viewer()->link_plot_axes(plot_name, link_id, axis); });
+}
+
+void AsyncLightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
+  guik::viewer()->invoke([=] { guik::viewer()->setup_legend(plot_name, loc, flags); });
 }
 
 void AsyncLightViewer::fit_plot(const std::string& plot_name) {

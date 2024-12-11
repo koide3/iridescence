@@ -34,6 +34,7 @@ public:
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
+  void lookat(const Eigen::Vector3d& pt);
   void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);

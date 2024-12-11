@@ -228,7 +228,10 @@ void define_guik(py::module_& m) {
     .def("update_drawable", &guik::LightViewerContext::update_drawable)
     .def("find_drawable", &guik::LightViewerContext::find_drawable)
     .def("reset_center", &guik::LightViewerContext::reset_center)
-    .def("lookat", &guik::LightViewerContext::lookat)
+    .def(
+      "lookat",
+      [](guik::LightViewerContext& context, const Eigen::Vector3f& pt) { context.lookat(pt); },
+      py::arg("pt"))
     .def("set_draw_xy_grid", &guik::LightViewerContext::set_draw_xy_grid, "")
     .def("set_screen_effect", &guik::LightViewerContext::set_screen_effect, "")
     .def("enable_normal_buffer", &guik::LightViewerContext::enable_normal_buffer, "")
@@ -313,7 +316,10 @@ void define_guik(py::module_& m) {
     .def("update_drawable", &guik::LightViewer::update_drawable, py::arg("name"), py::arg("drawable"), py::arg("settings"))
     .def("find_drawable", &guik::LightViewer::find_drawable, py::arg("name"))
     .def("reset_center", &guik::LightViewer::reset_center)
-    .def("lookat", &guik::LightViewer::lookat, py::arg("pt"))
+    .def(
+      "lookat",
+      [](guik::LightViewerContext& context, const Eigen::Vector3f& pt) { context.lookat(pt); },
+      py::arg("pt"))
     .def("set_draw_xy_grid", &guik::LightViewer::set_draw_xy_grid, py::arg("enable"))
     .def("set_screen_effect", &guik::LightViewer::set_screen_effect, py::arg("effect"))
     .def("enable_normal_buffer", &guik::LightViewer::enable_normal_buffer)
@@ -344,7 +350,10 @@ void define_guik(py::module_& m) {
       py::arg("pattern"),
       py::arg("regex") = false)
     .def("reset_center", &guik::AsyncLightViewerContext::reset_center)
-    .def("lookat", &guik::AsyncLightViewerContext::lookat)
+    .def(
+      "lookat",
+      [](guik::AsyncLightViewerContext& context, const Eigen::Vector3f& pt) { context.lookat(pt); },
+      py::arg("pt"))
     .def("set_draw_xy_grid", &guik::AsyncLightViewerContext::set_draw_xy_grid, "")
     .def(
       "use_orbit_camera_control",
@@ -389,7 +398,10 @@ void define_guik(py::module_& m) {
       py::arg("pattern"),
       py::arg("regex") = false)
     .def("reset_center", &guik::AsyncLightViewer::reset_center)
-    .def("lookat", &guik::AsyncLightViewer::lookat, py::arg("pt"))
+    .def(
+      "lookat",
+      [](guik::AsyncLightViewer& viewer, const Eigen::Vector3f& pt) { viewer.lookat(pt); },
+      py::arg("pt"))
     .def("set_draw_xy_grid", &guik::AsyncLightViewer::set_draw_xy_grid, py::arg("enable"))
     .def("use_orbit_camera_control", &guik::AsyncLightViewer::use_orbit_camera_control, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_orbit_camera_control_xz", &guik::AsyncLightViewer::use_orbit_camera_control_xz, py::arg("distance") = 80.0, py::arg("theta") = 0.0, py::arg("phi") = 0.0)
