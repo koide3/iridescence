@@ -257,10 +257,6 @@ void LightViewerContext::lookat(const Eigen::Vector3f& pt) {
   canvas->camera_control->lookat(pt);
 }
 
-void LightViewerContext::lookat(const Eigen::Vector3d& pt) {
-  canvas->camera_control->lookat(pt.cast<float>());
-}
-
 void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   this->draw_xy_grid = draw_xy_grid;
 }
