@@ -59,6 +59,7 @@ public:
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
+  void setup_plot_group_order(const std::string& group_name, int order);
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
 
   // Plotting update methods
@@ -278,6 +279,7 @@ private:
 
   std::unordered_map<int, Eigen::Matrix<double, 6, 2>> plot_linked_axis_limits;
   std::unordered_map<std::string, PlotSetting> plot_settings;
+  std::unordered_map<std::string, int> plot_group_orders;
   std::unordered_map<std::string, std::vector<std::pair<PlotStyleConstPtr, PlotDataConstPtr>>> plot_data;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;

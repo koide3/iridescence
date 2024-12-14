@@ -45,6 +45,7 @@ public:
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
+  void setup_plot_group_order(const std::string& group_name, int order);
 
   // Update plot methods
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);

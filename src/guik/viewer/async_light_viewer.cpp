@@ -152,6 +152,10 @@ void AsyncLightViewer::fit_all_plots() {
   guik::viewer()->invoke([=] { guik::viewer()->fit_all_plots(); });
 }
 
+void AsyncLightViewer::setup_plot_group_order(const std::string& group_name, int order) {
+  guik::viewer()->invoke([=] { guik::viewer()->setup_plot_group_order(group_name, order); });
+}
+
 void AsyncLightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
   guik::viewer()->invoke([=] { guik::viewer()->update_plot(plot_name, label, plot); });
 }
