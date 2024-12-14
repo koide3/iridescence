@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(iridescence VERSION 0.1.3 LANGUAGES CXX)
+project(iridescence VERSION 0.1.3 LANGUAGES C CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
@@ -148,6 +148,7 @@ add_library(iridescence
   src/glk/indexed_pointcloud_buffer.cpp
   src/glk/splatting.cpp
   src/glk/colormap.cpp
+  src/glk/html_colors.cpp
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp

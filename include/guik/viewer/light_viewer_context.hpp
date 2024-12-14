@@ -103,6 +103,11 @@ public:
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
+  template <typename Vector>
+  void lookat(const Vector& pt) {
+    const auto ptf = pt.eval().template cast<float>();
+    lookat(ptf);
+  }
 
   std::shared_ptr<OrbitCameraControlXY> use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<OrbitCameraControlXZ> use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
