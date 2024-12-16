@@ -241,18 +241,28 @@ void LightViewer::draw_ui() {
     ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     bool grouping = false;
-    std::unordered_map<std::string, std::vector<std::string>> groups;
+    std::vector<std::pair<std::string, std::vector<std::string>>> groups;
     for (const auto& plot : plot_data) {
       const size_t separator_loc = plot.first.find_first_of('/');
       grouping |= (separator_loc != std::string::npos);
 
       const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
-      groups[group].push_back(plot.first);
+      auto found = std::find_if(groups.begin(), groups.end(), [&group](const auto& g) { return g.first == group; });
+      if (found == groups.end()) {
+        groups.emplace_back(group, std::vector<std::string>());
+        found = groups.end() - 1;
+      }
+
+      found->second.push_back(plot.first);
     }
 
     if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
       ImGui::BeginTabBar("plottab", tab_bar_flags);
+
+      if (!plot_group_orders.empty()) {
+        std::sort(groups.begin(), groups.end(), [this](const auto& lhs, const auto& rhs) { return plot_group_orders[lhs.first] < plot_group_orders[rhs.first]; });
+      }
     }
 
     for (auto& group : groups) {
@@ -453,6 +463,10 @@ void LightViewer::fit_all_plots() {
   for (auto setting = plot_settings.begin(); setting != plot_settings.end(); setting++) {
     setting->second.set_axes_to_fit = true;
   }
+}
+
+void LightViewer::setup_plot_group_order(const std::string& group_name, int order) {
+  plot_group_orders[group_name] = order;
 }
 
 void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
