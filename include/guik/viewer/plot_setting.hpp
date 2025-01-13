@@ -40,7 +40,7 @@ public:
   int order;
 
   int axis_link_id;  // -1 for invalid
-  int linked_axes;   // 1 << ImAxes_X1 | 1 << ImAxes_X2 | ...
+  int linked_axes;   // 1 << ImAxis_X1 | 1 << ImAxis_X2 | ...
 
   bool set_axes_to_fit;
 };

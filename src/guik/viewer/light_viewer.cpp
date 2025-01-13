@@ -439,10 +439,20 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
 }
 
-void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+void LightViewer::link_plot_axis(const std::string& plot_name, int link_id, int axis) {
   auto& setting = plot_settings[plot_name];
   setting.axis_link_id = link_id;
   setting.linked_axes |= (1 << axis);
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
+}
+
+void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axes) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes = axes;
 
   if (plot_linked_axis_limits.count(link_id) == 0) {
     plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
@@ -691,6 +701,14 @@ void LightViewer::invoke(const std::function<void()>& func) {
 void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
   std::lock_guard<std::mutex> lock(post_render_invoke_requests_mutex);
   post_render_invoke_requests.push_back(func);
+}
+
+void LightViewer::invoke_once(const std::string& label, const std::function<void()>& func) {
+  std::lock_guard<std::mutex> lock(invoke_requests_mutex);
+  if (invoke_once_called.count(label) == 0) {
+    invoke_requests.push_back(func);
+    invoke_once_called.insert(label);
+  }
 }
 
 std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
