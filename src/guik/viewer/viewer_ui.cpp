@@ -690,8 +690,15 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
       hide_menu = true;
     }
 
-    if (ImGui::MenuItem("Quit")) {
+    if (ImGui::MenuItem("Quit viewer")) {
       viewer->close();
+    }
+
+    if (ImGui::MenuItem("Force kill")) {
+      auto result = pfd::message("Force kill", "This will kill the program immediately. Are you sure? ", pfd::choice::ok_cancel, pfd::icon::warning).result();
+      if (result == pfd::button::ok) {
+        exit(1);
+      }
     }
     ImGui::EndMenu();
   }
