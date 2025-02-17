@@ -56,7 +56,7 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 4, 1>(points, num_points)) {}
 
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);
@@ -207,7 +207,7 @@ void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4f* points,
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3d* points, const unsigned int* indices, int num_indices) {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points_f(num_indices);
-  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template  cast<float>(); });
+  std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template cast<float>(); });
   update_points_with_indices(points_f.data(), indices, num_indices);
 }
 
