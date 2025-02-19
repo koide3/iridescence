@@ -391,7 +391,6 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
   populate_field({"intensity"}, ply.intensities);
 
   for (const auto& prop : ply.properties) {
-    std::cout << prop->name << std::endl;
     if (std::find_if(props.begin(), props.end(), [&](const auto& p) { return p->name == prop->name; }) != props.end()) {
       // This property is already added
       continue;
@@ -402,10 +401,13 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
     prop_offset += property_bytes(prop->type);
   }
 
+  const size_t num_vertices = props.size() ? props[0]->size() : 0;
+
   // Write header
   ofs << "ply" << std::endl;
   ofs << "format " << (binary ? "binary_little_endian" : "ascii") << " 1.0" << std::endl;
-  ofs << "element vertex " << ply.vertices.size() << std::endl;
+  ofs << "comment generated with iridescence" << std::endl;
+  ofs << "element vertex " << num_vertices << std::endl;
 
   const std::vector<std::string> type_names = {"char", "uchar", "short", "ushort", "int", "uint", "float", "double"};
   for (const auto& prop : props) {
@@ -418,7 +420,6 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
   }
   ofs << "end_header" << std::endl;
 
-  const size_t num_vertices = props.size() ? props[0]->size() : 0;
   for (const auto& prop : props) {
     if (prop->size() != num_vertices) {
       std::cerr << bold_red << "error: property size mismatch!! prop=" << prop->name << " size=" << prop->size() << " vs " << num_vertices << reset << std::endl;
@@ -442,7 +443,7 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
     for (int i = 0; i < ply.indices.size() / 3; i++) {
       faces[i].num_indices = 3;
       for (int j = 0; j < 3; j++) {
-        faces[i].indices[j] = ply.indices[i * 3 + j];
+        faces[i].indices[j] = ply.indices[i * 3 + 2 - j];
       }
     }
 
@@ -456,7 +457,7 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
     }
 
     for (int i = 0; i < ply.indices.size() / 3; i++) {
-      ofs << 3 << " " << ply.indices[i * 3] << " " << ply.indices[i * 3 + 1] << " " << ply.indices[i * 3 + 2] << std::endl;
+      ofs << 3 << " " << ply.indices[i * 3 + 2] << " " << ply.indices[i * 3 + 1] << " " << ply.indices[i * 3 + 0] << std::endl;
     }
   }
 

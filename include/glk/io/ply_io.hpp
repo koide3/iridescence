@@ -18,6 +18,8 @@ PLYPropertyType prop_type();
 
 /// @brief PLY file metadata.
 struct PLYMetaData {
+  PLYMetaData() : num_vertices(0), num_faces(0) {}
+
   std::string format;                 // PLY format (ascii or binary_big_endian).
   std::vector<std::string> comments;  // Comments.
 
@@ -73,9 +75,13 @@ public:
   void read_from_buffer(char* buffer, size_t index) override { data[index] = *reinterpret_cast<T*>(buffer + offset); }
 
   void read_from_stream(std::istream& is, size_t index) override {
-    T value;
-    is >> value;
-    data[index] = value;
+    if (type == PLYPropertyType::FLOAT || type == PLYPropertyType::DOUBLE) {
+      is >> data[index];
+    } else {
+      int value;
+      is >> value;
+      data[index] = value;
+    }
   }
 
   void write_to_buffer(char* buffer, size_t index) const override { *reinterpret_cast<T*>(buffer + offset) = data[index]; }
