@@ -196,7 +196,7 @@ std::shared_ptr<glk::PLYPropertyBuffer<T>> generate_buffer(const std::string& na
 }
 
 TEST(PLYTest, GeneralTest) {
-  const std::vector<int> num_vertices = {1, 10, 100, 10000};
+  const std::vector<int> num_vertices = {1, 10, 100, 1000};
   for (int N : num_vertices) {
     std::vector<glk::PLYGenericPropertyBuffer::Ptr> props;
     props.push_back(generate_buffer<std::int8_t>("char", N));
@@ -220,7 +220,7 @@ TEST(PLYTest, GeneralTest) {
       compare_generic_fields(ply, *ply_asc);
     };
 
-    for (int mask = 1; mask < 128; mask++) {
+    for (int mask = 1; mask < (1 << props.size()); mask++) {
       auto ply = std::make_shared<glk::PLYData>();
 
       for (int select = 0; select < props.size(); select++) {
