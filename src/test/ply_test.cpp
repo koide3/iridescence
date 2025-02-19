@@ -212,7 +212,7 @@ TEST(PLYTest, GeneralTest) {
       ASSERT_TRUE(glk::save_ply_binary("/tmp/test_bin.ply", ply));
       auto ply_bin = glk::load_ply("/tmp/test_bin.ply");
       ASSERT_NE(ply_bin, nullptr);
-      // compare_generic_fields(ply, *ply_bin);
+      compare_generic_fields(ply, *ply_bin);
 
       ASSERT_TRUE(glk::save_ply_ascii("/tmp/test_asc.ply", ply));
       auto ply_asc = glk::load_ply("/tmp/test_asc.ply");
