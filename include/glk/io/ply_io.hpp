@@ -112,10 +112,17 @@ public:
 ///        If a property exists in both generic and primary properties, the primary property is prioritized.
 ///        (e.g., `vertices[0]` overwrites `properties[name =="x"]`).
 struct PLYData {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;
-  std::vector<float> intensities;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+public:
+  template <typename T>
+  void add_prop(const std::string& name, const T* data, size_t size) {
+    properties.emplace_back(std::make_shared<PLYPropertyBuffer<T>>(name, data, size));
+  }
+
+public:
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;  // Vertex positions (saved as "x", "y", "z" properties).
+  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;   // Vertex normals (saved as "nx", "ny", "nz" properties).
+  std::vector<float> intensities;                                                    // Intensity values (saved as "intensity" property).
+  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;    // RGBA colors (saved as "r", "g", "b", "a" properties).
   std::vector<int> indices;
 
   std::vector<std::string> comments;
