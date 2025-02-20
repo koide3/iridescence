@@ -14,7 +14,7 @@ enum class PLYPropertyType { CHAR, UCHAR, SHORT, USHORT, INT, UINT, FLOAT, DOUBL
 /// @tparam T  Primitive type (e.g., std::uint32_t, float).
 /// @return    PLY property type.
 template <typename T>
-PLYPropertyType prop_type();
+PLYPropertyType ply_prop_type();
 
 /// @brief PLY file metadata.
 struct PLYMetaData {
@@ -35,8 +35,10 @@ public:
   using Ptr = std::shared_ptr<PLYGenericPropertyBuffer>;
   using ConstPtr = std::shared_ptr<const PLYGenericPropertyBuffer>;
 
-  PLYGenericPropertyBuffer(const std::string& name, PLYPropertyType type, int offset) : name(name), type(type), offset(offset) {}
+  PLYGenericPropertyBuffer(const std::string& name, int offset) : name(name), offset(offset) {}
   virtual ~PLYGenericPropertyBuffer() = default;
+
+  virtual PLYPropertyType type() const = 0;
 
   /// @brief Get the number of elements.
   virtual size_t size() const = 0;
@@ -57,7 +59,6 @@ public:
 
 public:
   const std::string name;
-  const PLYPropertyType type;
   int offset;
 };
 
@@ -65,8 +66,10 @@ public:
 template <typename T>
 struct PLYPropertyBuffer : public PLYGenericPropertyBuffer {
 public:
-  PLYPropertyBuffer(const std::string& name, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, prop_type<T>(), offset), data(size) {}
-  PLYPropertyBuffer(const std::string& name, const T* data, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, prop_type<T>(), offset), data(data, data + size) {}
+  PLYPropertyBuffer(const std::string& name, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, offset), data(size) {}
+  PLYPropertyBuffer(const std::string& name, const T* data, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, offset), data(data, data + size) {}
+
+  PLYPropertyType type() const override { return ply_prop_type<T>(); }
 
   size_t size() const override { return data.size(); }
 
@@ -75,12 +78,12 @@ public:
   void read_from_buffer(char* buffer, size_t index) override { data[index] = *reinterpret_cast<T*>(buffer + offset); }
 
   void read_from_stream(std::istream& is, size_t index) override {
-    if (type == PLYPropertyType::FLOAT || type == PLYPropertyType::DOUBLE) {
-      is >> data[index];
-    } else {
+    if constexpr (std::is_integral_v<T>) {
       int value;
       is >> value;
       data[index] = value;
+    } else {
+      is >> data[index];
     }
   }
 
@@ -90,10 +93,10 @@ public:
     if (offset) {
       os << " ";
     }
-    if (type == PLYPropertyType::FLOAT || type == PLYPropertyType::DOUBLE) {
-      os << data[index];
-    } else {
+    if constexpr (std::is_integral_v<T>) {
       os << static_cast<int>(data[index]);
+    } else {
+      os << data[index];
     }
   }
 
@@ -111,6 +114,7 @@ struct PLYData {
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
   std::vector<int> indices;
 
+  std::vector<std::string> comments;
   std::vector<PLYGenericPropertyBuffer::Ptr> properties;
 };
 

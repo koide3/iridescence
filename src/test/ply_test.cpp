@@ -41,10 +41,10 @@ void compare_generic_fields(const glk::PLYData& ply1, const glk::PLYData& ply2) 
 
     const auto& prop2 = *found;
     ASSERT_EQ(prop1->name, prop2->name);
-    ASSERT_EQ(prop1->type, prop2->type);
+    ASSERT_EQ(prop1->type(), prop2->type());
     ASSERT_EQ(prop1->size(), prop2->size());
 
-    switch (prop1->type) {
+    switch (prop1->type()) {
       case glk::PLYPropertyType::CHAR:
         for (int j = 0; j < prop1->size(); j++) {
           EXPECT_EQ(prop1->get<std::int8_t>()[j], prop2->get<std::int8_t>()[j]);
@@ -135,6 +135,21 @@ TEST(PLYTest, EmptyTest) {
   compare_primary_fields(*ply, *ply_asc);
 }
 
+TEST(PLYTest, CommentTest) {
+  auto ply = std::make_shared<glk::PLYData>();
+  ply->comments = {"comment1", "comment2 abc", "comment3 def ghi"};
+
+  ASSERT_TRUE(glk::save_ply_binary("/tmp/comment.ply", *ply));
+  auto ply_bin = glk::load_ply("/tmp/comment.ply");
+  ASSERT_NE(ply_bin, nullptr);
+
+  ASSERT_EQ(ply->comments.size() + 1, ply_bin->comments.size());
+  for (const auto& comment : ply->comments) {
+    EXPECT_NE(std::find(ply_bin->comments.begin(), ply_bin->comments.end(), comment), ply_bin->comments.end());
+  }
+  EXPECT_TRUE(std::find(ply_bin->comments.begin(), ply_bin->comments.end(), "generated with iridescence") != ply_bin->comments.end());
+}
+
 TEST(PLYTest, PrimaryTest) {
   const std::vector<int> num_vertices = {1, 10, 100, 10000};
 
@@ -166,7 +181,7 @@ TEST(PLYTest, PrimaryTest) {
 
       if (mask & (1 << 2)) {
         ply->intensities.resize(N);
-        std::generate(ply->intensities.begin(), ply->intensities.end(), [] { return static_cast<float>(rand()) / RAND_MAX; });
+        std::generate(ply->intensities.begin(), ply->intensities.end(), [] { return static_cast<float>(rand() % 1024) / 1024.0; });
       }
 
       if (mask & (1 << 3)) {

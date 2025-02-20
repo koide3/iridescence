@@ -15,7 +15,7 @@ using namespace glk::console;
 
 #define DEFINE_PLY_PROP_TYPE(type, proptype) \
   template <>                                \
-  PLYPropertyType prop_type<type>() {        \
+  PLYPropertyType ply_prop_type<type>() {    \
     return PLYPropertyType::proptype;        \
   }
 
@@ -105,6 +105,7 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
   }
 
   auto ply = std::make_shared<PLYData>();
+  ply->comments = meta_data.comments;
 
   int property_offset = 0;
   for (int i = 0; i < meta_data.vertex_properties.size(); i++) {
@@ -230,7 +231,7 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
     }
 
     dst.resize(meta_data.num_vertices);
-    switch (prop->type) {
+    switch (prop->type()) {
       case PLYPropertyType::FLOAT:
         for (size_t i = 0; i < meta_data.num_vertices; i++) {
           reinterpret_cast<float*>(&dst[i])[element_idx] = prop->get<float>()[i];
@@ -247,7 +248,7 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
         }
         break;
       default:
-        std::cerr << console::bold_red << "error: unsupported property type!! (type=" << static_cast<int>(prop->type) << ")" << console::reset << std::endl;
+        std::cerr << console::bold_red << "error: unsupported property type!! (type=" << static_cast<int>(prop->type()) << ")" << console::reset << std::endl;
         break;
     }
   };
@@ -309,7 +310,7 @@ std::shared_ptr<PLYData> load_ply(const std::string& filename) {
     }
 
     if (starts_with(line, "comment")) {
-      meta_data.comments.emplace_back(line);
+      meta_data.comments.emplace_back(line.substr(8));
       continue;
     }
 
@@ -327,8 +328,8 @@ std::shared_ptr<PLYData> load_ply(const std::string& filename) {
 
       if (type != "list") {
         sst >> property;
-        PLYPropertyType prop_type = parse_property_type(type);
-        meta_data.vertex_properties.push_back(std::make_pair(property, prop_type));
+        PLYPropertyType ply_prop_type = parse_property_type(type);
+        meta_data.vertex_properties.push_back(std::make_pair(property, ply_prop_type));
       } else {
         std::string num_type;
         std::string index_type;
@@ -398,7 +399,7 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
 
     props.emplace_back(prop);
     props.back()->offset = prop_offset;
-    prop_offset += property_bytes(prop->type);
+    prop_offset += property_bytes(prop->type());
   }
 
   const size_t num_vertices = props.size() ? props[0]->size() : 0;
@@ -406,12 +407,19 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
   // Write header
   ofs << "ply" << std::endl;
   ofs << "format " << (binary ? "binary_little_endian" : "ascii") << " 1.0" << std::endl;
-  ofs << "comment generated with iridescence" << std::endl;
+
+  for (const auto& comment : ply.comments) {
+    ofs << "comment " << comment << std::endl;
+  }
+  if (std::find(ply.comments.begin(), ply.comments.end(), "generated with iridescence") == ply.comments.end()) {
+    ofs << "comment generated with iridescence" << std::endl;
+  }
+
   ofs << "element vertex " << num_vertices << std::endl;
 
   const std::vector<std::string> type_names = {"char", "uchar", "short", "ushort", "int", "uint", "float", "double"};
   for (const auto& prop : props) {
-    ofs << "property " << type_names[static_cast<int>(prop->type)] << " " << prop->name << std::endl;
+    ofs << "property " << type_names[static_cast<int>(prop->type())] << " " << prop->name << std::endl;
   }
 
   if (ply.indices.size()) {
