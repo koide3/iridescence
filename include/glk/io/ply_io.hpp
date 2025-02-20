@@ -35,8 +35,10 @@ public:
   using Ptr = std::shared_ptr<PLYGenericPropertyBuffer>;
   using ConstPtr = std::shared_ptr<const PLYGenericPropertyBuffer>;
 
-  PLYGenericPropertyBuffer(const std::string& name, int offset) : name(name), offset(offset) {}
+  PLYGenericPropertyBuffer(const std::string& name) : name(name) {}
   virtual ~PLYGenericPropertyBuffer() = default;
+
+  virtual std::shared_ptr<PLYGenericPropertyBuffer> clone() const = 0;
 
   virtual PLYPropertyType type() const = 0;
 
@@ -51,23 +53,24 @@ public:
     return static_cast<T*>(get());
   }
 
-  virtual void read_from_buffer(char* buffer, size_t index) = 0;
-  virtual void read_from_stream(std::istream& is, size_t index) = 0;
+  virtual void read_from_buffer(char* buffer, int offset, size_t index) = 0;
+  virtual void read_from_stream(std::istream& is, int offset, size_t index) = 0;
 
-  virtual void write_to_buffer(char* buffer, size_t index) const = 0;
-  virtual void write_to_stream(std::ostream& os, size_t index) const = 0;
+  virtual void write_to_buffer(char* buffer, int offset, size_t index) const = 0;
+  virtual void write_to_stream(std::ostream& os, int offset, size_t index) const = 0;
 
 public:
   const std::string name;
-  int offset;
 };
 
 /// @brief PLY property buffer for a specific type.
 template <typename T>
 struct PLYPropertyBuffer : public PLYGenericPropertyBuffer {
 public:
-  PLYPropertyBuffer(const std::string& name, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, offset), data(size) {}
-  PLYPropertyBuffer(const std::string& name, const T* data, size_t size, int offset = -1) : PLYGenericPropertyBuffer(name, offset), data(data, data + size) {}
+  PLYPropertyBuffer(const std::string& name, size_t size) : PLYGenericPropertyBuffer(name), data(size) {}
+  PLYPropertyBuffer(const std::string& name, const T* data, size_t size) : PLYGenericPropertyBuffer(name), data(data, data + size) {}
+
+  std::shared_ptr<PLYGenericPropertyBuffer> clone() const override { return std::make_shared<PLYPropertyBuffer<T>>(name, data.data(), data.size()); }
 
   PLYPropertyType type() const override { return ply_prop_type<T>(); }
 
@@ -75,9 +78,9 @@ public:
 
   void* get() override { return data.data(); }
 
-  void read_from_buffer(char* buffer, size_t index) override { data[index] = *reinterpret_cast<T*>(buffer + offset); }
+  void read_from_buffer(char* buffer, int offset, size_t index) override { data[index] = *reinterpret_cast<T*>(buffer + offset); }
 
-  void read_from_stream(std::istream& is, size_t index) override {
+  void read_from_stream(std::istream& is, int offset, size_t index) override {
     if constexpr (std::is_integral_v<T>) {
       int value;
       is >> value;
@@ -87,9 +90,9 @@ public:
     }
   }
 
-  void write_to_buffer(char* buffer, size_t index) const override { *reinterpret_cast<T*>(buffer + offset) = data[index]; }
+  void write_to_buffer(char* buffer, int offset, size_t index) const override { *reinterpret_cast<T*>(buffer + offset) = data[index]; }
 
-  void write_to_stream(std::ostream& os, size_t index) const override {
+  void write_to_stream(std::ostream& os, int offset, size_t index) const override {
     if (offset) {
       os << " ";
     }
@@ -105,8 +108,9 @@ public:
 };  // namespace
 
 /// @brief PLY data.
-/// @note  When saving, vertices, normals, intensities, and colors are first written to the properties, and then the generic properties are written to the file.
-///        If a property exists in both the generic and specific properties, the specific property is used (i.e., `vertices[0]` overwrites `properties[name == "x"]`).
+/// @note  When saving, primary properties (vertices, normals...) are first written, and then the generic properties are written to the file.
+///        If a property exists in both generic and primary properties, the primary property is prioritized.
+///        (e.g., `vertices[0]` overwrites `properties[name =="x"]`).
 struct PLYData {
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;

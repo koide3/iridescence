@@ -107,56 +107,53 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
   auto ply = std::make_shared<PLYData>();
   ply->comments = meta_data.comments;
 
-  int property_offset = 0;
+  // Create property buffers
+  int sum_property_offsets = 0;
+  std::vector<int> property_offsets;
   for (int i = 0; i < meta_data.vertex_properties.size(); i++) {
     const auto& name = meta_data.vertex_properties[i].first;
-    const int offset = property_offset;
-    property_offset += property_bytes(meta_data.vertex_properties[i].second);
+    property_offsets.emplace_back(sum_property_offsets);
+    sum_property_offsets += property_bytes(meta_data.vertex_properties[i].second);
 
     switch (meta_data.vertex_properties[i].second) {
       case PLYPropertyType::CHAR:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int8_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int8_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::UCHAR:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint8_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint8_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::SHORT:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int16_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int16_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::USHORT:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint16_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint16_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::INT:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int32_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<int32_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::UINT:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint32_t>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<uint32_t>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::FLOAT:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<float>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<float>>(name, meta_data.num_vertices));
         break;
       case PLYPropertyType::DOUBLE:
-        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<double>>(name, meta_data.num_vertices, offset));
+        ply->properties.emplace_back(std::make_shared<PLYPropertyBuffer<double>>(name, meta_data.num_vertices));
         break;
     }
   }
 
-  std::unordered_map<std::string, PLYGenericPropertyBuffer::Ptr> prop_map;
-  for (auto& prop : ply->properties) {
-    prop_map[prop->name] = prop;
-  }
-
-  // binary
+  // Read binary body
   if (meta_data.format.find("binary") != std::string::npos) {
-    const int vertex_step = property_offset;
+    const int vertex_step = sum_property_offsets;
     std::vector<char> vertex_buffer(vertex_step * meta_data.num_vertices);
     ifs.read(vertex_buffer.data(), vertex_buffer.size());
 
     // Read vertices
     for (size_t i = 0; i < meta_data.num_vertices; i++) {
       char* buff = vertex_buffer.data() + vertex_step * i;
-      for (auto& prop : ply->properties) {
-        prop->read_from_buffer(buff, i);
+      for (size_t j = 0; j < ply->properties.size(); j++) {
+        ply->properties[j]->read_from_buffer(buff, property_offsets[j], i);
       }
     }
 
@@ -189,12 +186,12 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
       }
     }
   }
-  // ascii
+  // Read ascii body
   else {
     // Read vertices
     for (size_t i = 0; i < meta_data.num_vertices; i++) {
-      for (auto& prop : ply->properties) {
-        prop->read_from_stream(ifs, i);
+      for (size_t j = 0; j < ply->properties.size(); j++) {
+        ply->properties[j]->read_from_stream(ifs, property_offsets[j], i);
       }
     }
     ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -217,11 +214,14 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
     }
   }
 
+  // Fill primary fields
   const auto populate_property = [&](const std::vector<std::string>& field_names, auto& dst, int element_idx) {
+    // Find a generic property that matches the field name
     PLYGenericPropertyBuffer::Ptr prop = nullptr;
     for (const auto& field_name : field_names) {
-      prop = prop_map[field_name];
-      if (prop) {
+      const auto found = std::find_if(ply->properties.begin(), ply->properties.end(), [&](const auto& p) { return p->name == field_name; });
+      if (found != ply->properties.end()) {
+        prop = *found;
         break;
       }
     }
@@ -230,6 +230,8 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
       return;
     }
 
+    // Populate the field
+    // Note: The elements in the property buffer are assumed to be floats
     dst.resize(meta_data.num_vertices);
     switch (prop->type()) {
       case PLYPropertyType::FLOAT:
@@ -242,6 +244,11 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
           reinterpret_cast<float*>(&dst[i])[element_idx] = prop->get<double>()[i];
         }
         break;
+      case PLYPropertyType::CHAR:
+        for (size_t i = 0; i < meta_data.num_vertices; i++) {
+          reinterpret_cast<float*>(&dst[i])[element_idx] = prop->get<int8_t>()[i] / 128.0f;
+        }
+        break;
       case PLYPropertyType::UCHAR:
         for (size_t i = 0; i < meta_data.num_vertices; i++) {
           reinterpret_cast<float*>(&dst[i])[element_idx] = prop->get<uint8_t>()[i] / 255.0f;
@@ -249,6 +256,7 @@ std::shared_ptr<PLYData> load_ply_body(std::ifstream& ifs, const PLYMetaData& me
         break;
       default:
         std::cerr << console::bold_red << "error: unsupported property type!! (type=" << static_cast<int>(prop->type()) << ")" << console::reset << std::endl;
+        dst.clear();
         break;
     }
   };
@@ -282,8 +290,7 @@ std::shared_ptr<PLYData> load_ply(const std::string& filename) {
     return nullptr;
   }
 
-  PLYMetaData meta_data;
-
+  // Check the magic number
   std::string line;
   std::getline(ifs, line);
   if (line != "ply") {
@@ -294,6 +301,7 @@ std::shared_ptr<PLYData> load_ply(const std::string& filename) {
   const auto starts_with = [](const std::string& str, const std::string& prefix) { return str.size() >= prefix.size() && str.substr(0, prefix.size()) == prefix; };
 
   // Read header
+  PLYMetaData meta_data;
   while (!ifs.eof()) {
     std::getline(ifs, line);
 
@@ -365,9 +373,11 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
     return false;
   }
 
+  std::vector<int> property_offsets;
   std::vector<PLYGenericPropertyBuffer::Ptr> props;
 
-  size_t prop_offset = 0;
+  // Populate primary fields
+  size_t sum_prop_offsets = 0;
   const auto populate_field = [&](const std::vector<std::string>& names, auto& data) {
     if (data.empty()) {
       return;
@@ -375,14 +385,15 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
 
     const int D = sizeof(data[0]) / sizeof(float);
     for (int i = 0; i < D; i++) {
-      props.emplace_back(std::make_shared<PLYPropertyBuffer<float>>(names[i], data.size(), prop_offset));
+      property_offsets.emplace_back(sum_prop_offsets);
+      props.emplace_back(std::make_shared<PLYPropertyBuffer<float>>(names[i], data.size()));
 
       float* ptr = props.back()->get<float>();
       for (size_t j = 0; j < data.size(); j++) {
         ptr[j] = reinterpret_cast<const float*>(&data[j])[i];
       }
 
-      prop_offset += sizeof(float);
+      sum_prop_offsets += sizeof(float);
     }
   };
 
@@ -397,9 +408,10 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
       continue;
     }
 
+    // props.emplace_back(prop->clone());
     props.emplace_back(prop);
-    props.back()->offset = prop_offset;
-    prop_offset += property_bytes(prop->type());
+    property_offsets.emplace_back(sum_prop_offsets);
+    sum_prop_offsets += property_bytes(prop->type());
   }
 
   const size_t num_vertices = props.size() ? props[0]->size() : 0;
@@ -437,11 +449,11 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
 
   // Write body
   if (binary) {
-    std::vector<char> buffer(prop_offset * num_vertices);
+    std::vector<char> buffer(sum_prop_offsets * num_vertices);
     for (size_t i = 0; i < num_vertices; i++) {
-      char* data_ptr = buffer.data() + i * prop_offset;
-      for (const auto& prop : props) {
-        prop->write_to_buffer(data_ptr, i);
+      char* data_ptr = buffer.data() + i * sum_prop_offsets;
+      for (size_t j = 0; j < props.size(); j++) {
+        props[j]->write_to_buffer(data_ptr, property_offsets[j], i);
       }
     }
 
@@ -458,8 +470,8 @@ bool save_ply(const std::string& filename, const PLYData& ply, bool binary) {
     ofs.write(reinterpret_cast<const char*>(faces.data()), sizeof(PLYFace) * faces.size());
   } else {
     for (size_t i = 0; i < num_vertices; i++) {
-      for (const auto& prop : props) {
-        prop->write_to_stream(ofs, i);
+      for (size_t j = 0; j < props.size(); j++) {
+        props[j]->write_to_stream(ofs, property_offsets[j], i);
       }
       ofs << std::endl;
     }
