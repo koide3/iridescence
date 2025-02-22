@@ -15,6 +15,25 @@ IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk
 IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::vector<unsigned int>& indices)
 : IndexedPointCloudBuffer(cloud_buffer, indices.data(), indices.size()) {}
 
+template <typename Integral>
+IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const Integral* indices, int num_indices)
+: IndexedPointCloudBuffer(cloud_buffer, std::vector<unsigned int>(indices, indices + num_indices)) {}
+
+template <typename Integral>
+IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::vector<Integral>& indices)
+: IndexedPointCloudBuffer(cloud_buffer, std::vector<unsigned int>(indices.begin(), indices.end())) {}
+
+template <>
+IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const int* indices, int num_indices)
+: IndexedPointCloudBuffer(cloud_buffer, reinterpret_cast<const unsigned int*>(indices), num_indices) {}
+template <>
+IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::vector<int>& indices)
+: IndexedPointCloudBuffer(cloud_buffer, reinterpret_cast<const unsigned int*>(indices.data()), indices.size()) {}
+template IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::int64_t* indices, int num_indices);
+template IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::vector<std::int64_t>& indices);
+template IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::uint64_t* indices, int num_indices);
+template IndexedPointCloudBuffer::IndexedPointCloudBuffer(const std::shared_ptr<const glk::PointCloudBuffer>& cloud_buffer, const std::vector<std::uint64_t>& indices);
+
 IndexedPointCloudBuffer::~IndexedPointCloudBuffer() {
   if (ebo) {
     glDeleteBuffers(1, &ebo);
