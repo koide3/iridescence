@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 setup(
     name="pyridescence",
-    version="0.1.4",
+    version="0.1.5",
     author="k.koide",
     author_email="k.koide@aist.go.jp",
     description="A 3D visualization library for rapid proto-typing",
