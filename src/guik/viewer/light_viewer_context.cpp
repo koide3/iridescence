@@ -293,6 +293,10 @@ void LightViewerContext::enable_partial_rendering(double clear_thresh) {
   canvas->enable_partial_rendering(clear_thresh);
 }
 
+void LightViewerContext::disable_partial_rendering() {
+  canvas->disable_partial_rendering();
+}
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }

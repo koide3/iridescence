@@ -69,6 +69,7 @@ public:
   void enable_normal_buffer();
   void enable_info_buffer();
   void enable_partial_rendering(double clear_thresh = 1e-6);
+  void disable_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
