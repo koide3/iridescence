@@ -38,10 +38,10 @@ guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const 
 guik::AsyncLightViewer* async_instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   if (is_first) {
     py::gil_scoped_acquire acquire;
-    py::object pyridescence = py::module::import("pyridescence");
+    py::object pyridescence = py::module::import("pyridescence_data");
     std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
 
-    glk::set_data_path(path.parent_path().string() + "/data");
+    glk::set_data_path(path.parent_path().string());
     is_first = false;
   }
 
