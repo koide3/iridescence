@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(iridescence VERSION 0.1.5 LANGUAGES C CXX)
+project(iridescence VERSION 0.1.6 LANGUAGES C CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
