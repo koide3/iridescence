@@ -323,7 +323,7 @@ void define_guik(py::module_& m) {
     .def(
       "shader_setting",
       [](guik::LightViewerContext& context) { return context.shader_setting(); },
-      py::return_value_policy::reference_internal)
+      py::return_value_policy::reference)
 
     .def("disable_xy_grid", &guik::LightViewerContext::disable_xy_grid)
     .def("enable_xy_grid", &guik::LightViewerContext::enable_xy_grid)
@@ -595,6 +595,9 @@ void define_guik(py::module_& m) {
       py::arg("y_range") = Eigen::Vector2d(0.0, 0.0),
       py::arg("histogram_flags") = 0)
 
+    .def("fit_plot", &guik::LightViewer::fit_plot, py::arg("plot_name"))
+    .def("fit_all_plots", &guik::LightViewer::fit_all_plots)
+
     ;
 
   // AsyncLightViewerContext
@@ -846,6 +849,9 @@ void define_guik(py::module_& m) {
       py::arg("x_range") = Eigen::Vector2d(0.0, 0.0),
       py::arg("y_range") = Eigen::Vector2d(0.0, 0.0),
       py::arg("histogram_flags") = 0)
+
+    .def("fit_plot", &guik::AsyncLightViewer::fit_plot, py::arg("plot_name"))
+    .def("fit_all_plots", &guik::AsyncLightViewer::fit_all_plots)
 
     ;
 
