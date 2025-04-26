@@ -585,6 +585,7 @@ void LightViewer::update_plot_histogram(
   p->x_range_min = x_range[0];
   p->x_range_max = x_range[1];
   p->xs = xs;
+  p->ys = ys;
 
   update_plot(plot_name, label, p);
 }
