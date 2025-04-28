@@ -648,6 +648,8 @@ void define_guik(py::module_& m) {
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_fps_camera_control", &guik::AsyncLightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0)
 
+    .def("update_drawable_setting", &guik::AsyncLightViewerContext::update_drawable_setting, py::arg("name"), py::arg("setting"))
+
     .def(
       "update_points",
       [](guik::AsyncLightViewerContext& context, const std::string& name, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points, const guik::ShaderSetting& shader_setting) {
