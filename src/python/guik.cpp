@@ -287,7 +287,7 @@ void define_guik(py::module_& m) {
   py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
 
   // guik::Application
-  py::class_<guik::Application>(guik_, "Application")
+  py::class_<guik::Application, std::unique_ptr<guik::Application, py::nodelete>>(guik_, "Application")
     .def("ok", &guik::Application::ok)
     .def("enable_vsync", &guik::Application::enable_vsync)
     .def("disable_vsync", &guik::Application::disable_vsync)
@@ -886,4 +886,10 @@ void define_guik(py::module_& m) {
     py::arg("title") = "screen");
   guik_.def("async_destroy", &guik::async_destroy, "");
   guik_.def("async_wait", &guik::async_wait, "");
+
+  auto atexit = py::module_::import("atexit");
+  atexit.attr("register")(py::cpp_function([]() {
+    guik::async_destroy();
+    guik::destroy();
+  }));
 }
