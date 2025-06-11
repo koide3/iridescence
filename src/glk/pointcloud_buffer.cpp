@@ -346,4 +346,17 @@ const AuxBufferData& PointCloudBuffer::get_aux_buffer(int i) const {
   return aux_buffers[i];
 }
 
+size_t PointCloudBuffer::memory_usage() const {
+  size_t bytes = stride * num_points;
+  if (ebo) {
+    bytes += sizeof(unsigned int) * num_points;
+  }
+
+  for (const auto& aux : aux_buffers) {
+    bytes += aux.stride * num_points;
+  }
+
+  return bytes;
+}
+
 }  // namespace glk

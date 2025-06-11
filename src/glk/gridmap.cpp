@@ -42,7 +42,9 @@ void GridMap::update_color(int width, int height, const unsigned char* values, i
         std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
         break;
     }
-    if (mode != ColorMode::RGBA) rgba[i * 4 + 3] = alpha;
+    if (mode != ColorMode::RGBA) {
+      rgba[i * 4 + 3] = alpha;
+    }
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data()));
@@ -76,8 +78,13 @@ void GridMap::update_color(int width, int height, float scale, const float* valu
       case ColorMode::PROB_TURBO:
         rgb = glk::colormapf(glk::COLORMAP::TURBO, (1.0f - x)).head<3>();
         break;
+      case ColorMode::RGBA:
+        std::copy(values + i * 4, values + i * 4 + 4, rgba.begin() + i * 4);
+        break;
     }
-    rgba[i * 4 + 3] = alpha;
+    if (mode != ColorMode::RGBA) {
+      rgba[i * 4 + 3] = alpha;
+    }
   }
 
   texture.reset(new Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_FLOAT, rgba.data()));
