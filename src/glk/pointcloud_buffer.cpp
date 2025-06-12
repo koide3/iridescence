@@ -1,6 +1,7 @@
 #include <glk/pointcloud_buffer.hpp>
 
 #include <random>
+#include <cassert>
 #include <numeric>
 #include <iostream>
 #include <glk/colormap.hpp>
