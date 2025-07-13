@@ -192,6 +192,13 @@ void define_glk(py::module_& m) {
       py::arg("normals"))
     .def(
       "add_color",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& colors) { 
+        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_(colors.size());
+        std::transform(colors.begin(), colors.end(), colors_.begin(), [](const Eigen::Vector3f& c) { return Eigen::Vector4f(c.x(), c.y(), c.z(), 1.0f); });
+        buffer.add_color(colors_); },
+      py::arg("colors"))
+    .def(
+      "add_color",
       [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) { buffer.add_color(colors); },
       py::arg("colors"))
     .def(
