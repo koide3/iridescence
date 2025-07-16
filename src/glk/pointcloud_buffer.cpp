@@ -3,6 +3,7 @@
 #include <random>
 #include <numeric>
 #include <iostream>
+#include <cassert>
 #include <glk/colormap.hpp>
 #include <glk/console_colors.hpp>
 #include <glk/type_conversion.hpp>
