@@ -458,7 +458,7 @@ Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int wind
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {
-  return canvas->pick_depth(p, 2);
+  return canvas->pick_depth(p, window);
 }
 
 Eigen::Vector3f LightViewerContext::unproject(const Eigen::Vector2i& p, float depth) const {
