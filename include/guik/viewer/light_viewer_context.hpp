@@ -69,6 +69,7 @@ public:
   void enable_normal_buffer();
   void enable_info_buffer();
   void enable_partial_rendering(double clear_thresh = 1e-6);
+  void disable_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
@@ -103,6 +104,11 @@ public:
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
+  template <typename Vector>
+  void lookat(const Vector& pt) {
+    const auto ptf = pt.eval().template cast<float>();
+    lookat(ptf);
+  }
 
   std::shared_ptr<OrbitCameraControlXY> use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<OrbitCameraControlXZ> use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);

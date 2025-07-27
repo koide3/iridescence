@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(iridescence VERSION 0.1.3 LANGUAGES CXX)
+project(iridescence VERSION 0.1.6 LANGUAGES C CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
@@ -82,6 +82,7 @@ set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/iridescence CACHE PATH "Loca
 
 # imgui
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GL3W)
+add_definitions(-DDATA_INSTALL_PATH="${CMAKE_INSTALL_FULL_DATADIR}/iridescence/data")
 add_definitions(-DDATA_PATH_GUESS="${CMAKE_SOURCE_DIR}/data")
 
 if(MSVC)
@@ -147,6 +148,7 @@ add_library(iridescence
   src/glk/indexed_pointcloud_buffer.cpp
   src/glk/splatting.cpp
   src/glk/colormap.cpp
+  src/glk/html_colors.cpp
   src/glk/texture.cpp
   src/glk/glsl_shader.cpp
   src/glk/frame_buffer.cpp

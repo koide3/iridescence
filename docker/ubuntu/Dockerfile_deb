@@ -8,7 +8,7 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends
 RUN apt-get install -y --no-install-recommends libc-bin
 RUN apt-get install -y --no-install-recommends build-essential cmake git \
-  libpng-dev libjpeg-dev libeigen3-dev libglm-dev libglfw3-dev file
+  libpng-dev libjpeg-dev libeigen3-dev libglm-dev libglfw3-dev file ninja-build
 
 COPY . /root/iridescence
 WORKDIR /root/iridescence

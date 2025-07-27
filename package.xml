@@ -8,7 +8,18 @@
 
   <license>MIT</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roslib</depend>
+  <buildtool_depend>cmake</buildtool_depend>
+
+  <build_depend>eigen</build_depend>
+  <depend>opengl</depend>
+  <depend>libglm-dev</depend>
+  <depend>libglfw3-dev</depend>
+  <depend>libpng-dev</depend>
+  <depend>libjpeg</depend>
+  <depend>assimp-dev</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
 
 </package>

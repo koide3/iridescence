@@ -99,6 +99,8 @@ public:
 
   int size() const { return num_points; }
 
+  size_t memory_usage() const;
+
 private:
   mutable std::atomic_uint rendering_count;
   int points_rendering_budget;
@@ -114,8 +116,7 @@ private:
 
 // template methods
 template <typename Scalar, int Dim, typename Allocator>
-PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points)
-: PointCloudBuffer(points.data(), points.size()) {}
+PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points) : PointCloudBuffer(points.data(), points.size()) {}
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {

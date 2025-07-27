@@ -47,7 +47,7 @@ bool LightViewer::running() {
   return inst.get() != nullptr;
 }
 
-LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
+LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32), toggle_spin_stop_flag(false) {}
 
 LightViewer::~LightViewer() {}
 
@@ -241,18 +241,28 @@ void LightViewer::draw_ui() {
     ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     bool grouping = false;
-    std::unordered_map<std::string, std::vector<std::string>> groups;
+    std::vector<std::pair<std::string, std::vector<std::string>>> groups;
     for (const auto& plot : plot_data) {
       const size_t separator_loc = plot.first.find_first_of('/');
       grouping |= (separator_loc != std::string::npos);
 
       const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
-      groups[group].push_back(plot.first);
+      auto found = std::find_if(groups.begin(), groups.end(), [&group](const auto& g) { return g.first == group; });
+      if (found == groups.end()) {
+        groups.emplace_back(group, std::vector<std::string>());
+        found = groups.end() - 1;
+      }
+
+      found->second.push_back(plot.first);
     }
 
     if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
       ImGui::BeginTabBar("plottab", tab_bar_flags);
+
+      if (!plot_group_orders.empty()) {
+        std::sort(groups.begin(), groups.end(), [this](const auto& lhs, const auto& rhs) { return plot_group_orders[lhs.first] < plot_group_orders[rhs.first]; });
+      }
     }
 
     for (auto& group : groups) {
@@ -275,7 +285,19 @@ void LightViewer::draw_ui() {
         if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
           if (!plots.empty()) {
             const auto& plot = plots.front();
+
+            if (plot_setting.axis_link_id >= 0) {
+              auto& limits = plot_linked_axis_limits[plot_setting.axis_link_id];
+
+              for (int axis = 0; axis < ImAxis_COUNT; axis++) {
+                if (plot_setting.linked_axes & (1 << axis)) {
+                  ImPlot::SetupAxisLinks(axis, &limits(axis, 0), &limits(axis, 1));
+                }
+              }
+            }
+
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
+            ImPlot::SetupLegend(plot_setting.legend_loc, plot_setting.legend_flags);
           }
 
           for (const auto& plot : plots) {
@@ -417,6 +439,22 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
 }
 
+void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes |= (1 << axis);
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
+}
+
+void LightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
+  auto& setting = plot_settings[plot_name];
+  setting.legend_loc = loc;
+  setting.legend_flags = flags;
+}
+
 void LightViewer::fit_plot(const std::string& plot_name) {
   plot_settings[plot_name].set_axes_to_fit = true;
 }
@@ -425,6 +463,10 @@ void LightViewer::fit_all_plots() {
   for (auto setting = plot_settings.begin(); setting != plot_settings.end(); setting++) {
     setting->second.set_axes_to_fit = true;
   }
+}
+
+void LightViewer::setup_plot_group_order(const std::string& group_name, int order) {
+  plot_group_orders[group_name] = order;
 }
 
 void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
@@ -543,6 +585,7 @@ void LightViewer::update_plot_histogram(
   p->x_range_min = x_range[0];
   p->x_range_max = x_range[1];
   p->xs = xs;
+  p->ys = ys;
 
   update_plot(plot_name, label, p);
 }
@@ -600,15 +643,20 @@ bool LightViewer::spin_until_click() {
 }
 
 bool LightViewer::toggle_spin_once() {
-  bool stop = false;
-
-  register_ui_callback("kill_switch", [&]() { ImGui::Checkbox("break", &stop); });
+  bool step = false;
+  register_ui_callback("kill_switch", [&]() {
+    ImGui::Checkbox("break", &toggle_spin_stop_flag);
+    ImGui::SameLine();
+    if (ImGui::Button("step")) {
+      step = true;
+    }
+  });
 
   do {
     if (!spin_once()) {
       return false;
     }
-  } while (stop);
+  } while (toggle_spin_stop_flag && !step);
 
   register_ui_callback("kill_switch", nullptr);
 
@@ -684,7 +732,7 @@ void LightViewer::show_sub_viewers() {
 
 std::shared_ptr<LightViewerContext> LightViewer::find_sub_viewer(const std::string& context_name) {
   auto found = sub_contexts.find(context_name);
-  return found == sub_contexts.end() ? found->second : nullptr;
+  return found != sub_contexts.end() ? found->second : nullptr;
 }
 
 bool LightViewer::remove_sub_viewer(const std::string& context_name) {

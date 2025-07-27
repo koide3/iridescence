@@ -42,6 +42,7 @@ private:
   GLint viewport[4];
 
   std::vector<GLenum> color_attachments;
+  std::vector<int> color_buffer_layouts;
   std::vector<std::shared_ptr<Texture>> color_buffers;
   std::shared_ptr<Texture> depth_buffer;
 

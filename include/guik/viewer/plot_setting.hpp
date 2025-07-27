@@ -9,7 +9,18 @@ namespace guik {
 
 struct PlotSetting {
 public:
-  PlotSetting() : width(512), height(256), plot_flags(0), x_flags(0), y_flags(0), order(0), set_axes_to_fit(false) {}
+  PlotSetting()
+  : width(512),
+    height(256),
+    plot_flags(0),
+    x_flags(0),
+    y_flags(0),
+    legend_loc(1 + 4),
+    legend_flags(0),
+    order(0),
+    axis_link_id(-1),
+    linked_axes(0),
+    set_axes_to_fit(false) {}
   ~PlotSetting() {}
 
 public:
@@ -23,7 +34,13 @@ public:
   int x_flags;
   int y_flags;
 
+  int legend_loc;
+  int legend_flags;
+
   int order;
+
+  int axis_link_id;  // -1 for invalid
+  int linked_axes;   // 1 << ImAxes_X1 | 1 << ImAxes_X2 | ...
 
   bool set_axes_to_fit;
 };

@@ -548,9 +548,7 @@ private:
  */
 class LightViewer::ViewerUI::PlotSettingWindow {
 public:
-  PlotSettingWindow(guik::LightViewer* viewer) : viewer(viewer) {
-    show_window = false;
-  }
+  PlotSettingWindow(guik::LightViewer* viewer) : viewer(viewer) { show_window = false; }
 
   ~PlotSettingWindow() {}
 
@@ -692,12 +690,20 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
       hide_menu = true;
     }
 
-    if (ImGui::MenuItem("Quit")) {
+    if (ImGui::MenuItem("Quit viewer")) {
       viewer->close();
+    }
+
+    if (ImGui::MenuItem("Force kill")) {
+      auto result = pfd::message("Force kill", "This will kill the program immediately. Are you sure? ", pfd::choice::ok_cancel, pfd::icon::warning).result();
+      if (result == pfd::button::ok) {
+        exit(1);
+      }
     }
     ImGui::EndMenu();
   }
 
+  static bool turn_table = false;
   if (ImGui::BeginMenu("Display")) {
     display_setting_window->menu_item();
     if (ImGui::MenuItem("Show Info Window")) {
@@ -719,7 +725,16 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
       viewer->set_draw_xy_grid(false);
     }
 
+    if (ImGui::MenuItem("Turn table", nullptr, &turn_table)) {
+    }
+
     ImGui::EndMenu();
+  }
+
+  if (turn_table) {
+    auto camera = viewer->get_camera_control();
+    camera->mouse({0.0f, 0.0f}, 0, true);
+    camera->drag({1.0f, 0.0f}, 0);
   }
 
   if (ImGui::BeginMenu("Drawable")) {
