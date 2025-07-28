@@ -37,7 +37,12 @@ Application ::~Application() {
 // dirty implementation
 std::unordered_map<GLFWwindow*, Application*> appmap;
 void fb_size_callback(GLFWwindow* window, int width, int height) {
-  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width, height));
+  GLFWmonitor* screen = glfwGetWindowMonitor(window);
+  float xscale, yscale;
+  glfwGetMonitorContentScale(screen, &xscale, &yscale);
+  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width/xscale, height/yscale));
+
+
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background, const std::string& title) {
