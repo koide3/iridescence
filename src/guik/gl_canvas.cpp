@@ -581,17 +581,18 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
   }
 
   std::sort(ps.begin(), ps.end(), [=](const Eigen::Vector2i& lhs, const Eigen::Vector2i& rhs) { return lhs.norm() < rhs.norm(); });
+  float min_depth = 1;
   for (int i = 0; i < ps.size(); i++) {
     Eigen::Vector2i p_ = p + ps[i];
     int index = ((size[1] - p[1]) * size[0] + p_[0]);
     float depth = pixels[index];
 
-    if (depth < 1.0f) {
-      return depth;
+    if (depth < 1.0f && depth < min_depth) {
+      min_depth = depth;
     }
   }
 
-  return 1.0f;
+  return min_depth;
 }
 
 /**
