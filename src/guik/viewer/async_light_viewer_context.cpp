@@ -106,6 +106,24 @@ void AsyncLightViewerContext::update_points(const std::string& name, const float
   });
 }
 
+void AsyncLightViewerContext::update_points(
+  const std::string& name,
+  const float* vertices,
+  int vertex_stride,
+  const float* colors,
+  int color_stride,
+  int num_points,
+  const ShaderSetting& shader_setting) {
+  std::vector<float> vertex_buffer(vertices, vertices + vertex_stride / sizeof(float) * num_points);
+  std::vector<float> color_buffer(colors, colors + color_stride / sizeof(float) * num_points);
+
+  guik::viewer()->invoke([=] {
+    auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertex_buffer.data(), vertex_stride, num_points);
+    cloud_buffer->add_color(color_buffer.data(), color_stride, num_points);
+    context->update_drawable(name, cloud_buffer, shader_setting);
+  });
+}
+
 template <typename Scalar, int Dim>
 void AsyncLightViewerContext::update_normal_dists(
   const std::string& name,

@@ -661,6 +661,25 @@ void define_guik(py::module_& m) {
       })
 
     .def(
+      "update_points",
+      [](
+        guik::AsyncLightViewerContext& context,
+        const std::string& name,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& colors,
+        const guik::ShaderSetting& shader_setting) {
+        if (points.cols() != 3 && points.cols() != 4) {
+          std::cerr << "warning: points must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+        if (colors.cols() != 3 && colors.cols() != 4) {
+          std::cerr << "warning: colors must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+
+        context.update_points(name, points.data(), sizeof(float) * points.cols(), colors.data(), sizeof(float) * colors.cols(), points.rows(), shader_setting);
+      })
+    .def(
       "update_normal_dists",
       [](
         guik::AsyncLightViewerContext& context,
