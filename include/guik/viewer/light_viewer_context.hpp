@@ -119,6 +119,8 @@ public:
   std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
 
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
+
   guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }
   Eigen::Vector2i canvas_br() const { return canvas_rect_max; }

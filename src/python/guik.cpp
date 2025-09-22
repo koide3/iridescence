@@ -333,6 +333,8 @@ void define_guik(py::module_& m) {
     .def("get_screen_effect", &guik::LightViewerContext::get_screen_effect)
     .def("set_bg_texture", &guik::LightViewerContext::set_bg_texture)
 
+    .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
+
     .def("enable_normal_buffer", &guik::LightViewerContext::enable_normal_buffer)
     .def("enable_info_buffer", &guik::LightViewerContext::enable_info_buffer)
     .def("enable_partial_rendering", &guik::LightViewerContext::enable_partial_rendering, py::arg("clear_thresh") = 1e-6)
@@ -618,6 +620,8 @@ void define_guik(py::module_& m) {
     .def("enable_xy_grid", &guik::AsyncLightViewerContext::enable_xy_grid)
     .def("set_draw_xy_grid", &guik::AsyncLightViewerContext::set_draw_xy_grid)
     .def("set_colormap", &guik::AsyncLightViewerContext::set_colormap)
+
+    .def("set_point_shape", &guik::AsyncLightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
 
     .def("clear_drawables", [](guik::AsyncLightViewerContext& context) { context.clear_drawables(); })
     .def(

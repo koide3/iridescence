@@ -518,6 +518,21 @@ std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(dou
   return fps_camera_control;
 }
 
+void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  shader_setting().set_point_size(point_size);
+  if (metric) {
+    shader_setting().set_point_scale_metric();
+  } else {
+    shader_setting().set_point_scale_screenspace();
+  }
+
+  if (circle) {
+    shader_setting().set_point_shape_circle();
+  } else {
+    shader_setting().set_point_shape_rectangle();
+  }
+}
+
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
   return canvas->pick_info(p, window);
 }

@@ -27,6 +27,8 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
 
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
+
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
   void remove_drawable(const std::string& name);
