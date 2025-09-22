@@ -371,6 +371,12 @@ void define_guik(py::module_& m) {
     .def("get_projection_control", &guik::LightViewerContext::get_projection_control)
     .def("set_projection_control", &guik::LightViewerContext::set_projection_control)
 
+    .def("save_camera_settings", &guik::LightViewerContext::save_camera_settings, py::arg("path"))
+    .def("load_camera_settings", &guik::LightViewerContext::load_camera_settings, py::arg("path"))
+
+    .def("save_color_buffer", &guik::LightViewerContext::save_color_buffer, py::arg("path"))
+    .def("save_depth_buffer", &guik::LightViewerContext::save_depth_buffer, py::arg("path"), py::arg("real_scale") = true)
+
     .def("reset_center", &guik::LightViewerContext::reset_center)
     .def(
       "lookat",
@@ -625,6 +631,11 @@ void define_guik(py::module_& m) {
       },
       py::arg("pattern"),
       py::arg("regex") = false)
+
+    .def("save_camera_settings", &guik::AsyncLightViewerContext::save_camera_settings, py::arg("path"))
+    .def("load_camera_settings", &guik::AsyncLightViewerContext::load_camera_settings, py::arg("path"))
+    .def("save_color_buffer", &guik::AsyncLightViewerContext::save_color_buffer, py::arg("path"))
+    .def("save_depth_buffer", &guik::AsyncLightViewerContext::save_depth_buffer, py::arg("path"), py::arg("real_scale") = true)
 
     .def("reset_center", &guik::AsyncLightViewerContext::reset_center)
     .def(

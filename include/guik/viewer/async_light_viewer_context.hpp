@@ -32,6 +32,11 @@ public:
   void remove_drawable(const std::string& name);
   void remove_drawable(const std::regex& regex);
 
+  void save_camera_settings(const std::string& path);
+  void load_camera_settings(const std::string& path);
+  void save_color_buffer(const std::string& filename);
+  void save_depth_buffer(const std::string& filename, bool real_scale = true);
+
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
   template <typename Vector>

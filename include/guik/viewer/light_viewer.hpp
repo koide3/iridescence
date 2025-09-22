@@ -243,10 +243,6 @@ public:
     float weight = -1,
     const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
 
-  // Buffer read methods
-  std::vector<unsigned char> read_color_buffer();
-  std::vector<float> read_depth_buffer(bool real_scale = true);
-
   void show_viewer_ui();
   void show_info_window();
 

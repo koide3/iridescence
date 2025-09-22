@@ -478,7 +478,7 @@ public:
     }
     recent_files.push(filename);
 
-    viewer->save_camera_setting(filename);
+    viewer->save_camera_settings(filename);
   }
 
   void load_camera() {
@@ -491,7 +491,7 @@ public:
     }
     recent_files.push(filenames.front());
 
-    viewer->load_camera_setting(filenames.front());
+    viewer->load_camera_settings(filenames.front());
   }
 
 private:
