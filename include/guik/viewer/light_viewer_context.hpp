@@ -102,6 +102,9 @@ public:
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
+  bool save_camera_setting(const std::string& path) const;
+  bool load_camera_setting(const std::string& path);
+
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
   template <typename Vector>

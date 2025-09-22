@@ -1,5 +1,6 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
+#include <fstream>
 #include <ImGuizmo.h>
 #include <glk/console_colors.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -11,6 +12,7 @@
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
+#include <guik/camera/basic_projection_control.hpp>
 
 namespace guik {
 
@@ -414,6 +416,68 @@ void LightViewerContext::set_camera_control(const std::shared_ptr<CameraControl>
 
 void LightViewerContext::set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control) {
   canvas->projection_control = projection_control;
+}
+
+bool LightViewerContext::save_camera_setting(const std::string& path) const {
+  std::ofstream ofs(path);
+  if (!ofs) {
+    std::cerr << glk::console::red << "error: failed to open " << path << " for writing" << glk::console::reset << std::endl;
+    return false;
+  }
+
+  auto projection = this->get_projection_control();
+  ofs << "ProjectionControl: " << projection->name() << std::endl;
+  ofs << (*projection) << std::endl;
+
+  auto view = this->get_camera_control();
+  ofs << "CameraControl: " << view->name() << std::endl;
+  ofs << (*view) << std::endl;
+  return true;
+}
+
+bool LightViewerContext::load_camera_setting(const std::string& path) {
+  std::ifstream ifs(path);
+  if (!ifs) {
+    std::cerr << glk::console::red << "error: failed to open " << path << " for reading" << glk::console::reset << std::endl;
+    return false;
+  }
+
+  // load projection setting
+  std::shared_ptr<guik::ProjectionControl> proj(new guik::BasicProjectionControl(this->canvas_size()));
+  ifs >> (*proj);
+  this->set_projection_control(proj);
+
+  std::string line;
+  while (!ifs.eof() && std::getline(ifs, line)) {
+    if (line.find("CameraControl") == std::string::npos) {
+      continue;
+    }
+
+    std::stringstream sst(line);
+    std::string token, type;
+    sst >> token >> type;
+
+    std::shared_ptr<guik::CameraControl> camera_control;
+    if (type == "OrbitCameraControlXY") {
+      camera_control.reset(new guik::OrbitCameraControlXY());
+    } else if (type == "OrbitCameraControlXZ") {
+      camera_control.reset(new guik::OrbitCameraControlXZ());
+    } else if (type == "TopDownCameraControl") {
+      camera_control.reset(new guik::TopDownCameraControl());
+    } else if (type == "ArcBallCameraControl") {
+      camera_control.reset(new guik::ArcBallCameraControl());
+    }
+
+    if (camera_control == nullptr) {
+      std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
+      break;
+    }
+
+    ifs >> (*camera_control);
+    this->set_camera_control(camera_control);
+  }
+
+  return true;
 }
 
 void LightViewerContext::reset_center() {

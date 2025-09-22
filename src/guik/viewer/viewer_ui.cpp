@@ -478,14 +478,7 @@ public:
     }
     recent_files.push(filename);
 
-    std::ofstream ofs(filename);
-    auto projection = viewer->get_projection_control();
-    ofs << "ProjectionControl: " << projection->name() << std::endl;
-    ofs << (*projection) << std::endl;
-
-    auto view = viewer->get_camera_control();
-    ofs << "CameraControl: " << view->name() << std::endl;
-    ofs << (*view) << std::endl;
+    viewer->save_camera_setting(filename);
   }
 
   void load_camera() {
@@ -498,42 +491,7 @@ public:
     }
     recent_files.push(filenames.front());
 
-    std::ifstream ifs(filenames.front());
-
-    // load projection setting
-    std::shared_ptr<guik::ProjectionControl> proj(new guik::BasicProjectionControl(viewer->canvas_size()));
-    ifs >> (*proj);
-    viewer->set_projection_control(proj);
-
-    std::string line;
-    while (!ifs.eof() && std::getline(ifs, line)) {
-      if (line.find("CameraControl") == std::string::npos) {
-        continue;
-      }
-
-      std::stringstream sst(line);
-      std::string token, type;
-      sst >> token >> type;
-
-      std::shared_ptr<guik::CameraControl> camera_control;
-      if (type == "OrbitCameraControlXY") {
-        camera_control.reset(new guik::OrbitCameraControlXY());
-      } else if (type == "OrbitCameraControlXZ") {
-        camera_control.reset(new guik::OrbitCameraControlXZ());
-      } else if (type == "TopDownCameraControl") {
-        camera_control.reset(new guik::TopDownCameraControl());
-      } else if (type == "ArcBallCameraControl") {
-        camera_control.reset(new guik::ArcBallCameraControl());
-      }
-
-      if (camera_control == nullptr) {
-        std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
-        break;
-      }
-
-      ifs >> (*camera_control);
-      viewer->set_camera_control(camera_control);
-    }
+    viewer->load_camera_setting(filenames.front());
   }
 
 private:
