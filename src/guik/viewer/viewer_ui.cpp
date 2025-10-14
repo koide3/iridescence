@@ -45,6 +45,11 @@ public:
 
     ImGui::Begin("display setting", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
 
+    Eigen::Vector4f clear_color = viewer->get_canvas().clear_color;
+    if (ImGui::ColorEdit4("Clear color", clear_color.data())) {
+      viewer->get_canvas().clear_color = clear_color;
+    }
+
     auto colormap_modes = glk::colormap_names();
     if (ImGui::Combo("Colormap mode", &colormap_mode, colormap_modes.data(), colormap_modes.size())) {
       viewer->set_colormap(static_cast<glk::COLORMAP>(colormap_mode));
@@ -57,11 +62,32 @@ public:
       viewer->shader_setting().add("colormap_axis", axis);
     }
 
+    ImGui::Separator();
+
+    auto point_scale_mode = viewer->shader_setting().get<int>("point_scale_mode");
+    if (!point_scale_mode) {
+      point_scale_mode = 0;
+    }
+    if (ImGui::Combo("Point scale mode", &point_scale_mode.value(), "SCREENSPACE\0METRIC\0")) {
+      viewer->shader_setting().add("point_scale_mode", *point_scale_mode);
+      if (*point_scale_mode == guik::PointScaleMode::METRIC) {
+        viewer->shader_setting().set_point_size(0.05f);  // 5 cm
+      }
+    }
+
+    auto point_shape_mode = viewer->shader_setting().get<int>("point_shape_mode");
+    if (!point_shape_mode) {
+      point_shape_mode = 0;
+    }
+    if (ImGui::Combo("Point shape mode", &point_shape_mode.value(), "RECTANGLE\0CIRCLE\0")) {
+      viewer->shader_setting().add("point_shape_mode", *point_shape_mode);
+    }
+
     auto point_size = viewer->shader_setting().get<float>("point_size");
     if (!point_size) {
       point_size = 10.0f;
     }
-    if (ImGui::DragFloat("Point size", &point_size.value(), 0.1f)) {
+    if (ImGui::DragFloat("Point size", &point_size.value(), 0.001f, 0.0f, 1000.0f)) {
       viewer->shader_setting().add("point_size", *point_size);
     }
 
