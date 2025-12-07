@@ -19,6 +19,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libglm-dev libglfw3-dev libpng-dev libjpeg-dev libeigen3-dev
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
