@@ -80,4 +80,4 @@ jobs:
           python -m pip install --upgrade twine
           # twine check may warn but won't block publishing here
           twine check dist/* || true
-          twine upload -r pypitest --non-interactive -u "$TWINE_USERNAME" -p "$TWINE_PASSWORD" dist/*
+          twine upload --non-interactive -u "$TWINE_USERNAME" -p "$TWINE_PASSWORD" dist/*

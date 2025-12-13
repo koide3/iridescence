@@ -4,7 +4,7 @@ version = "0.1.6"
 authors = [{name = "Kenji Koide", email = "k.koide@aist.go.jp"}]
 description = "3D visualization library for rapid prototyping of 3D algorithms"
 readme = "README.md"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 requires-python = ">=3.7"
 
 [build-system]
