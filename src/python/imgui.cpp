@@ -52,6 +52,31 @@ void define_imgui(py::module_& m) {
   imgui_.attr("DockNodeFlags_NoResize") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoResize));
   imgui_.attr("DockNodeFlags_AutoHideTabBar") = py::int_(static_cast<int>(ImGuiDockNodeFlags_AutoHideTabBar));
 
+  imgui_.attr("ColorEditFlags_None") = py::int_(static_cast<int>(ImGuiColorEditFlags_None));
+  imgui_.attr("ColorEditFlags_NoAlpha") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoPicker") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoOptions") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoSmallPreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoInputs") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoTooltip") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoLabel") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoSidePreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoDragDrop") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoBorder") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaBar") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaPreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaPreviewHalf") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_HDR") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayRGB") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayHSV") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayHex") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_Uint8") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_Float") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_PickerHueBar") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_PickerHueWheel") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_InputRGB") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_InputHSV") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+
   // macros
   imgui_.def("IM_COL32", [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); }, py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"));
 
@@ -186,6 +211,18 @@ void define_imgui(py::module_& m) {
   imgui_.def("begin_tab_item", [](const char* label) { return ImGui::BeginTabItem(label); }, py::arg("label"));
   imgui_.def("end_tab_item", &ImGui::EndTabItem);
   imgui_.def("tab_item_button", &ImGui::TabItemButton, py::arg("label"), py::arg("flags") = 0);
+
+  // color
+  imgui_.def(
+    "color_edit4",
+    [](const std::string& label, const Eigen::Vector4f& color, int flags) {
+      Eigen::Vector4f col = color;
+      const bool changed = ImGui::ColorEdit4(label.c_str(), col.data(), flags);
+      return std::make_pair(changed, col);
+    },
+    py::arg("label"),
+    py::arg("color"),
+    py::arg("flags") = 0);
 
   imgui_.def("show_demo_window", [] { ImGui::ShowDemoWindow(); });
 
