@@ -6,6 +6,7 @@ description = "3D visualization library for rapid prototyping of 3D algorithms"
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.7"
+dependencies = ["numpy"]
 
 [build-system]
 requires = ["setuptools", "scikit-build>=0.13", "scikit-build-core >=0.10", "pybind11 >2.10.0"]
@@ -14,10 +15,3 @@ build-backend = "scikit_build_core.setuptools.build_meta"
 [tool.scikit-build.cmake.define]
 BUILD_PYTHON_BINDINGS = true
 BUILD_SHARED_LIBS = false
-
-[tool.setuptools]
-packages = ["pyridescence_data"]
-include-package-data = true
-
-[tool.setuptools.package-dir]
-pyridescence_data = "data"
