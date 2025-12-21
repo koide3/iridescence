@@ -7,7 +7,7 @@ BUILD_PYTHON_BINDINGS = true
 BUILD_SHARED_LIBS = false
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y libpng-devel libjpeg-turbo-devel"
+before-all = "yum install -y libpng-devel libjpeg-turbo-devel wayland-devel mesa-libGL-devel libX11-devel libXcursor-devel libXinerama-devel libXrandr-devel libXi-devel libxkbcommon-devel"
 
 [tool.cibuildwheel]
 manylinux-x86_64-image = "manylinux_2_28"
