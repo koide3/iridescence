@@ -10,11 +10,42 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels on ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          # Linux x86_64
+          - os: ubuntu-latest
+            python: cp310
+            arch: x86_64
+          - os: ubuntu-latest
+            python: cp311
+            arch: x86_64
+          - os: ubuntu-latest
+            python: cp312
+            arch: x86_64
+          # Linux aarch64
+          - os: ubuntu-latest
+            python: cp310
+            arch: aarch64
+          - os: ubuntu-latest
+            python: cp311
+            arch: aarch64
+          - os: ubuntu-latest
+            python: cp312
+            arch: aarch64
+          # Windows
+          - os: windows-latest
+            python: cp310
+            arch: AMD64
+          - os: windows-latest
+            python: cp311
+            arch: AMD64
+          - os: windows-latest
+            python: cp312
+            arch: AMD64
 
     steps:
       - uses: actions/checkout@v4
@@ -22,22 +53,21 @@ jobs:
           submodules: true
 
       - name: Set up QEMU
-        if: runner.os == 'Linux'
+        if: matrix.arch == 'aarch64'
         uses: docker/setup-qemu-action@v3
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
         env:
-          CIBW_BUILD: cp310-* cp311-* cp312-*
-          CIBW_ARCHS_LINUX: x86_64 aarch64
-          CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_BUILD: ${{ matrix.python }}-*
+          CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_ALL_LINUX: >
             yum install -y epel-release &&
             yum install -y libpng-devel libjpeg-turbo-devel eigen3-devel glm-devel glfw-devel
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.python }}
           path: ./wheelhouse/*.whl
 
   build_sdist:
