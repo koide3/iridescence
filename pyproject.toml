@@ -5,3 +5,10 @@ build-backend = "scikit_build_core.setuptools.build_meta"
 [tool.scikit-build.cmake.define]
 BUILD_PYTHON_BINDINGS = true
 BUILD_SHARED_LIBS = false
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y libpng-devel libjpeg-turbo-devel eigen3-devel glm-devel glfw-devel"
+
+[tool.cibuildwheel]
+manylinux-x86_64-image = "manylinux_2_28"
+manylinux-aarch64-image = "manylinux_2_28"
