@@ -71,8 +71,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: "quay.io/pypa/manylinux_2_34_x86_64"
           CIBW_MANYLINUX_AARCH64_IMAGE: "quay.io/pypa/manylinux_2_34_aarch64"
           CIBW_BEFORE_ALL_LINUX: >
-            dnf install -y epel-release &&
-            dnf install -y libpng-devel libjpeg-turbo-devel eigen3-devel glm-devel glfw-devel
+            yum install -y epel-release &&
+            yum install -y libpng-devel libjpeg-turbo-devel eigen3-devel glm-devel glfw-devel
 
       - uses: actions/upload-artifact@v4
         with:
