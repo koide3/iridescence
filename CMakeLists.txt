@@ -221,6 +221,10 @@ target_compile_definitions(iridescence PRIVATE
   GL3W_EXPORTS
   GLK_EXPORTS
 )
+set_target_properties(iridescence PROPERTIES
+  VERSION   ${PROJECT_VERSION}
+  SOVERSION 1
+)
 
 if(BUILD_PYTHON_BINDINGS)
   add_subdirectory(thirdparty/pybind11)
