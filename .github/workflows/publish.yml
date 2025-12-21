@@ -17,32 +17,32 @@ jobs:
       matrix:
         include:
           # Linux x86_64
-          # - os: ubuntu-latest
-          #   python: cp310
-          #   arch: x86_64
-          # - os: ubuntu-latest
-          #   python: cp311
-          #   arch: x86_64
+          - os: ubuntu-latest
+            python: cp310
+            arch: x86_64
+          - os: ubuntu-latest
+            python: cp311
+            arch: x86_64
           - os: ubuntu-latest
             python: cp312
             arch: x86_64
           # Linux aarch64
-          # - os: ubuntu-latest
-          #   python: cp310
-          #   arch: aarch64
-          # - os: ubuntu-latest
-          #   python: cp311
-          #   arch: aarch64
-          # - os: ubuntu-latest
-          #   python: cp312
-          #   arch: aarch64
+          - os: ubuntu-latest
+            python: cp310
+            arch: aarch64
+          - os: ubuntu-latest
+            python: cp311
+            arch: aarch64
+          - os: ubuntu-latest
+            python: cp312
+            arch: aarch64
           # Windows
-          # - os: windows-latest
-          #   python: cp310
-          #   arch: AMD64
-          # - os: windows-latest
-          #   python: cp311
-          #   arch: AMD64
+          - os: windows-latest
+            python: cp310
+            arch: AMD64
+          - os: windows-latest
+            python: cp311
+            arch: AMD64
           - os: windows-latest
             python: cp312
             arch: AMD64
