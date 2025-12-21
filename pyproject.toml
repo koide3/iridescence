@@ -12,3 +12,5 @@ before-all = "yum install -y libpng-devel libjpeg-turbo-devel wayland-devel mesa
 [tool.cibuildwheel]
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
+build = "*"
+skip = "pp* *-win32 *_i686 *musllinux*" # Don't build for PyPy, Win32, i686
