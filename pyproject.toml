@@ -1,13 +1,3 @@
-[project]
-name = "pyridescence"
-version = "0.1.7"
-authors = [{name = "Kenji Koide", email = "k.koide@aist.go.jp"}]
-description = "3D visualization library for rapid prototyping of 3D algorithms"
-readme = "README.md"
-license = {file = "LICENSE"}
-requires-python = ">=3.7"
-dependencies = ["numpy"]
-
 [build-system]
 requires = ["setuptools", "scikit-build>=0.13", "scikit-build-core >=0.10", "pybind11 >2.10.0"]
 build-backend = "scikit_build_core.setuptools.build_meta"
