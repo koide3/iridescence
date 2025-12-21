@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pyridescence",
-    version="0.1.7",
+    version="0.1.8",
     author="Kenji Koide",
     author_email="k.koide@aist.go.jp",
     description="3D visualization library for rapid prototyping of 3D algorithms",
