@@ -1,0 +1,10 @@
+# Example file for upstream/metadata.
+# See https://wiki.debian.org/UpstreamMetadata for more info/fields.
+# Below an example based on a github project.
+
+# Bug-Database: https://github.com/<user>/libiridescence/issues
+# Bug-Submit: https://github.com/<user>/libiridescence/issues/new
+# Changelog: https://github.com/<user>/libiridescence/blob/master/CHANGES
+Documentation: https://koide3.github.io/iridescence/
+Repository-Browse: https://github.com/koide3/iridescence
+Repository: https://github.com/koide3/iridescence.git

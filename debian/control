@@ -1,0 +1,31 @@
+Source: libiridescence
+Section: utils
+Priority: optional
+Maintainer: k.koide <k.koide@aist.go.jp>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ libglm-dev,
+ libglfw3-dev,
+ libpng-dev,
+ libjpeg-dev,
+ libeigen3-dev
+Standards-Version: 4.6.2
+Homepage: https://github.com/koide3/iridescence
+#Vcs-Browser: https://salsa.debian.org/debian/libiridescence
+#Vcs-Git: https://salsa.debian.org/debian/libiridescence.git
+
+Package: libiridescence
+Architecture: any
+Multi-Arch: foreign
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: 3D visualization library for rapid prototyping of 3D algorithms.
+ Iridescence is a light-weight visualization library for rapid prototyping of 3D algorithms.
+ This library is designed for accelerating personal research and development projects (mainly
+ focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose
+ visualization library with rich rendering capabilities.
+
+
