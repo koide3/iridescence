@@ -1,0 +1,3 @@
+usr/lib/*/libiridescence.so
+usr/lib/*/libiridescence.so.*
+usr/share/iridescence/**
