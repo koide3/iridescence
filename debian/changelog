@@ -1,3 +1,9 @@
+libiridescence (0.1.9-1ppa1~noble1) noble; urgency=medium
+
+  * First release
+
+ -- Kenji Koide <k.koide@aist.go.jp>  Sat, 27 Dec 2025 00:20:49 +0900
+
 libiridescence (0.1.9-1ppa1~jammy1) jammy; urgency=medium
 
   * First release
