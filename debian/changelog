@@ -1,3 +1,9 @@
+libiridescence (0.1.9-1ppa1~noble2) noble; urgency=medium
+
+  * Fix build configuration for Noble
+
+ -- Kenji Koide <k.koide@aist.go.jp>  Sat, 27 Dec 2025 09:33:20 +0900
+
 libiridescence (0.1.9-1ppa1~noble1) noble; urgency=medium
 
   * First release
