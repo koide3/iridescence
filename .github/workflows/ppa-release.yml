@@ -1,0 +1,52 @@
+name: Release to PPA
+
+on:
+  push:
+    branches:
+      - ppa_ci
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build_and_upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-buildpackage debhelper devscripts dput dh-cmake
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Build Source Package
+        run: |
+          git checkout debian
+          
+          gbp buildpackage -S -sa \
+            --git-upstream-tag='v%(version)s' \
+            --git-submodules \
+            --git-ignore-branch
+
+      - name: Upload to Launchpad PPA
+        env:
+          PPA_TARGET: ${{ secrets.LP_PPA }}
+        run: |
+          dput -c dput.cf my-ppa ../*.changes
