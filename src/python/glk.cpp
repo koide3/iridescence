@@ -381,6 +381,44 @@ void define_glk(py::module_& m) {
     },
     py::arg("image_uint8"));
 
+  glk_.def(
+    "create_texture_f",
+    [](py::array_t<float, py::array::c_style | py::array::forcecast> arr) -> std::shared_ptr<glk::Texture> {
+      if (arr.ndim() != 2 && arr.ndim() != 3) {
+        std::cerr << "ndim must be 2 or 3 (ndim=" << arr.ndim() << ")" << std::endl;
+        return nullptr;
+      }
+
+      const int height = arr.shape(0);
+      const int width = arr.shape(1);
+
+      if (arr.ndim() == 2) {
+        return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RED, GL_FLOAT, arr.data());
+      }
+
+      GLuint format = GL_BGR;
+      switch (arr.shape(2)) {
+        default:
+          std::cerr << "warning: invalid ch=" << arr.shape(2) << std::endl;
+          break;
+        case 1:
+          format = GL_RED;
+          break;
+        case 2:
+          format = GL_RG;
+          break;
+        case 3:
+          format = GL_BGR;
+          break;
+        case 4:
+          format = GL_BGRA;
+          break;
+      }
+
+      return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, format, GL_FLOAT, arr.data());
+    },
+    py::arg("image_float"));
+
   // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
   py::class_<glk::NaiveScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::NaiveScreenSpaceAmbientOcclusion>>(glk_, "NaiveScreenSpaceAmbientOcclusion")
