@@ -2,8 +2,8 @@
 #define GUIK_SHADER_SETTING_HPP
 
 #include <memory>
+#include <optional>
 #include <unordered_map>
-#include <boost/optional.hpp>
 
 #include <glk/drawable.hpp>
 #include <glk/make_shared.hpp>
@@ -52,6 +52,7 @@ public:
   T value;
 };
 
+/// @brief Shader setting class holds rendering settings for the object.
 struct ShaderSetting {
 public:
   using Ptr = std::shared_ptr<ShaderSetting>;
@@ -91,15 +92,10 @@ public:
     return cloned;
   }
 
-  ShaderSetting& make_transparent() {
-    transparent = true;
-    return *this;
-  }
-
-  ShaderSetting& static_object() { return add("dynamic_object", 0); }
-
-  ShaderSetting& dymamic_object() { return add("dynamic_object", 1); }
-
+  /// @brief Add a new parameter to the shader setting.
+  /// @param name   Parameter name
+  /// @param value  Parameter value
+  /// @return       This object
   template <typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
     for (int i = 0; i < params.size(); i++) {
@@ -118,8 +114,11 @@ public:
     return *this;
   }
 
+  /// @brief Get a parameter value from the shader setting.
+  /// @param name   Parameter name
+  /// @return       Parameter value if found, otherwise std::nullopt
   template <typename T>
-  boost::optional<T> get(const std::string& name) {
+  std::optional<T> get(const std::string& name) {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
@@ -133,17 +132,20 @@ public:
       return p->value;
     }
 
-    return boost::none;
+    return std::nullopt;
   }
 
+  /// @brief Get a parameter value from the shader setting. This method avoid type checking. Fast but unsafe.
+  /// @param name   Parameter name
+  /// @return       Parameter value
   template <typename T>
-  const T& cast(const std::string& name) {
+  const T& cast(const std::string& name) const {
     for (const auto& param : params) {
       if (param->name != name) {
         continue;
       }
 
-      auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(param.get());
+      auto p = static_cast<ShaderParameter<T>*>(param.get());
       return p->value;
     }
 
@@ -151,13 +153,62 @@ public:
     abort();
   }
 
+  /// @brief Set shader parameters to the shader program.
+  /// @param shader  Shader program
   void set(glk::GLSLShader& shader) const {
     for (const auto& param : params) {
-      if(!param) {
+      if (!param) {
         continue;
       }
       param->set(shader);
     }
+  }
+
+  // Object type
+  ShaderSetting& static_object() { return add("dynamic_object", 0); }
+
+  ShaderSetting& dynamic_object() { return add("dynamic_object", 1); }
+
+  ShaderSetting& dymamic_object() {
+    std::cerr << "warning : dymamic_object() is deprecated. Use dynamic_object() instead. Sorry for the silly typo!!" << std::endl;
+    return add("dynamic_object", 1);
+  }
+
+  // Color
+  Eigen::Vector4f material_color() const { return cast<Eigen::Vector4f>("material_color"); }
+
+  ShaderSetting& set_color(float r, float g, float b, float a) {
+    if (a < 0.999f) {
+      transparent = true;
+    }
+    return add("material_color", Eigen::Vector4f(r, g, b, a));
+  }
+
+  template <typename Color>
+  ShaderSetting& set_color(const Color& color_) {
+    const Eigen::Vector4f color = color_.template cast<float>();
+    if (color.w() < 0.999f) {
+      transparent = true;
+    }
+    return add("material_color", color);
+  }
+
+  ShaderSetting& set_alpha(float alpha) {
+    Eigen::Vector4f color(1.0f, 1.0f, 1.0f, 1.0f);
+    auto found = this->get<Eigen::Vector4f>("material_color");
+    if (found) {
+      color = found.value();
+    }
+
+    color.w() = alpha;
+    this->add("material_color", color);
+    transparent = alpha < 0.999f;
+    return *this;
+  }
+
+  ShaderSetting& make_transparent() {
+    transparent = true;
+    return *this;
   }
 
   // Point size and scale
@@ -191,9 +242,30 @@ public:
     return *this;
   }
 
+  int color_mode() const {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    return p->value;
+  }
+
+  ShaderSetting& set_color_mode(int color_mode) {
+    auto p = static_cast<ShaderParameter<int>*>(params[0].get());
+    p->value = color_mode;
+    return *this;
+  }
+
   Eigen::Matrix4f model_matrix() const {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     return p->value;
+  }
+
+  Eigen::Vector3f translation() const {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    return p->value.block<3, 1>(0, 3);
+  }
+
+  Eigen::Matrix3f rotation() const {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    return p->value.block<3, 3>(0, 0);
   }
 
   template <typename Transform>
@@ -212,16 +284,32 @@ public:
 
   ShaderSetting& translate(float tx, float ty, float tz) { return translate(Eigen::Vector3f(tx, ty, tz)); }
 
-  template <typename Scalar, int Dim>
-  ShaderSetting& translate(const Eigen::Matrix<Scalar, Dim, 1>& translation) {
+  ShaderSetting& translate(const Eigen::Vector3f& translation) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value.block<3, 1>(0, 3) += translation.template cast<float>().template head<3>();
+    p->value.block<3, 1>(0, 3) += translation;
+    return *this;
+  }
+
+  template <typename Vector>
+  ShaderSetting& translate(const Vector& translation) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    const auto trans = translation.eval();
+    p->value.block<3, 1>(0, 3) += trans.template cast<float>().template head<3>();
     return *this;
   }
 
   ShaderSetting& rotate(const float angle, const Eigen::Vector3f& axis) {
+    const Eigen::Vector3f ax = axis.eval().template cast<float>();
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis)).matrix();
+    return *this;
+  }
+
+  template <typename Vector>
+  ShaderSetting& rotate(const float angle, const Vector& axis) {
+    const Eigen::Vector3f ax = axis.eval().template cast<float>();
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, ax)).matrix();
     return *this;
   }
 
@@ -256,8 +344,7 @@ public:
     return *this;
   }
 
-  template <typename Scalar, int Dim>
-  ShaderSetting& scale(const Eigen::Matrix<Scalar, Dim, 1>& scaling) {
+  ShaderSetting& scale(const Eigen::Vector3f& scaling) {
     auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
     p->value.col(0) *= scaling[0];
     p->value.col(1) *= scaling[1];
@@ -265,6 +352,15 @@ public:
     return *this;
   }
 
+  template <typename Vector>
+  std::enable_if_t<!std::is_arithmetic_v<Vector>, ShaderSetting&> scale(const Vector& scaling) {
+    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    const auto s = scaling.eval();
+    p->value.col(0) *= s[0];
+    p->value.col(1) *= s[1];
+    p->value.col(2) *= s[2];
+    return *this;
+  }
 
 public:
   bool transparent;
@@ -281,6 +377,9 @@ inline ShaderSetting& ShaderSetting::add(const std::string& name, const Eigen::A
   return add<Eigen::Matrix4f>(name, value.matrix());
 }
 
+/// @brief Rainbow coloring scheme that assigns colors to the height (z-value) of pixels of the object.
+///        The coloring band can be changed by setting `z_range` param.
+///        The direction for the color mapping can be changed by setting `colormap_axis` param.
 struct Rainbow : public ShaderSetting {
 public:
   Rainbow() : ShaderSetting(ColorMode::RAINBOW) {}
@@ -291,32 +390,71 @@ public:
   virtual ~Rainbow() override {}
 };
 
+/// @brief Flat coloring scheme that assigns a single color to the object.
+///        If the alpha value is less than 0.999f, the object is rendered as transparent.
 struct FlatColor : public ShaderSetting {
 public:
-  FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR) {
+  explicit FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR) {
     params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", Eigen::Vector4f(r, g, b, a)));
+    transparent = a < 0.999f;
   }
 
-  FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {  //
+  explicit FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
     params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
   }
 
   template <typename Transform>
-  FlatColor(float r, float g, float b, float a, const Transform& transform)
+  explicit FlatColor(const Eigen::Vector4f& color, const Transform& transform)
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", Eigen::Vector4f(r, g, b, a)));
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
+  }
+
+  template <typename Color>
+  explicit FlatColor(const Color& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
+    const Eigen::Vector4f c = color.eval().template cast<float>();
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
+    transparent = color.w() < 0.999f;
   }
 
   template <typename Transform>
-  FlatColor(const Eigen::Vector4f& color, const Transform& transform)
+  explicit FlatColor(float r, float g, float b, float a, const Transform& transform)
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", Eigen::Vector4f(r, g, b, a)));
+    transparent = a < 0.999f;
+  }
+
+  template <typename Color, typename Transform>
+  explicit FlatColor(const Color& color, const Transform& transform)
+  : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
+    const Eigen::Vector4f c = color.eval().template cast<float>();
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
+    transparent = color.w() < 0.999f;
+  }
+
+  template <typename T>
+  explicit FlatColor(std::initializer_list<T> i) : ShaderSetting(ColorMode::FLAT_COLOR) {
+    Eigen::Vector4f color = Eigen::Vector4f::Zero();
+    std::copy(i.begin(), i.end(), color.data());
     params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
+  }
+
+  template <typename T, typename Transform>
+  explicit FlatColor(std::initializer_list<T> i, const Transform& transform)
+  : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
+    Eigen::Vector4f color = Eigen::Vector4f::Zero();
+    std::copy(i.begin(), i.end(), color.data());
+    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    transparent = color.w() < 0.999f;
   }
 
   virtual ~FlatColor() override {}
 };
 
 /* primitive colors */
+/// @brief Flat red color
 struct FlatRed : public FlatColor {
   FlatRed() : FlatColor(1.0f, 0.0f, 0.0f, 1.0f) {}
 
@@ -324,6 +462,7 @@ struct FlatRed : public FlatColor {
   FlatRed(const Transform& transform) : FlatColor(1.0f, 0.0f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat green color
 struct FlatGreen : public FlatColor {
   FlatGreen() : FlatColor(0.0f, 1.0f, 0.0f, 1.0f) {}
 
@@ -331,6 +470,7 @@ struct FlatGreen : public FlatColor {
   FlatGreen(const Transform& transform) : FlatColor(0.0f, 1.0f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat blue color
 struct FlatBlue : public FlatColor {
   FlatBlue() : FlatColor(0.0f, 0.0f, 1.0f, 1.0f) {}
 
@@ -338,6 +478,7 @@ struct FlatBlue : public FlatColor {
   FlatBlue(const Transform& transform) : FlatColor(0.0f, 0.0f, 1.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat orange color
 struct FlatOrange : public FlatColor {
   FlatOrange() : FlatColor(1.0f, 0.5f, 0.0f, 1.0f) {}
 
@@ -345,6 +486,39 @@ struct FlatOrange : public FlatColor {
   FlatOrange(const Transform& transform) : FlatColor(1.0f, 0.5f, 0.0f, 1.0f, transform) {}
 };
 
+/// @brief Flat white color
+struct FlatWhite : public FlatColor {
+  FlatWhite() : FlatColor(1.0f, 1.0f, 1.0f, 1.0f) {}
+
+  template <typename Transform>
+  FlatWhite(const Transform& transform) : FlatColor(1.0f, 1.0f, 1.0f, 1.0f, transform) {}
+};
+
+/// @brief Flat light gray color
+struct FlatGray : public FlatColor {
+  FlatGray() : FlatColor(0.7f, 0.7f, 0.7f, 1.0f) {}
+
+  template <typename Transform>
+  FlatGray(const Transform& transform) : FlatColor(0.7f, 0.7f, 0.7f, 1.0f, transform) {}
+};
+
+/// @brief Flat dark gray color
+struct FlatDarkGray : public FlatColor {
+  FlatDarkGray() : FlatColor(0.3f, 0.3f, 0.3f, 1.0f) {}
+
+  template <typename Transform>
+  FlatDarkGray(const Transform& transform) : FlatColor(0.3f, 0.3f, 0.3f, 1.0f, transform) {}
+};
+
+/// @brief Flat black color
+struct FlatBlack : public FlatColor {
+  FlatBlack() : FlatColor(0.0f, 0.0f, 0.0f, 1.0f) {}
+
+  template <typename Transform>
+  FlatBlack(const Transform& transform) : FlatColor(0.0f, 0.0f, 0.0f, 1.0f, transform) {}
+};
+
+/// @brief Vertex color scheme that assigns colors based on vertex color attributes.
 struct VertexColor : public ShaderSetting {
 public:
   VertexColor() : ShaderSetting(ColorMode::VERTEX_COLOR) {}
@@ -355,6 +529,7 @@ public:
   virtual ~VertexColor() override {}
 };
 
+/// @brief Texture color scheme that assigns colors based on the binded texture.
 struct TextureColor : public ShaderSetting {
 public:
   TextureColor() : ShaderSetting(ColorMode::TEXTURE_COLOR) {}

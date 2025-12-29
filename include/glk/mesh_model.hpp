@@ -4,7 +4,7 @@
 #include <glk/drawable.hpp>
 
 namespace guik {
-class ShaderSetting;
+struct ShaderSetting;
 }  // namespace guik
 
 namespace glk {

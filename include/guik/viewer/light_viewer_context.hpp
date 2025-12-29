@@ -69,6 +69,7 @@ public:
   void enable_normal_buffer();
   void enable_info_buffer();
   void enable_partial_rendering(double clear_thresh = 1e-6);
+  void disable_partial_rendering();
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
@@ -101,14 +102,24 @@ public:
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
+  bool save_camera_settings(const std::string& path) const;
+  bool load_camera_settings(const std::string& path);
+
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
+  template <typename Vector>
+  void lookat(const Vector& pt) {
+    const auto ptf = pt.eval().template cast<float>();
+    lookat(ptf);
+  }
 
   std::shared_ptr<OrbitCameraControlXY> use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<OrbitCameraControlXZ> use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   std::shared_ptr<TopDownCameraControl> use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
   std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
+
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
 
   guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }
@@ -121,6 +132,13 @@ public:
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
   Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
   std::optional<Eigen::Vector3f> pick_point(int button = 0, int window = 2, Eigen::Vector4i* info = nullptr) const;
+
+  // Buffer read methods
+  std::vector<unsigned char> read_color_buffer() const;
+  std::vector<float> read_depth_buffer(bool real_scale = true);
+
+  bool save_color_buffer(const std::string& filename);
+  bool save_depth_buffer(const std::string& filename, bool real_scale = true);
 
   // Async
   AsyncLightViewerContext async();
@@ -148,8 +166,8 @@ public:
   template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
   void update_normal_dists(
     const std::string& name,
-    const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
-    const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+    const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
+    const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
     float scale,
     const ShaderSetting& shader_setting);
 
@@ -274,8 +292,8 @@ LightViewerContext::update_points(const std::string& name, const std::vector<Eig
 template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
 void LightViewerContext::update_normal_dists(
   const std::string& name,
-  const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
-  const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+  const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
+  const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
   float scale,
   const ShaderSetting& shader_setting) {
   update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);

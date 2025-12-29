@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
       }
 
       if(capture_depth) {
-        depth_pixel_buffers[current]->copy_from_texture(viewer->depth_buffer(), GL_DEPTH_COMPONENT16, GL_FLOAT);
+        depth_pixel_buffers[current]->copy_from_texture(viewer->depth_buffer(), GL_DEPTH_COMPONENT, GL_FLOAT);
         if(count > 0) {
           int prev = (count - 1) % num_pixel_buffers;
           depth_pixels = depth_pixel_buffers[prev]->read_pixels<float>();

@@ -1,8 +1,8 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
-#include <boost/algorithm/string.hpp>
-
+#include <fstream>
 #include <ImGuizmo.h>
+#include <glk/io/png_io.hpp>
 #include <glk/console_colors.hpp>
 #include <glk/primitives/primitives.hpp>
 
@@ -13,6 +13,7 @@
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
+#include <guik/camera/basic_projection_control.hpp>
 
 namespace guik {
 
@@ -99,8 +100,22 @@ void LightViewerContext::clear_text() {
 }
 
 void LightViewerContext::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  const auto split_lines = [](const std::string& text) {
+    std::vector<std::string> tokens;
+
+    size_t loc = 0;
+    size_t found = 0;
+
+    do {
+      found = text.find_first_of('\n', loc);
+      tokens.push_back(text.substr(loc, found - loc));
+      loc = found + 1;
+    } while (found != std::string::npos);
+
+    return tokens;
+  };
+
+  std::vector<std::string> texts = split_lines(text);
 
   std::lock_guard<std::mutex> lock(sub_texts_mutex);
   sub_texts.insert(sub_texts.end(), texts.begin(), texts.end());
@@ -281,6 +296,10 @@ void LightViewerContext::enable_partial_rendering(double clear_thresh) {
   canvas->enable_partial_rendering(clear_thresh);
 }
 
+void LightViewerContext::disable_partial_rendering() {
+  canvas->disable_partial_rendering();
+}
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }
@@ -400,6 +419,68 @@ void LightViewerContext::set_projection_control(const std::shared_ptr<Projection
   canvas->projection_control = projection_control;
 }
 
+bool LightViewerContext::save_camera_settings(const std::string& path) const {
+  std::ofstream ofs(path);
+  if (!ofs) {
+    std::cerr << glk::console::red << "error: failed to open " << path << " for writing" << glk::console::reset << std::endl;
+    return false;
+  }
+
+  auto projection = this->get_projection_control();
+  ofs << "ProjectionControl: " << projection->name() << std::endl;
+  ofs << (*projection) << std::endl;
+
+  auto view = this->get_camera_control();
+  ofs << "CameraControl: " << view->name() << std::endl;
+  ofs << (*view) << std::endl;
+  return true;
+}
+
+bool LightViewerContext::load_camera_settings(const std::string& path) {
+  std::ifstream ifs(path);
+  if (!ifs) {
+    std::cerr << glk::console::red << "error: failed to open " << path << " for reading" << glk::console::reset << std::endl;
+    return false;
+  }
+
+  // load projection setting
+  std::shared_ptr<guik::ProjectionControl> proj(new guik::BasicProjectionControl(this->canvas_size()));
+  ifs >> (*proj);
+  this->set_projection_control(proj);
+
+  std::string line;
+  while (!ifs.eof() && std::getline(ifs, line)) {
+    if (line.find("CameraControl") == std::string::npos) {
+      continue;
+    }
+
+    std::stringstream sst(line);
+    std::string token, type;
+    sst >> token >> type;
+
+    std::shared_ptr<guik::CameraControl> camera_control;
+    if (type == "OrbitCameraControlXY") {
+      camera_control.reset(new guik::OrbitCameraControlXY());
+    } else if (type == "OrbitCameraControlXZ") {
+      camera_control.reset(new guik::OrbitCameraControlXZ());
+    } else if (type == "TopDownCameraControl") {
+      camera_control.reset(new guik::TopDownCameraControl());
+    } else if (type == "ArcBallCameraControl") {
+      camera_control.reset(new guik::ArcBallCameraControl());
+    }
+
+    if (camera_control == nullptr) {
+      std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
+      break;
+    }
+
+    ifs >> (*camera_control);
+    this->set_camera_control(camera_control);
+  }
+
+  return true;
+}
+
 void LightViewerContext::reset_center() {
   canvas->camera_control->reset_center();
 }
@@ -437,12 +518,27 @@ std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(dou
   return fps_camera_control;
 }
 
+void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  shader_setting().set_point_size(point_size);
+  if (metric) {
+    shader_setting().set_point_scale_metric();
+  } else {
+    shader_setting().set_point_scale_screenspace();
+  }
+
+  if (circle) {
+    shader_setting().set_point_shape_circle();
+  } else {
+    shader_setting().set_point_shape_rectangle();
+  }
+}
+
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
   return canvas->pick_info(p, window);
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {
-  return canvas->pick_depth(p, 2);
+  return canvas->pick_depth(p, window);
 }
 
 Eigen::Vector3f LightViewerContext::unproject(const Eigen::Vector2i& p, float depth) const {
@@ -465,6 +561,73 @@ std::optional<Eigen::Vector3f> LightViewerContext::pick_point(int button, int wi
   }
 
   return unproject({io.MousePos.x, io.MousePos.y}, depth);
+}
+
+std::vector<unsigned char> LightViewerContext::read_color_buffer() const {
+  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE, 4);
+  std::vector<unsigned char> flipped(bytes.size(), 255);
+
+  Eigen::Vector2i size = canvas->frame_buffer->color().size();
+  for (int y = 0; y < size[1]; y++) {
+    int y_ = size[1] - y - 1;
+    for (int x = 0; x < size[0]; x++) {
+      for (int k = 0; k < 3; k++) {
+        flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
+      }
+    }
+  }
+
+  return flipped;
+}
+
+std::vector<float> LightViewerContext::read_depth_buffer(bool real_scale) {
+  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
+  std::vector<float> flipped(floats.size());
+
+  Eigen::Vector2i size = canvas->frame_buffer->depth().size();
+  for (int y = 0; y < size[1]; y++) {
+    int y_ = size[1] - y - 1;
+    for (int x = 0; x < size[0]; x++) {
+      flipped[y_ * size[0] + x] = floats[y * size[0] + x];
+    }
+  }
+
+  if (real_scale) {
+    const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
+    const float near_ = depth_range[0];
+    const float far_ = depth_range[1];
+    for (auto& depth : flipped) {
+      depth = 2.0 * near_ * far_ / (far_ + near_ - depth * (far_ - near_));
+    }
+  }
+
+  return flipped;
+}
+
+bool LightViewerContext::save_color_buffer(const std::string& filename) {
+  auto bytes = this->read_color_buffer();
+  if (glk::save_png(filename, canvas->size[0], canvas->size[1], bytes)) {
+  } else {
+    std::cout << "warning : failed to save screen shot" << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool LightViewerContext::save_depth_buffer(const std::string& filename, bool real_scale) {
+  auto depths = this->read_depth_buffer(real_scale);
+
+  std::vector<unsigned char> depths_u8(sizeof(float) * depths.size());
+  memcpy(depths_u8.data(), depths.data(), sizeof(float) * depths.size());
+
+  if (glk::save_png(filename, canvas->size[0], canvas->size[1], depths_u8)) {
+  } else {
+    std::cout << "warning : failed to save depth buffer" << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 AsyncLightViewerContext LightViewerContext::async() {

@@ -20,8 +20,11 @@ public:
   using Ptr = std::shared_ptr<PointCorrespondences>;
 
 #ifdef GLK_USE_PCL
-  template<typename PointT>
-  PointCorrespondences(const boost::shared_ptr<const pcl::PointCloud<PointT>>& source_cloud, const boost::shared_ptr<const pcl::PointCloud<PointT>>& target_cloud, const pcl::CorrespondencesConstPtr& correspondences);
+  template <typename PointT>
+  PointCorrespondences(
+    const pcl::shared_ptr<const pcl::PointCloud<PointT>>& source_cloud,
+    const pcl::shared_ptr<const pcl::PointCloud<PointT>>& target_cloud,
+    const pcl::CorrespondencesConstPtr& correspondences);
 #endif
 
   virtual ~PointCorrespondences() override;

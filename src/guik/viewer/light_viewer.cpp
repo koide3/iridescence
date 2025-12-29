@@ -6,12 +6,11 @@
 #include <regex>
 #include <chrono>
 #include <numeric>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <implot.h>
 
 #include <glk/io/png_io.hpp>
+#include <glk/split.hpp>
 #include <glk/glsl_shader.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/console_colors.hpp>
@@ -44,7 +43,11 @@ void LightViewer::destroy() {
   }
 }
 
-LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32) {}
+bool LightViewer::running() {
+  return inst.get() != nullptr;
+}
+
+LightViewer::LightViewer() : Application(), LightViewerContext("main"), max_texts_size(32), toggle_spin_stop_flag(false) {}
 
 LightViewer::~LightViewer() {}
 
@@ -71,11 +74,12 @@ void LightViewer::framebuffer_size_callback(const Eigen::Vector2i& size) {
 
 void LightViewer::draw_ui() {
   std::unique_lock<std::mutex> lock(invoke_requests_mutex);
-  while (!invoke_requests.empty()) {
-    invoke_requests.front()();
-    invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> invoke_requests;
+  invoke_requests.swap(this->invoke_requests);
   lock.unlock();
+  for (auto& request : invoke_requests) {
+    request();
+  }
 
   // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
   std::vector<const std::function<void()>*> callbacks;
@@ -111,13 +115,16 @@ void LightViewer::draw_ui() {
       point_size = 10.0f;
     }
 
+    const auto point_scale_mode = global_shader_setting.get<int>("point_scale_mode");
+    const float scaling_factor = (point_scale_mode && *point_scale_mode == guik::PointScaleMode::METRIC) ? 0.1f : 10.0f;
+
     if (decrease_point_size) {
-      *point_size = point_size.get() - ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() - ImGui::GetIO().DeltaTime * scaling_factor;
     } else {
-      *point_size = point_size.get() + ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() + ImGui::GetIO().DeltaTime * scaling_factor;
     }
 
-    *point_size = std::max(0.1f, std::min(1e6f, point_size.get()));
+    *point_size = std::max(1e-4f, std::min(1e6f, point_size.value()));
 
     global_shader_setting.add("point_size", *point_size);
   }
@@ -125,7 +132,7 @@ void LightViewer::draw_ui() {
   // screen shot
   if (ImGui::GetIO().KeysDown[GLFW_KEY_J]) {
     invoke_after_rendering([this] {
-      auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
+      auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE, 4);
       std::vector<unsigned char> flipped(bytes.size(), 255);
 
       Eigen::Vector2i size = canvas->frame_buffer->color().size();
@@ -139,7 +146,7 @@ void LightViewer::draw_ui() {
       }
 
       double time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count() / 1e9;
-      std::string filename = (boost::format("/tmp/ss_%.6f.png") % time).str();
+      std::string filename = "/tmp/ss_" + std::to_string(static_cast<int>(time)) + ".png";
       if (glk::save_png(filename, canvas->size[0], canvas->size[1], flipped)) {
         std::cout << "screen shot saved:" << filename << std::endl;
       } else {
@@ -237,18 +244,28 @@ void LightViewer::draw_ui() {
     ImGui::Begin("plots", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     bool grouping = false;
-    std::unordered_map<std::string, std::vector<std::string>> groups;
+    std::vector<std::pair<std::string, std::vector<std::string>>> groups;
     for (const auto& plot : plot_data) {
       const size_t separator_loc = plot.first.find_first_of('/');
       grouping |= (separator_loc != std::string::npos);
 
       const std::string group = separator_loc == std::string::npos ? "default" : plot.first.substr(0, separator_loc);
-      groups[group].push_back(plot.first);
+      auto found = std::find_if(groups.begin(), groups.end(), [&group](const auto& g) { return g.first == group; });
+      if (found == groups.end()) {
+        groups.emplace_back(group, std::vector<std::string>());
+        found = groups.end() - 1;
+      }
+
+      found->second.push_back(plot.first);
     }
 
     if (grouping) {
       ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
       ImGui::BeginTabBar("plottab", tab_bar_flags);
+
+      if (!plot_group_orders.empty()) {
+        std::sort(groups.begin(), groups.end(), [this](const auto& lhs, const auto& rhs) { return plot_group_orders[lhs.first] < plot_group_orders[rhs.first]; });
+      }
     }
 
     for (auto& group : groups) {
@@ -271,7 +288,19 @@ void LightViewer::draw_ui() {
         if (ImPlot::BeginPlot(plot_name.c_str(), ImVec2(plot_setting.width, plot_setting.height), plot_setting.plot_flags)) {
           if (!plots.empty()) {
             const auto& plot = plots.front();
+
+            if (plot_setting.axis_link_id >= 0) {
+              auto& limits = plot_linked_axis_limits[plot_setting.axis_link_id];
+
+              for (int axis = 0; axis < ImAxis_COUNT; axis++) {
+                if (plot_setting.linked_axes & (1 << axis)) {
+                  ImPlot::SetupAxisLinks(axis, &limits(axis, 0), &limits(axis, 1));
+                }
+              }
+            }
+
             ImPlot::SetupAxes(plot_setting.x_label.c_str(), plot_setting.y_label.c_str(), plot_setting.x_flags, plot_setting.y_flags);
+            ImPlot::SetupLegend(plot_setting.legend_loc, plot_setting.legend_flags);
           }
 
           for (const auto& plot : plots) {
@@ -317,11 +346,13 @@ void LightViewer::draw_gl() {
   canvas->render_to_screen();
 
   std::unique_lock<std::mutex> lock(post_render_invoke_requests_mutex);
-  while (!post_render_invoke_requests.empty()) {
-    post_render_invoke_requests.front()();
-    post_render_invoke_requests.pop_front();
-  }
+  std::deque<std::function<void()>> post_render_invoke_requests;
+  post_render_invoke_requests.swap(this->post_render_invoke_requests);
   lock.unlock();
+
+  for (auto& request : post_render_invoke_requests) {
+    request();
+  }
 }
 
 void LightViewer::clear() {
@@ -343,8 +374,7 @@ void LightViewer::clear_text() {
 }
 
 void LightViewer::append_text(const std::string& text) {
-  std::vector<std::string> texts;
-  boost::split(texts, text, boost::is_any_of("\n"));
+  std::vector<std::string> texts = glk::split_lines(text);
 
   std::lock_guard<std::mutex> lock(texts_mutex);
   this->texts.insert(this->texts.end(), texts.begin(), texts.end());
@@ -412,6 +442,32 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
 }
 
+void LightViewer::link_plot_axis(const std::string& plot_name, int link_id, int axis) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes |= (1 << axis);
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
+}
+
+void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axes) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes = axes;
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
+}
+
+void LightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {
+  auto& setting = plot_settings[plot_name];
+  setting.legend_loc = loc;
+  setting.legend_flags = flags;
+}
+
 void LightViewer::fit_plot(const std::string& plot_name) {
   plot_settings[plot_name].set_axes_to_fit = true;
 }
@@ -420,6 +476,10 @@ void LightViewer::fit_all_plots() {
   for (auto setting = plot_settings.begin(); setting != plot_settings.end(); setting++) {
     setting->second.set_axes_to_fit = true;
   }
+}
+
+void LightViewer::setup_plot_group_order(const std::string& group_name, int order) {
+  plot_group_orders[group_name] = order;
 }
 
 void LightViewer::update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot) {
@@ -538,6 +598,7 @@ void LightViewer::update_plot_histogram(
   p->x_range_min = x_range[0];
   p->x_range_max = x_range[1];
   p->xs = xs;
+  p->ys = ys;
 
   update_plot(plot_name, label, p);
 }
@@ -595,15 +656,20 @@ bool LightViewer::spin_until_click() {
 }
 
 bool LightViewer::toggle_spin_once() {
-  bool stop = false;
-
-  register_ui_callback("kill_switch", [&]() { ImGui::Checkbox("break", &stop); });
+  bool step = false;
+  register_ui_callback("kill_switch", [&]() {
+    ImGui::Checkbox("break", &toggle_spin_stop_flag);
+    ImGui::SameLine();
+    if (ImGui::Button("step")) {
+      step = true;
+    }
+  });
 
   do {
     if (!spin_once()) {
       return false;
     }
-  } while (stop);
+  } while (toggle_spin_stop_flag && !step);
 
   register_ui_callback("kill_switch", nullptr);
 
@@ -641,6 +707,14 @@ void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
   post_render_invoke_requests.push_back(func);
 }
 
+void LightViewer::invoke_once(const std::string& label, const std::function<void()>& func) {
+  std::lock_guard<std::mutex> lock(invoke_requests_mutex);
+  if (invoke_once_called.count(label) == 0) {
+    invoke_requests.push_back(func);
+    invoke_once_called.insert(label);
+  }
+}
+
 std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   using namespace glk::console;
 
@@ -672,14 +746,14 @@ std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& c
 }
 
 void LightViewer::show_sub_viewers() {
-  for (auto& sub: sub_contexts) {
+  for (auto& sub : sub_contexts) {
     sub.second->show();
   }
 }
 
 std::shared_ptr<LightViewerContext> LightViewer::find_sub_viewer(const std::string& context_name) {
   auto found = sub_contexts.find(context_name);
-  return found == sub_contexts.end() ? found->second : nullptr;
+  return found != sub_contexts.end() ? found->second : nullptr;
 }
 
 bool LightViewer::remove_sub_viewer(const std::string& context_name) {
@@ -692,47 +766,6 @@ bool LightViewer::remove_sub_viewer(const std::string& context_name) {
   }
   sub_contexts.erase(found);
   return true;
-}
-
-std::vector<unsigned char> LightViewer::read_color_buffer() {
-  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE);
-  std::vector<unsigned char> flipped(bytes.size(), 255);
-
-  Eigen::Vector2i size = canvas->frame_buffer->color().size();
-  for (int y = 0; y < size[1]; y++) {
-    int y_ = size[1] - y - 1;
-    for (int x = 0; x < size[0]; x++) {
-      for (int k = 0; k < 3; k++) {
-        flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
-      }
-    }
-  }
-
-  return flipped;
-}
-
-std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
-  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT);
-  std::vector<float> flipped(floats.size());
-
-  Eigen::Vector2i size = canvas->frame_buffer->color().size();
-  for (int y = 0; y < size[1]; y++) {
-    int y_ = size[1] - y - 1;
-    for (int x = 0; x < size[0]; x++) {
-      flipped[y_ * size[0] + x] = floats[y * size[0] + x];
-    }
-  }
-
-  if (real_scale) {
-    const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
-    const float near = depth_range[0];
-    const float far = depth_range[1];
-    for (auto& depth : flipped) {
-      depth = 2.0 * near * far / (far + near - depth * (far - near));
-    }
-  }
-
-  return flipped;
 }
 
 }  // namespace guik

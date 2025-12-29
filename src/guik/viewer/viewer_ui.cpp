@@ -45,6 +45,11 @@ public:
 
     ImGui::Begin("display setting", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
 
+    Eigen::Vector4f clear_color = viewer->get_canvas().clear_color;
+    if (ImGui::ColorEdit4("Clear color", clear_color.data())) {
+      viewer->get_canvas().clear_color = clear_color;
+    }
+
     auto colormap_modes = glk::colormap_names();
     if (ImGui::Combo("Colormap mode", &colormap_mode, colormap_modes.data(), colormap_modes.size())) {
       viewer->set_colormap(static_cast<glk::COLORMAP>(colormap_mode));
@@ -57,11 +62,32 @@ public:
       viewer->shader_setting().add("colormap_axis", axis);
     }
 
+    ImGui::Separator();
+
+    auto point_scale_mode = viewer->shader_setting().get<int>("point_scale_mode");
+    if (!point_scale_mode) {
+      point_scale_mode = 0;
+    }
+    if (ImGui::Combo("Point scale mode", &point_scale_mode.value(), "SCREENSPACE\0METRIC\0")) {
+      viewer->shader_setting().add("point_scale_mode", *point_scale_mode);
+      if (*point_scale_mode == guik::PointScaleMode::METRIC) {
+        viewer->shader_setting().set_point_size(0.05f);  // 5 cm
+      }
+    }
+
+    auto point_shape_mode = viewer->shader_setting().get<int>("point_shape_mode");
+    if (!point_shape_mode) {
+      point_shape_mode = 0;
+    }
+    if (ImGui::Combo("Point shape mode", &point_shape_mode.value(), "RECTANGLE\0CIRCLE\0")) {
+      viewer->shader_setting().add("point_shape_mode", *point_shape_mode);
+    }
+
     auto point_size = viewer->shader_setting().get<float>("point_size");
     if (!point_size) {
       point_size = 10.0f;
     }
-    if (ImGui::DragFloat("Point size", point_size.get_ptr(), 0.1f)) {
+    if (ImGui::DragFloat("Point size", &point_size.value(), 0.001f, 0.0f, 1000.0f)) {
       viewer->shader_setting().add("point_size", *point_size);
     }
 
@@ -387,7 +413,7 @@ public:
       auto color_mode = shader_setting->get<int>("color_mode");
       if (color_mode) {
         std::vector<const char*> color_modes = {"RAINBOW", "FLAT_COLOR", "VERTEX_COLOR"};
-        if (ImGui::Combo("Color mode", color_mode.get_ptr(), color_modes.data(), color_modes.size())) {
+        if (ImGui::Combo("Color mode", &color_mode.value(), color_modes.data(), color_modes.size())) {
           shader_setting->add("color_mode", *color_mode);
         }
 
@@ -478,14 +504,7 @@ public:
     }
     recent_files.push(filename);
 
-    std::ofstream ofs(filename);
-    auto projection = viewer->get_projection_control();
-    ofs << "ProjectionControl: " << projection->name() << std::endl;
-    ofs << (*projection) << std::endl;
-
-    auto view = viewer->get_camera_control();
-    ofs << "CameraControl: " << view->name() << std::endl;
-    ofs << (*view) << std::endl;
+    viewer->save_camera_settings(filename);
   }
 
   void load_camera() {
@@ -498,42 +517,7 @@ public:
     }
     recent_files.push(filenames.front());
 
-    std::ifstream ifs(filenames.front());
-
-    // load projection setting
-    std::shared_ptr<guik::ProjectionControl> proj(new guik::BasicProjectionControl(viewer->canvas_size()));
-    ifs >> (*proj);
-    viewer->set_projection_control(proj);
-
-    std::string line;
-    while (!ifs.eof() && std::getline(ifs, line)) {
-      if (line.find("CameraControl") == std::string::npos) {
-        continue;
-      }
-
-      std::stringstream sst(line);
-      std::string token, type;
-      sst >> token >> type;
-
-      std::shared_ptr<guik::CameraControl> camera_control;
-      if (type == "OrbitCameraControlXY") {
-        camera_control.reset(new guik::OrbitCameraControlXY());
-      } else if (type == "OrbitCameraControlXZ") {
-        camera_control.reset(new guik::OrbitCameraControlXZ());
-      } else if (type == "TopDownCameraControl") {
-        camera_control.reset(new guik::TopDownCameraControl());
-      } else if (type == "ArcBallCameraControl") {
-        camera_control.reset(new guik::ArcBallCameraControl());
-      }
-
-      if (camera_control == nullptr) {
-        std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
-        break;
-      }
-
-      ifs >> (*camera_control);
-      viewer->set_camera_control(camera_control);
-    }
+    viewer->load_camera_settings(filenames.front());
   }
 
 private:
@@ -548,9 +532,7 @@ private:
  */
 class LightViewer::ViewerUI::PlotSettingWindow {
 public:
-  PlotSettingWindow(guik::LightViewer* viewer) : viewer(viewer) {
-    show_window = false;
-  }
+  PlotSettingWindow(guik::LightViewer* viewer) : viewer(viewer) { show_window = false; }
 
   ~PlotSettingWindow() {}
 
@@ -692,12 +674,20 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
       hide_menu = true;
     }
 
-    if (ImGui::MenuItem("Quit")) {
+    if (ImGui::MenuItem("Quit viewer")) {
       viewer->close();
+    }
+
+    if (ImGui::MenuItem("Force kill")) {
+      auto result = pfd::message("Force kill", "This will kill the program immediately. Are you sure? ", pfd::choice::ok_cancel, pfd::icon::warning).result();
+      if (result == pfd::button::ok) {
+        exit(1);
+      }
     }
     ImGui::EndMenu();
   }
 
+  static bool turn_table = false;
   if (ImGui::BeginMenu("Display")) {
     display_setting_window->menu_item();
     if (ImGui::MenuItem("Show Info Window")) {
@@ -719,7 +709,16 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
       viewer->set_draw_xy_grid(false);
     }
 
+    if (ImGui::MenuItem("Turn table", nullptr, &turn_table)) {
+    }
+
     ImGui::EndMenu();
+  }
+
+  if (turn_table) {
+    auto camera = viewer->get_camera_control();
+    camera->mouse({0.0f, 0.0f}, 0, true);
+    camera->drag({1.0f, 0.0f}, 0);
   }
 
   if (ImGui::BeginMenu("Drawable")) {

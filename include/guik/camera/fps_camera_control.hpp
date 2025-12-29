@@ -57,8 +57,8 @@ private:
 
   Eigen::Vector2i size;
   double fovy;
-  double near;
-  double far;
+  double near_; // near, far are reserved words in MSVC!
+  double far_;
 
   double mouse_sensitivity_yaw;
   double mouse_sensitivity_pitch;

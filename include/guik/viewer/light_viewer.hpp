@@ -27,13 +27,18 @@ public:
 
   static LightViewer* instance(const Eigen::Vector2i& size = Eigen::Vector2i(-1, -1), bool background = false, const std::string& title = "screen");
   static void destroy();
+  static bool running();
 
   bool spin_until_click();
   bool toggle_spin_once();
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
+  // Invoke a task in the visualization thread
   void invoke(const std::function<void()>& func);
+  // Invoke a task after rendering in the visualization thread
   void invoke_after_rendering(const std::function<void()>& func);
+  // Invoke a labeled task only once
+  void invoke_once(const std::string& label, const std::function<void()>& func);
 
   virtual void clear() override;
   virtual void clear_text() override;
@@ -46,16 +51,20 @@ public:
 
   std::shared_ptr<LightViewerContext> sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
-  void show_sub_viewers();                                                                // Set all sub viewer windows to be opened
-  std::shared_ptr<LightViewerContext> find_sub_viewer(const std::string& context_name);   // Returns nullptr if sub viewer does not exist
-  bool remove_sub_viewer(const std::string& context_name);                                // Returns false if sub viwewer does not exist
+  void show_sub_viewers();                                                               // Set all sub viewer windows to be opened
+  std::shared_ptr<LightViewerContext> find_sub_viewer(const std::string& context_name);  // Returns nullptr if sub viewer does not exist
+  bool remove_sub_viewer(const std::string& context_name);                               // Returns false if sub viwewer does not exist
 
   // Plotting methods
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  void link_plot_axis(const std::string& plot_name, int link_id, int axis);       // axis = ImAxis_X1 or ImAxis_X2, ...
+  void link_plot_axes(const std::string& plot_name, int link_id, int axes = -1);  // axes = (1 << ImAxis_X1) | (1 << ImAxis_X2) ...
+  void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
+  void setup_plot_group_order(const std::string& group_name, int order);
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
 
   // Plotting update methods
@@ -91,7 +100,8 @@ public:
 
   // Plotting update template methods
   template <typename T>
-  void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
   template <typename T1, typename T2>
   void update_plot_line(
     const std::string& plot_name,
@@ -108,17 +118,73 @@ public:
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
   template <typename T, typename Func>
-  void
-  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12);
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<!std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = pt[0];
+      ys[i] = pt[1];
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
+  template <typename T, typename Func>
+  auto
+  update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
+    -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = i;
+      ys[i] = pt;
+    }
+    update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
+  }
 
   template <typename T>
-  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0);
+  auto update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0)
+    -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
   template <typename T1, typename T2>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags = 0);
   template <typename T, int D, typename Alloc>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags = 0);
   template <typename T, typename Func>
-  void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int scatter_flags = 0);
+  auto update_plot_scatter(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& data,
+    const Func& transform,
+    int scatter_flags = 0,
+    size_t max_num_data = 8192 * 12) -> std::enable_if_t<!std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = pt[0];
+      ys[i] = pt[1];
+    }
+    update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+  }
+  template <typename T, typename Func>
+  auto update_plot_scatter(
+    const std::string& plot_name,
+    const std::string& label,
+    const std::vector<T>& data,
+    const Func& transform,
+    int scatter_flags = 0,
+    size_t max_num_data = 8192 * 12) -> std::enable_if_t<std::is_arithmetic_v<decltype(transform(data[0]))>, void> {
+    std::vector<double> xs(data.size());
+    std::vector<double> ys(data.size());
+    for (size_t i = 0; i < data.size(); i++) {
+      const auto pt = transform(data[i]);
+      xs[i] = i;
+      ys[i] = pt;
+    }
+    update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
+  }
 
   template <typename T>
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags = 0);
@@ -182,10 +248,6 @@ public:
     float weight = -1,
     const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
 
-  // Buffer read methods
-  std::vector<unsigned char> read_color_buffer();
-  std::vector<float> read_depth_buffer(bool real_scale = true);
-
   void show_viewer_ui();
   void show_info_window();
 
@@ -208,18 +270,24 @@ private:
   std::mutex texts_mutex;
   int max_texts_size;
   std::deque<std::string> texts;
+
+  bool toggle_spin_stop_flag;
+
   std::unordered_map<std::string, std::function<void()>> ui_callbacks;
 
   std::unordered_map<std::string, std::tuple<double, std::shared_ptr<glk::Texture>, int>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;
 
+  std::unordered_map<int, Eigen::Matrix<double, 6, 2>> plot_linked_axis_limits;
   std::unordered_map<std::string, PlotSetting> plot_settings;
+  std::unordered_map<std::string, int> plot_group_orders;
   std::unordered_map<std::string, std::vector<std::pair<PlotStyleConstPtr, PlotDataConstPtr>>> plot_data;
 
   std::unordered_map<std::string, std::shared_ptr<LightViewerContext>> sub_contexts;
 
   std::mutex invoke_requests_mutex;
   std::deque<std::function<void()>> invoke_requests;
+  std::unordered_set<std::string> invoke_once_called;
 
   std::mutex post_render_invoke_requests_mutex;
   std::deque<std::function<void()>> post_render_invoke_requests;
@@ -237,10 +305,15 @@ inline void destroy() {
   LightViewer::destroy();
 }
 
+inline bool running() {
+  return LightViewer::running();
+}
+
 // Template methods
 
 template <typename T>
-void LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data) {
+auto LightViewer::update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags, size_t max_num_data)
+  -> std::enable_if_t<std::is_arithmetic_v<T>, void> {
   std::vector<double> ys_(ys.size());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_line(plot_name, label, ys_, line_flags, max_num_data);
@@ -275,20 +348,9 @@ void LightViewer::update_plot_line(
   update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
 }
 
-template <typename T, typename Func>
-void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags, size_t max_num_data) {
-  std::vector<double> xs(data.size());
-  std::vector<double> ys(data.size());
-  for (size_t i = 0; i < data.size(); i++) {
-    const auto pt = transform(data[i], xs[i], ys[i]);
-    xs[i] = pt[0];
-    ys[i] = pt[1];
-  }
-  update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
-}
-
 template <typename T>
-void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags) {
+auto LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags)
+  -> std::enable_if_t<std::is_arithmetic_v<T>, void> {
   std::vector<double> ys_(ys.size());
   std::copy(ys.begin(), ys.end(), ys_.begin());
   update_plot_scatter(plot_name, label, ys_, scatter_flags);
@@ -309,18 +371,6 @@ void LightViewer::update_plot_scatter(const std::string& plot_name, const std::s
   std::vector<double> ys(data.size());
   std::transform(data.begin(), data.end(), xs.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[0]; });
   std::transform(data.begin(), data.end(), ys.begin(), [](const Eigen::Matrix<T, D, 1>& v) { return v[1]; });
-  update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
-}
-
-template <typename T, typename Func>
-void LightViewer::update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int scatter_flags) {
-  std::vector<double> xs(data.size());
-  std::vector<double> ys(data.size());
-  for (size_t i = 0; i < data.size(); i++) {
-    const auto pt = transform(data[i], xs[i], ys[i]);
-    xs[i] = pt[0];
-    ys[i] = pt[1];
-  }
   update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
 }
 
