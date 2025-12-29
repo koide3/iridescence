@@ -12,7 +12,7 @@ ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip) :
 ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip) : ThinLines(vertices, colors, num_vertices, nullptr, 0, line_strip) {}
 
 ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: ThinLines(vertices, nullptr, colors, num_vertices, indices, num_indices, line_strip) {}
+: ThinLines(vertices, colors, nullptr, num_vertices, indices, num_indices, line_strip) {}
 
 ThinLines::ThinLines(const float* vertices, const float* colors, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
 : line_width(1.0f) {
