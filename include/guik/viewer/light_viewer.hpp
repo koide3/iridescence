@@ -33,8 +33,12 @@ public:
   bool toggle_spin_once();
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0) override;
 
+  // Invoke a task in the visualization thread
   void invoke(const std::function<void()>& func);
+  // Invoke a task after rendering in the visualization thread
   void invoke_after_rendering(const std::function<void()>& func);
+  // Invoke a labeled task only once
+  void invoke_once(const std::string& label, const std::function<void()>& func);
 
   virtual void clear() override;
   virtual void clear_text() override;
@@ -55,7 +59,8 @@ public:
   void clear_plots(bool clear_settings = true);
   void remove_plot(const std::string& plot_name, const std::string& label = "");
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
-  void link_plot_axes(const std::string& plot_name, int link_id, int axis);
+  void link_plot_axis(const std::string& plot_name, int link_id, int axis);       // axis = ImAxis_X1 or ImAxis_X2, ...
+  void link_plot_axes(const std::string& plot_name, int link_id, int axes = -1);  // axes = (1 << ImAxis_X1) | (1 << ImAxis_X2) ...
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
   void fit_plot(const std::string& plot_name);
   void fit_all_plots();
@@ -286,6 +291,7 @@ private:
 
   std::mutex invoke_requests_mutex;
   std::deque<std::function<void()>> invoke_requests;
+  std::unordered_set<std::string> invoke_once_called;
 
   std::mutex post_render_invoke_requests_mutex;
   std::deque<std::function<void()>> post_render_invoke_requests;
