@@ -20,25 +20,28 @@ uniform mat4 projection_matrix;
 // colormode = 1 : material_color
 // colormode = 2 : vert_color
 // colormode = 3 : texture_color
+// colormode = 4 : vert_cmap (color map)
 uniform int color_mode;
 uniform vec4 material_color;
 uniform sampler2D colormap_sampler;
 uniform sampler2D texture_sampler;
 
 uniform vec2 z_range;
+uniform vec2 cmap_range;
 uniform vec3 colormap_axis;
 
 in vec3 vert_position;
 in vec4 vert_color;
 in vec2 vert_texcoord;
 in vec3 vert_normal;
+in float vert_cmap;
 
 out vec4 frag_color;
 out vec2 frag_texcoord;
 out vec3 frag_normal;
 
-vec4 rainbow(vec3 position) {
-    float p = (dot(position, colormap_axis) - z_range[0]) / (z_range[1] - z_range[0]);
+vec4 rainbow(float val, vec2 range) {
+    float p = (val - range[0]) / (range[1] - range[0]);
     return texture(colormap_sampler, vec2(p, 0.0));
 }
 
@@ -49,7 +52,7 @@ void main() {
 
     switch(color_mode) {
         case 0:
-            frag_color = rainbow(frag_world_position);
+            frag_color = rainbow(dot(frag_world_position, colormap_axis), z_range);
             frag_color.a = material_color.a;
             break;
 
@@ -63,6 +66,11 @@ void main() {
 
         case 3:
             frag_texcoord = vert_texcoord;
+            break;
+
+        case 4:
+            frag_color = rainbow(vert_cmap, cmap_range);
+            frag_color.a = material_color.a;
             break;
     }
 

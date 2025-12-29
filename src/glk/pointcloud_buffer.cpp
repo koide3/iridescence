@@ -25,6 +25,7 @@ PointCloudBuffer::PointCloudBuffer(int stride, int num_points) {
   rendering_count = 0;
   points_rendering_budget = 8192;
   ebo = 0;
+  cmap_bo = 0;
 }
 
 PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points) {
@@ -45,6 +46,7 @@ PointCloudBuffer::PointCloudBuffer(const float* data, int stride, int num_points
   rendering_count = 0;
   points_rendering_budget = 8192;
   ebo = 0;
+  cmap_bo = 0;
 }
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points) : PointCloudBuffer(points.data(), sizeof(Eigen::Vector3f), points.cols()) {}
@@ -115,6 +117,50 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* data, 
   }
 
   add_color(colors[0].data(), sizeof(Eigen::Vector4f), num_points);
+}
+
+void PointCloudBuffer::set_colormap_buffer(const std::string& attribute_name) {
+  auto found = std::find_if(aux_buffers.begin(), aux_buffers.end(), [&](const AuxBufferData& aux) { return aux.attribute_name == attribute_name; });
+  if (found == aux_buffers.end()) {
+    std::cerr << console::bold_yellow << "warning : attribute_name=" << attribute_name << " does not exist!!" << console::reset << std::endl;
+  } else {
+    cmap_bo = found->buffer;
+  }
+}
+
+void PointCloudBuffer::add_colormap(std::vector<float>& cmap, float scale) {
+  add_colormap(cmap.data(), sizeof(float), cmap.size(), scale);
+}
+
+void PointCloudBuffer::add_colormap(std::vector<double>& cmap, float scale) {
+  std::vector<float> cmap_f(cmap.size());
+  std::copy(cmap.begin(), cmap.end(), cmap_f.begin());
+  add_colormap(cmap_f, scale);
+}
+
+void PointCloudBuffer::add_colormap(const float* data, int stride, int num_points, float scale) {
+  if (std::abs(scale - 1.0f) > 1e-6f) {
+    const int step = stride / sizeof(float);
+    std::vector<float> scaled(num_points);
+    for (int i = 0; i < num_points; i++) {
+      scaled[i] = scale * data[step * i];
+    }
+    add_buffer("cmap", 1, scaled.data(), sizeof(float), num_points);
+  } else {
+    add_buffer("cmap", 1, data, stride, num_points);
+  }
+
+  set_colormap_buffer("cmap");
+}
+
+void PointCloudBuffer::add_buffer(const std::string& attribute_name, const std::vector<float>& data) {
+  add_buffer(attribute_name, 1, data.data(), sizeof(float), data.size());
+}
+
+void PointCloudBuffer::add_buffer(const std::string& attribute_name, const std::vector<double>& data) {
+  std::vector<float> data_f(data.size());
+  std::copy(data.begin(), data.end(), data_f.begin());
+  add_buffer(attribute_name, 1, data_f.data(), sizeof(float), data_f.size());
 }
 
 void PointCloudBuffer::add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points) {
@@ -286,7 +332,18 @@ void PointCloudBuffer::bind(glk::GLSLShader& shader) const {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, stride, 0);
 
+  if (cmap_bo) {
+    GLint cmap_loc = shader.attrib("vert_cmap");
+    glEnableVertexAttribArray(cmap_loc);
+    glBindBuffer(GL_ARRAY_BUFFER, cmap_bo);
+    glVertexAttribPointer(cmap_loc, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+  }
+
   for (const auto& aux : aux_buffers) {
+    if (aux.buffer == cmap_bo) {
+      continue;
+    }
+
     GLint attrib_loc = shader.attrib(aux.attribute_name);
     glEnableVertexAttribArray(attrib_loc);
     glBindBuffer(GL_ARRAY_BUFFER, aux.buffer);
@@ -303,7 +360,13 @@ void PointCloudBuffer::unbind(glk::GLSLShader& shader) const {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glDisableVertexAttribArray(position_loc);
   for (const auto& aux : aux_buffers) {
+    if (aux.buffer == cmap_bo) {
+      continue;
+    }
     glDisableVertexAttribArray(shader.attrib(aux.attribute_name));
+  }
+  if (cmap_bo) {
+    glDisableVertexAttribArray(shader.attrib("vert_cmap"));
   }
 }
 

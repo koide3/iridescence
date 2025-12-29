@@ -13,12 +13,13 @@
 namespace guik {
 
 /// @brief Fragment color mode.
-///        RAINBOW       : Color mapped by 3D coordinates of pixels (by default, Z-axis is used for color mapping)
-///        FLAT_COLOR    : Single flat color
-///        VERTEX_COLOR  : Color from vertex color attribute
-///        TEXTURE_COLOR : Color from texture map
+///        RAINBOW         : Color mapped by 3D coordinates of pixels (by default, Z-axis is used for color mapping)
+///        FLAT_COLOR      : Single flat color
+///        VERTEX_COLOR    : Color from vertex color attribute
+///        TEXTURE_COLOR   : Color from texture map
+///        VERTEX_COLORMAP : Color from vertex colormap attribute
 struct ColorMode {
-  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2, TEXTURE_COLOR = 3 };
+  enum MODE { RAINBOW = 0, FLAT_COLOR = 1, VERTEX_COLOR = 2, TEXTURE_COLOR = 3, VERTEX_COLORMAP = 4 };
 };
 
 /// @brief Point size scale mode.
@@ -524,6 +525,17 @@ public:
   TextureColor(const Transform& transform) : ShaderSetting(ColorMode::TEXTURE_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {}
 
   virtual ~TextureColor() override {}
+};
+
+/// @brief Vertex colormap scheme that assigns colors based on vertex colormap attributes.
+struct VertexColorMap : public ShaderSetting {
+public:
+  VertexColorMap() : ShaderSetting(ColorMode::VERTEX_COLORMAP) {}
+
+  template <typename Transform>
+  VertexColorMap(const Transform& transform) : ShaderSetting(ColorMode::VERTEX_COLORMAP, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {}
+
+  virtual ~VertexColorMap() override {}
 };
 
 }  // namespace guik

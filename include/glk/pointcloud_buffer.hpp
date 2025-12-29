@@ -63,6 +63,16 @@ public:
   void add_normals(const float* data, int stride, int num_points);
   void add_color(const float* data, int stride, int num_points);
   void add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale = 1.0f);
+
+  void set_colormap_buffer(const std::string& attribute_name);
+  void add_colormap(std::vector<float>& cmap, float scale = 1.0f);
+  void add_colormap(std::vector<double>& cmap, float scale = 1.0);
+  void add_colormap(const float* data, int stride, int num_points, float scale = 1.0f);
+
+  void add_buffer(const std::string& attribute_name, const std::vector<float>& data);
+  void add_buffer(const std::string& attribute_name, const std::vector<double>& data);
+  template <typename Scalar, int D, typename Allocator>
+  void add_buffer(const std::string& attribute_name, const std::vector<Eigen::Matrix<Scalar, D, 1>, Allocator>& data);
   void add_buffer(const std::string& attribute_name, int dim, const float* data, int stride, int num_points);
 
   // Partial attribute update methods (User must ensure that stride and dim are matched with existing attribute)
@@ -111,6 +121,8 @@ private:
   int stride;
   int num_points;
 
+  GLuint cmap_bo;  // buffer object for colormap attribute
+
   std::vector<AuxBufferData> aux_buffers;
 };
 
@@ -145,6 +157,17 @@ void PointCloudBuffer::add_normals(const Eigen::Matrix<double, N, 1>* normals, i
 template <typename Scalar, typename Allocator>
 void PointCloudBuffer::add_color(const std::vector<Eigen::Matrix<Scalar, 4, 1>, Allocator>& colors) {
   add_color(colors.data(), colors.size());
+}
+
+template <typename Scalar, int D, typename Allocator>
+void PointCloudBuffer::add_buffer(const std::string& attribute_name, const std::vector<Eigen::Matrix<Scalar, D, 1>, Allocator>& data) {
+  if constexpr (std::is_same<Scalar, float>::value) {
+    add_buffer(attribute_name, D, data[0].data(), sizeof(float) * D, data.size());
+  } else {
+    std::vector<Eigen::Matrix<float, D, 1>, Eigen::aligned_allocator<Eigen::Matrix<float, D, 1>>> data_f(data.size());
+    std::transform(data.begin(), data.end(), data_f.begin(), [](const Eigen::Matrix<double, D, 1>& p) { return p.template cast<float>(); });
+    add_buffer(attribute_name, D, data_f.data(), sizeof(float) * D, data_f.size());
+  }
 }
 
 template <typename Scalar, int D, typename Allocator>

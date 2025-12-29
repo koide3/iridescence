@@ -54,6 +54,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);
@@ -121,6 +122,7 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);

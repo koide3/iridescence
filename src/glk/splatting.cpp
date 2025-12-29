@@ -83,6 +83,7 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
 
   shader->set_uniform("color_mode", shader_.get_uniform_cache<int>("color_mode"));
   shader->set_uniform("z_range", shader_.get_uniform_cache<Eigen::Vector2f>("z_range"));
+  shader->set_uniform("cmap_range", shader_.get_uniform_cache<Eigen::Vector2f>("cmap_range"));
   shader->set_uniform("colormap_axis", shader_.get_uniform_cache<Eigen::Vector3f>("colormap_axis"));
 
   shader->set_uniform("model_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>("model_matrix"));

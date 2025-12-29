@@ -103,6 +103,15 @@ public:
     ImGui::SameLine();
     ImGui::Checkbox("Auto", &auto_range);
 
+    auto cmap_range = viewer->shader_setting().get<Eigen::Vector2f>("cmap_range");
+    if (!cmap_range) {
+      cmap_range = Eigen::Vector2f(0.0f, 1.0f);
+    }
+
+    if (ImGui::DragFloatRange2("cmap_range", cmap_range->data(), cmap_range->data() + 1, 0.01f)) {
+      viewer->shader_setting().add("cmap_range", *cmap_range);
+    }
+
     if (auto_range) {
       Eigen::Vector3f axis = Eigen::Vector3f::Zero();
       axis[static_cast<int>(colormap_axis)] = 1.0f;
