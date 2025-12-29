@@ -133,6 +133,7 @@ add_library(iridescence
   thirdparty/imgui/backends/imgui_impl_opengl3.cpp
   # glk
   src/glk/path_std.cpp
+  src/glk/hash.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
   src/glk/lines.cpp
@@ -206,6 +207,7 @@ target_include_directories(iridescence PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/rapidhash>
   $<INSTALL_INTERFACE:include/iridescence>
 )
 target_link_libraries(iridescence PUBLIC
