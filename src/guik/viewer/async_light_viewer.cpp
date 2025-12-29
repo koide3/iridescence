@@ -109,6 +109,10 @@ void AsyncLightViewer::invoke_after_rendering(const std::function<void()>& func)
   guik::viewer()->invoke_after_rendering(func);
 }
 
+void AsyncLightViewer::invoke_once(const std::string& label, const std::function<void()>& func) {
+  guik::viewer()->invoke_once(label, func);
+}
+
 void AsyncLightViewer::clear_images() {
   guik::viewer()->invoke([] { guik::viewer()->clear_images(); });
 }
@@ -136,8 +140,12 @@ void AsyncLightViewer::setup_plot(const std::string& plot_name, int width, int h
   guik::viewer()->invoke([=] { guik::viewer()->setup_plot(plot_name, width, height, plot_flags, x_flags, y_flags, order); });
 }
 
-void AsyncLightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
-  guik::viewer()->invoke([=] { guik::viewer()->link_plot_axes(plot_name, link_id, axis); });
+void AsyncLightViewer::link_plot_axis(const std::string& plot_name, int link_id, int axis) {
+  guik::viewer()->invoke([=] { guik::viewer()->link_plot_axis(plot_name, link_id, axis); });
+}
+
+void AsyncLightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axes) {
+  guik::viewer()->invoke([=] { guik::viewer()->link_plot_axes(plot_name, link_id, axes); });
 }
 
 void AsyncLightViewer::setup_legend(const std::string& plot_name, int loc, int flags) {

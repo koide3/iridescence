@@ -42,6 +42,10 @@ void AsyncLightViewerContext::set_colormap(glk::COLORMAP colormap) {
   guik::viewer()->invoke([=] { context->set_colormap(colormap); });
 }
 
+void AsyncLightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  guik::viewer()->invoke([=] { context->set_point_shape(point_size, metric, circle); });
+}
+
 void AsyncLightViewerContext::clear_drawables() {
   guik::viewer()->invoke([=] { context->clear_drawables(); });
 }
@@ -55,6 +59,22 @@ void AsyncLightViewerContext::remove_drawable(const std::string& name) {
 
 void AsyncLightViewerContext::remove_drawable(const std::regex& regex) {
   guik::viewer()->invoke([=] { context->remove_drawable(regex); });
+}
+
+void AsyncLightViewerContext::save_camera_settings(const std::string& path) {
+  guik::viewer()->invoke([=] { context->save_camera_settings(path); });
+}
+
+void AsyncLightViewerContext::load_camera_settings(const std::string& path) {
+  guik::viewer()->invoke([=] { context->load_camera_settings(path); });
+}
+
+void AsyncLightViewerContext::save_color_buffer(const std::string& filename) {
+  guik::viewer()->invoke([=] { context->save_color_buffer(filename); });
+}
+
+void AsyncLightViewerContext::save_depth_buffer(const std::string& filename, bool real_scale) {
+  guik::viewer()->invoke([=] { context->save_depth_buffer(filename, real_scale); });
 }
 
 void AsyncLightViewerContext::reset_center() {
@@ -102,6 +122,24 @@ void AsyncLightViewerContext::update_points(const std::string& name, const float
 
   guik::viewer()->invoke([=] {
     auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(buffer.data(), stride, num_points);
+    context->update_drawable(name, cloud_buffer, shader_setting);
+  });
+}
+
+void AsyncLightViewerContext::update_points(
+  const std::string& name,
+  const float* vertices,
+  int vertex_stride,
+  const float* colors,
+  int color_stride,
+  int num_points,
+  const ShaderSetting& shader_setting) {
+  std::vector<float> vertex_buffer(vertices, vertices + vertex_stride / sizeof(float) * num_points);
+  std::vector<float> color_buffer(colors, colors + color_stride / sizeof(float) * num_points);
+
+  guik::viewer()->invoke([=] {
+    auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertex_buffer.data(), vertex_stride, num_points);
+    cloud_buffer->add_color(color_buffer.data(), color_stride, num_points);
     context->update_drawable(name, cloud_buffer, shader_setting);
   });
 }
