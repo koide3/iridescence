@@ -69,8 +69,8 @@ public:
   template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
   void update_normal_dists(
     const std::string& name,
-    const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
-    const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+    const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
+    const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
     float scale,
     const ShaderSetting& shader_setting);
 
@@ -175,8 +175,8 @@ void AsyncLightViewerContext::update_points(const std::string& name, const std::
 template <typename Scalar, int Dim, typename Alloc1, typename Alloc2>
 void AsyncLightViewerContext::update_normal_dists(
   const std::string& name,
-  const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1> points,
-  const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2> covs,
+  const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
+  const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
   float scale,
   const ShaderSetting& shader_setting) {
   update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
