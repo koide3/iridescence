@@ -27,10 +27,17 @@ public:
   void set_draw_xy_grid(bool draw_xy_grid);
   void set_colormap(glk::COLORMAP colormap);
 
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
+
   void clear_drawables();
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
   void remove_drawable(const std::string& name);
   void remove_drawable(const std::regex& regex);
+
+  void save_camera_settings(const std::string& path);
+  void load_camera_settings(const std::string& path);
+  void save_color_buffer(const std::string& filename);
+  void save_depth_buffer(const std::string& filename, bool real_scale = true);
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
@@ -52,9 +59,23 @@ public:
   void update_points(const std::string& name, const float* data, int stride, int num_points, const ShaderSetting& shader_setting);
   template <typename Scalar, int Dim>
   void update_points(const std::string& name, const Eigen::Matrix<Scalar, Dim, 1>* points, int num_points, const ShaderSetting& shader_setting);
-
   template <typename Scalar, int Dim, typename Allocator>
   void update_points(const std::string& name, const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting);
+
+  void update_points(const std::string& name, const float* vertices, int vertex_stride, const float* colors, int color_stride, int num_points, const ShaderSetting& shader_setting);
+  template <typename ScalarV, int DimV, typename ScalarC, int DimC>
+  void update_points(
+    const std::string& name,
+    const Eigen::Matrix<ScalarV, DimV, 1>* points,
+    const Eigen::Matrix<ScalarC, DimC, 1>* colors,
+    int num_points,
+    const ShaderSetting& shader_setting);
+  template <typename ScalarV, int DimV, typename AllocatorV, typename ScalarC, int DimC, typename AllocatorC>
+  void update_points(
+    const std::string& name,
+    const std::vector<Eigen::Matrix<ScalarV, DimV, 1>, AllocatorV>& points,
+    const std::vector<Eigen::Matrix<ScalarC, DimC, 1>, AllocatorC>& colors,
+    const ShaderSetting& shader_setting);
 
   // NormalDistributions
   template <typename Scalar, int Dim>
@@ -169,6 +190,38 @@ void AsyncLightViewerContext::update_points(const std::string& name, const Eigen
 template <typename Scalar, int Dim, typename Allocator>
 void AsyncLightViewerContext::update_points(const std::string& name, const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Allocator>& points, const ShaderSetting& shader_setting) {
   return update_points(name, points.data(), points.size(), shader_setting);
+}
+
+template <typename ScalarV, int DimV, typename ScalarC, int DimC>
+void AsyncLightViewerContext::update_points(
+  const std::string& name,
+  const Eigen::Matrix<ScalarV, DimV, 1>* points,
+  const Eigen::Matrix<ScalarC, DimC, 1>* colors,
+  int num_points,
+  const ShaderSetting& shader_setting) {
+  if constexpr (std::is_same<ScalarV, float>::value && std::is_same<ScalarC, float>::value) {
+    return update_points(
+      name,
+      reinterpret_cast<const float*>(points),
+      sizeof(float) * DimV,
+      reinterpret_cast<const float*>(colors),
+      sizeof(float) * DimC,
+      num_points,
+      shader_setting);
+  } else {
+    const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
+    const auto colors_4f = glk::convert_to_vector<float, 4, 1>(colors, num_points);
+    return update_points(name, points_3f.data(), colors_4f.data(), num_points, shader_setting);
+  }
+}
+
+template <typename ScalarV, int DimV, typename AllocatorV, typename ScalarC, int DimC, typename AllocatorC>
+void AsyncLightViewerContext::update_points(
+  const std::string& name,
+  const std::vector<Eigen::Matrix<ScalarV, DimV, 1>, AllocatorV>& points,
+  const std::vector<Eigen::Matrix<ScalarC, DimC, 1>, AllocatorC>& colors,
+  const ShaderSetting& shader_setting) {
+  return update_points(name, points.data(), colors.data(), points.size(), shader_setting);
 }
 
 // NormalDistributions

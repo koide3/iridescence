@@ -333,6 +333,8 @@ void define_guik(py::module_& m) {
     .def("get_screen_effect", &guik::LightViewerContext::get_screen_effect)
     .def("set_bg_texture", &guik::LightViewerContext::set_bg_texture)
 
+    .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
+
     .def("enable_normal_buffer", &guik::LightViewerContext::enable_normal_buffer)
     .def("enable_info_buffer", &guik::LightViewerContext::enable_info_buffer)
     .def("enable_partial_rendering", &guik::LightViewerContext::enable_partial_rendering, py::arg("clear_thresh") = 1e-6)
@@ -370,6 +372,12 @@ void define_guik(py::module_& m) {
     .def("set_camera_control", &guik::LightViewerContext::set_camera_control)
     .def("get_projection_control", &guik::LightViewerContext::get_projection_control)
     .def("set_projection_control", &guik::LightViewerContext::set_projection_control)
+
+    .def("save_camera_settings", &guik::LightViewerContext::save_camera_settings, py::arg("path"))
+    .def("load_camera_settings", &guik::LightViewerContext::load_camera_settings, py::arg("path"))
+
+    .def("save_color_buffer", &guik::LightViewerContext::save_color_buffer, py::arg("path"))
+    .def("save_depth_buffer", &guik::LightViewerContext::save_depth_buffer, py::arg("path"), py::arg("real_scale") = true)
 
     .def("reset_center", &guik::LightViewerContext::reset_center)
     .def(
@@ -613,6 +621,8 @@ void define_guik(py::module_& m) {
     .def("set_draw_xy_grid", &guik::AsyncLightViewerContext::set_draw_xy_grid)
     .def("set_colormap", &guik::AsyncLightViewerContext::set_colormap)
 
+    .def("set_point_shape", &guik::AsyncLightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
+
     .def("clear_drawables", [](guik::AsyncLightViewerContext& context) { context.clear_drawables(); })
     .def(
       "remove_drawable",
@@ -625,6 +635,11 @@ void define_guik(py::module_& m) {
       },
       py::arg("pattern"),
       py::arg("regex") = false)
+
+    .def("save_camera_settings", &guik::AsyncLightViewerContext::save_camera_settings, py::arg("path"))
+    .def("load_camera_settings", &guik::AsyncLightViewerContext::load_camera_settings, py::arg("path"))
+    .def("save_color_buffer", &guik::AsyncLightViewerContext::save_color_buffer, py::arg("path"))
+    .def("save_depth_buffer", &guik::AsyncLightViewerContext::save_depth_buffer, py::arg("path"), py::arg("real_scale") = true)
 
     .def("reset_center", &guik::AsyncLightViewerContext::reset_center)
     .def(
@@ -660,6 +675,25 @@ void define_guik(py::module_& m) {
         context.update_points(name, points.data(), sizeof(float) * points.cols(), points.rows(), shader_setting);
       })
 
+    .def(
+      "update_points",
+      [](
+        guik::AsyncLightViewerContext& context,
+        const std::string& name,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& colors,
+        const guik::ShaderSetting& shader_setting) {
+        if (points.cols() != 3 && points.cols() != 4) {
+          std::cerr << "warning: points must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+        if (colors.cols() != 3 && colors.cols() != 4) {
+          std::cerr << "warning: colors must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+
+        context.update_points(name, points.data(), sizeof(float) * points.cols(), colors.data(), sizeof(float) * colors.cols(), points.rows(), shader_setting);
+      })
     .def(
       "update_normal_dists",
       [](

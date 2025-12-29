@@ -102,6 +102,9 @@ public:
   void set_camera_control(const std::shared_ptr<CameraControl>& camera_control);
   void set_projection_control(const std::shared_ptr<ProjectionControl>& projection_control);
 
+  bool save_camera_settings(const std::string& path) const;
+  bool load_camera_settings(const std::string& path);
+
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
   template <typename Vector>
@@ -116,6 +119,8 @@ public:
   std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
 
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
+
   guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }
   Eigen::Vector2i canvas_br() const { return canvas_rect_max; }
@@ -127,6 +132,13 @@ public:
   float pick_depth(const Eigen::Vector2i& p, int window = 2) const;
   Eigen::Vector3f unproject(const Eigen::Vector2i& p, float depth) const;
   std::optional<Eigen::Vector3f> pick_point(int button = 0, int window = 2, Eigen::Vector4i* info = nullptr) const;
+
+  // Buffer read methods
+  std::vector<unsigned char> read_color_buffer() const;
+  std::vector<float> read_depth_buffer(bool real_scale = true);
+
+  bool save_color_buffer(const std::string& filename);
+  bool save_depth_buffer(const std::string& filename, bool real_scale = true);
 
   // Async
   AsyncLightViewerContext async();
