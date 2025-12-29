@@ -42,9 +42,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -109,9 +109,9 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -277,9 +277,9 @@ void GLCanvas::bind() {
   }
 
   shader->use();
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 

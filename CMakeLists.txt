@@ -186,6 +186,7 @@ add_library(iridescence
   src/guik/camera/projection_control.cpp
   src/guik/camera/basic_projection_control.cpp
   src/guik/viewer/plot_data.cpp
+  src/guik/viewer/shader_setting.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
   src/guik/viewer/light_viewer_context_util.cpp

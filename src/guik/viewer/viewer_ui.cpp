@@ -66,7 +66,7 @@ public:
 
     auto point_scale_mode = viewer->shader_setting().get<int>("point_scale_mode");
     if (!point_scale_mode) {
-      point_scale_mode = 0;
+      point_scale_mode = 1;
     }
     if (ImGui::Combo("Point scale mode", &point_scale_mode.value(), "SCREENSPACE\0METRIC\0")) {
       viewer->shader_setting().add("point_scale_mode", *point_scale_mode);
@@ -77,7 +77,7 @@ public:
 
     auto point_shape_mode = viewer->shader_setting().get<int>("point_shape_mode");
     if (!point_shape_mode) {
-      point_shape_mode = 0;
+      point_shape_mode = 1;
     }
     if (ImGui::Combo("Point shape mode", &point_shape_mode.value(), "RECTANGLE\0CIRCLE\0")) {
       viewer->shader_setting().add("point_shape_mode", *point_shape_mode);
@@ -85,7 +85,7 @@ public:
 
     auto point_size = viewer->shader_setting().get<float>("point_size");
     if (!point_size) {
-      point_size = 10.0f;
+      point_size = 0.025f;
     }
     if (ImGui::DragFloat("Point size", &point_size.value(), 0.001f, 0.0f, 1000.0f)) {
       viewer->shader_setting().add("point_size", *point_size);
