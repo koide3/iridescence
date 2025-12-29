@@ -322,7 +322,7 @@ void define_guik(py::module_& m) {
 
     .def(
       "shader_setting",
-      [](guik::LightViewerContext& context) { return context.shader_setting(); },
+      [](guik::LightViewerContext& context) { return &context.shader_setting(); },
       py::return_value_policy::reference)
 
     .def("disable_xy_grid", &guik::LightViewerContext::disable_xy_grid)
