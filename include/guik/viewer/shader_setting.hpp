@@ -167,7 +167,12 @@ public:
   // Object type
   ShaderSetting& static_object() { return add("dynamic_object", 0); }
 
-  ShaderSetting& dymamic_object() { return add("dynamic_object", 1); }
+  ShaderSetting& dynamic_object() { return add("dynamic_object", 1); }
+
+  ShaderSetting& dymamic_object() {
+    std::cerr << "warning : dymamic_object() is deprecated. Use dynamic_object() instead. Sorry for the silly typo!!" << std::endl;
+    return add("dynamic_object", 1);
+  }
 
   // Color
   Eigen::Vector4f material_color() const { return cast<Eigen::Vector4f>("material_color"); }

@@ -293,6 +293,10 @@ void LightViewerContext::enable_partial_rendering(double clear_thresh) {
   canvas->enable_partial_rendering(clear_thresh);
 }
 
+void LightViewerContext::disable_partial_rendering() {
+  canvas->disable_partial_rendering();
+}
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }
@@ -454,7 +458,7 @@ Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int wind
 }
 
 float LightViewerContext::pick_depth(const Eigen::Vector2i& p, int window) const {
-  return canvas->pick_depth(p, 2);
+  return canvas->pick_depth(p, window);
 }
 
 Eigen::Vector3f LightViewerContext::unproject(const Eigen::Vector2i& p, float depth) const {

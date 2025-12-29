@@ -85,6 +85,17 @@ void AsyncLightViewerContext::use_fps_camera_control(double fovy_deg) {
   guik::viewer()->invoke([=] { context->use_fps_camera_control(fovy_deg); });
 }
 
+void AsyncLightViewerContext::update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting) {
+  guik::viewer()->invoke([=] {
+    auto drawable = context->find_drawable(name);
+    if (!drawable.first || !drawable.second) {
+      std::cerr << "warning: drawable not found (name=" << name << ")" << std::endl;
+      return;
+    }
+    *drawable.first = shader_setting;
+  });
+}
+
 // PointCloudBuffer
 void AsyncLightViewerContext::update_points(const std::string& name, const float* data, int stride, int num_points, const ShaderSetting& shader_setting) {
   std::vector<float> buffer(data, data + stride / sizeof(float) * num_points);

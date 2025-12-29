@@ -595,6 +595,7 @@ void LightViewer::update_plot_histogram(
   p->x_range_min = x_range[0];
   p->x_range_max = x_range[1];
   p->xs = xs;
+  p->ys = ys;
 
   update_plot(plot_name, label, p);
 }
@@ -749,7 +750,7 @@ void LightViewer::show_sub_viewers() {
 
 std::shared_ptr<LightViewerContext> LightViewer::find_sub_viewer(const std::string& context_name) {
   auto found = sub_contexts.find(context_name);
-  return found == sub_contexts.end() ? found->second : nullptr;
+  return found != sub_contexts.end() ? found->second : nullptr;
 }
 
 bool LightViewer::remove_sub_viewer(const std::string& context_name) {

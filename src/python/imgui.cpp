@@ -52,14 +52,33 @@ void define_imgui(py::module_& m) {
   imgui_.attr("DockNodeFlags_NoResize") = py::int_(static_cast<int>(ImGuiDockNodeFlags_NoResize));
   imgui_.attr("DockNodeFlags_AutoHideTabBar") = py::int_(static_cast<int>(ImGuiDockNodeFlags_AutoHideTabBar));
 
+  imgui_.attr("ColorEditFlags_None") = py::int_(static_cast<int>(ImGuiColorEditFlags_None));
+  imgui_.attr("ColorEditFlags_NoAlpha") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoPicker") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoOptions") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoSmallPreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoInputs") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoTooltip") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoLabel") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoSidePreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoDragDrop") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_NoBorder") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaBar") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaPreview") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_AlphaPreviewHalf") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_HDR") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayRGB") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayHSV") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_DisplayHex") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_Uint8") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_Float") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_PickerHueBar") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_PickerHueWheel") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_InputRGB") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+  imgui_.attr("ColorEditFlags_InputHSV") = py::int_(static_cast<int>(ImGuiColorEditFlags_NoAlpha));
+
   // macros
-  imgui_.def(
-    "IM_COL32",
-    [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); },
-    py::arg("r"),
-    py::arg("g"),
-    py::arg("b"),
-    py::arg("a"));
+  imgui_.def("IM_COL32", [](int r, int g, int b, int a) { return IM_COL32(r, g, b, a); }, py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"));
 
   // structs
   py::class_<ImVec2>(imgui_, "ImVec2", py::buffer_protocol())
@@ -78,15 +97,9 @@ void define_imgui(py::module_& m) {
     py::arg("open") = true,
     py::arg("flags") = 0);
   imgui_.def("end", [] { ImGui::End(); });
-  imgui_.def(
-    "get_id",
-    [](const std::string& name) { return ImGui::GetID(name.c_str()); },
-    py::arg("name"));
+  imgui_.def("get_id", [](const std::string& name) { return ImGui::GetID(name.c_str()); }, py::arg("name"));
 
-  imgui_.def(
-    "open_popup",
-    [](const std::string& name) { ImGui::OpenPopup(name.c_str()); },
-    py::arg("name"));
+  imgui_.def("open_popup", [](const std::string& name) { ImGui::OpenPopup(name.c_str()); }, py::arg("name"));
   imgui_.def("begin_popup", &ImGui::BeginPopup, py::arg("id"), py::arg("flags"));
   imgui_.def(
     "begin_popup_modal",
@@ -104,22 +117,15 @@ void define_imgui(py::module_& m) {
     py::arg("pos"),
     py::arg("cond") = 0,
     py::arg("pivot") = Eigen::Vector2i(0, 0));
-  imgui_.def(
-    "set_next_window_size",
-    [](const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); },
-    "",
-    py::arg("size"),
-    py::arg("cond") = 0);
+  imgui_
+    .def("set_next_window_size", [](const Eigen::Vector2i& size, int cond) { ImGui::SetNextWindowSize(ImVec2(size[0], size[1]), cond); }, "", py::arg("size"), py::arg("cond") = 0);
 
   imgui_.def("separator", &ImGui::Separator);
   imgui_.def("same_line", &ImGui::SameLine, "", py::arg("offset_from_start_x") = 0.0, py::arg("spacing") = -1.0);
   imgui_.def("newline", &ImGui::NewLine);
   imgui_.def("spacing", &ImGui::Spacing);
 
-  imgui_.def(
-    "text",
-    [](const std::string& text) { ImGui::Text("%s", text.c_str()); },
-    py::arg("text"));
+  imgui_.def("text", [](const std::string& text) { ImGui::Text("%s", text.c_str()); }, py::arg("text"));
   imgui_.def(
     "input_text",
     [](const std::string& label, const std::string& text, int flags, int buffer_size) {
@@ -133,10 +139,7 @@ void define_imgui(py::module_& m) {
     py::arg("text"),
     py::arg("flags") = 0,
     py::arg("buffer_size") = 256);
-  imgui_.def(
-    "button",
-    [](const std::string& label) { return ImGui::Button(label.c_str()); },
-    py::arg("label"));
+  imgui_.def("button", [](const std::string& label) { return ImGui::Button(label.c_str()); }, py::arg("label"));
   imgui_.def("arrow_button", ImGui::ArrowButton, py::arg("id"), py::arg("dir"));
 
   imgui_.def(
@@ -147,11 +150,7 @@ void define_imgui(py::module_& m) {
     py::arg("size"),
     py::arg("flags") = 0);
 
-  imgui_.def(
-    "checkbox",
-    [](const std::string& label, bool v) { return std::make_tuple(ImGui::Checkbox(label.c_str(), &v), v); },
-    py::arg("label"),
-    py::arg("v"));
+  imgui_.def("checkbox", [](const std::string& label, bool v) { return std::make_tuple(ImGui::Checkbox(label.c_str(), &v), v); }, py::arg("label"), py::arg("v"));
   imgui_.def(
     "drag_int",
     [](const std::string& label, int v, int v_speed, int v_min, int v_max, const std::string& format) {
@@ -209,12 +208,21 @@ void define_imgui(py::module_& m) {
   // Tab bars
   imgui_.def("begin_tab_bar", &ImGui::BeginTabBar, py::arg("id"), py::arg("flags") = 0);
   imgui_.def("end_tab_bar", &ImGui::EndTabBar);
-  imgui_.def(
-    "begin_tab_item",
-    [](const char* label) { return ImGui::BeginTabItem(label); },
-    py::arg("label"));
+  imgui_.def("begin_tab_item", [](const char* label) { return ImGui::BeginTabItem(label); }, py::arg("label"));
   imgui_.def("end_tab_item", &ImGui::EndTabItem);
   imgui_.def("tab_item_button", &ImGui::TabItemButton, py::arg("label"), py::arg("flags") = 0);
+
+  // color
+  imgui_.def(
+    "color_edit4",
+    [](const std::string& label, const Eigen::Vector4f& color, int flags) {
+      Eigen::Vector4f col = color;
+      const bool changed = ImGui::ColorEdit4(label.c_str(), col.data(), flags);
+      return std::make_pair(changed, col);
+    },
+    py::arg("label"),
+    py::arg("color"),
+    py::arg("flags") = 0);
 
   imgui_.def("show_demo_window", [] { ImGui::ShowDemoWindow(); });
 
@@ -225,10 +233,7 @@ void define_imgui(py::module_& m) {
     py::arg("id"),
     py::arg("size") = Eigen::Vector2i(0, 0),
     py::arg("flags") = 0);
-  imgui_.def(
-    "dockspace_over_viewport",
-    [](int flags) { return ImGui::DockSpaceOverViewport(nullptr, flags); },
-    py::arg("flags") = 0);
+  imgui_.def("dockspace_over_viewport", [](int flags) { return ImGui::DockSpaceOverViewport(nullptr, flags); }, py::arg("flags") = 0);
   imgui_.def("set_next_window_dock_id", &ImGui::SetNextWindowDockID, py::arg("dock_id"), py::arg("cond") = 0);
 
   // Dock builder
@@ -245,10 +250,7 @@ void define_imgui(py::module_& m) {
     py::arg("node_id"),
     py::arg("split_dir"),
     py::arg("size_ratio_for_node_at_dir"));
-  imgui_.def(
-    "dock_builder_finish",
-    [](unsigned int node_id) { ImGui::DockBuilderFinish(node_id); },
-    py::arg("node_id"));
+  imgui_.def("dock_builder_finish", [](unsigned int node_id) { ImGui::DockBuilderFinish(node_id); }, py::arg("node_id"));
 
   // DrawList
   py::class_<ImDrawList, std::shared_ptr<ImDrawList>>(imgui_, "ImDrawList")
@@ -331,12 +333,7 @@ void define_imgui(py::module_& m) {
     .def_property_readonly("nav_inputs", [](const ImGuiIO& io) { return py::array(ImGuiNavInput_COUNT, io.NavInputs); });
 
   imgui_.def("get_io", [] { return ImGui::GetIO(); });
-  imgui_.def(
-    "is_mouse_clicked",
-    [](int button, bool repeat) { return ImGui::IsMouseClicked(button, repeat); },
-    "",
-    py::arg("button") = 0,
-    py::arg("repeat") = false);
+  imgui_.def("is_mouse_clicked", [](int button, bool repeat) { return ImGui::IsMouseClicked(button, repeat); }, "", py::arg("button") = 0, py::arg("repeat") = false);
 
   imgui_.def("get_mouse_pos", [] {
     auto pos = ImGui::GetMousePos();

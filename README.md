@@ -47,8 +47,12 @@ pip install .
 
 # [Optional2] Install stubs for autocomplete
 pip install pybind11-stubgen
+
 cd ~/.local/lib/python3.12/site-packages
-pybind11-stubgen -o . --ignore-invalid=all pyridescence
+# If you are using a virtual environment, you can find the path with:
+# cd $(dirname $(which python))/../lib/python3.12/site-packages
+
+pybind11-stubgen -o . pyridescence
 ```
 
 ### Install from [PPA](https://github.com/koide3/ppa) [AMD64, ARM64]
