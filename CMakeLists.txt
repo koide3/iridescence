@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(iridescence VERSION 0.1.6 LANGUAGES C CXX)
+project(iridescence VERSION 0.1.9 LANGUAGES C CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
@@ -220,6 +220,10 @@ target_link_libraries(iridescence PRIVATE
 target_compile_definitions(iridescence PRIVATE
   GL3W_EXPORTS
   GLK_EXPORTS
+)
+set_target_properties(iridescence PROPERTIES
+  VERSION   ${PROJECT_VERSION}
+  SOVERSION 1
 )
 
 if(BUILD_PYTHON_BINDINGS)
