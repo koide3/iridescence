@@ -1,0 +1,40 @@
+ARG BASE_IMAGE=ubuntu:jammy
+FROM ${BASE_IMAGE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  && apt-get install -y --no-install-recommends wget nano build-essential cmake git clang lld ninja-build \
+  libpng-dev libjpeg-dev libeigen3-dev libboost-all-dev libglm-dev libglfw3-dev libgtest-dev ca-certificates \
+  libfmt-dev libspdlog-dev libassimp-dev zenity xvfb libgl1-mesa-dri python3-pip python3-numpy python3-scipy \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY . /root/iridescence
+WORKDIR /root/iridescence
+RUN rm -rf /root/iridescence/build
+RUN git submodule init && git submodule update
+
+# build and test
+WORKDIR /root/iridescence/build
+RUN cmake .. -DBUILD_EXAMPLES=ON -DBUILD_EXT_TESTS=ON
+RUN make -j$(nproc)
+
+ENV XVFB_RES="1920x1080x24"
+ENV XVFB_ARGS=""
+
+RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS & \
+  sleep 1 && export DISPLAY=:99 && ctest
+
+# build and test python
+WORKDIR /root/iridescence
+RUN pip install . --user -v
+
+RUN rm /tmp/.X99-lock || true
+RUN Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS & \
+  export DISPLAY=:99 && python3 src/test/viewer_test.py
+
+WORKDIR /
+
+CMD ["bash"]

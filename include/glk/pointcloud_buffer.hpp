@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <glk/drawable.hpp>
 #include <glk/colormap.hpp>
+#include <glk/api_export.hpp>
 
 namespace glk {
 
@@ -97,6 +98,8 @@ public:
   const AuxBufferData& get_aux_buffer(int i) const;
 
   int size() const { return num_points; }
+
+  size_t memory_usage() const;
 
 private:
   mutable std::atomic_uint rendering_count;

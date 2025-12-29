@@ -30,6 +30,10 @@ void AsyncLightViewerContext::register_ui_callback(const std::string& name, cons
   guik::viewer()->invoke([=] { context->register_ui_callback(name, callback); });
 }
 
+void AsyncLightViewerContext::remove_ui_callback(const std::string& name) {
+  register_ui_callback(name, 0);
+}
+
 void AsyncLightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   guik::viewer()->invoke([=] { context->set_draw_xy_grid(draw_xy_grid); });
 }
@@ -79,6 +83,17 @@ void AsyncLightViewerContext::use_arcball_camera_control(double distance, double
 
 void AsyncLightViewerContext::use_fps_camera_control(double fovy_deg) {
   guik::viewer()->invoke([=] { context->use_fps_camera_control(fovy_deg); });
+}
+
+void AsyncLightViewerContext::update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting) {
+  guik::viewer()->invoke([=] {
+    auto drawable = context->find_drawable(name);
+    if (!drawable.first || !drawable.second) {
+      std::cerr << "warning: drawable not found (name=" << name << ")" << std::endl;
+      return;
+    }
+    *drawable.first = shader_setting;
+  });
 }
 
 // PointCloudBuffer

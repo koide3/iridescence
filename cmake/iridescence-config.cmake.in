@@ -1,0 +1,19 @@
+# Config file for the Iridescence package
+#
+# Usage from an external project:
+#
+#  find_package(Iridescence REQUIRED)
+#  target_link_libraries(MY_TARGET_NAME Iridescence::Iridescence)
+#
+@PACKAGE_INIT@
+
+include_guard()
+
+include(CMakeFindDependencyMacro)
+find_dependency(OpenGL REQUIRED)
+find_dependency(Eigen3 REQUIRED)
+find_dependency(PNG)
+find_dependency(JPEG)
+
+include("${CMAKE_CURRENT_LIST_DIR}/iridescence-targets.cmake")
+add_library(Iridescence::Iridescence ALIAS Iridescence::iridescence)

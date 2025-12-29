@@ -3,6 +3,7 @@
 #include <random>
 #include <numeric>
 #include <iostream>
+#include <cassert>
 #include <glk/colormap.hpp>
 #include <glk/console_colors.hpp>
 #include <glk/type_conversion.hpp>
@@ -56,7 +57,7 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 4, 1>(points, num_points)) {}
 
 PointCloudBuffer::~PointCloudBuffer() {
   glDeleteVertexArrays(1, &vao);
@@ -344,6 +345,19 @@ int PointCloudBuffer::get_aux_size() const {
 
 const AuxBufferData& PointCloudBuffer::get_aux_buffer(int i) const {
   return aux_buffers[i];
+}
+
+size_t PointCloudBuffer::memory_usage() const {
+  size_t bytes = stride * num_points;
+  if (ebo) {
+    bytes += sizeof(unsigned int) * num_points;
+  }
+
+  for (const auto& aux : aux_buffers) {
+    bytes += aux.stride * num_points;
+  }
+
+  return bytes;
 }
 
 }  // namespace glk

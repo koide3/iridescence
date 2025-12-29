@@ -9,6 +9,7 @@
 #include <glk/texture.hpp>
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/io/ply_io.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/screen_effect.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
@@ -16,7 +17,6 @@
 #include <glk/effects/screen_space_lighting.hpp>
 
 namespace py = pybind11;
-
 
 void define_glk(py::module_& m) {
   py::module_ gl_ = m.def_submodule("gl", "");
@@ -67,50 +67,62 @@ void define_glk(py::module_& m) {
 
   // glk::ThinLines
   py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines")
-    .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&, bool>(), "",
-      py::arg("points"), py::arg("line_strip") = false
-    )
-    .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&, bool>(), "",
-      py::arg("points"), py::arg("colors"), py::arg("line_strip") = false
-    )
+    .def(
+      py::init([](const std::vector<Eigen::Vector3f>& points, bool line_strip) { return std::make_shared<glk::ThinLines>(points, line_strip); }),
+      "",
+      py::arg("points"),
+      py::arg("line_strip") = false)
+    .def(
+      py::init([](const std::vector<Eigen::Vector3f>& points, const std::vector<Eigen::Vector4f>& colors, bool line_strip) {
+        return std::make_shared<glk::ThinLines>(points, colors, line_strip);
+      }),
+      "",
+      py::arg("points"),
+      py::arg("colors"),
+      py::arg("line_strip") = false)
     // pyplot-like constructor
-    .def(py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, bool line_strip) {
-      int size = std::max(x.size(), std::max(y.size(), z.size()));
-      if(x.size()) {
-        size = std::min<int>(size, x.size());
-      }
-      if(y.size()) {
-        size = std::min<int>(size, y.size());
-      }
-      if(z.size()) {
-        size = std::min<int>(size, z.size());
-      }
-
-      Eigen::Matrix<float, -1, 3, Eigen::RowMajor> vertices = Eigen::Matrix<float, -1, 3, Eigen::RowMajor>::Zero(size, 3);
-      if(x.size()) {
-        vertices.col(0) = x.topRows(size);
-      }
-      if(y.size()) {
-        vertices.col(1) = y.topRows(size);
-      }
-      if(z.size()) {
-        vertices.col(2) = z.topRows(size);
-      }
-
-      if(c.size()) {
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(size, Eigen::Vector4f::Zero());
-        for(int i=0; i < size && i < c.size(); i++) {
-          colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
+    .def(
+      py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, bool line_strip) {
+        int size = std::max(x.size(), std::max(y.size(), z.size()));
+        if (x.size()) {
+          size = std::min<int>(size, x.size());
+        }
+        if (y.size()) {
+          size = std::min<int>(size, y.size());
+        }
+        if (z.size()) {
+          size = std::min<int>(size, z.size());
         }
 
-        return std::make_shared<glk::ThinLines>(vertices.data(), colors[0].data(), size, line_strip);
-      }
+        Eigen::Matrix<float, -1, 3, Eigen::RowMajor> vertices = Eigen::Matrix<float, -1, 3, Eigen::RowMajor>::Zero(size, 3);
+        if (x.size()) {
+          vertices.col(0) = x.topRows(size);
+        }
+        if (y.size()) {
+          vertices.col(1) = y.topRows(size);
+        }
+        if (z.size()) {
+          vertices.col(2) = z.topRows(size);
+        }
 
-      return std::make_shared<glk::ThinLines>(vertices.data(), size, line_strip);
-    }), "",
-      py::arg("x") = Eigen::VectorXf(), py::arg("y") = Eigen::VectorXf(), py::arg("z") = Eigen::VectorXf(), py::arg("c") = Eigen::VectorXf(), py::arg("line_strip") = true
-    )
-  ;
+        if (c.size()) {
+          std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(size, Eigen::Vector4f::Zero());
+          for (int i = 0; i < size && i < c.size(); i++) {
+            colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
+          }
+
+          return std::make_shared<glk::ThinLines>(vertices.data(), colors[0].data(), size, line_strip);
+        }
+
+        return std::make_shared<glk::ThinLines>(vertices.data(), size, line_strip);
+      }),
+      "",
+      py::arg("x") = Eigen::VectorXf(),
+      py::arg("y") = Eigen::VectorXf(),
+      py::arg("z") = Eigen::VectorXf(),
+      py::arg("c") = Eigen::VectorXf(),
+      py::arg("line_strip") = true)
+    .def("set_line_width", &glk::ThinLines::set_line_width);
 
   // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
@@ -288,22 +300,27 @@ void define_glk(py::module_& m) {
     .def("set_specular_model", &glk::ScreenSpaceLighting::set_specular_model)
     .def("set_occlusion_model", &glk::ScreenSpaceLighting::set_occlusion_model)
     .def("set_iridescence_model", &glk::ScreenSpaceLighting::set_iridescence_model)
-    .def("set_light", [](glk::ScreenSpaceLighting& effect, int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) { return effect.set_light(i, pos, color); }, "")
+    .def(
+      "set_light",
+      [](glk::ScreenSpaceLighting& effect, int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) { return effect.set_light(i, pos, color); },
+      "")
     .def("set_albedo", &glk::ScreenSpaceLighting::set_albedo, "")
     .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, "");
 
- // methods
+  // methods
   glk_.def("set_data_path", &glk::set_data_path, "");
-  glk_.def("create_pointcloud_buffer", [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> std::shared_ptr<glk::PointCloudBuffer>
-    {
+  glk_.def(
+    "create_pointcloud_buffer",
+    [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> std::shared_ptr<glk::PointCloudBuffer> {
       auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * 3, points.rows());
-      if(colors.rows() == points.rows()) {
+      if (colors.rows() == points.rows()) {
         cloud_buffer->add_color(colors.data(), sizeof(Eigen::Vector4f), colors.rows());
       }
       return cloud_buffer;
-    }, "",
-    py::arg("points"), py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>()
-  );
+    },
+    "",
+    py::arg("points"),
+    py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>());
 
   // colormaps
   glk_.def("colormap", &glk::colormap, py::arg("colormap_type"), py::arg("x"));
@@ -318,9 +335,101 @@ void define_glk(py::module_& m) {
   primitives_.def("icosahedron", [] { return glk::Primitives::icosahedron(); });
   primitives_.def("bunny", [] { return glk::Primitives::bunny(); });
   primitives_.def("coordinate_system", [] { return glk::Primitives::coordinate_system(); });
+  primitives_.def("frustum", [] { return glk::Primitives::frustum(); });
   primitives_.def("wire_sphere", [] { return glk::Primitives::wire_sphere(); });
   primitives_.def("wire_cube", [] { return glk::Primitives::wire_cube(); });
   primitives_.def("wire_cone", [] { return glk::Primitives::wire_cone(); });
   primitives_.def("wire_icosahedron", [] { return glk::Primitives::wire_icosahedron(); });
   primitives_.def("wire_bunny", [] { return glk::Primitives::wire_bunny(); });
+  primitives_.def("wire_frustum", [] { return glk::Primitives::wire_frustum(); });
+
+  // IO
+  // glk::PLYData
+  py::class_<glk::PLYData, std::shared_ptr<glk::PLYData>>(glk_, "PLYData")  //
+    .def(py::init<>())
+    .def_property(
+      "vertices",
+      [](glk::PLYData& self) -> Eigen::Matrix<float, -1, -1, Eigen::RowMajor> {
+        return Eigen::Map<const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>(self.vertices[0].data(), self.vertices.size(), 3);
+      },
+      [](glk::PLYData& self, const Eigen::MatrixXf& vertices) {
+        if (vertices.cols() != 3 && vertices.cols() != 4) {
+          std::cerr << "vertices must be 3 or 4 columns (cols=" << vertices.cols() << ")" << std::endl;
+          return;
+        }
+
+        self.vertices.resize(vertices.rows());
+        for (int i = 0; i < vertices.rows(); i++) {
+          self.vertices[i] = vertices.row(i).head<3>();
+        }
+      })
+    .def_property(
+      "normals",
+      [](glk::PLYData& self) -> Eigen::Matrix<float, -1, -1, Eigen::RowMajor> {
+        return Eigen::Map<const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>(self.normals[0].data(), self.normals.size(), 3);
+      },
+      [](glk::PLYData& self, const Eigen::MatrixXf& normals) {
+        if (normals.cols() != 3 && normals.cols() != 4) {
+          std::cerr << "normals must be 3 or 4 columns (cols=" << normals.cols() << ")" << std::endl;
+          return;
+        }
+
+        self.normals.resize(normals.rows());
+        for (int i = 0; i < normals.rows(); i++) {
+          self.normals[i] = normals.row(i).head<3>();
+        }
+      })
+    .def_property(
+      "intensities",
+      [](glk::PLYData& self) -> Eigen::VectorXf { return Eigen::Map<const Eigen::VectorXf>(self.intensities.data(), self.intensities.size()); },
+      [](glk::PLYData& self, const Eigen::VectorXf& intensities) {
+        self.intensities.resize(intensities.size());
+        for (int i = 0; i < intensities.size(); i++) {
+          self.intensities[i] = intensities[i];
+        }
+      })
+    .def_property(
+      "colors",
+      [](glk::PLYData& self) -> Eigen::Matrix<float, -1, -1, Eigen::RowMajor> {
+        return Eigen::Map<const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>(self.colors[0].data(), self.colors.size(), 4);
+      },
+      [](glk::PLYData& self, const Eigen::MatrixXf& colors) {
+        if (colors.cols() != 4) {
+          std::cerr << "colors must be 3 or 4 columns (cols=" << colors.cols() << ")" << std::endl;
+          return;
+        }
+
+        self.colors.resize(colors.rows());
+        for (int i = 0; i < colors.rows(); i++) {
+          self.colors[i] = colors.row(i);
+        }
+      })
+    .def_property(
+      "indices",
+      [](glk::PLYData& self) -> Eigen::VectorXi { return Eigen::Map<const Eigen::VectorXi>(self.indices.data(), self.indices.size()); },
+      [](glk::PLYData& self, const Eigen::VectorXi& indices) {
+        self.indices.resize(indices.size());
+        for (int i = 0; i < indices.size(); i++) {
+          self.indices[i] = indices[i];
+        }
+      })
+    .def_property(
+      "comments",
+      [](glk::PLYData& self) -> std::vector<std::string> { return self.comments; },
+      [](glk::PLYData& self, const std::vector<std::string>& comments) { self.comments = comments; });
+
+  glk_.def("load_ply", &glk::load_ply, py::arg("filename"));
+  glk_.def("save_ply", &glk::save_ply, py::arg("filename"), py::arg("ply"), py::arg("binary") = true);
+  glk_.def("save_ply", [](const std::string& filename, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points) {
+    if (points.cols() != 3 && points.cols() != 4) {
+      std::cerr << "points must be 3 or 4 columns (cols=" << points.cols() << ")" << std::endl;
+      return false;
+    }
+
+    if (points.cols() == 3) {
+      return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 3, 1>*>(points.data()), points.rows());
+    } else {
+      return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 4, 1>*>(points.data()), points.rows());
+    }
+  });
 }

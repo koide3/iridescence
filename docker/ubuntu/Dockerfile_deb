@@ -1,0 +1,28 @@
+ARG BASE_IMAGE=ubuntu:jammy
+FROM ${BASE_IMAGE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# install dependencies
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends
+RUN apt-get install -y --no-install-recommends libc-bin
+RUN apt-get install -y --no-install-recommends build-essential cmake git \
+  libpng-dev libjpeg-dev libeigen3-dev libglm-dev libglfw3-dev file ninja-build
+
+COPY . /root/iridescence
+WORKDIR /root/iridescence
+RUN rm -rf /root/iridescence/build
+
+# build
+WORKDIR /root/iridescence/build
+RUN cmake ..
+RUN make -j$(nproc)
+RUN cpack
+
+ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+
+WORKDIR /
+
+CMD ["bash"]

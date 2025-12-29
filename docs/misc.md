@@ -259,6 +259,35 @@ std::vector<Eigen::Vector3f> points
 glk::save_ply_binary("model.ply", points.data(), points.size());
 ```
 
+## Partial point cloud rendering
+
+The rendering cost of large static point cloud can be mitigated with the partial rendering mode.
+In this mode, only a part of static point clouds are rendered every frame and accumulated over time.
+Although this causes flickering, it can drastically increase the rendering speed.
+
+1. Enable the partial rendering mode for the viewer.  
+    `viewer->enable_partial_rendering()`.
+2. Create a point cloud buffer and set the points rendering budget.  
+    ```cpp
+    auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
+    int points_rendering_budget = 512;
+    cloud_buffer->enable_partial_rendering(points_rendering_budget);
+    ```
+3. Mark the drawable as a static object.
+    ```cpp
+    viewer->update_drawable("points", cloud_buffer, guik::Rainbow().static_object());
+    ```
+4. Mark other objects as dynamic.
+    ```cpp
+    viewer->update_cube("cube", guik::FlatBlue().dynamic_object());
+    ```
+
+See also [ext_light_viewer_partial_rendering.cpp](https://github.com/koide3/iridescence/blob/master/src/example/ext_light_viewer_partial_rendering.cpp).
+
+![partial_rendering](https://github.com/koide3/iridescence/assets/31344317/1a54035f-3faf-4910-8a3a-97d0cfb71a1e)
+
+!!!note
+    This feature may not work well on non-NVIDIA GPUs.
 
 ## Viewer menu
 

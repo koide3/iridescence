@@ -45,6 +45,14 @@ ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertice
   glBindVertexArray(0);
 }
 
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, int num_vertices, bool line_strip) : ThinLines(vertices->data(), nullptr, num_vertices, nullptr, 0, line_strip) {}
+
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, bool line_strip)
+: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, nullptr, 0, line_strip) {}
+
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
+: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, indices, num_indices, line_strip) {}
+
 ThinLines::~ThinLines() {
   if (cbo) {
     glDeleteBuffers(1, &cbo);
@@ -91,5 +99,7 @@ void ThinLines::draw(glk::GLSLShader& shader) const {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  glLineWidth(1.0);
 }
 }  // namespace glk

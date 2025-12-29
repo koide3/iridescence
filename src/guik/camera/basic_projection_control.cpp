@@ -10,7 +10,7 @@
 
 namespace guik {
 
-BasicProjectionControl::BasicProjectionControl(const Eigen::Vector2i& size) : size(size), projection_mode(0), fovy(30.0f), width(10.0f), near(1.0f), far(1000.0f) {}
+BasicProjectionControl::BasicProjectionControl(const Eigen::Vector2i& size) : size(size), projection_mode(0), fovy(30.0f), width(10.0f), near_(1.0f), far_(1000.0f) {}
 
 BasicProjectionControl::~BasicProjectionControl() {}
 
@@ -27,10 +27,10 @@ void BasicProjectionControl::set_ortho_width(double width) {
 }
 
 void BasicProjectionControl::set_depth_range(const Eigen::Vector2f& range) {
-  this->near = range[0];
-  this->far = range[1];
+  this->near_ = range[0];
+  this->far_ = range[1];
 
-  width = (this->far - this->near) * 0.1;
+  width = (this->far_ - this->near_) * 0.1;
 }
 
 Eigen::Matrix4f BasicProjectionControl::projection_matrix() const {
@@ -38,9 +38,9 @@ Eigen::Matrix4f BasicProjectionControl::projection_matrix() const {
 
   glm::mat4 proj;
   if (projection_mode == 0) {
-    proj = glm::perspective<float>(fovy * M_PI / 180.0, aspect_ratio, near, far);
+    proj = glm::perspective<float>(fovy * M_PI / 180.0, aspect_ratio, near_, far_);
   } else {
-    proj = glm::ortho<float>(-width / 2.0f, width / 2.0f, -width / 2.0f / aspect_ratio, width / 2.0 / aspect_ratio, near, far);
+    proj = glm::ortho<float>(-width / 2.0f, width / 2.0f, -width / 2.0f / aspect_ratio, width / 2.0 / aspect_ratio, near_, far_);
   }
 
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(proj));
@@ -74,17 +74,17 @@ void BasicProjectionControl::load(std::istream& ist) {
   std::cout << token << std::endl;
   ist >> token >> width;
   std::cout << token << std::endl;
-  ist >> token >> near;
+  ist >> token >> near_;
   std::cout << token << std::endl;
-  ist >> token >> far;
+  ist >> token >> far_;
   std::cout << token << std::endl;
 }
 
 void BasicProjectionControl::save(std::ostream& ost) const {
   ost << "fovy: " << fovy << std::endl;
   ost << "width: " << width << std::endl;
-  ost << "near: " << near << std::endl;
-  ost << "far: " << far << std::endl;
+  ost << "near: " << near_ << std::endl;
+  ost << "far: " << far_ << std::endl;
 }
 
 }  // namespace guik

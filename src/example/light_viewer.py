@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import numpy
-import scipy.spatial
 from pyridescence import *
 
 viewer = guik.LightViewer.instance()
@@ -55,7 +54,7 @@ def callback():
     viewer.append_text('time:%.3f' % time)
     setting, drawable = viewer.find_drawable('cloud')
     matrix = numpy.identity(4)
-    matrix[:3, :3] = scipy.spatial.transform.Rotation.from_rotvec([0, 0, time]).as_matrix()
+    matrix[:2, :2] = [[numpy.cos(time), -numpy.sin(time)], [numpy.sin(time), numpy.cos(time)]]
     setting.add('model_matrix', matrix)
 
   global text

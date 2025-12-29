@@ -1,7 +1,6 @@
 #include <glk/trajectory.hpp>
 
 #include <numeric>
-#include <boost/iterator/counting_iterator.hpp>
 
 #include <glk/thin_lines.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -19,7 +18,9 @@ Trajectory::Trajectory(const std::vector<Eigen::Isometry3f, Eigen::aligned_alloc
 
 Trajectory::Trajectory(int num_frames, const std::function<Eigen::Isometry3f(int)>& adapter) {
   trajectory.resize(num_frames);
-  std::transform(boost::counting_iterator<int>(0), boost::counting_iterator<int>(num_frames), trajectory.begin(), adapter);
+  for (int i = 0; i < num_frames; i++) {
+    trajectory[i] = adapter(i);
+  }
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> line_vertices;
   for(int i = 1; i < trajectory.size(); i++) {

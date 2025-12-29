@@ -24,6 +24,7 @@ Mesh::Mesh(
   int num_indices,
   bool wireframe) {
   //
+  this->line_width = 1.0f;
   this->wireframe = wireframe;
   this->num_vertices = num_vertices;
   this->num_indices = num_indices;
@@ -115,6 +116,7 @@ void Mesh::draw(glk::GLSLShader& shader) const {
   if (wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glDisable(GL_CULL_FACE);
+    glLineWidth(line_width);
   }
 
   glBindVertexArray(vao);
@@ -171,9 +173,10 @@ void Mesh::draw(glk::GLSLShader& shader) const {
 
   if (wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    if(cull_was_enabled) {
+    if (cull_was_enabled) {
       glEnable(GL_CULL_FACE);
     }
+    glLineWidth(1.0f);
   }
 
   if (texture) {

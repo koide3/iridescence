@@ -20,6 +20,7 @@ public:
   void clear_text();
   void append_text(const std::string& text);
   void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+  void remove_ui_callback(const std::string& name);
 
   void disable_xy_grid() { set_draw_xy_grid(false); }
   void enable_xy_grid() { set_draw_xy_grid(true); }
@@ -33,11 +34,18 @@ public:
 
   void reset_center();
   void lookat(const Eigen::Vector3f& pt);
+  template <typename Vector>
+  void lookat(const Vector& pt) {
+    const auto ptf = pt.eval().template cast<float>();
+    lookat(ptf);
+  }
   void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   void use_orbit_camera_control_xz(double distance = 80.0, double theta = 0.0, double phi = 0.0);
   void use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
   void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   void use_fps_camera_control(double fovy_deg = 60.0);
+
+  void update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting);
 
   // utility methods to directly create and update drawables
   // PointCloudBuffer
