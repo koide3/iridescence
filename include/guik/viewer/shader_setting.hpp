@@ -39,7 +39,7 @@ struct PointShapeMode {
 /// @brief Generic shader parameter interface.
 struct ShaderParameterInterface {
 public:
-  using Ptr = std::shared_ptr<ShaderParameterInterface>;
+  using Ptr = std::unique_ptr<ShaderParameterInterface>;
   ShaderParameterInterface(const std::string& name) : name(name) {}
   virtual ~ShaderParameterInterface() {}
 
@@ -60,7 +60,7 @@ public:
 
   virtual void set(glk::GLSLShader& shader) const override { shader.set_uniform(name, value); }
 
-  virtual Ptr clone() const override { return glk::make_shared<ShaderParameter<T>>(name, value); }
+  virtual Ptr clone() const override { return glk::make_unique<ShaderParameter<T>>(name, value); }
 
 public:
   T value;
@@ -83,17 +83,22 @@ public:
   /// @param  color_mode  Color mode (ColorMode)
   ShaderSetting(int color_mode);
 
+  /// @brief  Constructor
+  /// @param  color_mode  Color mode (ColorMode)
+  /// @param  transform   Transform matrix (Eigen::Matrix4f)
+  ShaderSetting(int color_mode, const Eigen::Matrix4f& transform);
+
   /// @brief Constructor
   /// @param color_mode Color mode (ColorMode)
   /// @param transform  Transform matrix (e.g., Eigen::Matrix4(f|d) or Eigen::Isometry3(f|d))
   template <typename Transform>
-  ShaderSetting(int color_mode, const Transform& transform)
-  : transparent(false),
-    params(
-      {glk::make_shared<ShaderParameter<int>>("color_mode", color_mode),
-       glk::make_shared<ShaderParameter<float>>("point_scale", 1.0f),
-       glk::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix())})  //
-  {}
+  ShaderSetting(int color_mode, const Transform& transform) : ShaderSetting(color_mode, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {}
+
+  /// @brief Copy constructor
+  ShaderSetting(const ShaderSetting& other);
+
+  /// @brief Copy assignment operator
+  ShaderSetting& operator=(const ShaderSetting& other);
 
   /// @brief Destructor
   virtual ~ShaderSetting() {}
@@ -107,7 +112,8 @@ public:
   /// @return       This object
   template <typename T>
   ShaderSetting& add(const std::string& name, const T& value) {
-    for (int i = 0; i < params.size(); i++) {
+    int i = 0;
+    for (i = 0; i < params.size() && params[i] != nullptr; i++) {
       if (params[i]->name == name) {
         auto p = dynamic_cast<ShaderParameter<T>*>(params[i].get());
         if (p) {
@@ -119,7 +125,15 @@ public:
       }
     }
 
-    params.emplace_back(glk::make_shared<ShaderParameter<T>>(name, value));
+    if (i == params.size()) {
+      std::vector<ShaderParameterInterface::Ptr> old_params = std::move(params);
+      params.resize(old_params.size() * 2);
+      for (int j = 0; j < old_params.size(); j++) {
+        params[j] = std::move(old_params[j]);
+      }
+    }
+
+    params[i] = glk::make_unique<ShaderParameter<T>>(name, value);
     return *this;
   }
 
@@ -129,6 +143,10 @@ public:
   template <typename T>
   std::optional<T> get(const std::string& name) {
     for (const auto& param : params) {
+      if (!param) {
+        break;
+      }
+
       if (param->name != name) {
         continue;
       }
@@ -150,6 +168,10 @@ public:
   template <typename T>
   std::optional<T> get(const std::string& name) const {
     for (const auto& param : params) {
+      if (!param) {
+        break;
+      }
+
       if (param->name != name) {
         continue;
       }
@@ -171,6 +193,10 @@ public:
   template <typename T>
   const T& cast(const std::string& name) const {
     for (const auto& param : params) {
+      if (!param) {
+        break;
+      }
+
       if (param->name != name) {
         continue;
       }
@@ -382,33 +408,33 @@ public:
 struct FlatColor : public ShaderSetting {
 public:
   explicit FlatColor(float r, float g, float b, float a = 1.0f) : ShaderSetting(ColorMode::FLAT_COLOR) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", Eigen::Vector4f(r, g, b, a)));
+    add("material_color", Eigen::Vector4f(r, g, b, a));
     transparent = a < 0.999f;
   }
 
   explicit FlatColor(const Eigen::Vector4f& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    add("material_color", color);
     transparent = color.w() < 0.999f;
   }
 
   template <typename Transform>
   explicit FlatColor(const Eigen::Vector4f& color, const Transform& transform)
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    add("material_color", color);
     transparent = color.w() < 0.999f;
   }
 
   template <typename Color>
   explicit FlatColor(const Color& color) : ShaderSetting(ColorMode::FLAT_COLOR) {
     const Eigen::Vector4f c = color.eval().template cast<float>();
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
+    add("material_color", c);
     transparent = color.w() < 0.999f;
   }
 
   template <typename Transform>
   explicit FlatColor(float r, float g, float b, float a, const Transform& transform)
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", Eigen::Vector4f(r, g, b, a)));
+    add("material_color", Eigen::Vector4f(r, g, b, a));
     transparent = a < 0.999f;
   }
 
@@ -416,7 +442,7 @@ public:
   explicit FlatColor(const Color& color, const Transform& transform)
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
     const Eigen::Vector4f c = color.eval().template cast<float>();
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", c));
+    add("material_color", c);
     transparent = color.w() < 0.999f;
   }
 
@@ -424,7 +450,7 @@ public:
   explicit FlatColor(std::initializer_list<T> i) : ShaderSetting(ColorMode::FLAT_COLOR) {
     Eigen::Vector4f color = Eigen::Vector4f::Zero();
     std::copy(i.begin(), i.end(), color.data());
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    add("material_color", color);
     transparent = color.w() < 0.999f;
   }
 
@@ -433,7 +459,7 @@ public:
   : ShaderSetting(ColorMode::FLAT_COLOR, (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix()) {
     Eigen::Vector4f color = Eigen::Vector4f::Zero();
     std::copy(i.begin(), i.end(), color.data());
-    params.push_back(glk::make_shared<ShaderParameter<Eigen::Vector4f>>("material_color", color));
+    add("material_color", color);
     transparent = color.w() < 0.999f;
   }
 

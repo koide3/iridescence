@@ -26,6 +26,11 @@ std::enable_if_t<!needs_aligned_allocator<T>::value, std::shared_ptr<T>> make_sh
   return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+  return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
 }  // namespace glk
 
 #endif

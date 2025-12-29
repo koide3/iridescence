@@ -2,27 +2,34 @@
 
 namespace guik {
 
-ShaderSetting::ShaderSetting()
-: transparent(false),
-  params(
-    {glk::make_shared<ShaderParameter<int>>("color_mode", ColorMode::FLAT_COLOR),
-     glk::make_shared<ShaderParameter<float>>("point_scale", 1.0f),
-     glk::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity())})  //
-{}
+ShaderSetting::ShaderSetting() : ShaderSetting::ShaderSetting(ColorMode::FLAT_COLOR, Eigen::Matrix4f::Identity().eval()) {}
 
-ShaderSetting::ShaderSetting(int color_mode)
-: transparent(false),
-  params(
-    {glk::make_shared<ShaderParameter<int>>("color_mode", color_mode),
-     glk::make_shared<ShaderParameter<float>>("point_scale", 1.0f),
-     glk::make_shared<ShaderParameter<Eigen::Matrix4f>>("model_matrix", Eigen::Matrix4f::Identity())})  //
-{}
+ShaderSetting::ShaderSetting(int color_mode) : ShaderSetting::ShaderSetting(color_mode, Eigen::Matrix4f::Identity().eval()) {}
+
+ShaderSetting::ShaderSetting(int color_mode, const Eigen::Matrix4f& transform) : transparent(false), params(6) {
+  params[0] = glk::make_unique<ShaderParameter<int>>("color_mode", color_mode);
+  params[1] = glk::make_unique<ShaderParameter<float>>("point_scale", 1.0f);
+  params[2] = glk::make_unique<ShaderParameter<Eigen::Matrix4f>>("model_matrix", transform);
+}
+
+ShaderSetting::ShaderSetting(const ShaderSetting& other) : transparent(other.transparent), params(other.params.size()) {
+  std::transform(other.params.begin(), other.params.end(), params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
+}
+
+ShaderSetting& ShaderSetting::operator=(const ShaderSetting& other) {
+  if (this != &other) {
+    transparent = other.transparent;
+    params.resize(other.params.size());
+    std::transform(other.params.begin(), other.params.end(), params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
+  }
+  return *this;
+}
 
 ShaderSetting ShaderSetting::clone() const {
   ShaderSetting cloned;
   cloned.transparent = transparent;
   cloned.params.resize(params.size());
-  std::transform(params.begin(), params.end(), cloned.params.begin(), [](const auto& p) { return p->clone(); });
+  std::transform(params.begin(), params.end(), cloned.params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
   return cloned;
 }
 
