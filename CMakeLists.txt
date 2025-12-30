@@ -15,7 +15,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/cmake")
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 set(OpenGL_GL_PREFERENCE GLVND)
 
 if(BUILD_WITH_MARCH_NATIVE)
@@ -26,7 +26,7 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-find_package(glm)
+find_package(glm 1.0.1 CONFIG REQUIRED)
 find_package(glfw3)
 find_package(Eigen3)
 find_package(PNG)
@@ -96,7 +96,7 @@ else()
 endif()
 
 if(${assimp_FOUND})
-  list(APPEND EXTRA_LIBRARIES assimp)
+  list(APPEND EXTRA_LIBRARIES ${ASSIMP_LIBRARIES})
   list(APPEND EXTRA_SOURCE src/glk/io/mesh_io.cpp)
 endif()
 
@@ -302,6 +302,7 @@ endif()
 
 install(DIRECTORY include/ DESTINATION ${INCLUDE_INSTALL_DIR})
 install(DIRECTORY thirdparty/gl3w/GL/ DESTINATION ${INCLUDE_INSTALL_DIR}/GL)
+install(DIRECTORY thirdparty/gl3w/KHR/ DESTINATION ${INCLUDE_INSTALL_DIR}/KHR)
 install(FILES thirdparty/imgui/imgui.h thirdparty/imgui/imconfig.h thirdparty/imgui/imgui_internal.h thirdparty/imgui/imstb_textedit.h DESTINATION  ${INCLUDE_INSTALL_DIR})
 install(FILES thirdparty/implot/implot.h thirdparty/implot/implot_internal.h DESTINATION  ${INCLUDE_INSTALL_DIR})
 install(FILES thirdparty/portable-file-dialogs/portable-file-dialogs.h DESTINATION  ${INCLUDE_INSTALL_DIR})
