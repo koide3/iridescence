@@ -538,7 +538,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
 
   std::vector<int> pixels = frame_buffer->color(info_buffer_id).read_pixels<int>(GL_RGBA_INTEGER, GL_INT, 4);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {
@@ -574,7 +574,7 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
 
   std::vector<float> pixels = frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {

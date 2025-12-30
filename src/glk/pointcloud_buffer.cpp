@@ -97,7 +97,7 @@ void PointCloudBuffer::add_color(const Eigen::Vector4f* colors, int num_points) 
 }
 
 void PointCloudBuffer::add_color(const Eigen::Vector4d* colors, int num_points) {
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(num_points);
+  std::vector<Eigen::Vector4f> colors_f(num_points);
   std::transform(colors, colors + num_points, colors_f.begin(), [](const Eigen::Vector4d& c) { return c.cast<float>(); });
   add_color(colors_f);
 }
@@ -111,7 +111,7 @@ void PointCloudBuffer::add_color(const float* data, int stride, int num_points) 
 }
 
 void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* data, int stride, int num_points, float scale) {
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(num_points);
+  std::vector<Eigen::Vector4f> colors(num_points);
   for (int i = 0; i < num_points; i++) {
     colors[i] = glk::colormapf(colormap, scale * data[(stride / sizeof(float)) * i]);
   }
@@ -253,13 +253,13 @@ void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4f* points,
 }
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3d* points, const unsigned int* indices, int num_indices) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points_f(num_indices);
+  std::vector<Eigen::Vector3f> points_f(num_indices);
   std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template cast<float>(); });
   update_points_with_indices(points_f.data(), indices, num_indices);
 }
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4d* points, const unsigned int* indices, int num_indices) {
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> points_f(num_indices);
+  std::vector<Eigen::Vector4f> points_f(num_indices);
   std::transform(points, points + num_indices, points_f.begin(), [](const auto& p) { return p.template cast<float>(); });
   update_points_with_indices(points_f.data(), indices, num_indices);
 }
@@ -279,7 +279,7 @@ void PointCloudBuffer::update_color_with_indices(const Eigen::Vector4f* colors, 
 }
 
 void PointCloudBuffer::update_color_with_indices(const Eigen::Vector4d* colors, const unsigned int* indices, int num_indices) {
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_f(num_indices);
+  std::vector<Eigen::Vector4f> colors_f(num_indices);
   std::transform(colors, colors + num_indices, colors_f.begin(), [](const Eigen::Vector4d& c) { return c.cast<float>(); });
   update_color_with_indices(colors_f.data(), indices, num_indices);
 }

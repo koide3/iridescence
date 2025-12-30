@@ -12,7 +12,7 @@ NaiveScreenSpaceAmbientOcclusion::NaiveScreenSpaceAmbientOcclusion() {
     return;
   }
   std::mt19937 mt;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> random_vectors(32);
+  std::vector<Eigen::Vector3f> random_vectors(32);
   for (auto& vec : random_vectors) {
     double u = std::uniform_real_distribution<>(0.0, 1.0)(mt);
     double v = std::uniform_real_distribution<>(-1.0, 1.0)(mt);
@@ -27,7 +27,7 @@ NaiveScreenSpaceAmbientOcclusion::NaiveScreenSpaceAmbientOcclusion() {
 
   ssao_shader.use();
   ssao_shader.set_uniform("ao_radius", 0.1f);
-  ssao_shader.set_uniform("random_vectors", random_vectors.data(), random_vectors.size());
+  ssao_shader.set_uniform("random_vectors", random_vectors);
 }
 
 NaiveScreenSpaceAmbientOcclusion::~NaiveScreenSpaceAmbientOcclusion() {}

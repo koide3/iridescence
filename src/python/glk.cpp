@@ -160,7 +160,7 @@ void define_glk(py::module_& m) {
         }
 
         if (c.size()) {
-          std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(size, Eigen::Vector4f::Zero());
+          std::vector<Eigen::Vector4f> colors(size, Eigen::Vector4f::Zero());
           for (int i = 0; i < size && i < c.size(); i++) {
             colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
           }
@@ -180,14 +180,7 @@ void define_glk(py::module_& m) {
 
   // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
-    .def(
-      py::init<
-        float,
-        const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&,
-        const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&>(),
-      py::arg("thickness"),
-      py::arg("vertices"),
-      py::arg("colors"))
+    .def(py::init<float, const std::vector<Eigen::Vector3f>&, const std::vector<Eigen::Vector4f>&>(), py::arg("thickness"), py::arg("vertices"), py::arg("colors"))
     .def(
       py::init([](
                  float thickness,
@@ -203,8 +196,8 @@ void define_glk(py::module_& m) {
           throw std::runtime_error("vertices and colors must have the same number of rows");
         }
 
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices_vec(vertices.shape(0));
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_vec(colors.shape(0));
+        std::vector<Eigen::Vector3f> vertices_vec(vertices.shape(0));
+        std::vector<Eigen::Vector4f> colors_vec(colors.shape(0));
 
         for (int i = 0; i < vertices.shape(0); i++) {
           vertices_vec[i] = Eigen::Vector3f(vertices.at(i, 0), vertices.at(i, 1), vertices.at(i, 2));
@@ -230,7 +223,7 @@ void define_glk(py::module_& m) {
           size = std::min<int>(size, z.size());
         }
 
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
+        std::vector<Eigen::Vector3f> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
         for (int i = 1; i < size && i < x.size(); i++) {
           vertices[(i - 1) * 2].x() = x[i - 1];
           vertices[(i - 1) * 2 + 1].x() = x[i];
@@ -246,7 +239,7 @@ void define_glk(py::module_& m) {
           vertices[(i - 1) * 2 + 1].z() = z[i];
         }
 
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+        std::vector<Eigen::Vector4f> colors;
         if (c.size()) {
           colors.reserve((size - 1) * 2);
           for (int i = 1; i < size && i < c.size(); i++) {
@@ -276,13 +269,11 @@ void define_glk(py::module_& m) {
         return std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * points.shape(1), points.shape(0));
       }),
       py::arg("points"))
-    .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&>())
-    .def(
-      py::init([](const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& points) { return std::make_shared<glk::PointCloudBuffer>(points); }),
-      py::arg("points"))
+    .def(py::init<const std::vector<Eigen::Vector3f>&>())
+    .def(py::init([](const std::vector<Eigen::Vector3f>& points) { return std::make_shared<glk::PointCloudBuffer>(points); }), py::arg("points"))
     .def(
       "add_normals",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) { buffer.add_normals(normals); },
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& normals) { buffer.add_normals(normals); },
       py::arg("normals"))
     .def(
       "add_normals",
@@ -291,7 +282,7 @@ void define_glk(py::module_& m) {
           throw std::runtime_error("invalid normals array");
         }
 
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals_vec(normals.shape(0));
+        std::vector<Eigen::Vector3f> normals_vec(normals.shape(0));
         for (int i = 0; i < normals.shape(0); i++) {
           normals_vec[i] = Eigen::Vector3f(normals.at(i, 0), normals.at(i, 1), normals.at(i, 2));
         }
@@ -300,15 +291,15 @@ void define_glk(py::module_& m) {
       py::arg("normals"))
     .def(
       "add_color",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& colors) {
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_(colors.size());
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& colors) {
+        std::vector<Eigen::Vector4f> colors_(colors.size());
         std::transform(colors.begin(), colors.end(), colors_.begin(), [](const Eigen::Vector3f& c) { return Eigen::Vector4f(c.x(), c.y(), c.z(), 1.0f); });
         buffer.add_color(colors_);
       },
       py::arg("colors"))
     .def(
       "add_color",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) { buffer.add_color(colors); },
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f>& colors) { buffer.add_color(colors); },
       py::arg("colors"))
     .def(
       "add_color",
@@ -317,7 +308,7 @@ void define_glk(py::module_& m) {
           throw std::runtime_error("invalid colors array");
         }
 
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_vec(colors.shape(0));
+        std::vector<Eigen::Vector4f> colors_vec(colors.shape(0));
         for (int i = 0; i < colors.shape(0); i++) {
           colors_vec[i] = Eigen::Vector4f(colors.at(i, 0), colors.at(i, 1), colors.at(i, 2), colors.at(i, 3));
         }

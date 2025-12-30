@@ -50,12 +50,12 @@ ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vect
     return vec;
   };
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> random_vectors(16);
+  std::vector<Eigen::Vector3f> random_vectors(16);
   for (auto& vec : random_vectors) {
     vec = sample_random_vector();
   }
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> randomization(128 * 128);
+  std::vector<Eigen::Vector3f> randomization(128 * 128);
   for (auto& vec : randomization) {
     vec = sample_random_vector().normalized();
   }
@@ -81,7 +81,7 @@ ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vect
   occlusion_shader.set_uniform("normal_sampler", 2);
   occlusion_shader.set_uniform("randomization_sampler", 3);
   occlusion_shader.set_uniform("ao_radius", 0.05f);
-  occlusion_shader.set_uniform("random_vectors", random_vectors.data(), random_vectors.size());
+  occlusion_shader.set_uniform("random_vectors", random_vectors);
 
   bilateral_shader.use();
   bilateral_shader.set_uniform("color_sampler", 0);

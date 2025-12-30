@@ -40,13 +40,13 @@ public:
   void use() const { glUseProgram(shader_program); }
   void unuse() const { glUseProgram(0); }
 
-  GLint attrib(std::uint64_t name) const;
-  GLint attrib(const std::string& name) const;
-  GLint uniform(std::uint64_t name) const;
-  GLint uniform(const std::string& name) const;
-  GLint subroutine(GLenum shader_type, std::uint64_t name) const;
+  GLint attrib(std::uint64_t name, const char* debug_msg = nullptr);
+  GLint attrib(const std::string& name);
+  GLint uniform(std::uint64_t name, const char* debug_msg = nullptr);
+  GLint uniform(const std::string& name);
+  GLint subroutine(GLenum shader_type, std::uint64_t name, const char* debug_msg = nullptr);
   GLint subroutine(GLenum shader_type, const std::string& name);
-  GLint subroutine_uniform(GLenum shader_type, std::uint64_t name) const;
+  GLint subroutine_uniform(GLenum shader_type, std::uint64_t name, const char* debug_msg = nullptr);
   GLint subroutine_uniform(GLenum shader_type, const std::string& name);
 
   int get_uniformi(std::uint64_t name);
@@ -81,63 +81,62 @@ public:
   }
 
   // int
-  void set_uniform(std::uint64_t name, int value);
+  void set_uniform(std::uint64_t name, int value, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, int value);
 
   // float
-  void set_uniform(std::uint64_t name, float value);
+  void set_uniform(std::uint64_t name, float value, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, float value);
 
   // vec2f
-  void set_uniform(std::uint64_t name, const Eigen::Vector2f& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector2f& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector2f& vector);
 
   // vec3f
-  void set_uniform(std::uint64_t name, const Eigen::Vector3f& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector3f& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector3f& vector);
 
   // vec4f
-  void set_uniform(std::uint64_t name, const Eigen::Vector4f& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector4f& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector4f& vector);
 
   // vec2i
-  void set_uniform(std::uint64_t name, const Eigen::Vector2i& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector2i& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector2i& vector);
 
   // vec3i
-  void set_uniform(std::uint64_t name, const Eigen::Vector3i& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector3i& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector3i& vector);
 
   // vec4i
-  void set_uniform(std::uint64_t name, const Eigen::Vector4i& vector);
+  void set_uniform(std::uint64_t name, const Eigen::Vector4i& vector, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Vector4i& vector);
 
   // matrix4f
-  void set_uniform(std::uint64_t name, const Eigen::Matrix4f& matrix);
+  void set_uniform(std::uint64_t name, const Eigen::Matrix4f& matrix, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Matrix4f& matrix);
 
   // array of int
-  void set_uniform(std::uint64_t name, const std::vector<int>& vectors);
+  void set_uniform(std::uint64_t name, const std::vector<int>& vectors, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const std::vector<int>& vectors);
 
   // array of float
-  void set_uniform(std::uint64_t name, const std::vector<float>& vectors);
+  void set_uniform(std::uint64_t name, const std::vector<float>& vectors, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const std::vector<float>& vectors);
 
   // array of vec2f
-  void set_uniform(std::uint64_t name, const Eigen::Vector2f* vectors, size_t count);
-  void set_uniform(const std::string& name, const Eigen::Vector2f* vectors, size_t count);
+  void set_uniform(std::uint64_t name, const std::vector<Eigen::Vector2f>& vectors, const char* debug_msg = nullptr);
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector2f>& vectors);
 
   // array of vec3f
-  void set_uniform(std::uint64_t name, const Eigen::Vector3f* vectors, size_t count);
-  void set_uniform(const std::string& name, const Eigen::Vector3f* vectors, size_t count);
+  void set_uniform(std::uint64_t name, const std::vector<Eigen::Vector3f>& vectors, const char* debug_msg = nullptr);
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector3f>& vectors);
 
   // array of vec4f
-  void set_uniform(std::uint64_t name, const Eigen::Vector4f* vectors, size_t count);
-  void set_uniform(const std::string& name, const Eigen::Vector4f* vectors, size_t count);
-
+  void set_uniform(std::uint64_t name, const std::vector<Eigen::Vector4f>& vectors, const char* debug_msg = nullptr);
+  void set_uniform(const std::string& name, const std::vector<Eigen::Vector4f>& vectors);
   // matrix4d
-  void set_uniform(std::uint64_t name, const Eigen::Matrix4d& matrix_);
+  void set_uniform(std::uint64_t name, const Eigen::Matrix4d& matrix_, const char* debug_msg = nullptr);
   void set_uniform(const std::string& name, const Eigen::Matrix4d& matrix_);
 
   void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);

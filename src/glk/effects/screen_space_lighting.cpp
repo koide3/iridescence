@@ -335,9 +335,9 @@ void ScreenSpaceLighting::draw(
     lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
     lighting_shader.set_uniform("light_directional", light_directional);
     lighting_shader.set_uniform("light_range", light_range);
-    lighting_shader.set_uniform("light_attenuation", light_attenuation.data(), light_attenuation.size());
-    lighting_shader.set_uniform("light_pos", light_pos.data(), light_pos.size());
-    lighting_shader.set_uniform("light_color", light_color.data(), light_color.size());
+    lighting_shader.set_uniform("light_attenuation", light_attenuation);
+    lighting_shader.set_uniform("light_pos", light_pos);
+    lighting_shader.set_uniform("light_color", light_color);
   }
 
   if (splatting) {
