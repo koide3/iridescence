@@ -2,7 +2,6 @@ name: doc
 
 on:
   push:
-    branches: [ pyrev ]
     tags:
       - '*'
   # Allows you to run this workflow manually from the Actions tab
