@@ -140,6 +140,7 @@ public:
         shader.set_uniform(name, value<Eigen::Matrix4f>());
         break;
       default:
+        std::cerr << "error: invalid shader parameter type for " << name << std::endl;
         break;
     }
   }
@@ -198,8 +199,7 @@ public:
   ShaderSetting& add(const std::string& name_, const T& value) {
     const std::uint64_t name = glk::hash(name_);
 
-    int i = 0;
-    for (i = 0; i < params.size() && params[i].valid(); i++) {
+    for (int i = 0; i < params.size() && params[i].valid(); i++) {
       if (params[i].name == name) {
         params[i] = ShaderParameter(name, value);
         return *this;
@@ -218,11 +218,7 @@ public:
     const std::uint64_t name = glk::hash(name_);
 
     for (const auto& param : params) {
-      if (!param.valid()) {
-        continue;
-      }
-
-      if (param.name != name) {
+      if (!param.valid() || param.name != name) {
         continue;
       }
 
@@ -245,11 +241,7 @@ public:
     const std::uint64_t name = glk::hash(name_);
 
     for (const auto& param : params) {
-      if (!param.valid()) {
-        continue;
-      }
-
-      if (param.name != name) {
+      if (!param.valid() || param.name != name) {
         continue;
       }
 
@@ -272,11 +264,7 @@ public:
     const std::uint64_t name = glk::hash(name_);
 
     for (const auto& param : params) {
-      if (!param.valid()) {
-        continue;
-      }
-
-      if (param.name != name) {
+      if (!param.valid() || param.name != name) {
         continue;
       }
 
