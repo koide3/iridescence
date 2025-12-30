@@ -15,8 +15,6 @@ What this library does NOT provide:
 - Realistic rendering and shading
 - Rich textured 3D mesh rendering
 
-See **[documentation](https://koide3.github.io/iridescence/)** for details.
-
 ## Dependencies
 
 - [GLFW](https://www.glfw.org/) ([zlib/libpng license](https://www.glfw.org/license.html))
