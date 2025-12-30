@@ -37,6 +37,7 @@ There are four coloring schemes in Iridescence, and they have corresponding util
 - **FLAT_COLOR (guik::FlatColor)** scheme draws pixels with a flat color.
 - **VERTEX_COLOR (guik::VertexColor)** scheme draws pixels with interpolated colors of corresponding vertices.
 - **TEXTURE_COLOR (guik::TextureColor)** scheme samples pixel colors from a texture.
+- **VERTEX_COLORMAP (guik::VertexColorMap)** scheme draws pixels with colors that encode vertex colormap attribute (Similar to RAINBOW, but uses an arbitrary vertex scalar attribute like vertex intensity).
 
 ![Screenshot_20230101_004203](https://user-images.githubusercontent.com/31344317/210148371-c12e7126-2dc2-48e5-b43b-b57a7be9d92e.png)
 Left to right: Rainbow, FlatColor, VertexColor, TextureColor (transparent)
@@ -63,6 +64,9 @@ auto shader_setting = guik::VertexColor(transformation);
 
 // TEXTURE_COLOR with transparency
 auto shader_setting = guik::TextureColor(transformation).make_transparent();
+
+// VERTEX_COLORMAP
+auto shader_setting = guik::VertexColorMap(transformation);
 ```
 
 ![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
