@@ -13,6 +13,16 @@ py:
 	mkdir -p build && cd build && cmake ../../ -DBUILD_PYTHON_BINDINGS=ON && make -j
 	sphinx-build -b html . ./doc_py/
 
+.PHONY: mkdocs
+mkdocs:
+	@echo "Building MkDocs documentation..."
+	cd .. && mkdocs build
+
 .PHONY: all
-all: cpp py
+all: cpp py mkdocs
 	@echo "All documentation built."
+
+.PHONY: deploy
+deploy:
+	@echo "Deploying documentation..."
+	cd .. && mkdocs gh-deploy --force
