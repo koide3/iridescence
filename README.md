@@ -35,7 +35,7 @@ See **[documentation](https://koide3.github.io/iridescence/)** for details.
 
 ```bash
 # Install from PPA
-sudo add-apt-repository koide3/iridescence
+sudo add-apt-repository -y ppa:koide3/iridescence
 sudo apt install libiridescence-dev
 ```
 
