@@ -321,6 +321,12 @@ void define_glk(py::module_& m) {
       py::arg("colormap"),
       py::arg("intensities"),
       py::arg("scale") = 1.0f)
+    .def("set_colormap_buffer", &glk::PointCloudBuffer::set_colormap_buffer, py::arg("colormap_buffer"))
+    .def(
+      "add_colormap",
+      [](glk::PointCloudBuffer& buffer, std::vector<float>& cmap, float scale) { buffer.add_colormap(cmap, scale); },
+      py::arg("cmap"),
+      py::arg("scale") = 1.0f)
     .def(
       "add_buffer",
       [](glk::PointCloudBuffer& buffer, const std::string& attribute_name, const Eigen::MatrixXf& data) {

@@ -12,6 +12,7 @@
 #include <glk/pointcloud_buffer.hpp>
 #include <guik/recent_files.hpp>
 #include <guik/model_control.hpp>
+#include <guik/hovered_drawings.hpp>
 #include <guik/camera/orbit_camera_control_xy.hpp>
 #include <guik/camera/orbit_camera_control_xz.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
@@ -74,6 +75,8 @@ void define_guik(py::module_& m) {
     .def("add", &guik::ShaderSetting::add<Eigen::Vector2f>)
     .def("add", &guik::ShaderSetting::add<Eigen::Matrix4f>)
     .def("addi", &guik::ShaderSetting::add<Eigen::Vector4i>)
+    .def("static_object", &guik::ShaderSetting::static_object, py::return_value_policy::reference_internal)
+    .def("dynamic_object", &guik::ShaderSetting::dynamic_object, py::return_value_policy::reference_internal)
     .def("material_color", &guik::ShaderSetting::material_color)
     .def(
       "set_color",
@@ -100,6 +103,7 @@ void define_guik(py::module_& m) {
     .def("set_point_scale_mode", &guik::ShaderSetting::set_point_scale_mode, py::arg("mode"), py::return_value_policy::reference_internal)
     .def("set_point_scale_screenspace", &guik::ShaderSetting::set_point_scale_screenspace, py::return_value_policy::reference_internal)
     .def("set_point_scale_metric", &guik::ShaderSetting::set_point_scale_metric, py::return_value_policy::reference_internal)
+    .def("set_point_shape", &guik::ShaderSetting::set_point_shape, py::arg("point_size"), py::arg("metric"), py::arg("circle"), py::return_value_policy::reference_internal)
     .def("remove_model_matrix", &guik::ShaderSetting::remove_model_matrix, py::return_value_policy::reference_internal)
     .def("color_mode", &guik::ShaderSetting::color_mode)
     .def("set_color_mode", &guik::ShaderSetting::set_color_mode, py::arg("color_mode"), py::return_value_policy::reference_internal)
@@ -283,6 +287,136 @@ void define_guik(py::module_& m) {
     .def("set_mouse_senstivity", &guik::FPSCameraControl::set_mouse_senstivity)
     .def("set_translation_speed", &guik::FPSCameraControl::set_translation_speed);
 
+  // guik::HoveredDrawings
+  py::class_<guik::HoveredDrawings, std::shared_ptr<guik::HoveredDrawings>>(guik_, "HoveredDrawings")  //
+    .def(
+      py::init([](guik::LightViewerContext* context) {
+        if (context == nullptr) {
+          context = guik::LightViewer::instance();
+        }
+        return std::make_shared<guik::HoveredDrawings>(context);
+      }),
+      py::arg("context") = nullptr)
+    .def(
+      "add_text",
+      &guik::HoveredDrawings::add_text,
+      py::arg("pt"),
+      py::arg("text"),
+      py::arg("fg_color") = 0xFFFFFFFF,
+      py::arg("bg_color") = 0x80000000,
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def(
+      "add_text_on",
+      &guik::HoveredDrawings::add_text_on,
+      py::arg("drawable_name"),
+      py::arg("text"),
+      py::arg("fg_color") = 0xFFFFFFFF,
+      py::arg("bg_color") = 0x80000000,
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def("add_cross", &guik::HoveredDrawings::add_cross, py::arg("pt"), py::arg("color") = 0xFFFFFFFF, py::arg("size") = 7.07f, py::arg("thickness") = 1.0f)
+    .def("add_cross_on", &guik::HoveredDrawings::add_cross_on, py::arg("drawable_name"), py::arg("color") = 0xFFFFFFFF, py::arg("size") = 7.07f, py::arg("thickness") = 1.0f)
+    .def(
+      "add_circle",
+      &guik::HoveredDrawings::add_circle,
+      py::arg("pt"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("radius") = 10.0f,
+      py::arg("num_segments") = 32,
+      py::arg("thickness") = 1.0f)
+    .def(
+      "add_circle_on",
+      &guik::HoveredDrawings::add_circle_on,
+      py::arg("drawable_name"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("radius") = 10.0f,
+      py::arg("num_segments") = 32,
+      py::arg("thickness") = 1.0f)
+    .def(
+      "add_triangle",
+      &guik::HoveredDrawings::add_triangle,
+      py::arg("pt"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("height") = 20.0f,
+      py::arg("thickness") = 1.0f,
+      py::arg("upsidedown") = true,
+      py::arg("centering") = false)
+    .def(
+      "add_triangle_on",
+      &guik::HoveredDrawings::add_triangle_on,
+      py::arg("drawable"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("height") = 20.0f,
+      py::arg("thickness") = 1.0f,
+      py::arg("upsidedown") = true,
+      py::arg("centering") = false)
+    .def(
+      "add_filled_triangle",
+      &guik::HoveredDrawings::add_filled_triangle,
+      py::arg("pt"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("height") = 20.0f,
+      py::arg("upsidedown") = true,
+      py::arg("centering") = false)
+    .def(
+      "add_filled_triangle_on",
+      &guik::HoveredDrawings::add_filled_triangle_on,
+      py::arg("drawable_name"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("height") = 20.0f,
+      py::arg("upsidedown") = true,
+      py::arg("centering") = false)
+    .def(
+      "add_rect",
+      &guik::HoveredDrawings::add_rect,
+      py::arg("pt"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("size") = Eigen::Vector2f(15.0f, 15.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def(
+      "add_rect_on",
+      &guik::HoveredDrawings::add_rect_on,
+      py::arg("drawable"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("size") = Eigen::Vector2f(15.0f, 15.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def(
+      "add_filled_rect",
+      &guik::HoveredDrawings::add_filled_rect,
+      py::arg("pt"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("size") = Eigen::Vector2f(15.0f, 15.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def(
+      "add_filled_rect_on",
+      &guik::HoveredDrawings::add_filled_rect_on,
+      py::arg("drawable_name"),
+      py::arg("color") = 0xFFFFFFFF,
+      py::arg("size") = Eigen::Vector2f(15.0f, 15.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f))
+    .def(
+      "add_image",
+      &guik::HoveredDrawings::add_image,
+      py::arg("pt"),
+      py::arg("texture"),
+      py::arg("size") = Eigen::Vector2f(0.0f, 0.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f),
+      py::arg("bg_color") = 0,
+      py::arg("border_color") = 0,
+      py::arg("border_thickness") = 1.0f)
+    .def(
+      "add_image_on",
+      &guik::HoveredDrawings::add_image_on,
+      py::arg("drawable_name"),
+      py::arg("texture"),
+      py::arg("size") = Eigen::Vector2f(0.0f, 0.0f),
+      py::arg("offset") = Eigen::Vector2f(0.0f, 0.0f),
+      py::arg("bg_color") = 0,
+      py::arg("border_color") = 0,
+      py::arg("border_thickness") = 1.0f)
+    .def("remove_drawing", &guik::HoveredDrawings::remove_drawing, py::arg("drawing_id"))
+    .def("clear", &guik::HoveredDrawings::clear)
+    .def("create_callback", &guik::HoveredDrawings::create_callback);
+
   // guik::ProjectionControl
   py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
 
@@ -297,6 +431,7 @@ void define_guik(py::module_& m) {
     .def("show_window", &guik::Application::show_window)
     .def("hide_window", &guik::Application::hide_window)
     .def("maximize_window", &guik::Application::maximize_window)
+    .def("fullscreen_window", &guik::Application::fullscreen_window)
     .def("resize", &guik::Application::resize)
     .def("set_title", &guik::Application::set_title)
     .def("framebuffer_size", &guik::Application::framebuffer_size)
@@ -332,8 +467,6 @@ void define_guik(py::module_& m) {
     .def("set_screen_effect", &guik::LightViewerContext::set_screen_effect)
     .def("get_screen_effect", &guik::LightViewerContext::get_screen_effect)
     .def("set_bg_texture", &guik::LightViewerContext::set_bg_texture)
-
-    .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
 
     .def("enable_normal_buffer", &guik::LightViewerContext::enable_normal_buffer)
     .def("enable_info_buffer", &guik::LightViewerContext::enable_info_buffer)
@@ -402,6 +535,8 @@ void define_guik(py::module_& m) {
       py::arg("theta") = 0.0,
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_fps_camera_control", &guik::LightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0)
+
+    .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
 
     .def("pick_info", &guik::LightViewerContext::pick_info, py::arg("p"), py::arg("window") = 2)
     .def("pick_depth", &guik::LightViewerContext::pick_depth, py::arg("p"), py::arg("window") = 2)
