@@ -354,6 +354,9 @@ if(BUILD_PYTHON_BINDINGS)
     LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
     COMPONENT python
   )
+
+  # install stubs in src/python/stubs
+  install(DIRECTORY src/python/stubs/ DESTINATION ${PYTHON_INSTALL_DIR})
 endif()
 
 #############
