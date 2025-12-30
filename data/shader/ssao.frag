@@ -19,5 +19,5 @@ void main() {
     return;
   }
 
-  final_color = frag_color * (1 - frag_occlusion);
+  final_color = frag_color * (1 - clamp(frag_occlusion - 0.2, 0.0, 1.0));
 }
