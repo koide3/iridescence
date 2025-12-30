@@ -15,7 +15,7 @@
 namespace glk {
 
 ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size, bool use_splatting) {
-  if(use_splatting) {
+  if (use_splatting) {
     splatting.reset(new ScreenSpaceSplatting(size));
   } else {
     ssae.reset(new ScreenSpaceAttributeEstimation(size));
@@ -24,7 +24,7 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size, bool use_s
   int width, height;
   std::vector<unsigned char> bytes;
 
-  if(!load_png(get_data_path() + "/texture/iridescence1.png", width, height, bytes)) {
+  if (!load_png(get_data_path() + "/texture/iridescence1.png", width, height, bytes)) {
     return;
   }
   iridescence_texture.reset(new glk::Texture(Eigen::Vector2i(width, height), GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, bytes.data()));
@@ -34,7 +34,7 @@ ScreenSpaceLighting::ScreenSpaceLighting(const Eigen::Vector2i& size, bool use_s
   occlusion_model = OCCLUSION_MODEL::AMBIENT_OCCLUSION;
   iridescence_model = IRIDESCENCE_MODEL::IRIDESCENCE1;
 
-  if(!load_shader()) {
+  if (!load_shader()) {
     return;
   }
 
@@ -88,7 +88,7 @@ bool ScreenSpaceLighting::load_shader() {
   std::vector<std::string> vertex_shaders = {get_data_path() + "/shader/texture.vert"};
   std::vector<std::string> fragment_shaders = {get_data_path() + "/shader/ssli.frag", get_data_path() + "/shader/brdf/schlick_fresnel.frag"};
 
-  switch(diffuse_model) {
+  switch (diffuse_model) {
     default:
     case DIFFUSE_MODEL::ZERO:
       fragment_shaders.push_back(get_data_path() + "/shader/brdf/diffuse_zero.frag");
@@ -110,7 +110,7 @@ bool ScreenSpaceLighting::load_shader() {
       break;
   }
 
-  switch(specular_model) {
+  switch (specular_model) {
     default:
     case SPECULAR_MODEL::ZERO:
       fragment_shaders.push_back(get_data_path() + "/shader/brdf/specular_zero.frag");
@@ -126,7 +126,7 @@ bool ScreenSpaceLighting::load_shader() {
       break;
   }
 
-  switch(occlusion_model) {
+  switch (occlusion_model) {
     default:
     case OCCLUSION_MODEL::ZERO:
       fragment_shaders.push_back(get_data_path() + "/shader/brdf/occlusion_zero.frag");
@@ -137,7 +137,7 @@ bool ScreenSpaceLighting::load_shader() {
   }
 
   std::string iridescence_texture_path;
-  switch(iridescence_model) {
+  switch (iridescence_model) {
     case IRIDESCENCE_MODEL::ZERO:
       break;
     case IRIDESCENCE_MODEL::IRIDESCENCE1:
@@ -151,13 +151,13 @@ bool ScreenSpaceLighting::load_shader() {
       break;
   }
 
-  if(iridescence_model == IRIDESCENCE_MODEL::ZERO) {
+  if (iridescence_model == IRIDESCENCE_MODEL::ZERO) {
     fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence_zero.frag");
   } else {
     int width, height;
     std::vector<unsigned char> bytes;
 
-    if(!load_png(iridescence_texture_path, width, height, bytes)) {
+    if (!load_png(iridescence_texture_path, width, height, bytes)) {
       return false;
     }
     fragment_shaders.push_back(get_data_path() + "/shader/brdf/iridescence.frag");
@@ -248,7 +248,7 @@ void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eig
 void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color, const Eigen::Vector2f& attenuation, float max_range) {
   light_updated = true;
 
-  while(i >= light_pos.size()) {
+  while (i >= light_pos.size()) {
     light_directional.push_back(false);
     light_range.push_back(1000.0f);
     light_attenuation.push_back(Eigen::Vector2f(0.0f, 0.0f));
@@ -266,7 +266,7 @@ void ScreenSpaceLighting::set_light(int i, const Eigen::Vector3f& pos, const Eig
 void ScreenSpaceLighting::set_directional_light(int i, const Eigen::Vector3f& direction, const Eigen::Vector4f& color) {
   light_updated = true;
 
-  while(i >= light_pos.size()) {
+  while (i >= light_pos.size()) {
     light_directional.push_back(false);
     light_range.push_back(1000.0f);
     light_attenuation.push_back(Eigen::Vector2f(0.0f, 0.0f));
@@ -281,31 +281,36 @@ void ScreenSpaceLighting::set_directional_light(int i, const Eigen::Vector3f& di
 }
 
 void ScreenSpaceLighting::set_size(const Eigen::Vector2i& size) {
-  if(splatting) {
+  if (splatting) {
     splatting->set_size(size);
   }
 
-  if(ssae) {
+  if (ssae) {
     ssae->set_size(size);
   }
 }
 
-void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+void ScreenSpaceLighting::draw(
+  const TextureRenderer& renderer,
+  const glk::Texture& color_texture,
+  const glk::Texture& depth_texture,
+  const TextureRendererInput::Ptr& input,
+  glk::FrameBuffer* frame_buffer) {
   using namespace glk::console;
 
-  if(splatting) {
+  if (splatting) {
     splatting->draw(renderer, color_texture, depth_texture, input);
   }
-  if(ssae) {
+  if (ssae) {
     ssae->draw(renderer, color_texture, depth_texture, input);
   }
 
-  if(frame_buffer) {
+  if (frame_buffer) {
     frame_buffer->bind();
   }
 
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
-  if(!view_matrix) {
+  if (!view_matrix) {
     std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
@@ -326,16 +331,16 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
   lighting_shader.set_uniform("albedo", albedo);
   lighting_shader.set_uniform("roughness", roughness);
 
-  if(light_updated) {
+  if (light_updated) {
     lighting_shader.set_uniform("num_lights", static_cast<int>(light_pos.size()));
     lighting_shader.set_uniform("light_directional", light_directional);
     lighting_shader.set_uniform("light_range", light_range);
-    lighting_shader.set_uniform("light_attenuation", light_attenuation);
-    lighting_shader.set_uniform("light_pos", light_pos);
-    lighting_shader.set_uniform("light_color", light_color);
+    lighting_shader.set_uniform("light_attenuation", light_attenuation.data(), light_attenuation.size());
+    lighting_shader.set_uniform("light_pos", light_pos.data(), light_pos.size());
+    lighting_shader.set_uniform("light_color", light_color.data(), light_color.size());
   }
 
-  if(splatting) {
+  if (splatting) {
     splatting->color().bind(GL_TEXTURE0);
     splatting->position().bind(GL_TEXTURE1);
     splatting->normal().bind(GL_TEXTURE2);
@@ -366,7 +371,7 @@ void ScreenSpaceLighting::draw(const TextureRenderer& renderer, const glk::Textu
   });
   */
 
-  if(frame_buffer) {
+  if (frame_buffer) {
     frame_buffer->unbind();
   }
 }

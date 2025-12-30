@@ -10,23 +10,23 @@
 namespace glk {
 
 ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vector2i& size, BufferType rendering_type) {
-  if(!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
+  if (!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
     return;
   }
 
-  if(!pos_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_pos.frag")) {
+  if (!pos_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_pos.frag")) {
     return;
   }
 
-  if(!normal_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_normal.frag")) {
+  if (!normal_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_normal.frag")) {
     return;
   }
 
-  if(!occlusion_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_ao.frag")) {
+  if (!occlusion_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/ssae_ao.frag")) {
     return;
   }
 
-  if(!bilateral_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/bilateral.frag")) {
+  if (!bilateral_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/bilateral.frag")) {
     return;
   }
 
@@ -51,12 +51,12 @@ ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vect
   };
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> random_vectors(16);
-  for(auto& vec : random_vectors) {
+  for (auto& vec : random_vectors) {
     vec = sample_random_vector();
   }
 
   std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> randomization(128 * 128);
-  for(auto& vec : randomization) {
+  for (auto& vec : randomization) {
     vec = sample_random_vector().normalized();
   }
   randomization_texture.reset(new glk::Texture(Eigen::Vector2i(128, 128), GL_RGB32F, GL_RGB, GL_FLOAT, randomization.data()));
@@ -81,7 +81,7 @@ ScreenSpaceAttributeEstimation::ScreenSpaceAttributeEstimation(const Eigen::Vect
   occlusion_shader.set_uniform("normal_sampler", 2);
   occlusion_shader.set_uniform("randomization_sampler", 3);
   occlusion_shader.set_uniform("ao_radius", 0.05f);
-  occlusion_shader.set_uniform("random_vectors", random_vectors);
+  occlusion_shader.set_uniform("random_vectors", random_vectors.data(), random_vectors.size());
 
   bilateral_shader.use();
   bilateral_shader.set_uniform("color_sampler", 0);
@@ -136,7 +136,12 @@ const glk::Texture& ScreenSpaceAttributeEstimation::occlusion() const {
   return bilateral_y_buffer->color(0);
 }
 
-void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+void ScreenSpaceAttributeEstimation::draw(
+  const TextureRenderer& renderer,
+  const glk::Texture& color_texture,
+  const glk::Texture& depth_texture,
+  const TextureRendererInput::Ptr& input,
+  glk::FrameBuffer* frame_buffer) {
   using namespace glk::console;
 
   glDisable(GL_DEPTH_TEST);
@@ -144,7 +149,7 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
   // position
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
-  if(!view_matrix || !projection_matrix) {
+  if (!view_matrix || !projection_matrix) {
     std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
@@ -160,7 +165,7 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
   renderer.draw_plain(pos_shader);
   position_buffer->unbind();
 
-  if(smooth_normal) {
+  if (smooth_normal) {
     // apply bilateral filter to position buffer
     bilateral_shader.use();
     bilateral_shader.set_uniform("inv_frame_size", inv_frame_size);
@@ -194,7 +199,7 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
 
   normal_buffer->bind();
   depth_texture.bind(GL_TEXTURE0);
-  if(smooth_normal) {
+  if (smooth_normal) {
     position_smoothing_y_buffer->color().bind(GL_TEXTURE1);
   } else {
     position_buffer->color().bind(GL_TEXTURE1);
@@ -202,7 +207,7 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
 
   glActiveTexture(GL_TEXTURE2);
   auto normal_texture = input->get<GLuint>("normal_texture");
-  if(normal_texture) {
+  if (normal_texture) {
     glBindTexture(GL_TEXTURE_2D, *normal_texture);
   } else {
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -255,8 +260,8 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
   renderer.draw_plain(bilateral_shader);
   bilateral_y_buffer->unbind();
 
-  if(rendering_type != BufferType::NONE) {
-    if(frame_buffer) {
+  if (rendering_type != BufferType::NONE) {
+    if (frame_buffer) {
       frame_buffer->bind();
     }
 
@@ -268,15 +273,14 @@ void ScreenSpaceAttributeEstimation::draw(const TextureRenderer& renderer, const
       &normal_buffer->color(),
       &occlusion_buffer->color(),
       &bilateral_x_buffer->color(),
-      &bilateral_y_buffer->color()
-    };
+      &bilateral_y_buffer->color()};
     const auto texture = textures[static_cast<int>(rendering_type) - 1];
     texture->bind();
 
     texture_shader.use();
     renderer.draw_plain(texture_shader);
 
-    if(frame_buffer) {
+    if (frame_buffer) {
       frame_buffer->unbind();
     }
   }
