@@ -2,8 +2,9 @@
 
 **Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focuing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
 
-[![ppa](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.launchpad.net%2F1.0%2F~koide3%2F%2Barchive%2Fubuntu%2Firidescence%3Fws.op%3DgetPublishedSources%26status%3DPublished&query=entries.0.source_package_version&label=ppa)](https://launchpad.net/~koide3/+archive/ubuntu/iridescence) [![PyPI - Version](https://img.shields.io/pypi/v/pyridescence)](https://pypi.org/project/pyridescence/) [![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 22.04 / 24.04 and Windows
+**[Documentation](https://koide3.github.io/iridescence/)**, **[API(C++)](https://koide3.github.io/iridescence/doc_cpp/), [API(Python)](https://koide3.github.io/iridescence/doc_py/)**
 
+[![ppa](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.launchpad.net%2F1.0%2F~koide3%2F%2Barchive%2Fubuntu%2Firidescence%3Fws.op%3DgetPublishedSources%26status%3DPublished&query=entries.0.source_package_version&label=ppa)](https://launchpad.net/~koide3/+archive/ubuntu/iridescence) [![PyPI - Version](https://img.shields.io/pypi/v/pyridescence)](https://pypi.org/project/pyridescence/) [![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 22.04 / 24.04 and Windows
 
 ## Features
 
