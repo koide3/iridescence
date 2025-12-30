@@ -36,34 +36,118 @@ struct PointShapeMode {
   enum MODE { RECTANGLE = 0, CIRCLE = 1 };
 };
 
-/// @brief Generic shader parameter interface.
-struct ShaderParameterInterface {
-public:
-  using Ptr = std::unique_ptr<ShaderParameterInterface>;
-  ShaderParameterInterface(const std::string& name) : name(name) {}
-  virtual ~ShaderParameterInterface() {}
+/// @brief Data type of shader parameter.
+enum class ShaderDataType { INT = 0, INT2, INT3, INT4, FLOAT, FLOAT2, FLOAT3, FLOAT4, MATRIX4, INVALID };
 
-  virtual void set(glk::GLSLShader& shader) const = 0;
-  virtual Ptr clone() const = 0;
-
-public:
-  std::string name;
-};
-
-/// @brief Type-specific shader parameter.
+/// @brief  Deduce shader data type from C++ type.
 template <typename T>
-struct ShaderParameter : public ShaderParameterInterface {
+ShaderDataType deduce_data_type() {
+  if constexpr (std::is_same<T, int>::value) {
+    return ShaderDataType::INT;
+  } else if constexpr (std::is_same<T, Eigen::Vector2i>::value) {
+    return ShaderDataType::INT2;
+  } else if constexpr (std::is_same<T, Eigen::Vector3i>::value) {
+    return ShaderDataType::INT3;
+  } else if constexpr (std::is_same<T, Eigen::Vector4i>::value) {
+    return ShaderDataType::INT4;
+  } else if constexpr (std::is_same<T, float>::value) {
+    return ShaderDataType::FLOAT;
+  } else if constexpr (std::is_same<T, Eigen::Vector2f>::value) {
+    return ShaderDataType::FLOAT2;
+  } else if constexpr (std::is_same<T, Eigen::Vector3f>::value) {
+    return ShaderDataType::FLOAT3;
+  } else if constexpr (std::is_same<T, Eigen::Vector4f>::value) {
+    return ShaderDataType::FLOAT4;
+  } else if constexpr (std::is_same<T, Eigen::Matrix4f>::value) {
+    return ShaderDataType::MATRIX4;
+  } else {
+    return ShaderDataType::INVALID;
+  }
+}
+
+/// @brief Shader parameter class that holds a single parameter for shader setting.
+/// @note  The maximum size of the parameter value is 4x4 float matrix.
+struct ShaderParameter {
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ShaderParameter(const std::string& name, const T& value) : ShaderParameterInterface(name), value(value) {}
-  virtual ~ShaderParameter() override {}
+  /// @brief Default constructor
+  ShaderParameter() : type(ShaderDataType::INVALID), name(0), mat4f(Eigen::Matrix4f::Zero()) {}
 
-  virtual void set(glk::GLSLShader& shader) const override { shader.set_uniform(name, value); }
+  /// @brief Constructor
+  template <typename T>
+  ShaderParameter(std::uint64_t name, const T& v) : type(deduce_data_type<T>()),
+                                                    name(name) {
+    value<T>() = v;
+  }
 
-  virtual Ptr clone() const override { return glk::make_unique<ShaderParameter<T>>(name, value); }
+  /// @brief Check if the parameter is valid.
+  bool valid() const { return type != ShaderDataType::INVALID && name != 0; }
+
+  /// @brief Invalidate the parameter.
+  void invalidate() {
+    type = ShaderDataType::INVALID;
+    name = 0;
+    mat4f.setZero();
+  }
+
+  /// @brief Get the parameter value.
+  template <typename T>
+  T& value() {
+    if (type != deduce_data_type<T>()) {
+      std::cerr << "error: type mismatch when getting shader parameter " << name << std::endl;
+      abort();
+    }
+    return *reinterpret_cast<T*>(&mat4f);
+  }
+
+  /// @brief Get the parameter value.
+  template <typename T>
+  const T& value() const {
+    if (type != deduce_data_type<T>()) {
+      std::cerr << "error: type mismatch when getting shader parameter " << name << std::endl;
+      abort();
+    }
+    return *reinterpret_cast<const T*>(&mat4f);
+  }
+
+  /// @brief Set the parameter to the shader.
+  void set(glk::GLSLShader& shader) const {
+    switch (type) {
+      case ShaderDataType::INT:
+        shader.set_uniform(name, value<int>());
+        break;
+      case ShaderDataType::INT2:
+        shader.set_uniform(name, value<Eigen::Vector2i>());
+        break;
+      case ShaderDataType::INT3:
+        shader.set_uniform(name, value<Eigen::Vector3i>());
+        break;
+      case ShaderDataType::INT4:
+        shader.set_uniform(name, value<Eigen::Vector4i>());
+        break;
+      case ShaderDataType::FLOAT:
+        shader.set_uniform(name, value<float>());
+        break;
+      case ShaderDataType::FLOAT2:
+        shader.set_uniform(name, value<Eigen::Vector2f>());
+        break;
+      case ShaderDataType::FLOAT3:
+        shader.set_uniform(name, value<Eigen::Vector3f>());
+        break;
+      case ShaderDataType::FLOAT4:
+        shader.set_uniform(name, value<Eigen::Vector4f>());
+        break;
+      case ShaderDataType::MATRIX4:
+        shader.set_uniform(name, value<Eigen::Matrix4f>());
+        break;
+      default:
+        break;
+    }
+  }
 
 public:
-  T value;
+  ShaderDataType type;    ///< Data type of the parameter
+  std::uint64_t name;     ///< Name of the parameter (hashed)
+  Eigen::Matrix4f mat4f;  ///< Value of the parameter (stored as 4x4 float matrix)
 };
 
 /// @brief Shader setting class that holds rendering settings.
@@ -111,29 +195,18 @@ public:
   /// @param value  Parameter value
   /// @return       This object
   template <typename T>
-  ShaderSetting& add(const std::string& name, const T& value) {
+  ShaderSetting& add(const std::string& name_, const T& value) {
+    const std::uint64_t name = glk::hash(name_);
+
     int i = 0;
-    for (i = 0; i < params.size() && params[i] != nullptr; i++) {
-      if (params[i]->name == name) {
-        auto p = dynamic_cast<ShaderParameter<T>*>(params[i].get());
-        if (p) {
-          p->value = value;
-        } else {
-          params[i].reset(new ShaderParameter<T>(name, value));
-        }
+    for (i = 0; i < params.size() && params[i].valid(); i++) {
+      if (params[i].name == name) {
+        params[i] = ShaderParameter(name, value);
         return *this;
       }
     }
 
-    if (i == params.size()) {
-      std::vector<ShaderParameterInterface::Ptr> old_params = std::move(params);
-      params.resize(old_params.size() * 2);
-      for (int j = 0; j < old_params.size(); j++) {
-        params[j] = std::move(old_params[j]);
-      }
-    }
-
-    params[i] = glk::make_unique<ShaderParameter<T>>(name, value);
+    params.emplace_back(ShaderParameter(name, value));
     return *this;
   }
 
@@ -141,22 +214,24 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value if found, otherwise std::nullopt
   template <typename T>
-  std::optional<T> get(const std::string& name) {
+  std::optional<T> get(const std::string& name_) {
+    const std::uint64_t name = glk::hash(name_);
+
     for (const auto& param : params) {
-      if (!param) {
-        break;
-      }
-
-      if (param->name != name) {
+      if (!param.valid()) {
         continue;
       }
 
-      auto p = dynamic_cast<ShaderParameter<T>*>(param.get());
-      if (p == nullptr) {
+      if (param.name != name) {
         continue;
       }
 
-      return p->value;
+      if (param.type != deduce_data_type<T>()) {
+        std::cerr << "warning: type mismatch for shader parameter " << name_ << std::endl;
+        return std::nullopt;
+      }
+
+      return param.value<T>();
     }
 
     return std::nullopt;
@@ -166,22 +241,24 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value if found, otherwise std::nullopt
   template <typename T>
-  std::optional<T> get(const std::string& name) const {
+  std::optional<T> get(const std::string& name_) const {
+    const std::uint64_t name = glk::hash(name_);
+
     for (const auto& param : params) {
-      if (!param) {
-        break;
-      }
-
-      if (param->name != name) {
+      if (!param.valid()) {
         continue;
       }
 
-      auto p = dynamic_cast<ShaderParameter<T>*>(param.get());
-      if (p == nullptr) {
+      if (param.name != name) {
         continue;
       }
 
-      return p->value;
+      if (param.type != deduce_data_type<T>()) {
+        std::cerr << "warning: type mismatch for shader parameter " << name_ << std::endl;
+        return std::nullopt;
+      }
+
+      return param.value<T>();
     }
 
     return std::nullopt;
@@ -191,18 +268,24 @@ public:
   /// @param name   Parameter name
   /// @return       Parameter value
   template <typename T>
-  const T& cast(const std::string& name) const {
-    for (const auto& param : params) {
-      if (!param) {
-        break;
-      }
+  const T& cast(const std::string& name_) const {
+    const std::uint64_t name = glk::hash(name_);
 
-      if (param->name != name) {
+    for (const auto& param : params) {
+      if (!param.valid()) {
         continue;
       }
 
-      auto p = static_cast<ShaderParameter<T>*>(param.get());
-      return p->value;
+      if (param.name != name) {
+        continue;
+      }
+
+      if (param.type != deduce_data_type<T>()) {
+        std::cerr << "error: type mismatch for shader parameter " << name << std::endl;
+        abort();
+      }
+
+      return param.value<T>();
     }
 
     std::cerr << "error: " << name << " not found in the param list" << std::endl;
@@ -298,8 +381,10 @@ public:
   /// @tparam Transform  Transform matrix type (e.g., Eigen::Matrix4(f|d) or Eigen::Isometry3(f|d))
   template <typename Transform>
   ShaderSetting& set_model_matrix(const Transform& transform) {
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix();
+    Eigen::Matrix4f mat = (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix();
+
+    auto& p = params[2];
+    p.value<Eigen::Matrix4f>() = mat;
     return *this;
   }
 
@@ -308,8 +393,9 @@ public:
   /// @note   The transformation is applied after the existing transformation. (T_new = T_old * transform)
   template <typename Transform>
   ShaderSetting& transform(const Transform& transform) {
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = p->value * (Eigen::Isometry3f::Identity() * transform.template cast<float>()).matrix();
+    auto& p = params[2];
+    const Eigen::Matrix4f mat = (p.value<Eigen::Matrix4f>() * transform.template cast<float>()).matrix();
+    p.value<Eigen::Matrix4f>() = mat;
     return *this;
   }
 
@@ -321,9 +407,9 @@ public:
   /// @tparam Vector  Eigen vector type (e.g., Eigen::Vector3f, Eigen::Vector3d)
   template <typename Vector>
   ShaderSetting& translate(const Vector& translation) {
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    auto& p = params[2];
     const auto trans = translation.eval();
-    p->value.block<3, 1>(0, 3) += trans.template cast<float>().template head<3>();
+    p.mat4f.block<3, 1>(0, 3) += trans.template cast<float>().template head<3>();
     return *this;
   }
 
@@ -333,16 +419,16 @@ public:
   template <typename Vector>
   ShaderSetting& rotate(const float angle, const Vector& axis) {
     const Eigen::Vector3f ax = axis.eval().template cast<float>();
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, ax)).matrix();
+    auto& p = params[2];
+    p.mat4f = p.mat4f * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, ax)).matrix();
     return *this;
   }
   /// @brief Apply rotation to the model matrix.
   /// @param quat  Rotation quaternion (Eigen::Quaternion(f|d))
   template <typename Scalar>
   ShaderSetting& rotate(const Eigen::Quaternion<Scalar>& quat) {
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = p->value * (Eigen::Isometry3f::Identity() * quat.template cast<float>()).matrix();
+    auto& p = params[2];
+    p.mat4f = p.mat4f * (Eigen::Isometry3f::Identity() * quat.template cast<float>()).matrix();
     return *this;
   }
   /// @brief Apply rotation to the model matrix.
@@ -352,8 +438,8 @@ public:
     Eigen::Isometry3f R = Eigen::Isometry3f::Identity();
     R.linear() = rot.template cast<float>().template block<3, 3>(0, 0);
 
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-    p->value = p->value * R.matrix();
+    auto& p = params[2];
+    p.mat4f = p.mat4f * R.matrix();
     return *this;
   }
 
@@ -367,17 +453,17 @@ public:
   /// @tparam Vector  Eigen vector type (e.g., Eigen::Vector3f, Eigen::Vector3d)
   template <typename Vector>
   std::enable_if_t<!std::is_arithmetic_v<Vector>, ShaderSetting&> scale(const Vector& scaling) {
-    auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
+    auto& p = params[2];
     const auto s = scaling.eval();
-    p->value.col(0) *= s[0];
-    p->value.col(1) *= s[1];
-    p->value.col(2) *= s[2];
+    p.mat4f.col(0) *= s[0];
+    p.mat4f.col(1) *= s[1];
+    p.mat4f.col(2) *= s[2];
     return *this;
   }
 
 public:
-  bool transparent;                                   ///< If true, the object is rendered as transparent.
-  std::vector<ShaderParameterInterface::Ptr> params;  ///< Shader parameters
+  bool transparent;                     ///< If true, the object is rendered as transparent.
+  std::vector<ShaderParameter> params;  ///< Shader parameters
 };
 
 template <>

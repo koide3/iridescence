@@ -6,21 +6,19 @@ ShaderSetting::ShaderSetting() : ShaderSetting::ShaderSetting(ColorMode::FLAT_CO
 
 ShaderSetting::ShaderSetting(int color_mode) : ShaderSetting::ShaderSetting(color_mode, Eigen::Matrix4f::Identity().eval()) {}
 
-ShaderSetting::ShaderSetting(int color_mode, const Eigen::Matrix4f& transform) : transparent(false), params(6) {
-  params[0] = glk::make_unique<ShaderParameter<int>>("color_mode", color_mode);
-  params[1] = glk::make_unique<ShaderParameter<float>>("point_scale", 1.0f);
-  params[2] = glk::make_unique<ShaderParameter<Eigen::Matrix4f>>("model_matrix", transform);
+ShaderSetting::ShaderSetting(int color_mode, const Eigen::Matrix4f& transform) : transparent(false) {
+  params.reserve(6);
+  params.emplace_back(ShaderParameter(glk::hash("color_mode"), color_mode));
+  params.emplace_back(ShaderParameter(glk::hash("point_scale"), 1.0f));
+  params.emplace_back(ShaderParameter(glk::hash("model_matrix"), transform));
 }
 
-ShaderSetting::ShaderSetting(const ShaderSetting& other) : transparent(other.transparent), params(other.params.size()) {
-  std::transform(other.params.begin(), other.params.end(), params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
-}
+ShaderSetting::ShaderSetting(const ShaderSetting& other) : transparent(other.transparent), params(other.params) {}
 
 ShaderSetting& ShaderSetting::operator=(const ShaderSetting& other) {
   if (this != &other) {
     transparent = other.transparent;
-    params.resize(other.params.size());
-    std::transform(other.params.begin(), other.params.end(), params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
+    params = other.params;
   }
   return *this;
 }
@@ -28,17 +26,16 @@ ShaderSetting& ShaderSetting::operator=(const ShaderSetting& other) {
 ShaderSetting ShaderSetting::clone() const {
   ShaderSetting cloned;
   cloned.transparent = transparent;
-  cloned.params.resize(params.size());
-  std::transform(params.begin(), params.end(), cloned.params.begin(), [](const auto& p) { return p ? p->clone() : nullptr; });
+  cloned.params = params;
   return cloned;
 }
 
 void ShaderSetting::set(glk::GLSLShader& shader) const {
   for (const auto& param : params) {
-    if (!param) {
+    if (!param.valid()) {
       continue;
     }
-    param->set(shader);
+    param.set(shader);
   }
 }
 
@@ -80,13 +77,13 @@ ShaderSetting& ShaderSetting::make_transparent() {
 }
 
 float ShaderSetting::point_scale() const {
-  auto p = static_cast<ShaderParameter<float>*>(params[1].get());
-  return p->value;
+  auto& p = params[1];
+  return p.value<float>();
 }
 
 ShaderSetting& ShaderSetting::set_point_scale(float scaling) {
-  auto p = static_cast<ShaderParameter<float>*>(params[1].get());
-  p->value = scaling;
+  auto& p = params[1];
+  p.value<float>() = scaling;
   return *this;
 }
 
@@ -145,34 +142,34 @@ ShaderSetting& ShaderSetting::set_old_default_point_shape() {
 }
 
 ShaderSetting& ShaderSetting::remove_model_matrix() {
-  params[2] = nullptr;
+  params[2].invalidate();
   return *this;
 }
 
 int ShaderSetting::color_mode() const {
-  auto p = static_cast<ShaderParameter<int>*>(params[0].get());
-  return p->value;
+  const auto& p = params[0];
+  return p.value<int>();
 }
 
 ShaderSetting& ShaderSetting::set_color_mode(int color_mode) {
-  auto p = static_cast<ShaderParameter<int>*>(params[0].get());
-  p->value = color_mode;
+  auto& p = params[0];
+  p.value<int>() = color_mode;
   return *this;
 }
 
 Eigen::Matrix4f ShaderSetting::model_matrix() const {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  return p->value;
+  const auto& p = params[2];
+  return p.value<Eigen::Matrix4f>();
 }
 
 Eigen::Vector3f ShaderSetting::translation() const {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  return p->value.block<3, 1>(0, 3);
+  const auto& p = params[2];
+  return p.value<Eigen::Matrix4f>().block<3, 1>(0, 3);
 }
 
 Eigen::Matrix3f ShaderSetting::rotation() const {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  return p->value.block<3, 3>(0, 0);
+  const auto& p = params[2];
+  return p.value<Eigen::Matrix4f>().block<3, 3>(0, 0);
 }
 
 ShaderSetting& ShaderSetting::translate(float tx, float ty, float tz) {
@@ -180,37 +177,38 @@ ShaderSetting& ShaderSetting::translate(float tx, float ty, float tz) {
 }
 
 ShaderSetting& ShaderSetting::translate(const Eigen::Vector3f& translation) {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  p->value.block<3, 1>(0, 3) += translation;
+  auto& p = params[2];
+  p.mat4f.block<3, 1>(0, 3) += translation;
   return *this;
 }
 
 ShaderSetting& ShaderSetting::rotate(const float angle, const Eigen::Vector3f& axis) {
   const Eigen::Vector3f ax = axis.eval().template cast<float>();
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  p->value = p->value * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, axis)).matrix();
+
+  auto& p = params[2];
+  p.mat4f = p.mat4f * (Eigen::Isometry3f::Identity() * Eigen::AngleAxisf(angle, ax.normalized())).matrix();
   return *this;
 }
 
 ShaderSetting& ShaderSetting::scale(float scaling) {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  p->value.block<4, 3>(0, 0) *= scaling;
+  auto& p = params[2];
+  p.mat4f.block<4, 3>(0, 0) *= scaling;
   return *this;
 }
 
 ShaderSetting& ShaderSetting::scale(float sx, float sy, float sz) {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  p->value.col(0) *= sx;
-  p->value.col(1) *= sy;
-  p->value.col(2) *= sz;
+  auto& p = params[2];
+  p.mat4f.col(0) *= sx;
+  p.mat4f.col(1) *= sy;
+  p.mat4f.col(2) *= sz;
   return *this;
 }
 
 ShaderSetting& ShaderSetting::scale(const Eigen::Vector3f& scaling) {
-  auto p = static_cast<ShaderParameter<Eigen::Matrix4f>*>(params[2].get());
-  p->value.col(0) *= scaling[0];
-  p->value.col(1) *= scaling[1];
-  p->value.col(2) *= scaling[2];
+  auto& p = params[2];
+  p.mat4f.col(0) *= scaling[0];
+  p.mat4f.col(1) *= scaling[1];
+  p.mat4f.col(2) *= scaling[2];
   return *this;
 }
 
