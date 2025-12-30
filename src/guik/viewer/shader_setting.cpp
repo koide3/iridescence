@@ -78,12 +78,12 @@ ShaderSetting& ShaderSetting::make_transparent() {
 
 float ShaderSetting::point_scale() const {
   auto& p = params[1];
-  return p.value<float>();
+  return p.get_value<float>();
 }
 
 ShaderSetting& ShaderSetting::set_point_scale(float scaling) {
   auto& p = params[1];
-  p.value<float>() = scaling;
+  p.set_value<float>(scaling);
   return *this;
 }
 
@@ -148,28 +148,28 @@ ShaderSetting& ShaderSetting::remove_model_matrix() {
 
 int ShaderSetting::color_mode() const {
   const auto& p = params[0];
-  return p.value<int>();
+  return p.get_value<int>();
 }
 
 ShaderSetting& ShaderSetting::set_color_mode(int color_mode) {
   auto& p = params[0];
-  p.value<int>() = color_mode;
+  p.set_value<int>(color_mode);
   return *this;
 }
 
 Eigen::Matrix4f ShaderSetting::model_matrix() const {
   const auto& p = params[2];
-  return p.value<Eigen::Matrix4f>();
+  return p.get_value<Eigen::Matrix4f>();
 }
 
 Eigen::Vector3f ShaderSetting::translation() const {
   const auto& p = params[2];
-  return p.value<Eigen::Matrix4f>().block<3, 1>(0, 3);
+  return p.get_value<Eigen::Matrix4f>().block<3, 1>(0, 3);
 }
 
 Eigen::Matrix3f ShaderSetting::rotation() const {
   const auto& p = params[2];
-  return p.value<Eigen::Matrix4f>().block<3, 3>(0, 0);
+  return p.get_value<Eigen::Matrix4f>().block<3, 3>(0, 0);
 }
 
 ShaderSetting& ShaderSetting::translate(float tx, float ty, float tz) {
