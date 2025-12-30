@@ -80,7 +80,7 @@ bool GLSLShader::add_feedback_varying(const std::string& name) {
 bool GLSLShader::link_program() {
   if (shader_program) {
     glUseProgram(0);
-    glDeleteShader(shader_program);
+    glDeleteProgram(shader_program);
     attrib_cache.clear();
     uniform_cache.clear();
   }
@@ -230,7 +230,7 @@ GLint GLSLShader::subroutine(GLenum shader_type, std::uint64_t name, const char*
 GLint GLSLShader::subroutine(GLenum shader_type, const std::string& name) {
   const std::uint64_t h = glk::hash(name);
   GLint id = subroutine(shader_type, h, name.c_str());
-  if (id >= -1) {
+  if (id != -1) {
     return id;
   }
 
@@ -256,7 +256,7 @@ GLint GLSLShader::subroutine_uniform(GLenum shader_type, std::uint64_t name, con
 GLint GLSLShader::subroutine_uniform(GLenum shader_type, const std::string& name) {
   const std::uint64_t h = glk::hash(name);
   GLint id = subroutine_uniform(shader_type, h, name.c_str());
-  if (id >= -1) {
+  if (id != -1) {
     return id;
   }
 

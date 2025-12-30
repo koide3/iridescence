@@ -77,7 +77,7 @@ public:
     if (found == uniform_variable_cache.end()) {
       return std::nullopt;
     }
-    return *std::reinterpret_pointer_cast<const T>(found->second);
+    return *reinterpret_cast<const T*>(found->second.get());
   }
 
   // int

@@ -414,8 +414,9 @@ public:
   template <typename Transform>
   ShaderSetting& transform(const Transform& transform) {
     auto& p = params[2];
-    const Eigen::Matrix4f mat = (p.get_value<Eigen::Matrix4f>() * transform.template cast<float>()).matrix();
-    p.set_value<Eigen::Matrix4f>(mat);
+    Eigen::Matrix4f current = p.get_value<Eigen::Matrix4f>();
+    Eigen::Matrix4f trans_mat = (transform.template cast<float>() * Eigen::Isometry3f::Identity()).matrix();
+    p.set_value<Eigen::Matrix4f>(current * trans_mat);
     return *this;
   }
 
