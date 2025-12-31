@@ -115,13 +115,16 @@ void LightViewer::draw_ui() {
       point_size = 10.0f;
     }
 
+    const auto point_scale_mode = global_shader_setting.get<int>("point_scale_mode");
+    const float scaling_factor = (point_scale_mode && *point_scale_mode == guik::PointScaleMode::METRIC) ? 0.1f : 10.0f;
+
     if (decrease_point_size) {
-      *point_size = point_size.value() - ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() - ImGui::GetIO().DeltaTime * scaling_factor;
     } else {
-      *point_size = point_size.value() + ImGui::GetIO().DeltaTime * 10.0f;
+      *point_size = point_size.value() + ImGui::GetIO().DeltaTime * scaling_factor;
     }
 
-    *point_size = std::max(0.1f, std::min(1e6f, point_size.value()));
+    *point_size = std::max(1e-4f, std::min(1e6f, point_size.value()));
 
     global_shader_setting.add("point_size", *point_size);
   }
@@ -439,10 +442,20 @@ void LightViewer::setup_plot(const std::string& plot_name, int width, int height
   setting.order = order >= 0 ? order : 8192 + plot_settings.size();
 }
 
-void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axis) {
+void LightViewer::link_plot_axis(const std::string& plot_name, int link_id, int axis) {
   auto& setting = plot_settings[plot_name];
   setting.axis_link_id = link_id;
   setting.linked_axes |= (1 << axis);
+
+  if (plot_linked_axis_limits.count(link_id) == 0) {
+    plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
+  }
+}
+
+void LightViewer::link_plot_axes(const std::string& plot_name, int link_id, int axes) {
+  auto& setting = plot_settings[plot_name];
+  setting.axis_link_id = link_id;
+  setting.linked_axes = axes;
 
   if (plot_linked_axis_limits.count(link_id) == 0) {
     plot_linked_axis_limits[link_id] = Eigen::Matrix<double, 6, 2>::Zero();
@@ -694,6 +707,14 @@ void LightViewer::invoke_after_rendering(const std::function<void()>& func) {
   post_render_invoke_requests.push_back(func);
 }
 
+void LightViewer::invoke_once(const std::string& label, const std::function<void()>& func) {
+  std::lock_guard<std::mutex> lock(invoke_requests_mutex);
+  if (invoke_once_called.count(label) == 0) {
+    invoke_requests.push_back(func);
+    invoke_once_called.insert(label);
+  }
+}
+
 std::shared_ptr<LightViewerContext> LightViewer::sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size) {
   using namespace glk::console;
 
@@ -745,47 +766,6 @@ bool LightViewer::remove_sub_viewer(const std::string& context_name) {
   }
   sub_contexts.erase(found);
   return true;
-}
-
-std::vector<unsigned char> LightViewer::read_color_buffer() {
-  auto bytes = canvas->frame_buffer->color().read_pixels<unsigned char>(GL_RGBA, GL_UNSIGNED_BYTE, 4);
-  std::vector<unsigned char> flipped(bytes.size(), 255);
-
-  Eigen::Vector2i size = canvas->frame_buffer->color().size();
-  for (int y = 0; y < size[1]; y++) {
-    int y_ = size[1] - y - 1;
-    for (int x = 0; x < size[0]; x++) {
-      for (int k = 0; k < 3; k++) {
-        flipped[(y_ * size[0] + x) * 4 + k] = bytes[(y * size[0] + x) * 4 + k];
-      }
-    }
-  }
-
-  return flipped;
-}
-
-std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
-  auto floats = canvas->frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
-  std::vector<float> flipped(floats.size());
-
-  Eigen::Vector2i size = canvas->frame_buffer->depth().size();
-  for (int y = 0; y < size[1]; y++) {
-    int y_ = size[1] - y - 1;
-    for (int x = 0; x < size[0]; x++) {
-      flipped[y_ * size[0] + x] = floats[y * size[0] + x];
-    }
-  }
-
-  if (real_scale) {
-    const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
-    const float near_ = depth_range[0];
-    const float far_ = depth_range[1];
-    for (auto& depth : flipped) {
-      depth = 2.0 * near_ * far_ / (far_ + near_ - depth * (far_ - near_));
-    }
-  }
-
-  return flipped;
 }
 
 }  // namespace guik
