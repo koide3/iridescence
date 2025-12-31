@@ -638,13 +638,13 @@
 <h2 id="_2">開発経緯</h2>
 <h2 id="interactive_slam">interactive_slam</h2>
 <p>研究で取り組んでいた<a href="https://github.com/koide3/interactive_slam">interactive_slam</a>というプロジェクトがあり、これがIridescenceのもとになりました。この interactive_slam では 3D LiDAR SLAM のうまく処理できていない箇所を、ユーザがインタラクティブに指定・修正することで、自動での地図生成が困難な環境においても高品質な地図を生成できるようにすることを目指していました。</p>
-<p>このプロジェクトではインタラクティブな地図修正が肝だったため、直感的に操作しやすい3D表示とUIが必要でした。当初はROSを使い慣れていたこともあってrvizにインタフェースプラグインを追加する形で実装を進めていましたが、また3D表示も細かい制御ができず、またrvizの設計上の制約からUIの柔軟な拡張が難しかったため、最終的には独自に3DビューワとUIシステムを実装することにしました。</p>
+<p>このプロジェクトではインタラクティブな地図修正が肝だったため、直感的に操作しやすい3D表示とUIが必要でした。当初はROSを使い慣れていたこともあってrvizにインタフェースプラグインを追加する形で実装を進めていましたが、3D表示は細かい制御ができず、またrviz上ではUIの柔軟な拡張が難しかったため、最終的には独自に3DビューワとUIシステムを実装することにしました。</p>
 <div class="admonition さらに余談">
 <p class="admonition-title">さらに余談</p>
-<p>個人的な意見ですがrvizを可視化の主軸にした研究開発はかなり効率が悪いと感じています。自作プログラムと表示が別プロセスに分離しているせいで表示の遅延や同期の問題が発生しやすく、またオブジェクトの姿勢変更は基本的にTFを介して行う必要があるため、細かい制御がしづらいです。さらにUIの拡張性も低く、複雑なインタラクションを実装するのはかなり困難です。研究開発においては、表示とロジックが密に連携できることが重要であり、その点でrvizはあまり適していないと感じます。<br />
-誤解のないように補足すると、rvizはロボット開発のような複数のノードが連携するシステムにおいては非常に有用であり、その点では優れたツールです。しかし、単一のアプリケーション内での柔軟なインタラクションやリアルタイムなフィードバックが求められる研究開発には不向きだと感じています。</p>
+<p>個人的な意見ですがrvizを可視化の主軸にした研究開発はかなり効率が悪いと感じています。自作プログラムと表示が別プロセスに分離しているせいで表示の遅延や同期の問題が発生しやすく、またオブジェクトの姿勢変更は基本的にTFを介して行う必要があるため細かい制御がしづらいです。さらにUIの拡張性も低く、複雑なインタラクションを実装するのはかなり困難です。研究開発においては、表示とロジックが密に連携できることが重要であり、その点でrvizはあまり適していないと感じます。<br />
+誤解のないように補足すると、rvizはロボット開発のような複数のノードが協調・連携するシステムの開発においては非常に有用であり、その点では優れたツールです。しかし、単一のアプリケーション内での柔軟なインタラクションやリアルタイムなフィードバックが求められる研究開発には不向きだと感じています。</p>
 </div>
-<p>学生時代から3Dグラフィクスに興味があってOpenGLに触れていたこともあり、またROSとの連携が念頭にあったためGLFW + OpenGLで動作するアプリケーションを作成しました。UIは色々検討した結果、Dear ImGuiを採用しました。Dear ImGuiはゲーム開発に広く使用されている即時モードGUIライブラリ（コードで実行される順序そのままにGUIが構築される）で、非常に軽量かつ多機能・柔軟です。また、アルゴリズム開発などで多用していた線形代数ライブラリのEigenをデータ構造の中心に据えることとしました。</p>
+<p>学生時代から3Dグラフィクスに興味があってOpenGLに触れていたこともあり、またROSとの連携が念頭にあったためクロスプラットフォームなGLFW + OpenGLで動作するアプリケーションを作成しました。UIは色々検討した結果、Dear ImGuiを採用しました。Dear ImGuiはゲーム開発に広く使用されている即時モードGUIライブラリ（コードで実行される順序そのままにGUIが構築される）で、非常に軽量かつ多機能・柔軟です。また、アルゴリズム開発などで多用していた線形代数ライブラリのEigenをデータ構造の中心に据えることとしました。</p>
 <p>ガリガリプログラムを作成してそこそこ満足行くGUIと3D表示を実装でき、成果を論文・OSSとして公開できました。</p>
 <iframe width="640" height="380" src="https://www.youtube.com/embed/vAqo6YkbKpU?si=IIXNooYjTbjTL6qK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
@@ -756,7 +756,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.expand", "navigation.sections"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
