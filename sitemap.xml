@@ -140,4 +140,10 @@
         <xhtml:link rel="alternate" hreflang="ja" href="https://koide3.github.io/iridescence/ja/shader/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://koide3.github.io/iridescence/shader/"/>
     </url>
+    <url>
+        <loc>https://koide3.github.io/iridescence/ja/yodan/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://koide3.github.io/iridescence/ja/yodan/"/>
+    </url>
 </urlset>
