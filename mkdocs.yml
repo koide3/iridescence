@@ -11,19 +11,6 @@ theme:
     front:
         text: Roboto
 
-# plugins:
-#     - search:
-#     - i18n:
-#         default_language: en
-#         languages:
-#             en: English
-#             ja: 日本語
-#         nav_translations:
-#             ja:
-#               site_name: サンプルドキュメント
-#               Introduction: はじめに
-#               MkDocs Sample: MkDocsのサンプル
-
 plugins:
   - search
   - i18n:

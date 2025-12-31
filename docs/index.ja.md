@@ -197,3 +197,7 @@ while viewer.spin_once():
 ## ライセンス
 
 IridescenceはMITライセンスで公開されています。
+
+## 余談
+
+[開発経緯など](yodan)
