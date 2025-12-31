@@ -1,7 +1,7 @@
 site_name: "Iridescence"
 site_author: k.koide
 repo_url: https://github.com/koide3/iridescence
-site_url: https://iridescence.github.io/site
+site_url: https://koide3.github.io/iridescence/
 site_description: "Iridescence: Visualization library for rapid prototyping of 3D point cloud algorithms"
 
 theme: 
