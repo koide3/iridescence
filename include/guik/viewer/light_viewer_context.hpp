@@ -65,6 +65,10 @@ public:
   const std::shared_ptr<glk::ScreenEffect>& get_screen_effect() const;
   void set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture);
 
+  void set_rainbow_range(const Eigen::Vector2f& minmax_z);
+  void set_rainbow_axis(const Eigen::Vector3f& axis);
+  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
+
   void enable_decimal_rendering();
   void enable_normal_buffer();
   void enable_info_buffer();
@@ -118,8 +122,6 @@ public:
   std::shared_ptr<TopDownCameraControl> use_topdown_camera_control(double distance = 80.0, double theta = 0.0);
   std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
-
-  void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
 
   guik::GLCanvas& get_canvas();
   Eigen::Vector2i canvas_tl() const { return canvas_rect_min; }

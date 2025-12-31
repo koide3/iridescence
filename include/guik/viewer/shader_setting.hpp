@@ -344,6 +344,11 @@ public:
   /// @brief  Make the object transparent (alpha blending).
   ShaderSetting& make_transparent();
 
+  /// @brief Set RAINBOW color range.
+  ShaderSetting& set_rainbow_range(const Eigen::Vector2f& minmax_z);
+  /// @brief Set RAINBOW coloring axis.
+  ShaderSetting& set_rainbow_axis(const Eigen::Vector3f& axis);
+
   // Point size and scale
   /// @brief Get point size scale factor.
   float point_scale() const;
