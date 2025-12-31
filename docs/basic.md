@@ -106,7 +106,7 @@ See [Shader setting](shader.md) for more details.
 
     ```cpp
     // Register a solid sphere with translation and scaling
-    viewer->update_sphere("sphere", guik::FlatRed()).translate({1.0, 2.0, 3.0}).scale(0.1);
+    viewer->update_sphere("sphere", guik::FlatRed().translate({1.0, 2.0, 3.0}).scale(0.1));
     ``` 
 
 

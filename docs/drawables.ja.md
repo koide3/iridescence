@@ -1,116 +1,117 @@
-# Drawables
+# 描画オブジェクト
 
-Examples of lines, 3D primitives, and 2D drawings ([Code](https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_primitives.cpp)):
+描画可能な線、3Dプリミティブ、2Dプリミティブの例 ([Code](https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_primitives.cpp)):
 ![primitives](https://user-images.githubusercontent.com/31344317/210129208-2d126725-67d9-48ff-9eae-7af118a319f9.png)
 
 
-## Shorthand methods
+## ショートハンドメソッド
 
 
-For frequently used drawable types, ```guik::LightViewer``` provides shorthand methods to quickly create and update drawables.
+頻繁に使用されるオブジェクトタイプのために、```guik::LightViewer``` に略記メソッドを複数用意しています。これらのメソッドは、オブジェクトの作成と ```update_drawable()``` の呼び出しを1つの関数で行います。
 
 ```cpp
-// Primitives
+// 3Dプリミティブ
 viewer->update_sphere("sphere", guik::FlatRed());
 viewer->update_wire_sphere("wire_sphere", guik::FlatRed());
 viewer->update_coord("coord", guik::VertexColor());
 viewer->update_wire_frustum("frustum", guik::FlatGreen());
 
-// PointCloudBuffer
-// Any of Vector(3|4)(f|d) are allowed as input
+// 点群
+// 各点をVector(3|4)(f|d)とした生配列やstd::vectorから点群オブジェクトを作成・登録できます。
 std::vector<Eigen::Vector4d> points = ...;
 viewer->update_points("points", points, guik::Rainbow());
 
-// NormalDistributions
+// 正規分布（点群＋共分散行列）
 std::vector<Eigen::Vector3f> means = ...;
 std::vector<Eigen::Matrix3f> covs = ...;
 float scale = 1.0f;
 viewer->update_normal_dists("normal_dists", means, covs, scale, guik::Rainbow());
 
-// ThinLine
+// 線集合（line_strip=trueの場合、頂点間を数珠つなぎした線を描画します）
 std::vector<Eigen::Vector3f> line_vertices = ...;
 bool line_strip = true;
 viewer->update_thin_lines("lines", line_vertices, true, guik::FlatGreen());
 ```
 
 
-## 3D Primitives
+## 3Dプリミティブ
 
-- Icosahedron
-- Sphere
-- Stanford bunny
-- Cube
-- Cone
-- Coordinate system
-- Frustum
+以下のプリミティブが **glk::Primitives** から利用可能です。
+- Icosahedron (正二十面体)
+- Sphere (球)
+- Stanford bunny (スタンフォードバニー)
+- Cube (立方体)
+- Cone (円錐)
+- Coordinate system (座標系を表す線)
+- Frustum (視錐台)
 
 ```cpp
 #include <glk/primitives/primitives.hpp>
 
-// Solid and wire icosahedrons
+// ソリッドおよびワイヤーフレームの正二十面体
 glk::Primitives::icosahedron();
 glk::Primitives::wire_icosahedron();
 
-// Solid and wire spheres
+// ソリッドおよびワイヤーフレームの球
 glk::Primitives::sphere();
 glk::Primitives::wire_sphere();
 
-// Solid and wire bunnies
+// ソリッドおよびワイヤーフレームのバニー
 glk::Primitives::bunny();
 glk::Primitives::wire_bunny();
 
-// Solid and wire cubes
+// ソリッドおよびワイヤーフレームの立方体
 glk::Primitives::cube();
 glk::Primitives::wire_cube();
 
-// Solid and wire cones
+// ソリッドおよびワイヤーフレームの円錐
 glk::Primitives::cone();
 glk::Primitives::wire_cone();
 
-// RGB-colored coordinate systems rendered using GL_LINES and polygons
-// They should be rendered with guik::VertexColor
+// RGBカラーの座標系を表す線
+// 色付けのために guik::VertexColor でレンダリングする必要があります
 glk::Primitives::coordinate_system();
 glk::Primitives::solid_coordinate_system();
 
-// Wire frustum for representing a camera pose (+Z=front)
+// カメラ姿勢を表すワイヤーフレーム視錐台 (+Z=前方)
 glk::Primitives::wire_frustum();
 ```
 
 ![Screenshot_20221231_182844](https://user-images.githubusercontent.com/31344317/210131821-42071de7-3ace-433b-9cb4-d39d9444ee85.png)
 
 
-## Lines
+## 線
 
-**glk::ThinLines** draws lines with GL_LINES. 
-The thickness of lines is independent of the viewpoint.
+**glk::ThinLines** は線の太さが一定の線を描画します。
 
 ```cpp
 #include <glk/thin_lines.hpp>
 
-// Line vertices
+// 線の頂点
 std::vector<Eigen::Vector3f> vertices = ...;
 
-// If line_strip == true, lines are drawn between adjacent vertices (GL_LINE_STRIP).
-// If line_strip == false, lines are drawn between vertices[i * 2] and vertices[i * 2 + 1] (GL_LINES).
+// line_strip == true の場合、隣接する頂点間に線が描画されます (GL_LINE_STRIP)。
+// line_strip == false の場合、vertices[i * 2] と vertices[i * 2 + 1] の間に線が描画されます (GL_LINES)。
+// 参考 : https://tkengo.github.io/assets/img/2015-01-03-opengl-es-2-2d-knowledge-2/gl-lines.png
 bool line_strip = true;
 
-// Create lines (All vertices are processed in order)
+// 線オブジェクトの生成 (すべての頂点が順番に利用されます)
 auto lines = std::make_shared<glk::ThinLines>(vertices, line_strip);
 
-// Create lines with indexing
+// 頂点の順序を指定して線オブジェクトを作成
 std::vector<unsigned int> indices = ...;
 auto lines_with_indices = std::make_shared<glk::ThinLines>(vertices, indices, line_strip);
 
-// Create lines with vertex colors
+// 頂点カラー付きの線オブジェクトの作成
 std::vector<Eigen::Vector4f> colors = ...;
 auto lines_with_colors = std::make_shared<glk::ThinLines>(vertices, colors, line_strip);
 
-// Set line width (glLineWidth)
+// 幅の設定 (glLineWidth)
 lines->set_line_width(2.0f);
 ```
 
 
-**glk::Lines** draws lines with polygons. The thickness of lines changes depending on the viewpoint and perspective.
+**glk::Lines** はポリゴンで線を描画します。線の太さは視点と視野角に応じて変化します。
 ```cpp
 #include <glk/thin_lines.hpp>
 
@@ -125,43 +126,46 @@ auto lines = std::make_shared<glk::Lines>(line_width, vertices, colors, line_str
 ![Screenshot_20221231_183450](https://user-images.githubusercontent.com/31344317/210131978-1b99b57e-193b-4196-8887-fffe51a858c6.png)
 
 
-## Point cloud
+## 点群
 
-**glk::PointCloudBuffer** holds and renders a 3D point cloud.
+**glk::PointCloudBuffer** は3D点群をレンダリングします。
 
 ```cpp
 #include <glk/pointcloud_buffer.hpp>
 
-// Create PointCloudBuffer from std::vector<Eigen::Vector3f>
+// std::vector<Eigen::Vector3f> から PointCloudBuffer を作成
 std::vector<Eigen::Vector3f> vertices = ...;
 auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertices);
 
-// Add vertex colors
+// 各点の色を追加
 std::vector<Eigen::Vector4f> colors = ...;
 cloud_buffer->add_color(colors);
 
-// Add vertex colors that encode scalar values in [0, 1]
+// [0, 1] のスカラー値をエンコードする頂点カラーの追加 (VERTEX_COLORモードで参照される)
 std::vector<double> intensities = ...;
 cloud_buffer->add_intensity(glk::COLORMAP::TURBO, intensities);
 
-// Add vertex normals
+// [0, 1] のスカラー値をカラーマップ属性として追加 (VERTEX_COLORMAPモードで参照される)
+cloud_buffer->add_colormap(intensities);
+
+// 頂点法線の追加
 std::vector<Eigen::Vector3f> normals = ...;
 cloud_buffer->add_normals(normals);
 
-// Add AUX point property
+// 各点に任意属性データを追加
 std::vector<float> values = ...;
 int dim = 1;
 cloud_buffer->add_buffer("radius", dim, values.data(), sizeof(float) * dim, values.size());
 
-// Enlarge point size
+// 点の描画サイズを設定
 auto shader_setting = guik::Rainbow().set_point_scale(2.0f);
 viewer->update_drawable("points", cloud_buffer, shader_setting);
 ```
 
 ![Screenshot_20230101_005425](https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png)
-```glk::PointCloudBuffer``` rendered with ```guik::Rainbow```
+```guik::Rainbow``` でレンダリングされた ```glk::PointCloudBuffer```
 
-**glk::IndexedPointCloudBuffer** enables specifying the indices of vertices to be rendered.
+**glk::IndexedPointCloudBuffer** ではレンダリングする頂点のインデックスを指定できます。
 
 ```cpp
 #include <glk/indexed_pointcloud_buffer.hpp>
@@ -173,53 +177,59 @@ std::vector<unsigned int> indices = ...;
 auto indexed_buffer = std::make_shared<glk::IndexedPointCloudBuffer>(cloud_buffer, indices);
 ```
 
-### Point shape
+### 点の形状
 
-The point shape (rectangles by default) can be changed to circles by setting `point_shape_mode=PointShapeMode::CIRCLE`.
+デフォルトの点のサイズ・形状は `set_point_shape()` メソッドで設定できます。
 
 ```cpp
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
-global_setting.set_point_shape_mode(guik::PointShapeMode::RECTANGLE);  // Set default point shape mode to RECTANGLE. Alternatively, global_setting.set_point_shape_rectangle() can be used.
-global_setting.set_point_shape_mode(guik::PointShapeMode::CIRCLE);     // Set default point shape mode to CIRCLE. Alternatively, global_setting.set_point_shape_circle() can be used.
+
+float point_size = 0.01f;  // 点のベースサイズ
+bool metric = true;        // Trueの場合、三次元空間スケール、Falseの場合、スクリーンスペーススケールで点を描画
+bool circle = true;        // Trueの場合、点を円形で描画、Falseの場合、点を四角形で描画（少し高速）
+global_setting.set_point_shape(0.01f, true, true);
 ```
 
-### Point scale
+### 点のスケール
 
-**Screen space scaling (default)**  
-The size of points is computed as `radius_pix = point_scale * point_size * nz + point_size_offset`, where `nz` is the fragment screen space depth in [0, 1]. By default `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0`, and they can be updated by setting values to `guik::ShaderSetting`.
-
-```cpp
-auto viewer = guik::viewer();
-guik::ShaderSetting& global_setting = viewer->shader_setting();
-  global_setting.set_point_scale_screenspace();   // Set the point scale mode to screenspace
-  global_setting.set_point_size(5.0f);            // Set the base point size to 5.0
-
-auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
-// Make the size of points as twice large as the base point size
-viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().set_point_scale(2.0f));
-```
-
-**Metric space scaling**  
-The size of points is computed based on the physical size specified as `radius_m = point_scale * point_size + point_size_offset`.
+**メトリックスペーススケーリング（デフォルト）**  
+各点は `radius_m = point_scale * point_size + point_size_offset` で計算される三次元空間における大きさで描画されます。
 
 ```cpp
 auto viewer = guik::viewer();
 guik::ShaderSetting& global_setting = viewer->shader_setting();
-  global_setting.set_point_shape_circle();
-  global_setting.set_point_scale_metric();
-  global_setting.set_point_size(0.5f);  // Set default point radius to 0.5
+global_setting.set_point_shape_circle();
+global_setting.set_point_scale_metric();
+global_setting.set_point_size(0.5f);  // デフォルトの点半径を 0.5 に設定
 
 auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
-// Set point radius to 0.5
+// 点半径を 0.5 に設定
 viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().set_point_size(0.5f));
 ```
 
 ![ss_1710604595 779500](https://github.com/koide3/iridescence/assets/31344317/f13f8c91-8dcc-4cc0-8dfa-9e4edcb2f518)
-Red : Wire spheres (radius=0.5), Blue : Points rendered with PointCloudBuffer (`point_shape_mode=CIRCLE`, `point_scale_mode=METRIC`, `point_size=0.5`).
+赤 : ワイヤーフレーム球 (半径=0.5), 青 : PointCloudBuffer でレンダリングされた点 (`point_shape_mode=CIRCLE`, `point_scale_mode=METRIC`, `point_size=0.5`).
 
+<details>
+<summary>スクリーンスペーススケーリング（旧実装）</summary>
 
-## Normal distributions
+点のサイズは `radius_pix = point_scale * point_size * nz + point_size_offset` として計算されます。ここで `nz` は [0, 1] のピクセルのスクリーンスペース深度です。デフォルトでは `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0` であり、これらは `guik::ShaderSetting` に値を設定することで更新できます。
+
+```cpp
+auto viewer = guik::viewer();
+guik::ShaderSetting& global_setting = viewer->shader_setting();
+  global_setting.set_point_scale_screenspace();   // 点スケールモードをスクリーンスペースに設定
+  global_setting.set_point_size(5.0f);            // 基本点サイズを 5.0 に設定
+
+auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(...);
+// 点のサイズをベースサイズの2倍にする
+viewer->update_drawable("points", cloud_buffer, guik::FlatBlue().set_point_scale(2.0f));
+```
+
+</details>
+
+## 正規分布集合
 
 **glk::NormalDistributions**
 
@@ -233,30 +243,30 @@ float scale = 1.0f;
 auto normal_distributions = std::make_shared<glk::NormalDistributions>(means, covs, scale);
 ```
 
-## Point splatting
+## ポイントスプラッティング
 
-**glk::Splatting**
+**glk::Splatting** は点群を向きのある円盤の集合としてレンダリングします。
 
 ```cpp
 #include <glk/splatting.hpp>
 
-// Create a PointCloudBuffer with normals
+// 法線付きの PointCloudBuffer を作成
 std::vector<Eigen::Vector3f> vertices = ...;
 std::vector<Eigen::Vector3f> normals = ...;
 auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertices);
 cloud_buffer->add_normals(normals);
 
-// Create a splatting shader
+// スプラッティングシェーダーを作成
 auto splatting_shader = glk::create_splatting_shader();
 
-// Create a splatting instance
+// スプラッティングインスタンスを作成
 float point_radius = 0.1f;
 auto splatting = std::make_shared<glk::Splatting>(splatting_shader);
 splatting->set_point_radius(point_radius);
 splatting->set_cloud_buffer(cloud_buffer);
 
-// If vertex radius is enabled, the radius of each point is calculated as point_radius * vertex's radius.
-// Otherwise, the fixed point_radius is used for rendering all points.
+// 頂点半径が有効な場合、各点の半径は point_radius * 頂点の半径 として計算されます。
+// それ以外の場合、固定の point_radius がすべての点のレンダリングに使用されます。
 splatting->enable_vertex_radius();
 
 std::vector<float> radii = ...;
@@ -264,16 +274,16 @@ cloud_buffer->add_buffer("radius", 1, radii.data(), sizeof(float), radii.size())
 ```
 
 ![points](https://user-images.githubusercontent.com/31344317/210149278-ac7a1424-5846-4a8c-94a8-dc2173229566.png)
-Sparse point cloud
+疎な点群
 
 ![splats](https://user-images.githubusercontent.com/31344317/210149280-7160f17f-c6cd-46c5-a66c-4a41d480db69.png)
-Sparse point cloud rendered using ```glk::Splatting```
+```glk::Splatting``` を使用してレンダリングされた点群
 
 ![splats2](https://user-images.githubusercontent.com/31344317/210149281-18ad2296-4bc6-4f44-9ef5-0696f1b03141.png)
-Closer look at the splatting result: Points are rendered as oriented disks
+結果図: 各点は向きを持った円盤としてレンダリングされます
 
 
-## Mesh
+## メッシュ
 
 ```cpp
 #include <glk/mesh.hpp>
@@ -284,8 +294,8 @@ std::vector<Eigen::Vector4f> colors = ...;
 std::vector<Eigen::Vector2f> tex_coords;
 std::vector<unsigned int> indices;
 
-// Create a mesh instance
-// Pass nullptr if normal/color/tex_coord is not available
+// メッシュインスタンスを作成
+// normal/color/tex_coord が無い場合は nullptr を渡します
 auto mesh = std::make_shared<glk::Mesh>(
   vertices.data(), sizeof(float) * 3,
   normals.data(), sizeof(float) * 3,
@@ -300,49 +310,49 @@ std::shared_ptr<glk::Texture> texture = ...;
 mesh->set_texture(texture);
 ```
 
-## 2D Drawings
+## 2Dオブジェクト
 
-**guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives on the projected positions.
+**guik::HoveredDrawings** は三次元座標位置を画面に投影し、投影された画面上位置に2Dプリミティブを描画します。
 
 ```cpp
 #include <guik/hovered_drawings.hpp>
 
-// Create hovered drawings renderer and register it to the viewer
+// 2D描画レンダラーを作成し、ビューワに登録
 auto hovered = std::make_shared<guik::HoveredDrawings>();
 viewer->register_ui_callback("hovered", hovered->create_callback());
 
-// Draw a text at a fixed 3D position (1.0, 2.0, 3.0)
+// 固定の三次元座標 (1.0, 2.0, 3.0) にテキストを描画
 std::uint32_t fg_color = IM_COL32(255, 255, 255, 255);
 std::uint32_t bg_color = IM_COL32(0, 0, 0, 128);
 hovered->add_text({1.0f, 2.0f, 3.0f}, "text1", fg_color, bg_color);
 
-// Instead of directly giving a 3D position, a drawable name can be 
-// used to draw a 2D drawing on the drawable position
+// 三次元座標を直接指定する代わりに3Dオブジェクト名を使用して、
+// そのオブジェクトにオーバーレイして2D描画を行うこともできます
 hovered->add_text_on("drawable_name", "text2", fg_color, bg_color);
 
 
-// Cross
+// クロス
 Eigen::Vector3f position = {1.0f, 2.0f, 3.0f};
 std::uint32_t color = IM_COL32(255, 255, 255, 255);
 float size = 10.0f;
 hovered->add_cross(position, color, size);
 
-// Circle
+// 円
 float radius = 10.0f;
 hovered->add_circle(position, color, radius);
 
-// Triangle
+// 三角形
 float height = 20.0f;
 hovered->add_triangle(position, color, height);
 hovered->add_filled_triangle(position, color, height);
 
-// Rectangle
+// 矩形
 Eigen::Vector2f size = {10.0f, 10.0f};
 Eigen::Vector2f offset = {0.0f, 0.0f};
 hovered->add_rect(position, color, size, offset);
 hovered->add_filled_rect(position, color, size, offset);
 
-// Image (glk::Texture)
+// 画像 (glk::Texture)
 std::make_shared<glk::Texture> texture = ...;
 hovered->add_image(position, texture, size, offset);
 ```
@@ -350,7 +360,7 @@ hovered->add_image(position, texture, size, offset);
 ![Screenshot_20221231_183315](https://user-images.githubusercontent.com/31344317/210131927-75c87acf-a85d-4c8c-a877-1ae8d18e15ad.png)
 
 
-**guik::HoveredDrawings** can be drawn on subviewers.
+**guik::HoveredDrawings** はサブビューワ上に描画することもできます。
 
 ```cpp
 auto sub = viewer->sub_viewer("sub");
@@ -360,12 +370,12 @@ sub->register_ui_callback("hovered", hovered->create_callback());
 ```
 
 
-## Image (2D texture)
+## 画像 (2Dテクスチャ)
 
 ```cpp
 #include <glk/texture.hpp>
 
-// Create a texture from raw pixel data
+// 生のピクセルデータからテクスチャを作成
 Eigen::Vector2i size = ...;
 GLuint internal_format = GL_RGBA;
 GLuint format = GL_RGB;
@@ -373,11 +383,11 @@ GLuint type = GL_UNSIGNED_BYTE;
 std::vector<unsigned char> pixels = ...;
 auto texture = std::make_shared<glk::Texture>(size, internal_format, format, type, pixels.data());
 
-// Register the image to the viewer
+// 画像をビューワに登録
 viewer->update_image("image", texture);
 ```
 
-There is also a utility function to create a texture from ```cv::Mat```.
+```cv::Mat``` からテクスチャを作成するユーティリティ関数もあります。
 ```cpp
 #include <glk/texture_opencv.hpp>
 
@@ -389,7 +399,7 @@ viewer->update_image("image", texture);
 
 ![Screenshot_20230101_011615](https://user-images.githubusercontent.com/31344317/210149508-e98dd695-9a38-4bd9-8216-96aa5c2510d1.png)
 
-If an image name contains '/', the string before the slash is recognized as a group name, and images with the same group name are grouped in a tab.
+画像名に '/' が含まれている場合、スラッシュの前の文字列はグループ名として認識され、同じグループ名の画像はタブにグループ化されます。
 
 ```cpp
 viewer->update_image("group0/image0", texture);
@@ -400,7 +410,7 @@ viewer->update_image("group1/image0", texture);
 ![Screenshot_20230101_011918](https://user-images.githubusercontent.com/31344317/210149509-c096fdcb-7337-44bf-833d-ce369378bbe1.png)
 
 
-## Plots (ImPlot)
+## プロット (ImPlot)
 
 ```cpp
 #include <implot.h>
@@ -410,17 +420,17 @@ viewer->update_image("group1/image0", texture);
 std::vector<double> xs = ...;
 std::vector<double> ys = ...;
 
-// Basic plotting
+// 基本的なプロット
 viewer->setup_plot("curves_y", 1024, 256);
-viewer->update_plot_line("curves_y", "sin", ys_sin);  // When only Y values are given, X values become index IDs
+viewer->update_plot_line("curves_y", "sin", ys_sin);  // Y値のみが与えられた場合、X値はインデックスIDになります
 viewer->update_plot_stairs("curves_y", "sin_stairs", ys_sin);
 
 
 std::vector<double> xs_circle = ...;
 std::vector<double> ys_circle = ...;
 
-// If a plot name contains "/", the string before the slash is recognized as a group name.
-// Plots with the same group name are displayed in the same tab.
+// プロット名に '/' が含まれている場合、スラッシュの前の文字列はグループ名として認識されます。
+// 同じグループ名のプロットは同じタブに表示されます。
 viewer->setup_plot("group02/circle", 1024, 1024, ImPlotFlags_Equal);
 viewer->update_plot_line("group02/circle", "circle", xs_circle, ys_circle, ImPlotLineFlags_Loop);
 ```
