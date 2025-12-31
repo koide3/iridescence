@@ -1,0 +1,22 @@
+#!/bin/bash
+export DEBFULLNAME="Kenji Koide"
+export DEBEMAIL="k.koide@aist.go.jp"
+
+# Automatically increment the Debian revision number
+dch -i "New release message"
+
+# Specify a new upstream version (例: 1.2.3-1)
+export DEBFULLNAME="Kenji Koide"
+export DEBEMAIL="k.koide@aist.go.jp"
+dch -v 1.2.3-1 "Update to new upstream version 1.2.3" -D noble
+
+
+# Build the source package with git-buildpackage
+gbp buildpackage -S -sa --git-upstream-tag='v%(version)s' --git-submodules
+
+# Build the package using pbuilder for Ubuntu Noble
+sudo pbuilder create --distribution noble --mirror http://jp.archive.ubuntu.com/ubuntu 
+sudo pbuilder build ../libiridescence_0.1.9-1ppa1~noble1.dsc
+
+# Upload the package to the PPA
+dput ppa:koide3/iridescence ../*.changes
