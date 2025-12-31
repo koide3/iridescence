@@ -1,0 +1,21 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classguik_1_1CameraControl.html" title=" " alt="" coords="13,104,169,129"/>
+<area shape="rect" id="Node000001" href="$classguik_1_1ArcBallCameraControl.html" title=" " alt="" coords="230,5,433,31"/>
+<area shape="poly" id="edge26_Node000000_Node000001" title=" " alt="" coords="120,94,167,66,223,40,259,28,261,33,225,44,170,71,123,99"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1FPSCameraControl.html" title=" " alt="" coords="241,203,421,228"/>
+<area shape="poly" id="edge27_Node000000_Node000002" title=" " alt="" coords="124,135,171,162,225,188,265,200,263,205,223,192,168,167,121,139"/>
+<area shape="rect" id="Node000006" href="$classguik_1_1OrbitCameraControlXY.html" title="Orbit camera control (Up vector is locked to Z axis) Left button: rotate (pan/tilt) Middle or Right b..." alt="" coords="229,55,434,80"/>
+<area shape="poly" id="edge28_Node000000_Node000006" title=" " alt="" coords="166,99,268,77,269,83,167,104"/>
+<area shape="rect" id="Node000008" href="$classguik_1_1StaticCameraControl.html" title=" " alt="" coords="235,104,428,129"/>
+<area shape="poly" id="edge30_Node000000_Node000008" title=" " alt="" coords="183,114,234,114,234,119,183,119"/>
+<area shape="rect" id="Node000009" href="$classguik_1_1TopDownCameraControl.html" title=" " alt="" coords="224,153,439,179"/>
+<area shape="poly" id="edge31_Node000000_Node000009" title=" " alt="" coords="167,130,269,151,268,156,166,135"/>
+<area shape="rect" id="Node000007" href="$classguik_1_1OrbitCameraControlXZ.html" title=" " alt="" coords="487,55,693,80"/>
+<area shape="poly" id="edge29_Node000006_Node000007" title=" " alt="" coords="448,65,486,65,486,70,448,70"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1ProjectionControl.html" title=" " alt="" coords="5,252,176,277"/>
+<area shape="poly" id="edge33_Node000003_Node000002" title=" " alt="" coords="166,247,268,225,269,231,167,252"/>
+<area shape="rect" id="Node000004" href="$classguik_1_1BasicProjectionControl.html" title=" " alt="" coords="229,252,434,277"/>
+<area shape="poly" id="edge32_Node000003_Node000004" title=" " alt="" coords="190,262,228,262,228,267,190,267"/>
+<area shape="rect" id="Node000005" href="$classguik_1_1StaticProjectionControl.html" title=" " alt="" coords="228,301,435,327"/>
+<area shape="poly" id="edge34_Node000003_Node000005" title=" " alt="" coords="167,278,269,299,268,304,166,283"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="guik::AsyncLightViewerContext" name="guik::AsyncLightViewerContext">
+<area shape="rect" id="Node000001" title="Async interface to manipulate LightViewerContext. All OpenGL operations will be done in the viewer th..." alt="" coords="5,5,231,31"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1AsyncLightViewer.html" title=" " alt="" coords="31,79,205,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,44,121,79,115,79,115,44"/>
+</map>

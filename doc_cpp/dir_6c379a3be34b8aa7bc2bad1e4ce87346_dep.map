@@ -1,0 +1,10 @@
+<map id="/home/koide/workspace/iridescence/include/guik/viewer" name="/home/koide/workspace/iridescence/include/guik/viewer">
+<area shape="rect" id="node1" href="dir_65eb0d41e8ccac7111b873aefda30099.html" title="camera" alt="" coords="27,125,98,151"/>
+<area shape="rect" id="node2" href="dir_6c379a3be34b8aa7bc2bad1e4ce87346.html" title="viewer" alt="" coords="31,52,97,77"/>
+<area shape="poly" id="edge1" href="dir_000007_000000.html" alt="" coords="66,78,66,112,60,112,61,78"/>
+<area shape="rect" id="edge1-headlabel" href="dir_000007_000000.html" title="2" alt="" coords="67,100,76,115"/>
+<area shape="rect" id="node3" href="dir_a9d60bcba5a4288480640111a5e7b260.html" title="glk" alt="" coords="123,125,165,151"/>
+<area shape="poly" id="edge2" href="dir_000007_000002.html" alt="" coords="79,75,123,114,119,118,75,79"/>
+<area shape="rect" id="edge2-headlabel" href="dir_000007_000002.html" title="6" alt="" coords="118,99,128,114"/>
+<area shape="rect" id="clust1" href="dir_433ac4a186f0cf0acedfc1c05e4c904b.html" title="guik" alt="" coords="16,16,109,161"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="glk::ScreenEffect" name="glk::ScreenEffect">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,149,136,174"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1NaiveScreenSpaceAmbientOcclusion.html" title=" " alt="" coords="196,5,423,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,136,129,95,155,73,183,55,210,43,212,48,185,60,158,77,133,99,93,140"/>
+<area shape="rect" id="Node000003" href="$classglk_1_1PlainRendering.html" title=" " alt="" coords="235,70,383,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="105,140,142,121,183,104,234,91,236,96,185,109,144,126,107,144"/>
+<area shape="rect" id="Node000004" href="$classglk_1_1ScreenSpaceAmbientOcclusion.html" title=" " alt="" coords="184,119,435,145"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="150,149,206,142,206,147,150,154"/>
+<area shape="rect" id="Node000005" href="$classglk_1_1ScreenSpaceAttributeEstimation.html" title=" " alt="" coords="214,169,405,209"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="151,168,214,176,214,181,150,173"/>
+<area shape="rect" id="Node000006" href="$classglk_1_1ScreenSpaceLighting.html" title=" " alt="" coords="217,234,402,259"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="105,179,143,200,185,219,229,231,228,237,183,224,140,205,102,184"/>
+<area shape="rect" id="Node000007" href="$classglk_1_1ScreenSpaceSplatting.html" title=" " alt="" coords="214,283,405,309"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="91,183,131,228,157,250,185,268,216,281,214,286,183,273,154,254,127,231,87,187"/>
+</map>

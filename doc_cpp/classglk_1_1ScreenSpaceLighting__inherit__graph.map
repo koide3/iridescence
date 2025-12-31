@@ -1,0 +1,5 @@
+<map id="glk::ScreenSpaceLighting" name="glk::ScreenSpaceLighting">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,191,104"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1ScreenEffect.html" title=" " alt="" coords="33,5,163,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,44,101,79,95,79,95,44"/>
+</map>

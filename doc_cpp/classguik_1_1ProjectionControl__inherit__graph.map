@@ -1,0 +1,9 @@
+<map id="guik::ProjectionControl" name="guik::ProjectionControl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="240,5,411,31"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1BasicProjectionControl.html" title=" " alt="" coords="5,79,211,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="278,37,144,81,142,76,277,32"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1FPSCameraControl.html" title=" " alt="" coords="235,79,415,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="328,44,328,79,323,79,323,44"/>
+<area shape="rect" id="Node000004" href="$classguik_1_1StaticProjectionControl.html" title=" " alt="" coords="439,79,646,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="374,32,508,76,507,81,372,37"/>
+</map>

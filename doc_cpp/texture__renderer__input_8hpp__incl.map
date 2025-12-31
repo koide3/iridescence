@@ -1,0 +1,11 @@
+<map id="/home/koide/workspace/iridescence/include/glk/texture_renderer_input.hpp" name="/home/koide/workspace/iridescence/include/glk/texture_renderer_input.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="96,5,272,75"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,123,61,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,77,65,118,62,113,128,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,123,160,148"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="164,76,140,113,136,110,160,73"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="185,123,309,148"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="209,73,233,110,229,113,204,76"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="333,123,425,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="255,72,344,114,341,119,253,77"/>
+</map>

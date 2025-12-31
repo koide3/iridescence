@@ -1,0 +1,20 @@
+<map id="/home/koide/workspace/iridescence/include/guik/viewer/anonymous.hpp" name="/home/koide/workspace/iridescence/include/guik/viewer/anonymous.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="101,5,311,60"/>
+<area shape="rect" id="Node000002" href="$light__viewer__context_8hpp.html" title=" " alt="" coords="113,108,299,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,74,209,108,203,108,203,74"/>
+<area shape="rect" id="Node000003" href="$async__light__viewer__context_8hpp.html" title=" " alt="" coords="5,225,185,295"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="166,189,130,227,126,223,162,186"/>
+<area shape="rect" id="Node000005" href="$light__viewer_8hpp.html" title=" " alt="" coords="210,233,423,287"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="250,186,293,231,289,234,246,189"/>
+<area shape="rect" id="Node000004" href="$async__light__viewer_8hpp.html" title=" " alt="" coords="5,343,185,412"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,309,98,342,93,342,93,309"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="255,296,161,345,159,340,253,291"/>
+<area shape="rect" id="Node000006" href="$hovered__drawings_8hpp.html" title=" " alt="" coords="210,350,415,405"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="318,301,316,350,311,350,313,301"/>
+<area shape="rect" id="Node000008" href="$info__window_8hpp.html" title=" " alt="" coords="440,350,655,405"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="382,291,496,347,494,352,380,296"/>
+<area shape="rect" id="Node000009" href="$viewer__ui_8hpp.html" title=" " alt="" coords="679,350,877,405"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="437,285,668,340,694,347,693,353,667,345,436,290"/>
+<area shape="rect" id="Node000007" href="$hovered__primitives_8hpp.html" title=" " alt="" coords="207,460,419,515"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="315,419,315,460,310,460,310,419"/>
+</map>

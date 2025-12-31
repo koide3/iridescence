@@ -1,0 +1,17 @@
+<map id="/home/koide/workspace/iridescence/include/guik/camera/static_camera_control.hpp" name="/home/koide/workspace/iridescence/include/guik/camera/static_camera_control.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="83,5,286,75"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,211,97,236"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,76,70,201,66,198,158,73"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="121,211,248,236"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,75,187,197,182,197,182,75"/>
+<area shape="rect" id="Node000004" href="$camera__control_8hpp.html" title=" " alt="" coords="228,123,384,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="227,73,274,112,271,116,224,77"/>
+<area shape="poly" id="edge7_Node000004_Node000002" title=" " alt="" coords="246,165,103,209,101,204,244,160"/>
+<area shape="poly" id="edge8_Node000004_Node000003" title=" " alt="" coords="278,165,215,205,213,201,275,161"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="273,211,350,236"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="310,163,312,197,307,197,305,163"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="374,211,454,236"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="334,161,388,200,385,204,331,165"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="478,211,563,236"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="358,160,477,203,476,208,357,165"/>
+</map>

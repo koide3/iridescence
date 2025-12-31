@@ -19,8 +19,15 @@
         <link rel="next" href="basic/">
       
       
+        
+          <link rel="alternate" href="/site/" hreflang="en">
+        
+          <link rel="alternate" href="/site/ja/" hreflang="ja">
+        
+      
+      
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.0">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -28,10 +35,10 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.9f615399.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.649f08f9.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -54,11 +61,10 @@
     
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
-    
     
     
   </head>
@@ -71,7 +77,6 @@
     
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
   
-    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -98,12 +103,12 @@
     <a href="." title="Iridescence" class="md-header__button md-logo" aria-label="Iridescence" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -126,32 +131,61 @@
     
     
     
-      <label class="md-header__button md-icon" for="__search">
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
+          <li class="md-select__item">
+            <a href="/site/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/site/ja/" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -162,13 +196,14 @@
     </div>
   </div>
 </div>
+      
     
     
       <div class="md-header__source">
         <a href="https://github.com/koide3/iridescence" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -204,7 +239,7 @@
     <a href="." title="Iridescence" class="md-nav__button md-logo" aria-label="Iridescence" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     Iridescence
@@ -214,7 +249,7 @@
       <a href="https://github.com/koide3/iridescence" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -231,6 +266,7 @@
     
   
   
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -240,9 +276,16 @@
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
+  
   <span class="md-ellipsis">
+    
+  
     Home
+  
+
+    
   </span>
+  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -251,9 +294,16 @@
       <a href="." class="md-nav__link md-nav__link--active">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Home
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -273,96 +323,133 @@
       
         <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
-    Features
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#dependencies" class="md-nav__link">
-    Dependencies
+    <span class="md-ellipsis">
+      
+        Dependencies
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
-    Installation
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-from-source" class="md-nav__link">
-    Install from source
+  <a href="#c-install-from-ppa-ubuntu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Install from PPA (Ubuntu)
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#install-from-ppa-amd64-arm64" class="md-nav__link">
-    Install from PPA [AMD64, ARM64]
+  <a href="#python-install-from-pypi-ubuntu-and-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python : Install from PyPI (Ubuntu and Windows)
+      
+    </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install from PPA [AMD64, ARM64]">
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2404" class="md-nav__link">
-    Ubuntu 24.04
+  <a href="#c-use-iridescence-in-your-cmake-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Use Iridescence in your cmake project
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2204" class="md-nav__link">
-    Ubuntu 22.04
+  <a href="#c-minimum-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Minimum example
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2004" class="md-nav__link">
-    Ubuntu 20.04
+  <a href="#python-minimum-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python : Minimum example
+      
+    </span>
   </a>
   
 </li>
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-iridescence-in-your-cmake-project" class="md-nav__link">
-    Use Iridescence in your cmake project
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-example" class="md-nav__link">
-    Minimum example
-  </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#some-use-examples-in-my-academic-works" class="md-nav__link">
-    Some use examples in my academic works
+    <span class="md-ellipsis">
+      
+        Some use examples in my academic works
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
-    License
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
   </a>
   
 </li>
@@ -380,13 +467,21 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="basic/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Basic usage
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -396,6 +491,7 @@
     
       
       
+  
   
   
   
@@ -403,9 +499,16 @@
       <a href="shader/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Shader setting
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -415,6 +518,7 @@
     
       
       
+  
   
   
   
@@ -422,9 +526,16 @@
       <a href="drawables/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Drawables
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -434,6 +545,7 @@
     
       
       
+  
   
   
   
@@ -441,9 +553,16 @@
       <a href="controls/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Camera and model controls
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -453,6 +572,7 @@
     
       
       
+  
   
   
   
@@ -460,9 +580,16 @@
       <a href="picking/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Point picking
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -472,6 +599,7 @@
     
       
       
+  
   
   
   
@@ -479,9 +607,16 @@
       <a href="multithread/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Multi-threading
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -491,6 +626,7 @@
     
       
       
+  
   
   
   
@@ -498,9 +634,16 @@
       <a href="effects/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Screen space effect
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -510,6 +653,7 @@
     
       
       
+  
   
   
   
@@ -517,9 +661,16 @@
       <a href="cookbook/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Cookbook
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -532,13 +683,21 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="misc/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Miscellaneous
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -572,96 +731,133 @@
       
         <li class="md-nav__item">
   <a href="#features" class="md-nav__link">
-    Features
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#dependencies" class="md-nav__link">
-    Dependencies
+    <span class="md-ellipsis">
+      
+        Dependencies
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#installation" class="md-nav__link">
-    Installation
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
   </a>
   
     <nav class="md-nav" aria-label="Installation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#install-from-source" class="md-nav__link">
-    Install from source
+  <a href="#c-install-from-ppa-ubuntu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Install from PPA (Ubuntu)
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#install-from-ppa-amd64-arm64" class="md-nav__link">
-    Install from PPA [AMD64, ARM64]
+  <a href="#python-install-from-pypi-ubuntu-and-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python : Install from PyPI (Ubuntu and Windows)
+      
+    </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install from PPA [AMD64, ARM64]">
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2404" class="md-nav__link">
-    Ubuntu 24.04
+  <a href="#c-use-iridescence-in-your-cmake-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Use Iridescence in your cmake project
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2204" class="md-nav__link">
-    Ubuntu 22.04
+  <a href="#c-minimum-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C++ : Minimum example
+      
+    </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ubuntu-2004" class="md-nav__link">
-    Ubuntu 20.04
+  <a href="#python-minimum-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python : Minimum example
+      
+    </span>
   </a>
   
 </li>
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-iridescence-in-your-cmake-project" class="md-nav__link">
-    Use Iridescence in your cmake project
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-example" class="md-nav__link">
-    Minimum example
-  </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#some-use-examples-in-my-academic-works" class="md-nav__link">
-    Some use examples in my academic works
+    <span class="md-ellipsis">
+      
+        Some use examples in my academic works
+      
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
-    License
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
   </a>
   
 </li>
@@ -676,9 +872,11 @@
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
+
 
   
   
@@ -687,19 +885,16 @@
   <h1>Home</h1>
 
 <p><img alt="Iridescence" src="assets/logo.png" /></p>
-<p><strong>Iridescence</strong> a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.</p>
-<p><a href="https://github.com/koide3/iridescence/actions/workflows/build.yml"><img alt="Build" src="https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg" /></a> on Ubuntu 18.04 / 20.04 / 22.04</p>
+<p><strong>Iridescence</strong> is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focuing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.</p>
+<p><strong><a href="https://koide3.github.io/iridescence/">Documentation (en)</a></strong>, <strong><a href="https://koide3.github.io/iridescence/ja">Documentation (日本語)</a></strong>, <strong><a href="https://koide3.github.io/iridescence/doc_cpp/">API(C++)</a>, <a href="https://koide3.github.io/iridescence/doc_py/">API(Python)</a></strong></p>
+<p><a href="https://launchpad.net/~koide3/+archive/ubuntu/iridescence"><img alt="ppa" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.launchpad.net%2F1.0%2F~koide3%2F%2Barchive%2Fubuntu%2Firidescence%3Fws.op%3DgetPublishedSources%26status%3DPublished&amp;query=entries.0.source_package_version&amp;label=ppa" /></a> <a href="https://pypi.org/project/pyridescence/"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/pyridescence" /></a> <a href="https://github.com/koide3/iridescence/actions/workflows/build.yml"><img alt="Build" src="https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg" /></a> on Ubuntu 22.04 / 24.04 and Windows</p>
 <h2 id="features">Features</h2>
-<p>What this library provides:</p>
-<ul>
-<li>An easy-to-use 3D visualization framework (inpaticular suitable for rendering point clouds)</li>
-<li>Tightly integrated Dear ImGui interfaces for rapid UI design</li>
-</ul>
-<p>What this library does NOT provide:</p>
-<ul>
-<li>Realistic rendering and shading</li>
-<li>Rich textured 3D mesh rendering</li>
-</ul>
+<p>What this library provides:
+- An easy-to-use 3D visualization framework (inpaticular suitable for rendering point clouds)
+- Tightly integrated Dear ImGui interfaces for rapid UI design</p>
+<p>What this library does NOT provide:
+- Realistic rendering and shading
+- Rich textured 3D mesh rendering</p>
 <h2 id="dependencies">Dependencies</h2>
 <ul>
 <li><a href="https://www.glfw.org/">GLFW</a> (<a href="https://www.glfw.org/license.html">zlib/libpng license</a>)</li>
@@ -708,63 +903,60 @@
 <li><a href="https://github.com/CedricGuillemet/ImGuizmo">ImGuizmo</a> (<a href="https://github.com/CedricGuillemet/ImGuizmo/blob/master/LICENSE">MIT license</a>)</li>
 <li><a href="https://github.com/epezent/implot">implot</a> (<a href="https://github.com/epezent/implot/blob/master/LICENSE">MIT license</a>)</li>
 <li><a href="https://eigen.tuxfamily.org/index.php">Eigen</a> (<a href="https://www.mozilla.org/en-US/MPL/2.0/">MPL2 license</a>)</li>
+<li><a href="https://github.com/Nicoshev/rapidhash">rapidhash</a> (<a href="https://github.com/Nicoshev/rapidhash/blob/master/LICENSE">MIT license</a>)</li>
 <li><a href="https://github.com/samhocevar/portable-file-dialogs">portable-file-dialogs</a> (<a href="https://github.com/samhocevar/portable-file-dialogs/blob/main/COPYING">WTFPL license</a>)</li>
 </ul>
 <h2 id="installation">Installation</h2>
-<h3 id="install-from-source">Install from source</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install dependencies</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libglm-dev<span class="w"> </span>libglfw3-dev<span class="w"> </span>libpng-dev<span class="w"> </span>libjpeg-dev<span class="w"> </span>libeigen3-dev
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Build and install Iridescence</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/koide3/iridescence
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>mkdir<span class="w"> </span>iridescence/build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>iridescence/build
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>cmake<span class="w"> </span>..
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>make<span class="w"> </span>-j
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>sudo<span class="w"> </span>make<span class="w"> </span>install
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># [Optional] Build and install python bindings</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nb">cd</span><span class="w"> </span>..
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>pip<span class="w"> </span>install<span class="w"> </span>.
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># [Optional2] Install stubs for autocomplete</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>pip<span class="w"> </span>install<span class="w"> </span>pybind11-stubgen
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">cd</span><span class="w"> </span>~/.local/lib/python3.10/site-packages
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>pybind11-stubgen<span class="w"> </span>-o<span class="w"> </span>.<span class="w"> </span>--ignore-invalid<span class="o">=</span>all<span class="w"> </span>pyridescence
+<h3 id="c-install-from-ppa-ubuntu">C++ : Install from <a href="https://launchpad.net/~koide3/+archive/ubuntu/iridescence">PPA</a> (Ubuntu)</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install from PPA</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>add-apt-repository<span class="w"> </span>-y<span class="w"> </span>ppa:koide3/iridescence
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>libiridescence-dev
 </code></pre></div>
-<h3 id="install-from-ppa-amd64-arm64">Install from <a href="https://github.com/koide3/ppa">PPA</a> [AMD64, ARM64]</h3>
-<h4 id="ubuntu-2404">Ubuntu 24.04</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>--compressed<span class="w"> </span><span class="s2">&quot;https://koide3.github.io/ppa/ubuntu2404/KEY.gpg&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/trusted.gpg.d/koide3_ppa.gpg<span class="w"> </span>&gt;/dev/null
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2404 ./&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/koide3_ppa.list
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libiridescence-dev
+<h3 id="python-install-from-pypi-ubuntu-and-windows">Python : Install from <a href="https://pypi.org/project/pyridescence/">PyPI</a> (Ubuntu and Windows)</h3>
+<p>Note : Source installation is required for Python 3.14.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Install from PyPI</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>pyridescence
 </code></pre></div>
-<h4 id="ubuntu-2204">Ubuntu 22.04</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>--compressed<span class="w"> </span><span class="s2">&quot;https://koide3.github.io/ppa/ubuntu2204/KEY.gpg&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/trusted.gpg.d/koide3_ppa.gpg<span class="w"> </span>&gt;/dev/null
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2204 ./&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/koide3_ppa.list
+<details>
+  <summary>Install from source</summary>
+
+
+### C++ : Install from source (Ubuntu)
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Install dependencies</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libglm-dev<span class="w"> </span>libglfw3-dev<span class="w"> </span>libpng-dev<span class="w"> </span>libjpeg-dev<span class="w"> </span>libeigen3-dev
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libiridescence-dev
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Build and install Iridescence</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/koide3/iridescence<span class="w"> </span>--recursive
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>mkdir<span class="w"> </span>iridescence/build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>iridescence/build
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>cmake<span class="w"> </span>..
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>make<span class="w"> </span>-j
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>sudo<span class="w"> </span>make<span class="w"> </span>install
 </code></pre></div>
-<h4 id="ubuntu-2004">Ubuntu 20.04</h4>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>--compressed<span class="w"> </span><span class="s2">&quot;https://koide3.github.io/ppa/ubuntu2004/KEY.gpg&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/trusted.gpg.d/koide3_ppa.gpg<span class="w"> </span>&gt;/dev/null
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2004 ./&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/koide3_ppa.list
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>libiridescence-dev
+
+### Python : Install from source
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/koide3/iridescence<span class="w"> </span>--recursive
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>iridescence
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>pip<span class="w"> </span>install<span class="w"> </span>.
 </code></pre></div>
-<h2 id="use-iridescence-in-your-cmake-project">Use Iridescence in your cmake project</h2>
+
+</details>
+
+<h2 id="usage">Usage</h2>
+<h3 id="c-use-iridescence-in-your-cmake-project">C++ : Use Iridescence in your cmake project</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c"># Find package</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">find_package</span><span class="p">(</span><span class="s">Iridescence</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c"># Add include dirs and link libraries</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">add_executable</span><span class="p">(</span><span class="s">your_program</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="s">src/your_program.cpp</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">your_program</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="s">Iridescence::Iridescence</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c"># Add include dirs and link libraries</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">add_executable</span><span class="p">(</span><span class="s">your_program</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="s">src/your_program.cpp</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">your_program</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="s">Iridescence::Iridescence</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">)</span>
 </code></pre></div>
-<h2 id="minimum-example">Minimum example</h2>
-<p>C++:
+<h3 id="c-minimum-example">C++ : Minimum example</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/primitives/primitives.hpp&gt;</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;guik/viewer/light_viewer.hpp&gt;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
@@ -788,56 +980,58 @@
 <a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">  </span><span class="c1">// Spin the viewer until it gets closed</span>
 <a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">spin_once</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">    </span><span class="c1">// Objects to be rendered are called &quot;drawables&quot; and managed with unique names.</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">    </span><span class="c1">// Here, solid and wire spheres are registered to the viewer respectively with the &quot;Rainbow&quot; and &quot;FlatColor&quot; coloring schemes.</span>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="c1">// The &quot;Rainbow&quot; coloring scheme encodes the height of each fragment using the turbo colormap by default.</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">AngleAxisf</span><span class="w"> </span><span class="n">transform</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">::</span><span class="n">UnitZ</span><span class="p">());</span>
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">sphere</span><span class="p">(),</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">Rainbow</span><span class="p">(</span><span class="n">transform</span><span class="p">));</span>
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="w">    </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;wire_sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_sphere</span><span class="p">(),</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatColor</span><span class="p">({</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="n">transform</span><span class="p">));</span>
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">  </span><span class="p">}</span>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="p">}</span>
-</code></pre></div></p>
-<details>
-  <summary>Python version</summary>
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="ch">#!/usr/bin/python3</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span> <span class="nn">numpy</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kn">from</span> <span class="nn">pyridescence</span> <span class="kn">import</span> <span class="o">*</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># Create a viewer instance (global singleton)</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">viewer</span> <span class="o">=</span> <span class="n">guik</span><span class="o">.</span><span class="n">LightViewer</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">angle</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="c1"># Define a callback for UI rendering</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="k">def</span> <span class="nf">ui_callback</span><span class="p">():</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>  <span class="c1"># In the callback, you can call ImGui commands to create your UI.</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>  <span class="c1"># Here, we use &quot;DragFloat&quot; and &quot;Button&quot; to create a simple UI.</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>  <span class="k">global</span> <span class="n">angle</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>  <span class="n">_</span><span class="p">,</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">imgui</span><span class="o">.</span><span class="n">drag_float</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>  <span class="k">if</span> <span class="n">imgui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">):</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="n">viewer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="c1"># Register a callback for UI rendering</span>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="n">viewer</span><span class="o">.</span><span class="n">register_ui_callback</span><span class="p">(</span><span class="s1">&#39;ui&#39;</span><span class="p">,</span> <span class="n">ui_callback</span><span class="p">)</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="c1"># Spin the viewer until it gets closed</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="k">while</span> <span class="n">viewer</span><span class="o">.</span><span class="n">spin_once</span><span class="p">():</span>
-<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>  <span class="c1"># Objects to be rendered are called &quot;drawables&quot; and managed with unique names.</span>
-<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>  <span class="c1"># Here, solid and wire spheres are registered to the viewer respectively with the &quot;Rainbow&quot; and &quot;FlatColor&quot; coloring schemes.</span>
-<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>  <span class="c1"># The &quot;Rainbow&quot; coloring scheme encodes the height of each fragment using the turbo colormap by default.</span>
-<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>  <span class="n">transform</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>  <span class="n">transform</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">angle</span><span class="p">])</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>  <span class="n">viewer</span><span class="o">.</span><span class="n">update_drawable</span><span class="p">(</span><span class="s1">&#39;sphere&#39;</span><span class="p">,</span> <span class="n">glk</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">sphere</span><span class="p">(),</span> <span class="n">guik</span><span class="o">.</span><span class="n">Rainbow</span><span class="p">(</span><span class="n">transform</span><span class="p">))</span>
-<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>  <span class="n">viewer</span><span class="o">.</span><span class="n">update_drawable</span><span class="p">(</span><span class="s1">&#39;wire_sphere&#39;</span><span class="p">,</span> <span class="n">glk</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">wire_sphere</span><span class="p">(),</span> <span class="n">guik</span><span class="o">.</span><span class="n">FlatColor</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">transform</span><span class="p">))</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">    </span><span class="c1">// Here, solid and wire spheres are registered to the viewer respectively with</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="c1">// the &quot;Rainbow&quot; and &quot;FlatColor&quot; coloring schemes.</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="c1">// The &quot;Rainbow&quot; coloring scheme encodes the height of each fragment using the</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="c1">// turbo colormap by default.</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">AngleAxisf</span><span class="w"> </span><span class="n">transform</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">::</span><span class="n">UnitZ</span><span class="p">());</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">    </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">sphere</span><span class="p">(),</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">Rainbow</span><span class="p">(</span><span class="n">transform</span><span class="p">));</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">    </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;wire_sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_sphere</span><span class="p">(),</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatColor</span><span class="p">({</span><span class="mf">0.1f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.7f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">},</span><span class="w"> </span><span class="n">transform</span><span class="p">));</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="p">}</span>
 </code></pre></div>
-</details>
-
+<h3 id="python-minimum-example">Python : Minimum example</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="ch">#!/usr/bin/python3</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyridescence</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Create a viewer instance (global singleton)</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">viewer</span> <span class="o">=</span> <span class="n">guik</span><span class="o">.</span><span class="n">LightViewer</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">angle</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="c1"># Define a callback for UI rendering</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">ui_callback</span><span class="p">():</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>  <span class="c1"># In the callback, you can call ImGui commands to create your UI.</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>  <span class="c1"># Here, we use &quot;DragFloat&quot; and &quot;Button&quot; to create a simple UI.</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>  <span class="k">global</span> <span class="n">angle</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>  <span class="n">_</span><span class="p">,</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">imgui</span><span class="o">.</span><span class="n">drag_float</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>  <span class="k">if</span> <span class="n">imgui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">):</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    <span class="n">viewer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="c1"># Register a callback for UI rendering</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="n">viewer</span><span class="o">.</span><span class="n">register_ui_callback</span><span class="p">(</span><span class="s1">&#39;ui&#39;</span><span class="p">,</span> <span class="n">ui_callback</span><span class="p">)</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="c1"># Spin the viewer until it gets closed</span>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="k">while</span> <span class="n">viewer</span><span class="o">.</span><span class="n">spin_once</span><span class="p">():</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>  <span class="c1"># Objects to be rendered are called &quot;drawables&quot; and managed with unique names.</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>  <span class="c1"># Here, solid and wire spheres are registered to the viewer respectively with</span>
+<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>  <span class="c1"># the &quot;Rainbow&quot; and &quot;FlatColor&quot; coloring schemes.</span>
+<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>  <span class="c1"># The &quot;Rainbow&quot; coloring scheme encodes the height of each fragment using the</span>
+<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>  <span class="c1"># turbo colormap by default.</span>
+<a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>  <span class="n">transform</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>  <span class="n">transform</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">angle</span><span class="p">])</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+<a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>  <span class="n">viewer</span><span class="o">.</span><span class="n">update_drawable</span><span class="p">(</span><span class="s1">&#39;sphere&#39;</span><span class="p">,</span> <span class="n">glk</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">sphere</span><span class="p">(),</span> <span class="n">guik</span><span class="o">.</span><span class="n">Rainbow</span><span class="p">(</span><span class="n">transform</span><span class="p">))</span>
+<a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>  <span class="n">viewer</span><span class="o">.</span><span class="n">update_drawable</span><span class="p">(</span><span class="s1">&#39;wire_sphere&#39;</span><span class="p">,</span> <span class="n">glk</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">wire_sphere</span><span class="p">(),</span> <span class="n">guik</span><span class="o">.</span><span class="n">FlatColor</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">transform</span><span class="p">))</span>
+</code></pre></div>
 <p><img alt="example_01" src="https://user-images.githubusercontent.com/31344317/210127177-31630466-f8a1-45b6-8bc7-2fdd2e4c9548.gif" /></p>
+<p>See <strong><a href="https://koide3.github.io/iridescence/">documentation</a></strong> for details.</p>
 <h2 id="some-use-examples-in-my-academic-works">Some use examples in my academic works</h2>
 <p><img alt="ral2021" src="https://user-images.githubusercontent.com/31344317/210128637-80f79abf-69c3-479c-91e9-0807e5b8b3ae.jpg" />
 <img alt="iros2022" src="https://user-images.githubusercontent.com/31344317/210128635-2ef02dff-3d74-499e-bde8-2c9c0dc047ff.jpg" /></p>
@@ -848,11 +1042,19 @@
 
 
 
+
+
+
+
+
+
+
                 
               </article>
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
       </main>
@@ -875,7 +1077,8 @@
   
 </div>
       
-        <div class="md-social">
+        
+<div class="md-social">
   
     
     
@@ -885,7 +1088,7 @@
       
     
     <a href="https://staff.aist.go.jp/k.koide/" target="_blank" rel="noopener" title="staff.aist.go.jp" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     </a>
   
     
@@ -896,7 +1099,7 @@
       
     
     <a href="https://github.com/koide3/iridescence" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
     </a>
   
     
@@ -907,7 +1110,7 @@
       
     
     <a href="https://twitter.com/k_koide3" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
     </a>
   
 </div>
@@ -921,10 +1124,14 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.a264c092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.4e0fa4ba.min.js"></script>
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

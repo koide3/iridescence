@@ -1,0 +1,21 @@
+<map id="/home/koide/workspace/iridescence/include/guik/viewer/shader_setting.hpp" name="/home/koide/workspace/iridescence/include/guik/viewer/shader_setting.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="519,5,749,60"/>
+<area shape="rect" id="Node000002" href="$light__viewer_8hpp.html" title=" " alt="" coords="462,233,675,287"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="613,73,597,109,580,175,573,233,568,232,575,174,591,107,608,71"/>
+<area shape="rect" id="Node000008" href="$light__viewer__context_8hpp.html" title=" " alt="" coords="606,108,793,177"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="660,71,681,106,677,109,655,74"/>
+<area shape="rect" id="Node000003" href="$hovered__drawings_8hpp.html" title=" " alt="" coords="9,350,214,405"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="449,291,227,345,200,352,199,347,225,340,448,286"/>
+<area shape="rect" id="Node000005" href="$async__light__viewer_8hpp.html" title=" " alt="" coords="700,343,880,412"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="632,291,726,340,724,345,630,296"/>
+<area shape="rect" id="Node000006" href="$info__window_8hpp.html" title=" " alt="" coords="239,350,453,405"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="507,296,398,352,395,348,505,291"/>
+<area shape="rect" id="Node000007" href="$viewer__ui_8hpp.html" title=" " alt="" coords="478,350,675,405"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="574,301,577,350,572,350,569,301"/>
+<area shape="rect" id="Node000004" href="$hovered__primitives_8hpp.html" title=" " alt="" coords="5,460,217,515"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="114,419,114,460,109,460,109,419"/>
+<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="653,188,600,235,597,231,649,184"/>
+<area shape="rect" id="Node000009" href="$async__light__viewer__context_8hpp.html" title=" " alt="" coords="700,225,880,295"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="736,187,766,223,761,227,732,190"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="793,309,793,342,787,342,787,309"/>
+</map>

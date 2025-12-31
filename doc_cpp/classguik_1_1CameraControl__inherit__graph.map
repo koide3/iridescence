@@ -1,0 +1,15 @@
+<map id="guik::CameraControl" name="guik::CameraControl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,161,129"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1ArcBallCameraControl.html" title=" " alt="" coords="215,5,418,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,94,156,66,208,40,244,28,246,33,210,44,158,70,114,98"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1FPSCameraControl.html" title=" " alt="" coords="227,55,407,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,99,255,77,256,83,158,104"/>
+<area shape="rect" id="Node000004" href="$classguik_1_1OrbitCameraControlXY.html" title="Orbit camera control (Up vector is locked to Z axis) Left button: rotate (pan/tilt) Middle or Right b..." alt="" coords="214,104,419,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="175,114,214,114,214,119,175,119"/>
+<area shape="rect" id="Node000006" href="$classguik_1_1StaticCameraControl.html" title=" " alt="" coords="220,153,413,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="158,130,256,151,255,156,157,135"/>
+<area shape="rect" id="Node000007" href="$classguik_1_1TopDownCameraControl.html" title=" " alt="" coords="209,203,424,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="115,135,159,162,210,188,250,200,248,205,208,192,156,167,112,139"/>
+<area shape="rect" id="Node000005" href="$classguik_1_1OrbitCameraControlXZ.html" title=" " alt="" coords="472,104,679,129"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="433,114,472,114,472,119,433,119"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="guik::FlatColor" name="guik::FlatColor">
+<area shape="rect" id="Node000001" title="Flat coloring scheme that assigns a single color to the object. If the alpha value is less than 0...." alt="" coords="203,179,320,204"/>
+<area shape="rect" id="Node000003" href="$structguik_1_1FlatBlack.html" title="Flat black color." alt="" coords="381,5,500,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="272,165,308,103,335,69,366,40,387,28,390,33,370,44,339,73,313,106,276,168"/>
+<area shape="rect" id="Node000004" href="$structguik_1_1FlatBlue.html" title="Flat blue color." alt="" coords="385,55,497,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="280,166,318,127,367,89,391,78,393,82,369,94,321,131,284,170"/>
+<area shape="rect" id="Node000005" href="$structguik_1_1FlatDarkGray.html" title="Flat dark gray color." alt="" coords="368,104,513,129"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="298,170,367,138,398,127,400,132,369,143,300,175"/>
+<area shape="rect" id="Node000006" href="$structguik_1_1FlatGray.html" title="Flat light gray color." alt="" coords="383,153,498,179"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="333,179,382,171,383,177,334,184"/>
+<area shape="rect" id="Node000007" href="$structguik_1_1FlatGreen.html" title="Flat green color." alt="" coords="379,203,502,228"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="334,198,380,205,379,210,333,204"/>
+<area shape="rect" id="Node000008" href="$structguik_1_1FlatOrange.html" title="Flat orange color." alt="" coords="375,252,506,277"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="301,208,369,238,400,249,398,254,367,243,299,213"/>
+<area shape="rect" id="Node000009" href="$structguik_1_1FlatRed.html" title="Flat red color." alt="" coords="387,301,495,327"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="284,213,321,251,369,288,393,299,391,304,367,292,318,255,280,216"/>
+<area shape="rect" id="Node000010" href="$structguik_1_1FlatWhite.html" title="Flat white color." alt="" coords="380,351,501,376"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="277,215,313,276,339,309,370,337,390,348,387,353,366,341,335,313,308,279,272,218"/>
+<area shape="rect" id="Node000002" href="$structguik_1_1ShaderSetting.html" title="Shader setting class that holds rendering settings." alt="" coords="5,179,155,204"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,189,202,189,202,194,168,194"/>
+</map>

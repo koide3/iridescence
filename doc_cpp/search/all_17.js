@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['wait_0',['wait',['../classguik_1_1AsyncLightViewer.html#a04ff4121fc55c1c9a509e715c24110b3',1,'guik::AsyncLightViewer']]],
+  ['wait_5funtil_5fclick_1',['wait_until_click',['../classguik_1_1AsyncLightViewer.html#a0c6932375e31f5d52f1e187f079da34c',1,'guik::AsyncLightViewer']]],
+  ['weight_2',['weight',['../structguik_1_1LinePlotStyle.html#a03f135e7d8c5d765f5bf4fdf91123eb0',1,'guik::LinePlotStyle::weight'],['../structguik_1_1ScatterPlotStyle.html#ab6fdb6295812814a854c27e0257373e7',1,'guik::ScatterPlotStyle::weight']]],
+  ['wheat_3',['wheat',['../namespaceglk.html#a92dac46c78ee46753c2a6b51384a0314a966d953817980d045a3538d3b8bbb468',1,'glk::Wheat'],['../namespaceglk.html#ae4c9910812d005b41432f67195edf5b1',1,'glk::Wheat()']]],
+  ['white_4',['white',['../namespaceglk_1_1console.html#a8f70b0c0808a8a1ea284a0283b86529d',1,'glk::console::white()'],['../namespaceglk.html#ab8be49643d482ce9d9d666c0a2d13ec1',1,'glk::White()'],['../namespaceglk.html#a92dac46c78ee46753c2a6b51384a0314a25a81701fbfa4a1efdf660a950c1d006',1,'glk::White']]],
+  ['whitesmoke_5',['whitesmoke',['../namespaceglk.html#a0ce9cf16fdafad6ad15879a1df9e9f7c',1,'glk::WhiteSmoke()'],['../namespaceglk.html#a92dac46c78ee46753c2a6b51384a0314a877db63f7c8ac1eea50cf8ba00d01a77',1,'glk::WhiteSmoke']]],
+  ['width_6',['width',['../structguik_1_1PlotSetting.html#a7828ad5058ff5fc8635027eac50fb3cc',1,'guik::PlotSetting']]],
+  ['window_7',['window',['../classguik_1_1Application.html#afaeb38e3f7e61b1bd5f79eaa36c89b51',1,'guik::Application']]],
+  ['window_5fsize_8',['window_size',['../classguik_1_1Application.html#a177107f5a6b8493708b25a6b276dd327',1,'guik::Application']]],
+  ['windows_9',['Python : Install from &lt;a href=&quot;https://pypi.org/project/pyridescence/&quot; &gt;PyPI&lt;/a&gt; (Ubuntu and Windows)',['../index.html#autotoc_md4',1,'']]],
+  ['winter_10',['WINTER',['../namespaceglk.html#a7d5cc6b24c23ada308bc406e59571216a832294ab11474e3f807c5eaa92b63058',1,'glk']]],
+  ['wire_5fbunny_11',['wire_bunny',['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aad9177b647d99a4205cc3ccf905115738',1,'glk::Primitives::WIRE_BUNNY'],['../classglk_1_1Primitives.html#af1ba3087a2bf2eaec57351359e982822',1,'glk::Primitives::wire_bunny()']]],
+  ['wire_5fcone_12',['wire_cone',['../classglk_1_1Primitives.html#adc4f56b983f29821c6942e3cd87187a8',1,'glk::Primitives::wire_cone()'],['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aa257cc2097cc48084c2be002d32b6d256',1,'glk::Primitives::WIRE_CONE']]],
+  ['wire_5fcube_13',['wire_cube',['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aabedc1fe3f9e7dc55210cc4159ac47fdb',1,'glk::Primitives::WIRE_CUBE'],['../classglk_1_1Primitives.html#a12299cad05d6476b46373bfb8866b384',1,'glk::Primitives::wire_cube()']]],
+  ['wire_5ffrustum_14',['wire_frustum',['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aa0a7f1ed2de035ef16a9b554a5f325b28',1,'glk::Primitives::WIRE_FRUSTUM'],['../classglk_1_1Primitives.html#a72d440c9efb7fe69face8416682d08ce',1,'glk::Primitives::wire_frustum()']]],
+  ['wire_5ficosahedron_15',['wire_icosahedron',['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aa93a3af001c3b36942f8f45a587726c64',1,'glk::Primitives::WIRE_ICOSAHEDRON'],['../classglk_1_1Primitives.html#a89c18359d18474569a937c263436cfb1',1,'glk::Primitives::wire_icosahedron()']]],
+  ['wire_5fsphere_16',['wire_sphere',['../classglk_1_1Primitives.html#a96bed4ab0edb26000e828428d62f221f',1,'glk::Primitives::wire_sphere()'],['../classglk_1_1Primitives.html#a0c05a4d8fef3db5728690febca23f80aa8ce89dc147c1525df2e9cb48baa1af65',1,'glk::Primitives::WIRE_SPHERE']]],
+  ['works_17',['Some use examples in my academic works',['../index.html#autotoc_md11',1,'']]],
+  ['write_18',['write',['../classguik_1_1RecentFiles.html#a9d2f6ef94d8395b512b9eb086a607e37',1,'guik::RecentFiles']]],
+  ['write_5fbuffer_5fasync_19',['write_buffer_async',['../namespaceglk.html#a712c9c876b2c1950ba6e45af722e2944',1,'glk']]],
+  ['write_5fnamed_5fbuffer_5fasync_20',['write_named_buffer_async',['../namespaceglk.html#a32725a2afde8bee4e16d8e916b52bc4c',1,'glk']]],
+  ['write_5fto_5fbuffer_21',['write_to_buffer',['../structglk_1_1PLYPropertyBuffer.html#a56b5c331e578e46c4026c022dc46275e',1,'glk::PLYPropertyBuffer::write_to_buffer()'],['../structglk_1_1PLYGenericPropertyBuffer.html#ad62efd401318fc8a3408f605208e7cfe',1,'glk::PLYGenericPropertyBuffer::write_to_buffer()']]],
+  ['write_5fto_5fstream_22',['write_to_stream',['../structglk_1_1PLYPropertyBuffer.html#a40589fb2a70120b97638f501c780a3e3',1,'glk::PLYPropertyBuffer::write_to_stream()'],['../structglk_1_1PLYGenericPropertyBuffer.html#a000ba1c72665e46c0e3c35b3189fe0a4',1,'glk::PLYGenericPropertyBuffer::write_to_stream()']]]
+];

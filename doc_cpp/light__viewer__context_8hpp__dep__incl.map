@@ -1,0 +1,18 @@
+<map id="/home/koide/workspace/iridescence/include/guik/viewer/light_viewer_context.hpp" name="/home/koide/workspace/iridescence/include/guik/viewer/light_viewer_context.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="113,5,299,75"/>
+<area shape="rect" id="Node000002" href="$async__light__viewer__context_8hpp.html" title=" " alt="" coords="5,123,185,192"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,87,130,124,126,121,162,83"/>
+<area shape="rect" id="Node000004" href="$light__viewer_8hpp.html" title=" " alt="" coords="210,130,423,185"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="250,83,293,128,289,132,246,87"/>
+<area shape="rect" id="Node000003" href="$async__light__viewer_8hpp.html" title=" " alt="" coords="5,240,185,309"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="98,206,98,240,93,240,93,206"/>
+<area shape="poly" id="edge6_Node000004_Node000003" title=" " alt="" coords="255,193,161,242,159,237,253,189"/>
+<area shape="rect" id="Node000005" href="$hovered__drawings_8hpp.html" title=" " alt="" coords="210,247,415,302"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="318,198,316,247,311,247,313,198"/>
+<area shape="rect" id="Node000007" href="$info__window_8hpp.html" title=" " alt="" coords="440,247,655,302"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="382,188,496,245,494,250,380,193"/>
+<area shape="rect" id="Node000008" href="$viewer__ui_8hpp.html" title=" " alt="" coords="679,247,877,302"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="437,182,668,237,694,245,693,250,667,243,436,187"/>
+<area shape="rect" id="Node000006" href="$hovered__primitives_8hpp.html" title=" " alt="" coords="207,357,419,412"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="315,316,315,357,310,357,310,316"/>
+</map>

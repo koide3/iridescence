@@ -1,0 +1,1358 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Iridescence: Visualization library for rapid prototyping of 3D point cloud algorithms">
+      
+      
+        <meta name="author" content="k.koide">
+      
+      
+        <link rel="canonical" href="https://iridescence.github.io/site/ja/drawables/">
+      
+      
+        <link rel="prev" href="../shader/">
+      
+      
+        <link rel="next" href="../controls/">
+      
+      
+        
+          <link rel="alternate" href="../../drawables/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="ja">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>描画オブジェクト - Iridescence</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href="../" title="Iridescence" class="md-header__button md-logo" aria-label="Iridescence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Iridescence
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              描画オブジェクト
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="言語切り替え">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../drawables/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="ja" class="md-select__link">
+              日本語
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/koide3/iridescence" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="Iridescence" class="md-nav__button md-logo" aria-label="Iridescence" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Iridescence
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/koide3/iridescence" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    はじめに
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    基本操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    シェーダ設定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    描画オブジェクト
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    描画オブジェクト
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ショートハンドメソッド
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3Dプリミティブ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        線
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点群
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="点群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点の形状
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点のスケール
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        正規分布集合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポイントスプラッティング
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        メッシュ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2Dオブジェクト
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2d_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        画像 (2Dテクスチャ)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        プロット (ImPlot)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    カメラとモデルの操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../picking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ポイントピッキング
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multithread/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    マルチスレッド
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../effects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    スクリーンスペースエフェクト
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    クックブック
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../misc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    その他
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ショートハンドメソッド
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3Dプリミティブ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        線
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点群
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="点群">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点の形状
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        点のスケール
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        正規分布集合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポイントスプラッティング
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        メッシュ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2Dオブジェクト
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2d_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        画像 (2Dテクスチャ)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        プロット (ImPlot)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="_1">描画オブジェクト</h1>
+<p>描画可能な線、3Dプリミティブ、2Dプリミティブの例 (<a href="https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_primitives.cpp">Code</a>):
+<img alt="primitives" src="https://user-images.githubusercontent.com/31344317/210129208-2d126725-67d9-48ff-9eae-7af118a319f9.png" /></p>
+<h2 id="_2">ショートハンドメソッド</h2>
+<p>頻繁に使用されるオブジェクトタイプのために、<code>guik::LightViewer</code> に略記メソッドを複数用意しています。これらのメソッドは、オブジェクトの作成と <code>update_drawable()</code> の呼び出しを1つの関数で行います。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// 3Dプリミティブ</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_sphere</span><span class="p">(</span><span class="s">&quot;sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatRed</span><span class="p">());</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_wire_sphere</span><span class="p">(</span><span class="s">&quot;wire_sphere&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatRed</span><span class="p">());</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_coord</span><span class="p">(</span><span class="s">&quot;coord&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">VertexColor</span><span class="p">());</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_wire_frustum</span><span class="p">(</span><span class="s">&quot;frustum&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatGreen</span><span class="p">());</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">// 点群</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">// 各点をVector(3|4)(f|d)とした生配列やstd::vectorから点群オブジェクトを作成・登録できます。</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4d</span><span class="o">&gt;</span><span class="w"> </span><span class="n">points</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_points</span><span class="p">(</span><span class="s">&quot;points&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">points</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">Rainbow</span><span class="p">());</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// 正規分布（点群＋共分散行列）</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">means</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">covs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="kt">float</span><span class="w"> </span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_normal_dists</span><span class="p">(</span><span class="s">&quot;normal_dists&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">means</span><span class="p">,</span><span class="w"> </span><span class="n">covs</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">Rainbow</span><span class="p">());</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="c1">// 線集合（line_strip=trueの場合、頂点間を数珠つなぎした線を描画します）</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">line_vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="kt">bool</span><span class="w"> </span><span class="n">line_strip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_thin_lines</span><span class="p">(</span><span class="s">&quot;lines&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line_vertices</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatGreen</span><span class="p">());</span>
+</code></pre></div>
+<h2 id="3d">3Dプリミティブ</h2>
+<p>以下のプリミティブが <strong>glk::Primitives</strong> から利用可能です。
+- Icosahedron (正二十面体)
+- Sphere (球)
+- Stanford bunny (スタンフォードバニー)
+- Cube (立方体)
+- Cone (円錐)
+- Coordinate system (座標系を表す線)
+- Frustum (視錐台)</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/primitives/primitives.hpp&gt;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// ソリッドおよびワイヤーフレームの正二十面体</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">icosahedron</span><span class="p">();</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_icosahedron</span><span class="p">();</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">// ソリッドおよびワイヤーフレームの球</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">sphere</span><span class="p">();</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_sphere</span><span class="p">();</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1">// ソリッドおよびワイヤーフレームのバニー</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">bunny</span><span class="p">();</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_bunny</span><span class="p">();</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1">// ソリッドおよびワイヤーフレームの立方体</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">cube</span><span class="p">();</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_cube</span><span class="p">();</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1">// ソリッドおよびワイヤーフレームの円錐</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">cone</span><span class="p">();</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_cone</span><span class="p">();</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="c1">// RGBカラーの座標系を表す線</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="c1">// 色付けのために guik::VertexColor でレンダリングする必要があります</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">coordinate_system</span><span class="p">();</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">solid_coordinate_system</span><span class="p">();</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="c1">// カメラ姿勢を表すワイヤーフレーム視錐台 (+Z=前方)</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="n">glk</span><span class="o">::</span><span class="n">Primitives</span><span class="o">::</span><span class="n">wire_frustum</span><span class="p">();</span>
+</code></pre></div>
+<p><img alt="Screenshot_20221231_182844" src="https://user-images.githubusercontent.com/31344317/210131821-42071de7-3ace-433b-9cb4-d39d9444ee85.png" /></p>
+<h2 id="_3">線</h2>
+<p><strong>glk::ThinLines</strong> は線の太さが一定の線を描画します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/thin_lines.hpp&gt;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1">// 線の頂点</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">// line_strip == true の場合、隣接する頂点間に線が描画されます (GL_LINE_STRIP)。</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">// line_strip == false の場合、vertices[i * 2] と vertices[i * 2 + 1] の間に線が描画されます (GL_LINES)。</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1">// 参考 : https://tkengo.github.io/assets/img/2015-01-03-opengl-es-2-2d-knowledge-2/gl-lines.png</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="kt">bool</span><span class="w"> </span><span class="n">line_strip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1">// 線オブジェクトの生成 (すべての頂点が順番に利用されます)</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="k">auto</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">ThinLines</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">line_strip</span><span class="p">);</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="c1">// 頂点の順序を指定して線オブジェクトを作成</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="k">auto</span><span class="w"> </span><span class="n">lines_with_indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">ThinLines</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">indices</span><span class="p">,</span><span class="w"> </span><span class="n">line_strip</span><span class="p">);</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="c1">// 頂点カラー付きの線オブジェクトの作成</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="k">auto</span><span class="w"> </span><span class="n">lines_with_colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">ThinLines</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="n">line_strip</span><span class="p">);</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="c1">// 幅の設定 (glLineWidth)</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="n">lines</span><span class="o">-&gt;</span><span class="n">set_line_width</span><span class="p">(</span><span class="mf">2.0f</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>glk::Lines</strong> はポリゴンで線を描画します。線の太さは視点と視野角に応じて変化します。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/thin_lines.hpp&gt;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kt">float</span><span class="w"> </span><span class="n">line_width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">;</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kt">bool</span><span class="w"> </span><span class="n">line_strip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">auto</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Lines</span><span class="o">&gt;</span><span class="p">(</span><span class="n">line_width</span><span class="p">,</span><span class="w"> </span><span class="n">vertices</span><span class="p">,</span><span class="w"> </span><span class="n">colors</span><span class="p">,</span><span class="w"> </span><span class="n">line_strip</span><span class="p">);</span>
+</code></pre></div></p>
+<p><img alt="Screenshot_20221231_183450" src="https://user-images.githubusercontent.com/31344317/210131978-1b99b57e-193b-4196-8887-fffe51a858c6.png" /></p>
+<h2 id="_4">点群</h2>
+<p><strong>glk::PointCloudBuffer</strong> は3D点群をレンダリングします。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/pointcloud_buffer.hpp&gt;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">// std::vector&lt;Eigen::Vector3f&gt; から PointCloudBuffer を作成</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">auto</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">PointCloudBuffer</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">);</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">// 各点の色を追加</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_color</span><span class="p">(</span><span class="n">colors</span><span class="p">);</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1">// [0, 1] のスカラー値をエンコードする頂点カラーの追加 (VERTEX_COLORモードで参照される)</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">intensities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_intensity</span><span class="p">(</span><span class="n">glk</span><span class="o">::</span><span class="n">COLORMAP</span><span class="o">::</span><span class="n">TURBO</span><span class="p">,</span><span class="w"> </span><span class="n">intensities</span><span class="p">);</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1">// [0, 1] のスカラー値をカラーマップ属性として追加 (VERTEX_COLORMAPモードで参照される)</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_colormap</span><span class="p">(</span><span class="n">intensities</span><span class="p">);</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="c1">// 頂点法線の追加</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">normals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_normals</span><span class="p">(</span><span class="n">normals</span><span class="p">);</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1">// 各点に任意属性データを追加</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="kt">int</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_buffer</span><span class="p">(</span><span class="s">&quot;radius&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dim</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dim</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="c1">// 点の描画サイズを設定</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="k">auto</span><span class="w"> </span><span class="n">shader_setting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">Rainbow</span><span class="p">().</span><span class="n">set_point_scale</span><span class="p">(</span><span class="mf">2.0f</span><span class="p">);</span>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;points&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">shader_setting</span><span class="p">);</span>
+</code></pre></div>
+<p><img alt="Screenshot_20230101_005425" src="https://user-images.githubusercontent.com/31344317/210149282-38377bad-dfb8-4f86-a907-60cdcef10b92.png" />
+<code>guik::Rainbow</code> でレンダリングされた <code>glk::PointCloudBuffer</code></p>
+<p><strong>glk::IndexedPointCloudBuffer</strong> ではレンダリングする頂点のインデックスを指定できます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/indexed_pointcloud_buffer.hpp&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">auto</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">PointCloudBuffer</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">);</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">auto</span><span class="w"> </span><span class="n">indexed_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">IndexedPointCloudBuffer</span><span class="o">&gt;</span><span class="p">(</span><span class="n">cloud_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">indices</span><span class="p">);</span>
+</code></pre></div>
+<h3 id="_5">点の形状</h3>
+<p>デフォルトの点のサイズ・形状は <code>set_point_shape()</code> メソッドで設定できます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">viewer</span><span class="p">();</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">guik</span><span class="o">::</span><span class="n">ShaderSetting</span><span class="o">&amp;</span><span class="w"> </span><span class="n">global_setting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">shader_setting</span><span class="p">();</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kt">float</span><span class="w"> </span><span class="n">point_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01f</span><span class="p">;</span><span class="w">  </span><span class="c1">// 点のベースサイズ</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kt">bool</span><span class="w"> </span><span class="n">metric</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">        </span><span class="c1">// Trueの場合、三次元空間スケール、Falseの場合、スクリーンスペーススケールで点を描画</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="kt">bool</span><span class="w"> </span><span class="n">circle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">        </span><span class="c1">// Trueの場合、点を円形で描画、Falseの場合、点を四角形で描画（少し高速）</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_shape</span><span class="p">(</span><span class="mf">0.01f</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+</code></pre></div>
+<h3 id="_6">点のスケール</h3>
+<p><strong>メトリックスペーススケーリング（デフォルト）</strong><br />
+各点は <code>radius_m = point_scale * point_size + point_size_offset</code> で計算される三次元空間における大きさで描画されます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">viewer</span><span class="p">();</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">guik</span><span class="o">::</span><span class="n">ShaderSetting</span><span class="o">&amp;</span><span class="w"> </span><span class="n">global_setting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">shader_setting</span><span class="p">();</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_shape_circle</span><span class="p">();</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_scale_metric</span><span class="p">();</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_size</span><span class="p">(</span><span class="mf">0.5f</span><span class="p">);</span><span class="w">  </span><span class="c1">// デフォルトの点半径を 0.5 に設定</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="k">auto</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">PointCloudBuffer</span><span class="o">&gt;</span><span class="p">(...);</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="c1">// 点半径を 0.5 に設定</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;points&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatBlue</span><span class="p">().</span><span class="n">set_point_size</span><span class="p">(</span><span class="mf">0.5f</span><span class="p">));</span>
+</code></pre></div>
+<p><img alt="ss_1710604595 779500" src="https://github.com/koide3/iridescence/assets/31344317/f13f8c91-8dcc-4cc0-8dfa-9e4edcb2f518" />
+赤 : ワイヤーフレーム球 (半径=0.5), 青 : PointCloudBuffer でレンダリングされた点 (<code>point_shape_mode=CIRCLE</code>, <code>point_scale_mode=METRIC</code>, <code>point_size=0.5</code>).</p>
+<details>
+<summary>スクリーンスペーススケーリング（旧実装）</summary>
+
+点のサイズは `radius_pix = point_scale * point_size * nz + point_size_offset` として計算されます。ここで `nz` は [0, 1] のピクセルのスクリーンスペース深度です。デフォルトでは `point_scale=1.0`, `point_size=10.0`, `point_size_offset=0.0` であり、これらは `guik::ShaderSetting` に値を設定することで更新できます。
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">viewer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">viewer</span><span class="p">();</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">guik</span><span class="o">::</span><span class="n">ShaderSetting</span><span class="o">&amp;</span><span class="w"> </span><span class="n">global_setting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">shader_setting</span><span class="p">();</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_scale_screenspace</span><span class="p">();</span><span class="w">   </span><span class="c1">// 点スケールモードをスクリーンスペースに設定</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="n">global_setting</span><span class="p">.</span><span class="n">set_point_size</span><span class="p">(</span><span class="mf">5.0f</span><span class="p">);</span><span class="w">            </span><span class="c1">// 基本点サイズを 5.0 に設定</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">auto</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">PointCloudBuffer</span><span class="o">&gt;</span><span class="p">(...);</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1">// 点のサイズをベースサイズの2倍にする</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_drawable</span><span class="p">(</span><span class="s">&quot;points&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="p">,</span><span class="w"> </span><span class="n">guik</span><span class="o">::</span><span class="n">FlatBlue</span><span class="p">().</span><span class="n">set_point_scale</span><span class="p">(</span><span class="mf">2.0f</span><span class="p">));</span>
+</code></pre></div>
+
+</details>
+
+<h2 id="_7">正規分布集合</h2>
+<p><strong>glk::NormalDistributions</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/normal_distributions.hpp&gt;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">means</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">covs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kt">float</span><span class="w"> </span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="k">auto</span><span class="w"> </span><span class="n">normal_distributions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">NormalDistributions</span><span class="o">&gt;</span><span class="p">(</span><span class="n">means</span><span class="p">,</span><span class="w"> </span><span class="n">covs</span><span class="p">,</span><span class="w"> </span><span class="n">scale</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="_8">ポイントスプラッティング</h2>
+<p><strong>glk::Splatting</strong> は点群を向きのある円盤の集合としてレンダリングします。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/splatting.hpp&gt;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1">// 法線付きの PointCloudBuffer を作成</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">normals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">auto</span><span class="w"> </span><span class="n">cloud_buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">PointCloudBuffer</span><span class="o">&gt;</span><span class="p">(</span><span class="n">vertices</span><span class="p">);</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_normals</span><span class="p">(</span><span class="n">normals</span><span class="p">);</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="c1">// スプラッティングシェーダーを作成</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="k">auto</span><span class="w"> </span><span class="n">splatting_shader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">create_splatting_shader</span><span class="p">();</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="c1">// スプラッティングインスタンスを作成</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="kt">float</span><span class="w"> </span><span class="n">point_radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">;</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="k">auto</span><span class="w"> </span><span class="n">splatting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Splatting</span><span class="o">&gt;</span><span class="p">(</span><span class="n">splatting_shader</span><span class="p">);</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">splatting</span><span class="o">-&gt;</span><span class="n">set_point_radius</span><span class="p">(</span><span class="n">point_radius</span><span class="p">);</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="n">splatting</span><span class="o">-&gt;</span><span class="n">set_cloud_buffer</span><span class="p">(</span><span class="n">cloud_buffer</span><span class="p">);</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="c1">// 頂点半径が有効な場合、各点の半径は point_radius * 頂点の半径 として計算されます。</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="c1">// それ以外の場合、固定の point_radius がすべての点のレンダリングに使用されます。</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="n">splatting</span><span class="o">-&gt;</span><span class="n">enable_vertex_radius</span><span class="p">();</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">float</span><span class="o">&gt;</span><span class="w"> </span><span class="n">radii</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="n">cloud_buffer</span><span class="o">-&gt;</span><span class="n">add_buffer</span><span class="p">(</span><span class="s">&quot;radius&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">radii</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">),</span><span class="w"> </span><span class="n">radii</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+</code></pre></div>
+<p><img alt="points" src="https://user-images.githubusercontent.com/31344317/210149278-ac7a1424-5846-4a8c-94a8-dc2173229566.png" />
+疎な点群</p>
+<p><img alt="splats" src="https://user-images.githubusercontent.com/31344317/210149280-7160f17f-c6cd-46c5-a66c-4a41d480db69.png" />
+<code>glk::Splatting</code> を使用してレンダリングされた点群</p>
+<p><img alt="splats2" src="https://user-images.githubusercontent.com/31344317/210149281-18ad2296-4bc6-4f44-9ef5-0696f1b03141.png" />
+結果図: 各点は向きを持った円盤としてレンダリングされます</p>
+<h2 id="_9">メッシュ</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/mesh.hpp&gt;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">normals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector4f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">colors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector2f</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tex_coords</span><span class="p">;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="w"> </span><span class="n">indices</span><span class="p">;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1">// メッシュインスタンスを作成</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="c1">// normal/color/tex_coord が無い場合は nullptr を渡します</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="k">auto</span><span class="w"> </span><span class="n">mesh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Mesh</span><span class="o">&gt;</span><span class="p">(</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="n">vertices</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="n">normals</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="n">colors</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">  </span><span class="n">tex_coords</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">  </span><span class="n">vertices</span><span class="p">.</span><span class="n">size</span><span class="p">()</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">  </span><span class="n">indices</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="n">indices</span><span class="p">.</span><span class="n">size</span><span class="p">()</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="p">);</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Texture</span><span class="o">&gt;</span><span class="w"> </span><span class="n">texture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="n">mesh</span><span class="o">-&gt;</span><span class="n">set_texture</span><span class="p">(</span><span class="n">texture</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="2d">2Dオブジェクト</h2>
+<p><strong>guik::HoveredDrawings</strong> は三次元座標位置を画面に投影し、投影された画面上位置に2Dプリミティブを描画します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;guik/hovered_drawings.hpp&gt;</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">// 2D描画レンダラーを作成し、ビューワに登録</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">auto</span><span class="w"> </span><span class="n">hovered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">guik</span><span class="o">::</span><span class="n">HoveredDrawings</span><span class="o">&gt;</span><span class="p">();</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">register_ui_callback</span><span class="p">(</span><span class="s">&quot;hovered&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">create_callback</span><span class="p">());</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1">// 固定の三次元座標 (1.0, 2.0, 3.0) にテキストを描画</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">fg_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IM_COL32</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">bg_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IM_COL32</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">);</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_text</span><span class="p">({</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0f</span><span class="p">},</span><span class="w"> </span><span class="s">&quot;text1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fg_color</span><span class="p">,</span><span class="w"> </span><span class="n">bg_color</span><span class="p">);</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1">// 三次元座標を直接指定する代わりに3Dオブジェクト名を使用して、</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="c1">// そのオブジェクトにオーバーレイして2D描画を行うこともできます</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_text_on</span><span class="p">(</span><span class="s">&quot;drawable_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;text2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fg_color</span><span class="p">,</span><span class="w"> </span><span class="n">bg_color</span><span class="p">);</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="c1">// クロス</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector3f</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">1.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0f</span><span class="p">};</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IM_COL32</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">);</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="kt">float</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">;</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_cross</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="c1">// 円</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="kt">float</span><span class="w"> </span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">;</span>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_circle</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">radius</span><span class="p">);</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="c1">// 三角形</span>
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="kt">float</span><span class="w"> </span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">20.0f</span><span class="p">;</span>
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_triangle</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_filled_triangle</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">);</span>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>
+<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="c1">// 矩形</span>
+<a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector2f</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">10.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">10.0f</span><span class="p">};</span>
+<a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector2f</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">};</span>
+<a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_rect</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span>
+<a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_filled_rect</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span>
+<a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a>
+<a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a><span class="c1">// 画像 (glk::Texture)</span>
+<a id="__codelineno-12-39" name="__codelineno-12-39" href="#__codelineno-12-39"></a><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Texture</span><span class="o">&gt;</span><span class="w"> </span><span class="n">texture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-12-40" name="__codelineno-12-40" href="#__codelineno-12-40"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_image</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span>
+</code></pre></div>
+<p><img alt="Screenshot_20221231_183315" src="https://user-images.githubusercontent.com/31344317/210131927-75c87acf-a85d-4c8c-a877-1ae8d18e15ad.png" /></p>
+<p><strong>guik::HoveredDrawings</strong> はサブビューワ上に描画することもできます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">sub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">sub_viewer</span><span class="p">(</span><span class="s">&quot;sub&quot;</span><span class="p">);</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">auto</span><span class="w"> </span><span class="n">hovered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">guik</span><span class="o">::</span><span class="n">HoveredDrawings</span><span class="o">&gt;</span><span class="p">(</span><span class="n">sub</span><span class="p">);</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">add_rect_on</span><span class="p">(</span><span class="s">&quot;coord&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">IM_COL32</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">));</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">sub</span><span class="o">-&gt;</span><span class="n">register_ui_callback</span><span class="p">(</span><span class="s">&quot;hovered&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">hovered</span><span class="o">-&gt;</span><span class="n">create_callback</span><span class="p">());</span>
+</code></pre></div>
+<h2 id="2d_1">画像 (2Dテクスチャ)</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/texture.hpp&gt;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1">// 生のピクセルデータからテクスチャを作成</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">Vector2i</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">GLuint</span><span class="w"> </span><span class="n">internal_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GL_RGBA</span><span class="p">;</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">GLuint</span><span class="w"> </span><span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GL_RGB</span><span class="p">;</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">GLuint</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GL_UNSIGNED_BYTE</span><span class="p">;</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pixels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="k">auto</span><span class="w"> </span><span class="n">texture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">glk</span><span class="o">::</span><span class="n">Texture</span><span class="o">&gt;</span><span class="p">(</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">internal_format</span><span class="p">,</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">pixels</span><span class="p">.</span><span class="n">data</span><span class="p">());</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="c1">// 画像をビューワに登録</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_image</span><span class="p">(</span><span class="s">&quot;image&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">);</span>
+</code></pre></div>
+<p><code>cv::Mat</code> からテクスチャを作成するユーティリティ関数もあります。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;glk/texture_opencv.hpp&gt;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">auto</span><span class="w"> </span><span class="n">texture</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">glk</span><span class="o">::</span><span class="n">create_texture</span><span class="p">(</span><span class="n">image</span><span class="p">);</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_image</span><span class="p">(</span><span class="s">&quot;image&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">);</span>
+</code></pre></div></p>
+<p><img alt="Screenshot_20230101_011615" src="https://user-images.githubusercontent.com/31344317/210149508-e98dd695-9a38-4bd9-8216-96aa5c2510d1.png" /></p>
+<p>画像名に '/' が含まれている場合、スラッシュの前の文字列はグループ名として認識され、同じグループ名の画像はタブにグループ化されます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_image</span><span class="p">(</span><span class="s">&quot;group0/image0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">);</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_image</span><span class="p">(</span><span class="s">&quot;group0/image1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">);</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_image</span><span class="p">(</span><span class="s">&quot;group1/image0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">texture</span><span class="p">);</span>
+</code></pre></div>
+<p><img alt="Screenshot_20230101_011918" src="https://user-images.githubusercontent.com/31344317/210149509-c096fdcb-7337-44bf-833d-ce369378bbe1.png" /></p>
+<h2 id="implot">プロット (ImPlot)</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;implot.h&gt;</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;guik/viewer/light_viewer.hpp&gt;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">xs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1">// 基本的なプロット</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">setup_plot</span><span class="p">(</span><span class="s">&quot;curves_y&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">);</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_plot_line</span><span class="p">(</span><span class="s">&quot;curves_y&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ys_sin</span><span class="p">);</span><span class="w">  </span><span class="c1">// Y値のみが与えられた場合、X値はインデックスIDになります</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_plot_stairs</span><span class="p">(</span><span class="s">&quot;curves_y&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;sin_stairs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ys_sin</span><span class="p">);</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">xs_circle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ys_circle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...;</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="c1">// プロット名に &#39;/&#39; が含まれている場合、スラッシュの前の文字列はグループ名として認識されます。</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="c1">// 同じグループ名のプロットは同じタブに表示されます。</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">setup_plot</span><span class="p">(</span><span class="s">&quot;group02/circle&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="n">ImPlotFlags_Equal</span><span class="p">);</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="n">viewer</span><span class="o">-&gt;</span><span class="n">update_plot_line</span><span class="p">(</span><span class="s">&quot;group02/circle&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;circle&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xs_circle</span><span class="p">,</span><span class="w"> </span><span class="n">ys_circle</span><span class="p">,</span><span class="w"> </span><span class="n">ImPlotLineFlags_Loop</span><span class="p">);</span>
+</code></pre></div>
+<p><img alt="Screenshot_20231212_103830" src="https://github.com/koide3/iridescence/assets/31344317/0036c0ab-63bb-451f-8f0f-e8931c820f71" /></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021 - 2022 Kenji Koide
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://staff.aist.go.jp/k.koide/" target="_blank" rel="noopener" title="staff.aist.go.jp" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/koide3/iridescence" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/k_koide3" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

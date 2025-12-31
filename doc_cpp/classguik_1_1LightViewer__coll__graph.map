@@ -1,0 +1,9 @@
+<map id="guik::LightViewer" name="guik::LightViewer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="57,168,191,193"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1Application.html" title=" " alt="" coords="5,93,136,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,129,117,166,113,169,85,132"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1LightViewerContext.html" title=" " alt="" coords="160,93,347,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,128,146,170,143,165,220,123"/>
+<area shape="rect" id="Node000004" href="$structguik_1_1ShaderSetting.html" title="Shader setting class that holds rendering settings." alt="" coords="179,5,328,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="256,45,256,93,251,93,251,45"/>
+</map>

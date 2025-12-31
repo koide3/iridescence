@@ -1,53 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-         <loc>https://iridescence.github.io/site/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/basic/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/basic/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/basic/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/basic/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/controls/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/controls/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/controls/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/controls/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/cookbook/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/cookbook/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/cookbook/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/cookbook/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/drawables/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/drawables/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/drawables/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/drawables/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/effects/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/effects/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/effects/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/effects/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/misc/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/misc/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/misc/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/misc/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/multithread/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/multithread/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/multithread/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/multithread/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/picking/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/picking/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/picking/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/picking/"/>
     </url>
     <url>
-         <loc>https://iridescence.github.io/site/shader/</loc>
-         <lastmod>2024-07-23</lastmod>
-         <changefreq>daily</changefreq>
+        <loc>https://iridescence.github.io/site/shader/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/shader/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/shader/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/basic/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/basic/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/basic/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/controls/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/controls/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/controls/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/cookbook/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/cookbook/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/cookbook/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/drawables/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/drawables/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/drawables/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/effects/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/effects/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/effects/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/misc/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/misc/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/misc/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/multithread/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/multithread/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/multithread/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/picking/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/picking/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/picking/"/>
+    </url>
+    <url>
+        <loc>https://iridescence.github.io/site/ja/shader/</loc>
+        <lastmod>2025-12-31</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://iridescence.github.io/site/ja/shader/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://iridescence.github.io/site/shader/"/>
     </url>
 </urlset>
