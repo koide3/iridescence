@@ -31,6 +31,7 @@ class TopDownCameraControl;
 class ArcBallCameraControl;
 class FPSCameraControl;
 
+/// @brief Viewer context.
 class LightViewerContext {
 public:
   LightViewerContext(const std::string& context_name);
@@ -48,57 +49,122 @@ public:
   void show();
   void hide();
 
+  /// @brief Clear everything in the viewer (callbacks, filters, drawables, texts).
   virtual void clear();
+  /// @brief Clear texts.
   virtual void clear_text();
+
+  /// @brief Append debug text to the viewer. This method is thread-safe.
   virtual void append_text(const std::string& text);
+
+  /// @brief Register a UI callback function.
+  /// @param name     Callback name
+  /// @param callback Callback function. If null, the callback with the given name is removed.
   virtual void register_ui_callback(const std::string& name, const std::function<void()>& callback = 0);
+  /// @brief Remove a UI callback function.
+  /// @param name Callback name
   void remove_ui_callback(const std::string& name);
 
+  /// @brief Global shader setting.
   guik::ShaderSetting& shader_setting() { return global_shader_setting; }
+  /// @brief Global shader setting.
   const guik::ShaderSetting& shader_setting() const { return global_shader_setting; }
 
+  /// @brief Disable XY grid drawing.
   void disable_xy_grid() { set_draw_xy_grid(false); }
+  /// @brief Enable XY grid drawing.
   void enable_xy_grid() { set_draw_xy_grid(true); }
+  /// @brief Set enable/disable XY grid drawing.
   void set_draw_xy_grid(bool draw_xy_grid);
+
+  /// @brief Set colormap used for RAINBOW and VERTEX_COLORMAP modes.
   void set_colormap(glk::COLORMAP colormap);
+
+  /// @brief Set screen effect.
   void set_screen_effect(const std::shared_ptr<glk::ScreenEffect>& effect);
+  /// @brief Get screen effect.
   const std::shared_ptr<glk::ScreenEffect>& get_screen_effect() const;
+  /// @brief Set background texture.
   void set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture);
 
+  /// @brief Set range of color mapping for RAINBOW mode.
   void set_rainbow_range(const Eigen::Vector2f& minmax_z);
+  /// @brief Set axis of color mapping for RAINBOW mode.
   void set_rainbow_axis(const Eigen::Vector3f& axis);
+
+  /// @brief Set point shape properties.
+  /// @param point_size   Point size
+  /// @param metric       If true, point size is in the metric unit [m], otherwise in pixel unit.
+  /// @param circle       If true, points are rendered as circles, otherwise as squares.
   void set_point_shape(float point_size = 1.0f, bool metric = true, bool circle = true);
 
-  void enable_decimal_rendering();
+  /// @brief Enable normal buffer.
   void enable_normal_buffer();
+  /// @brief Enable info buffer.
   void enable_info_buffer();
+
+  /// @brief Enable partial rendering (This method will be deprecated).
+  void enable_decimal_rendering();
+  /// @brief Enable partial rendering.
+  /// @param clear_thresh Threshold for clearing the partial rendering buffer.
   void enable_partial_rendering(double clear_thresh = 1e-6);
+  /// @brief Disable partial rendering.
   void disable_partial_rendering();
 
+  /// @brief Whether normal buffer is enabled.
   bool normal_buffer_enabled() const;
+  /// @brief  Whether info buffer is enabled.
   bool info_buffer_enabled() const;
+  /// @brief  Whether partial rendering is enabled.
   bool partial_rendering_enabled() const;
 
+  /// @brief Color buffer.
   const glk::Texture& color_buffer() const;
+  /// @brief Depth buffer.
   const glk::Texture& depth_buffer() const;
+  /// @brief Normal buffer.
   const glk::Texture& normal_buffer() const;
+  /// @brief Info buffer.
   const glk::Texture& info_buffer() const;
+  /// @brief Dynamic flag buffer.
   const glk::Texture& dynamic_flag_buffer() const;
 
+  /// @brief Clear all drawables.
   void clear_drawables();
+  /// @brief Clear drawables that satisfy the given condition.
+  /// @param fn Condition function
   void clear_drawables(const std::function<bool(const std::string&)>& fn);
 
+  /// @brief Get all drawables.
+  /// @note  This method may be removed in the future.
   std::unordered_map<std::string, std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr>>& get_drawables();
 
+  /// @brief Find a drawable by name.
+  /// @param name  Drawable name
+  /// @return Drawable and its shader setting pair if found, otherwise an empty pair
   std::pair<ShaderSetting::Ptr, glk::Drawable::ConstPtr> find_drawable(const std::string& name);
+
+  /// @brief Remove a drawable by name.
   void remove_drawable(const std::string& name);
+  /// @brief Remove all drawables that match the given regex.
   void remove_drawable(const std::regex& regex);
+
+  /// @brief Update a drawable.
+  /// @param name           Drawable name
+  /// @param drawable       Drawable
+  /// @param shader_setting Shader setting
   void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
 
+  /// @brief Clear all drawable filters.
   void clear_drawable_filters();
+  /// @brief Register a drawable filter.
+  /// @param filter_name  Filter name
+  /// @param filter       Filter function. If null, the filter with the given name is removed.
   void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
+  /// @brief Remove a drawable filter.
   void remove_drawable_filter(const std::string& filter_name);
 
+  /// @brief Clear partial rendering buffer.
   void clear_partial_rendering();
 
   const std::shared_ptr<CameraControl>& get_camera_control() const;
