@@ -9,7 +9,7 @@
 project = 'pyridescence'
 copyright = '2024, k.koide'
 author = 'k.koide'
-version = '0.1.9'
+version = '1.0.0'
 
 import os
 import sys
