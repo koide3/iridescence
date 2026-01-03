@@ -22,7 +22,7 @@ using PlotStyleConstPtr = std::shared_ptr<const PlotStyle>;
 
 /// @brief Light viewer. The main visualization class in Iridescence.
 class LightViewer : public guik::Application, public guik::LightViewerContext {
-protected:
+public:
   /// @brief Constructor. Do not call directly. Use LightViewer::instance() instead.
   LightViewer();
   virtual ~LightViewer();
