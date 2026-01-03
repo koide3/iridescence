@@ -8,12 +8,12 @@
 namespace glk {
 
 NaiveScreenSpaceAmbientOcclusion::NaiveScreenSpaceAmbientOcclusion() {
-  if(!ssao_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/naive_ssao.frag")) {
+  if (!ssao_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/naive_ssao.frag")) {
     return;
   }
   std::mt19937 mt;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> random_vectors(32);
-  for(auto& vec : random_vectors) {
+  std::vector<Eigen::Vector3f> random_vectors(32);
+  for (auto& vec : random_vectors) {
     double u = std::uniform_real_distribution<>(0.0, 1.0)(mt);
     double v = std::uniform_real_distribution<>(-1.0, 1.0)(mt);
     double w = std::uniform_real_distribution<>(0.0, 1.0)(mt);
@@ -32,8 +32,13 @@ NaiveScreenSpaceAmbientOcclusion::NaiveScreenSpaceAmbientOcclusion() {
 
 NaiveScreenSpaceAmbientOcclusion::~NaiveScreenSpaceAmbientOcclusion() {}
 
-void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
-  if(frame_buffer) {
+void NaiveScreenSpaceAmbientOcclusion::draw(
+  const TextureRenderer& renderer,
+  const glk::Texture& color_texture,
+  const glk::Texture& depth_texture,
+  const TextureRendererInput::Ptr& input,
+  glk::FrameBuffer* frame_buffer) {
+  if (frame_buffer) {
     frame_buffer->bind();
   }
 
@@ -43,7 +48,7 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
 
   auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
-  if(!view_matrix || !projection_matrix) {
+  if (!view_matrix || !projection_matrix) {
     using namespace glk::console;
     std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
@@ -60,7 +65,7 @@ void NaiveScreenSpaceAmbientOcclusion::draw(const TextureRenderer& renderer, con
 
   renderer.draw_plain(ssao_shader);
 
-  if(frame_buffer) {
+  if (frame_buffer) {
     frame_buffer->unbind();
   }
 }

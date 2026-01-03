@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(iridescence VERSION 0.1.9 LANGUAGES C CXX)
+project(iridescence VERSION 1.0.0 LANGUAGES C CXX)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
@@ -90,6 +90,8 @@ if(MSVC)
   add_compile_definitions(_USE_MATH_DEFINES)
   add_compile_options(/wd4018 /wd4244 /wd4267 /wd4305 /wd4312)
   add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+  # Enable parallel compilation
+  add_compile_options(/MP)
 else()
   list(APPEND EXTRA_LIBRARIES dl)
   list(APPEND EXTRA_LIBRARIES pthread)
@@ -133,6 +135,7 @@ add_library(iridescence
   thirdparty/imgui/backends/imgui_impl_opengl3.cpp
   # glk
   src/glk/path_std.cpp
+  src/glk/hash.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
   src/glk/lines.cpp
@@ -186,6 +189,7 @@ add_library(iridescence
   src/guik/camera/projection_control.cpp
   src/guik/camera/basic_projection_control.cpp
   src/guik/viewer/plot_data.cpp
+  src/guik/viewer/shader_setting.cpp
   src/guik/viewer/light_viewer.cpp
   src/guik/viewer/light_viewer_context.cpp
   src/guik/viewer/light_viewer_context_util.cpp
@@ -205,6 +209,7 @@ target_include_directories(iridescence PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/implot>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/portable-file-dialogs>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gl3w>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/rapidhash>
   $<INSTALL_INTERFACE:include/iridescence>
 )
 target_link_libraries(iridescence PUBLIC
@@ -351,6 +356,9 @@ if(BUILD_PYTHON_BINDINGS)
     LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
     COMPONENT python
   )
+
+  # install stubs in src/python/stubs
+  install(DIRECTORY src/python/stubs/ DESTINATION ${PYTHON_INSTALL_DIR})
 endif()
 
 #############

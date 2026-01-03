@@ -13,6 +13,7 @@
 #include <GL/gl3w.h>
 #include <Eigen/Core>
 
+#include <glk/hash.hpp>
 #include <glk/console_colors.hpp>
 
 namespace glk {
@@ -79,7 +80,7 @@ bool GLSLShader::add_feedback_varying(const std::string& name) {
 bool GLSLShader::link_program() {
   if (shader_program) {
     glUseProgram(0);
-    glDeleteShader(shader_program);
+    glDeleteProgram(shader_program);
     attrib_cache.clear();
     uniform_cache.clear();
   }
@@ -116,6 +117,53 @@ bool GLSLShader::link_program() {
     return false;
   }
 
+  // Find attribs
+  glUseProgram(shader_program);
+  GLint num_attribs = 0;
+  glGetProgramiv(shader_program, GL_ACTIVE_ATTRIBUTES, &num_attribs);
+  for (GLint i = 0; i < num_attribs; i++) {
+    char name[256];
+    GLsizei len = 0;
+    GLint size = 0;
+    GLenum type = 0;
+    glGetActiveAttrib(shader_program, i, sizeof(name), &len, &size, &type, name);
+    std::string name_str(name, len);
+
+    // if variable is an array and name_str ends with "[0]", remove it
+    if (name_str.length() > 3 && name_str.substr(name_str.length() - 3) == "[0]") {
+      name_str = name_str.substr(0, name_str.length() - 3);
+    }
+
+    GLint location = glGetAttribLocation(shader_program, name_str.c_str());
+
+    // std::cerr << bold_green << "info : found attrib " << name_str << " at location " << location << reset << std::endl;
+    attrib_cache.emplace_back(glk::hash(name_str), location);
+  }
+
+  // Find uniforms
+  GLint num_uniforms = 0;
+  glGetProgramiv(shader_program, GL_ACTIVE_UNIFORMS, &num_uniforms);
+  for (GLint i = 0; i < num_uniforms; i++) {
+    char name[256];
+    GLsizei len = 0;
+    GLint size = 0;
+    GLenum type = 0;
+    glGetActiveUniform(shader_program, i, sizeof(name), &len, &size, &type, name);
+    std::string name_str(name, len);
+
+    // if variable is an array and name_str ends with "[0]", remove it
+    if (name_str.length() > 3 && name_str.substr(name_str.length() - 3) == "[0]") {
+      name_str = name_str.substr(0, name_str.length() - 3);
+    }
+
+    GLint location = glGetUniformLocation(shader_program, name_str.c_str());
+
+    // std::cerr << bold_green << "info : found uniform " << name_str << " at location " << location << reset << std::endl;
+    uniform_cache.emplace_back(glk::hash(name_str), location);
+  }
+
+  glUseProgram(0);
+
   return true;
 }
 
@@ -135,63 +183,89 @@ bool GLSLShader::init(const std::vector<std::string>& vertex_shader_paths, const
   return link_program();
 }
 
-GLint GLSLShader::attrib(const std::string& name) {
-  auto found = attrib_cache.find(name);
+GLint GLSLShader::attrib(std::uint64_t name, const char* debug_msg) {
+  auto found = std::find_if(attrib_cache.begin(), attrib_cache.end(), [&name](const auto& pair) { return pair.first == name; });
   if (found != attrib_cache.end()) {
     return found->second;
+  } else {
+    // std::cerr << bold_yellow << "warning : attrib " << (debug_msg ? debug_msg : "N/A") << " (" << name << ")" << " not found" << reset << std::endl;
   }
 
-  GLint id = glGetAttribLocation(shader_program, name.c_str());
-  if (id == -1) {
-    std::cerr << bold_yellow << "warning : attrib " << name << " not found" << reset << std::endl;
+  attrib_cache.emplace_back(name, -1);
+  return -1;
+}
+
+GLint GLSLShader::attrib(const std::string& name) {
+  return attrib(glk::hash(name), name.c_str());
+}
+
+GLint GLSLShader::uniform(std::uint64_t name, const char* debug_msg) {
+  auto found = std::find_if(uniform_cache.begin(), uniform_cache.end(), [&name](const auto& pair) { return pair.first == name; });
+  if (found != uniform_cache.end()) {
+    return found->second;
+  } else {
+    // std::cerr << bold_yellow << "warning : uniform " << (debug_msg ? debug_msg : "N/A") << " (" << name << ")" << " not found" << reset << std::endl;
   }
 
-  attrib_cache[name] = id;
-  return id;
+  uniform_cache.emplace_back(name, -1);
+  return -1;
 }
 
 GLint GLSLShader::uniform(const std::string& name) {
-  auto found = uniform_cache.find(name);
-  if (found != uniform_cache.end()) {
+  return uniform(glk::hash(name), name.c_str());
+}
+
+GLint GLSLShader::subroutine(GLenum shader_type, std::uint64_t name, const char* debug_msg) {
+  auto found = std::find_if(subroutine_cache.begin(), subroutine_cache.end(), [&name](const auto& pair) { return pair.first == name; });
+  if (found != subroutine_cache.end()) {
     return found->second;
+  } else {
+    // std::cerr << bold_yellow << "warning : subroutine " << (debug_msg ? debug_msg : "N/A") << " (" << name << ")" << " not found" << reset << std::endl;
   }
 
-  GLint id = glGetUniformLocation(shader_program, name.c_str());
-  if (id == -1) {
-    // std::cerr << bold_yellow << "warning : uniform " << name << " not found" << reset << std::endl;
-  }
-
-  uniform_cache[name] = id;
-  return id;
+  subroutine_cache.emplace_back(name, -1);
+  return -1;
 }
 
 GLint GLSLShader::subroutine(GLenum shader_type, const std::string& name) {
-  auto found = subroutine_cache.find(name);
-  if (found != subroutine_cache.end()) {
-    return found->second;
+  const std::uint64_t h = glk::hash(name);
+  GLint id = subroutine(shader_type, h, name.c_str());
+  if (id != -1) {
+    return id;
   }
 
-  GLint id = glGetSubroutineIndex(shader_program, shader_type, name.c_str());
+  id = glGetSubroutineIndex(shader_program, shader_type, name.c_str());
   if (id == -1) {
-    std::cerr << bold_yellow << "warning : subroutine " << name << " not found" << reset << std::endl;
+    // std::cerr << bold_yellow << "warning : subroutine " << name << " not found" << reset << std::endl;
   }
 
-  subroutine_cache[name] = id;
+  subroutine_cache.emplace_back(h, id);
   return id;
 }
 
-GLint GLSLShader::subroutine_uniform(GLenum shader_type, const std::string& name) {
-  auto found = uniform_cache.find(name);
+GLint GLSLShader::subroutine_uniform(GLenum shader_type, std::uint64_t name, const char* debug_msg) {
+  auto found = std::find_if(uniform_cache.begin(), uniform_cache.end(), [&name](const auto& pair) { return pair.first == name; });
   if (found != uniform_cache.end()) {
     return found->second;
+  } else {
+    // std::cerr << bold_yellow << "warning : subroutine uniform " << (debug_msg ? debug_msg : "N/A") << " (" << name << ")" << " not found" << reset << std::endl;
+    return -1;
+  }
+}
+
+GLint GLSLShader::subroutine_uniform(GLenum shader_type, const std::string& name) {
+  const std::uint64_t h = glk::hash(name);
+  GLint id = subroutine_uniform(shader_type, h, name.c_str());
+  if (id != -1) {
+    return id;
   }
 
-  GLint id = glGetSubroutineUniformLocation(shader_program, shader_type, name.c_str());
+  id = glGetSubroutineUniformLocation(shader_program, shader_type, name.c_str());
   if (id == -1) {
-    std::cerr << bold_yellow << "warning : subroutine uniform " << name << " not found" << reset << std::endl;
+    // std::cerr << bold_yellow << "warning : subroutine uniform " << name << " not found" << reset << std::endl;
   }
 
-  uniform_cache[name] = id;
+  uniform_cache.emplace_back(h, id);
   return id;
 }
 
@@ -215,7 +289,8 @@ void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, cons
   glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
 }
 
-GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, const std::string& defines, GLuint shader_type) {
+GLuint
+GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, const std::string& defines, GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
 
   const auto read_source = [](const std::string& filename) -> std::string {
@@ -242,7 +317,7 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
     const std::string include_filename = match.str(2);
 
     std::string include_source;
-    if(include_filename == "define") {
+    if (include_filename == "define") {
       include_source = defines;
     } else {
       const auto found = include_map.find(include_filename);
@@ -306,7 +381,7 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
       if (std::regex_search(error_line, matched, std::regex("[0-9]+\\(([0-9]+)\\) : (error|warning)"))) {
         const int line = std::stoi(matched.str(1)) - 1;
 
-        if(line < source_lines.size()) {
+        if (line < source_lines.size()) {
           std::cout << console::cyan << "       :            : L" << line << "= " << source_lines[line] << console::reset << std::endl;
         } else {
           std::cout << console::cyan << "       :            : L" << line << "= out of source" << console::reset << std::endl;
@@ -316,6 +391,192 @@ GLuint GLSLShader::read_shader_from_file(const std::string& filename, const std:
   }
 
   return shader_id;
+}
+
+int GLSLShader::get_uniformi(std::uint64_t name) {
+  int value;
+  glGetUniformiv(shader_program, uniform(name), &value);
+  return value;
+}
+
+int GLSLShader::get_uniformi(const std::string& name) {
+  int value;
+  glGetUniformiv(shader_program, uniform(name), &value);
+  return value;
+}
+
+float GLSLShader::get_uniformf(std::uint64_t name) {
+  float value;
+  glGetUniformfv(shader_program, uniform(name), &value);
+  return value;
+}
+
+float GLSLShader::get_uniformf(const std::string& name) {
+  float value;
+  glGetUniformfv(shader_program, uniform(name), &value);
+  return value;
+}
+
+Eigen::Vector4f GLSLShader::get_uniform4f(std::uint64_t name) {
+  Eigen::Vector4f vec;
+  glGetUniformfv(shader_program, uniform(name), vec.data());
+  return vec;
+}
+
+Eigen::Vector4f GLSLShader::get_uniform4f(const std::string& name) {
+  Eigen::Vector4f vec;
+  glGetUniformfv(shader_program, uniform(name), vec.data());
+  return vec;
+}
+
+Eigen::Matrix4f GLSLShader::get_uniform_matrix4f(std::uint64_t name) {
+  Eigen::Matrix4f mat;
+  glGetUniformfv(shader_program, uniform(name), mat.data());
+  return mat;
+}
+
+Eigen::Matrix4f GLSLShader::get_uniform_matrix4f(const std::string& name) {
+  Eigen::Matrix4f mat;
+  glGetUniformfv(shader_program, uniform(name), mat.data());
+  return mat;
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, int value, const char* debug_msg) {
+  glUniform1i(uniform(name, debug_msg), value);
+  set_uniform_cache(name, value);
+}
+
+void GLSLShader::set_uniform(const std::string& name, int value) {
+  return set_uniform(glk::hash(name), value, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, float value, const char* debug_msg) {
+  glUniform1f(uniform(name, debug_msg), value);
+  set_uniform_cache(name, value);
+}
+
+void GLSLShader::set_uniform(const std::string& name, float value) {
+  return set_uniform(glk::hash(name), value, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector2f& vector, const char* debug_msg) {
+  glUniform2fv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector2f& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector3f& vector, const char* debug_msg) {
+  glUniform3fv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector3f& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector4f& vector, const char* debug_msg) {
+  glUniform4fv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector4f& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector2i& vector, const char* debug_msg) {
+  glUniform2iv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector2i& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector3i& vector, const char* debug_msg) {
+  glUniform3iv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector3i& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Vector4i& vector, const char* debug_msg) {
+  glUniform4iv(uniform(name, debug_msg), 1, vector.data());
+  set_uniform_cache(name, vector);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Vector4i& vector) {
+  return set_uniform(glk::hash(name), vector, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Matrix4f& matrix, const char* debug_msg) {
+  GLint loc = uniform(name, debug_msg);
+  if (loc >= 0) {
+    glUniformMatrix4fv(loc, 1, GL_FALSE, matrix.data());
+  }
+  set_uniform_cache(name, matrix);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Matrix4f& matrix) {
+  return set_uniform(glk::hash(name), matrix, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const std::vector<int>& vectors, const char* debug_msg) {
+  glUniform1iv(uniform(name, debug_msg), vectors.size(), vectors.data());
+  set_uniform_cache(name, vectors);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const std::vector<int>& vectors) {
+  return set_uniform(glk::hash(name), vectors, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const std::vector<float>& vectors, const char* debug_msg) {
+  glUniform1fv(uniform(name, debug_msg), vectors.size(), vectors.data());
+  set_uniform_cache(name, vectors);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const std::vector<float>& vectors) {
+  return set_uniform(glk::hash(name), vectors, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector2f>& vectors, const char* debug_msg) {
+  glUniform2fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  set_uniform_cache(name, vectors);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector2f>& vectors) {
+  return set_uniform(glk::hash(name), vectors, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector3f>& vectors, const char* debug_msg) {
+  glUniform3fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  set_uniform_cache(name, vectors);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector3f>& vectors) {
+  return set_uniform(glk::hash(name), vectors, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector4f>& vectors, const char* debug_msg) {
+  glUniform4fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  set_uniform_cache(name, vectors);
+}
+
+void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector4f>& vectors) {
+  return set_uniform(glk::hash(name), vectors, name.c_str());
+}
+
+void GLSLShader::set_uniform(std::uint64_t name, const Eigen::Matrix4d& matrix_, const char* debug_msg) {
+  Eigen::Matrix4f matrix = matrix_.cast<float>();
+  glUniformMatrix4fv(uniform(name, debug_msg), 1, GL_FALSE, matrix.data());
+}
+
+void GLSLShader::set_uniform(const std::string& name, const Eigen::Matrix4d& matrix_) {
+  set_uniform(glk::hash(name), matrix_, name.c_str());
 }
 
 }  // namespace glk

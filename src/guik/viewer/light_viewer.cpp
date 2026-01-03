@@ -112,11 +112,11 @@ void LightViewer::draw_ui() {
   if (decrease_point_size || increase_point_size) {
     auto point_size = global_shader_setting.get<float>("point_size");
     if (!point_size) {
-      point_size = 10.0f;
+      point_size = 0.025f;
     }
 
     const auto point_scale_mode = global_shader_setting.get<int>("point_scale_mode");
-    const float scaling_factor = (point_scale_mode && *point_scale_mode == guik::PointScaleMode::METRIC) ? 0.1f : 10.0f;
+    const float scaling_factor = (point_scale_mode && *point_scale_mode == guik::PointScaleMode::SCREENSPACE) ? 10.0f : 0.1f;
 
     if (decrease_point_size) {
       *point_size = point_size.value() - ImGui::GetIO().DeltaTime * scaling_factor;

@@ -9,7 +9,7 @@ namespace glk {
 
 class Flatize {
 public:
-  Flatize(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices_, const std::vector<int>& indices_) {
+  Flatize(const std::vector<Eigen::Vector3f>& vertices_, const std::vector<int>& indices_) {
     vertices.resize(indices_.size());
     normals.resize(indices_.size());
     indices.resize(indices_.size());
@@ -29,14 +29,14 @@ public:
   }
 
 public:
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;
+  std::vector<Eigen::Vector3f> vertices;
+  std::vector<Eigen::Vector3f> normals;
   std::vector<int> indices;
 };
 
 class NormalEstimater {
 public:
-  NormalEstimater(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices, const std::vector<int>& indices) {
+  NormalEstimater(const std::vector<Eigen::Vector3f>& vertices, const std::vector<int>& indices) {
     normals.resize(vertices.size(), Eigen::Vector3f::Zero());
     for (int i = 0; i < indices.size(); i += 3) {
       Eigen::Vector3f v1 = vertices[indices[i]];
@@ -56,7 +56,7 @@ public:
   }
 
 public:
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;
+  std::vector<Eigen::Vector3f> normals;
 };
 
 }  // namespace glk

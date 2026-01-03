@@ -1,8 +1,10 @@
 ![Iridescence](docs/assets/logo.png)
 
-**Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focusing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
+**Iridescence** is a light-weight visualization library for rapid prototyping of 3D algorithms. This library is designed for accelerating personal research and development projects (mainly focuing on point-cloud-related algorithms) and is NOT intended to be a general-purpose visualization library with rich rendering capabilities.
 
-[![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 20.04 / 22.04 / 24.04
+**[Documentation (en)](https://koide3.github.io/iridescence/)**, **[Documentation (日本語)](https://koide3.github.io/iridescence/ja)**, **[API(C++)](https://koide3.github.io/iridescence/doc_cpp/), [API(Python)](https://koide3.github.io/iridescence/doc_py/)**
+
+[![ppa](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.launchpad.net%2F1.0%2F~koide3%2F%2Barchive%2Fubuntu%2Firidescence%3Fws.op%3DgetPublishedSources%26status%3DPublished&query=entries.0.source_package_version&label=ppa)](https://launchpad.net/~koide3/+archive/ubuntu/iridescence) [![PyPI - Version](https://img.shields.io/pypi/v/pyridescence)](https://pypi.org/project/pyridescence/) [![Build](https://github.com/koide3/iridescence/actions/workflows/build.yml/badge.svg)](https://github.com/koide3/iridescence/actions/workflows/build.yml) on Ubuntu 22.04 / 24.04 and Windows
 
 ## Features
 
@@ -24,11 +26,33 @@ See **[documentation](https://koide3.github.io/iridescence/)** for details.
 - [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo) ([MIT license](https://github.com/CedricGuillemet/ImGuizmo/blob/master/LICENSE))
 - [implot](https://github.com/epezent/implot) ([MIT license](https://github.com/epezent/implot/blob/master/LICENSE))
 - [Eigen](https://eigen.tuxfamily.org/index.php) ([MPL2 license](https://www.mozilla.org/en-US/MPL/2.0/))
+- [rapidhash](https://github.com/Nicoshev/rapidhash) ([MIT license](https://github.com/Nicoshev/rapidhash/blob/master/LICENSE))
 - [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) ([WTFPL license](https://github.com/samhocevar/portable-file-dialogs/blob/main/COPYING))
 
 ## Installation
 
-### Install from source
+### C++ : Install from [PPA](https://launchpad.net/~koide3/+archive/ubuntu/iridescence) (Ubuntu)
+
+```bash
+# Install from PPA
+sudo add-apt-repository -y ppa:koide3/iridescence
+sudo apt install libiridescence-dev
+```
+
+### Python : Install from [PyPI](https://pypi.org/project/pyridescence/) (Ubuntu and Windows)
+
+Note : Source installation is required for Python 3.14.
+
+```bash
+# Install from PyPI
+pip install pyridescence
+```
+
+<details>
+  <summary>Install from source</summary>
+
+
+### C++ : Install from source (Ubuntu)
 
 ```bash
 # Install dependencies
@@ -40,52 +64,21 @@ mkdir iridescence/build && cd iridescence/build
 cmake ..
 make -j
 sudo make install
+```
 
-# [Optional] Build and install python bindings
-cd ..
+### Python : Install from source
+
+```bash
+git clone https://github.com/koide3/iridescence --recursive
+cd iridescence
 pip install .
-
-# [Optional2] Install stubs for autocomplete
-pip install pybind11-stubgen
-
-cd ~/.local/lib/python3.12/site-packages
-# If you are using a virtual environment, you can find the path with:
-# cd $(dirname $(which python))/../lib/python3.12/site-packages
-
-pybind11-stubgen -o . pyridescence
 ```
 
-### Install from [PPA](https://github.com/koide3/ppa) [AMD64, ARM64]
+</details>
 
-#### Ubuntu 24.04
+## Usage
 
-```bash
-curl -s --compressed "https://koide3.github.io/ppa/ubuntu2404/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
-echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2404 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
-
-sudo apt update && sudo apt install -y libiridescence-dev
-```
-
-#### Ubuntu 22.04
-
-```bash
-curl -s --compressed "https://koide3.github.io/ppa/ubuntu2204/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
-echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2204 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
-
-sudo apt update && sudo apt install -y libiridescence-dev
-```
-
-#### Ubuntu 20.04
-
-```bash
-curl -s --compressed "https://koide3.github.io/ppa/ubuntu2004/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/koide3_ppa.gpg >/dev/null
-echo "deb [signed-by=/etc/apt/trusted.gpg.d/koide3_ppa.gpg] https://koide3.github.io/ppa/ubuntu2004 ./" | sudo tee /etc/apt/sources.list.d/koide3_ppa.list
-
-sudo apt update && sudo apt install -y libiridescence-dev
-```
-
-
-## Use Iridescence in your cmake project
+### C++ : Use Iridescence in your cmake project
 
 ```cmake
 # Find package
@@ -101,7 +94,7 @@ target_link_libraries(your_program
 ```
 
 
-## Minimum example
+### C++ : Minimum example
 
 C++:
 ```cpp
@@ -128,8 +121,10 @@ int main(int argc, char** argv) {
   // Spin the viewer until it gets closed
   while (viewer->spin_once()) {
     // Objects to be rendered are called "drawables" and managed with unique names.
-    // Here, solid and wire spheres are registered to the viewer respectively with the "Rainbow" and "FlatColor" coloring schemes.
-    // The "Rainbow" coloring scheme encodes the height of each fragment using the turbo colormap by default.
+    // Here, solid and wire spheres are registered to the viewer respectively with
+    // the "Rainbow" and "FlatColor" coloring schemes.
+    // The "Rainbow" coloring scheme encodes the height of each fragment using the
+    // turbo colormap by default.
     Eigen::AngleAxisf transform(angle, Eigen::Vector3f::UnitZ());
     viewer->update_drawable("sphere", glk::Primitives::sphere(), guik::Rainbow(transform));
     viewer->update_drawable("wire_sphere", glk::Primitives::wire_sphere(), guik::FlatColor({0.1f, 0.7f, 1.0f, 1.0f}, transform));
@@ -139,8 +134,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-<details>
-  <summary>Python version</summary>
+### Python : Minimum example
 
 ```py
 #!/usr/bin/python3
@@ -171,16 +165,16 @@ viewer.register_ui_callback('ui', ui_callback)
 # Spin the viewer until it gets closed
 while viewer.spin_once():
   # Objects to be rendered are called "drawables" and managed with unique names.
-  # Here, solid and wire spheres are registered to the viewer respectively with the "Rainbow" and "FlatColor" coloring schemes.
-  # The "Rainbow" coloring scheme encodes the height of each fragment using the turbo colormap by default.
+  # Here, solid and wire spheres are registered to the viewer respectively with
+  # the "Rainbow" and "FlatColor" coloring schemes.
+  # The "Rainbow" coloring scheme encodes the height of each fragment using the
+  # turbo colormap by default.
   transform = numpy.identity(4)
   transform[:3, :3] = Rotation.from_rotvec([0.0, 0.0, angle]).as_matrix()
   viewer.update_drawable('sphere', glk.primitives.sphere(), guik.Rainbow(transform))
   viewer.update_drawable('wire_sphere', glk.primitives.wire_sphere(), guik.FlatColor(0.1, 0.7, 1.0, 1.0, transform))
 
 ```
-</details>
-
 
 ![example_01](https://user-images.githubusercontent.com/31344317/210127177-31630466-f8a1-45b6-8bc7-2fdd2e4c9548.gif)
 

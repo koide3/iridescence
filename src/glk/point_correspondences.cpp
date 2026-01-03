@@ -9,8 +9,8 @@ PointCorrespondences::PointCorrespondences(
   const pcl::shared_ptr<const pcl::PointCloud<PointT>>& source_cloud,
   const pcl::shared_ptr<const pcl::PointCloud<PointT>>& target_cloud,
   const pcl::CorrespondencesConstPtr& correspondences) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices(correspondences->size() * 2);
-  for(const auto& c: *correspondences) {
+  std::vector<Eigen::Vector3f> vertices(correspondences->size() * 2);
+  for (const auto& c : *correspondences) {
     vertices.push_back(source_cloud->at(c.index_query).getVector3fMap());
     vertices.push_back(target_cloud->at(c.index_match).getVector3fMap());
   }

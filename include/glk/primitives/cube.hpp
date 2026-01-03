@@ -17,18 +17,18 @@ public:
     // | 2 -----| 3   Y
     // |/       |/
     // 0 ------ 1
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices = {
-        Eigen::Vector3f(-0.5f, -0.5f, -0.5f),  // 0
-        Eigen::Vector3f(-0.5f, -0.5f, 0.5f),   // 1
-        Eigen::Vector3f(-0.5f, 0.5f, -0.5f),   // 2
-        Eigen::Vector3f(-0.5f, 0.5f, 0.5f),    // 3
-        Eigen::Vector3f(0.5f, -0.5f, -0.5f),   // 4
-        Eigen::Vector3f(0.5f, -0.5f, 0.5f),    // 5
-        Eigen::Vector3f(0.5f, 0.5f, -0.5f),    // 6
-        Eigen::Vector3f(0.5f, 0.5f, 0.5f),     // 7
+    std::vector<Eigen::Vector3f> vertices = {
+      Eigen::Vector3f(-0.5f, -0.5f, -0.5f),  // 0
+      Eigen::Vector3f(-0.5f, -0.5f, 0.5f),   // 1
+      Eigen::Vector3f(-0.5f, 0.5f, -0.5f),   // 2
+      Eigen::Vector3f(-0.5f, 0.5f, 0.5f),    // 3
+      Eigen::Vector3f(0.5f, -0.5f, -0.5f),   // 4
+      Eigen::Vector3f(0.5f, -0.5f, 0.5f),    // 5
+      Eigen::Vector3f(0.5f, 0.5f, -0.5f),    // 6
+      Eigen::Vector3f(0.5f, 0.5f, 0.5f),     // 7
     };
 
-    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals(vertices.size());
+    std::vector<Eigen::Vector3f> normals(vertices.size());
     for (int i = 0; i < vertices.size(); i++) {
       normals[i] = vertices[i].normalized();
     }
@@ -40,8 +40,8 @@ public:
   }
 
 public:
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals;
+  std::vector<Eigen::Vector3f> vertices;
+  std::vector<Eigen::Vector3f> normals;
   std::vector<int> indices;
 };
 

@@ -131,6 +131,12 @@ void Application::maximize_window() {
   glfwMaximizeWindow(window);
 }
 
+void Application::fullscreen_window() {
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+  glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+}
+
 void Application::resize(const Eigen::Vector2i& size) {
   glfwSetWindowSize(window, size[0], size[1]);
 }

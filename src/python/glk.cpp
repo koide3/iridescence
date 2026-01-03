@@ -18,6 +18,30 @@
 
 namespace py = pybind11;
 
+bool check_valid_points(const py::array_t<float, py::array::c_style | py::array::forcecast>& points) {
+  if (points.ndim() != 2) {
+    std::cerr << "points must be 2-dimensional (ndim=" << points.ndim() << ")" << std::endl;
+    return false;
+  }
+  if (points.shape(1) != 3 && points.shape(1) != 4) {
+    std::cerr << "points must have 3 or 4 columns (cols=" << points.shape(1) << ")" << std::endl;
+    return false;
+  }
+  return true;
+}
+
+bool check_valid_colors(const py::array_t<float, py::array::c_style | py::array::forcecast>& points) {
+  if (points.ndim() != 2) {
+    std::cerr << "points must be 2-dimensional (ndim=" << points.ndim() << ")" << std::endl;
+    return false;
+  }
+  if (points.shape(1) != 4) {
+    std::cerr << "points must have 4 columns (cols=" << points.shape(1) << ")" << std::endl;
+    return false;
+  }
+  return true;
+}
+
 void define_glk(py::module_& m) {
   py::module_ gl_ = m.def_submodule("gl", "");
   py::module_ glk_ = m.def_submodule("glk", "");
@@ -68,6 +92,36 @@ void define_glk(py::module_& m) {
   // glk::ThinLines
   py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines")
     .def(
+      py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points, bool line_strip) {
+        if (!check_valid_points(points)) {
+          throw std::runtime_error("invalid points array");
+        }
+
+        return std::make_shared<glk::ThinLines>(points.data(), points.shape(0), line_strip);
+      }),
+      py::arg("points"),
+      py::arg("line_strip") = false)
+    .def(
+      py::init([](
+                 const py::array_t<float, py::array::c_style | py::array::forcecast>& points,
+                 const py::array_t<float, py::array::c_style | py::array::forcecast>& colors,
+                 bool line_strip) {
+        if (!check_valid_points(points)) {
+          throw std::runtime_error("invalid points array");
+        }
+        if (!check_valid_colors(colors)) {
+          throw std::runtime_error("invalid colors array");
+        }
+        if (points.shape(0) != colors.shape(0)) {
+          throw std::runtime_error("points and colors must have the same number of rows");
+        }
+
+        return std::make_shared<glk::ThinLines>(points.data(), colors.data(), points.shape(0), line_strip);
+      }),
+      py::arg("points"),
+      py::arg("colors"),
+      py::arg("line_strip") = false)
+    .def(
       py::init([](const std::vector<Eigen::Vector3f>& points, bool line_strip) { return std::make_shared<glk::ThinLines>(points, line_strip); }),
       "",
       py::arg("points"),
@@ -106,7 +160,7 @@ void define_glk(py::module_& m) {
         }
 
         if (c.size()) {
-          std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(size, Eigen::Vector4f::Zero());
+          std::vector<Eigen::Vector4f> colors(size, Eigen::Vector4f::Zero());
           for (int i = 0; i < size && i < c.size(); i++) {
             colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
           }
@@ -126,11 +180,32 @@ void define_glk(py::module_& m) {
 
   // glk::Lines
   py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
+    .def(py::init<float, const std::vector<Eigen::Vector3f>&, const std::vector<Eigen::Vector4f>&>(), py::arg("thickness"), py::arg("vertices"), py::arg("colors"))
     .def(
-      py::init<
-        float,
-        const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&,
-        const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>&>(),
+      py::init([](
+                 float thickness,
+                 const py::array_t<float, py::array::c_style | py::array::forcecast>& vertices,
+                 const py::array_t<float, py::array::c_style | py::array::forcecast>& colors) {
+        if (!check_valid_points(vertices)) {
+          throw std::runtime_error("invalid vertices array");
+        }
+        if (!check_valid_colors(colors)) {
+          throw std::runtime_error("invalid colors array");
+        }
+        if (vertices.shape(0) != colors.shape(0)) {
+          throw std::runtime_error("vertices and colors must have the same number of rows");
+        }
+
+        std::vector<Eigen::Vector3f> vertices_vec(vertices.shape(0));
+        std::vector<Eigen::Vector4f> colors_vec(colors.shape(0));
+
+        for (int i = 0; i < vertices.shape(0); i++) {
+          vertices_vec[i] = Eigen::Vector3f(vertices.at(i, 0), vertices.at(i, 1), vertices.at(i, 2));
+          colors_vec[i] = Eigen::Vector4f(colors.at(i, 0), colors.at(i, 1), colors.at(i, 2), colors.at(i, 3));
+        }
+
+        return std::make_shared<glk::Lines>(thickness, vertices_vec, colors_vec);
+      }),
       py::arg("thickness"),
       py::arg("vertices"),
       py::arg("colors"))
@@ -148,7 +223,7 @@ void define_glk(py::module_& m) {
           size = std::min<int>(size, z.size());
         }
 
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
+        std::vector<Eigen::Vector3f> vertices((size - 1) * 2, Eigen::Vector3f::Zero());
         for (int i = 1; i < size && i < x.size(); i++) {
           vertices[(i - 1) * 2].x() = x[i - 1];
           vertices[(i - 1) * 2 + 1].x() = x[i];
@@ -164,7 +239,7 @@ void define_glk(py::module_& m) {
           vertices[(i - 1) * 2 + 1].z() = z[i];
         }
 
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+        std::vector<Eigen::Vector4f> colors;
         if (c.size()) {
           colors.reserve((size - 1) * 2);
           for (int i = 1; i < size && i < c.size(); i++) {
@@ -185,28 +260,72 @@ void define_glk(py::module_& m) {
 
   // glk::PointCloudBuffer
   py::class_<glk::PointCloudBuffer, glk::Drawable, std::shared_ptr<glk::PointCloudBuffer>>(glk_, "PointCloudBuffer")
-    .def(py::init<const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>&>())
+    .def(
+      py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points) {
+        if (!check_valid_points(points)) {
+          throw std::runtime_error("invalid points array");
+        }
+
+        return std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * points.shape(1), points.shape(0));
+      }),
+      py::arg("points"))
+    .def(py::init<const std::vector<Eigen::Vector3f>&>())
+    .def(py::init([](const std::vector<Eigen::Vector3f>& points) { return std::make_shared<glk::PointCloudBuffer>(points); }), py::arg("points"))
     .def(
       "add_normals",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals) { buffer.add_normals(normals); },
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& normals) { buffer.add_normals(normals); },
+      py::arg("normals"))
+    .def(
+      "add_normals",
+      [](glk::PointCloudBuffer& buffer, const py::array_t<float, py::array::c_style | py::array::forcecast>& normals) {
+        if (!check_valid_points(normals)) {
+          throw std::runtime_error("invalid normals array");
+        }
+
+        std::vector<Eigen::Vector3f> normals_vec(normals.shape(0));
+        for (int i = 0; i < normals.shape(0); i++) {
+          normals_vec[i] = Eigen::Vector3f(normals.at(i, 0), normals.at(i, 1), normals.at(i, 2));
+        }
+        buffer.add_normals(normals_vec);
+      },
       py::arg("normals"))
     .def(
       "add_color",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& colors) {
-        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_(colors.size());
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& colors) {
+        std::vector<Eigen::Vector4f> colors_(colors.size());
         std::transform(colors.begin(), colors.end(), colors_.begin(), [](const Eigen::Vector3f& c) { return Eigen::Vector4f(c.x(), c.y(), c.z(), 1.0f); });
         buffer.add_color(colors_);
       },
       py::arg("colors"))
     .def(
       "add_color",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>>& colors) { buffer.add_color(colors); },
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f>& colors) { buffer.add_color(colors); },
+      py::arg("colors"))
+    .def(
+      "add_color",
+      [](glk::PointCloudBuffer& buffer, const py::array_t<float, py::array::c_style | py::array::forcecast>& colors) {
+        if (!check_valid_colors(colors)) {
+          throw std::runtime_error("invalid colors array");
+        }
+
+        std::vector<Eigen::Vector4f> colors_vec(colors.shape(0));
+        for (int i = 0; i < colors.shape(0); i++) {
+          colors_vec[i] = Eigen::Vector4f(colors.at(i, 0), colors.at(i, 1), colors.at(i, 2), colors.at(i, 3));
+        }
+        buffer.add_color(colors_vec);
+      },
       py::arg("colors"))
     .def(
       "add_intensity",
       [](glk::PointCloudBuffer& buffer, glk::COLORMAP colormap, const std::vector<float>& intensities, float scale) { buffer.add_intensity(colormap, intensities, scale); },
       py::arg("colormap"),
       py::arg("intensities"),
+      py::arg("scale") = 1.0f)
+    .def("set_colormap_buffer", &glk::PointCloudBuffer::set_colormap_buffer, py::arg("colormap_buffer"))
+    .def(
+      "add_colormap",
+      [](glk::PointCloudBuffer& buffer, std::vector<float>& cmap, float scale) { buffer.add_colormap(cmap, scale); },
+      py::arg("cmap"),
       py::arg("scale") = 1.0f)
     .def(
       "add_buffer",
@@ -267,6 +386,44 @@ void define_glk(py::module_& m) {
     },
     py::arg("image_uint8"));
 
+  glk_.def(
+    "create_texture_f",
+    [](py::array_t<float, py::array::c_style | py::array::forcecast> arr) -> std::shared_ptr<glk::Texture> {
+      if (arr.ndim() != 2 && arr.ndim() != 3) {
+        std::cerr << "ndim must be 2 or 3 (ndim=" << arr.ndim() << ")" << std::endl;
+        return nullptr;
+      }
+
+      const int height = arr.shape(0);
+      const int width = arr.shape(1);
+
+      if (arr.ndim() == 2) {
+        return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, GL_RED, GL_FLOAT, arr.data());
+      }
+
+      GLuint format = GL_BGR;
+      switch (arr.shape(2)) {
+        default:
+          std::cerr << "warning: invalid ch=" << arr.shape(2) << std::endl;
+          break;
+        case 1:
+          format = GL_RED;
+          break;
+        case 2:
+          format = GL_RG;
+          break;
+        case 3:
+          format = GL_BGR;
+          break;
+        case 4:
+          format = GL_BGRA;
+          break;
+      }
+
+      return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, format, GL_FLOAT, arr.data());
+    },
+    py::arg("image_float"));
+
   // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
   py::class_<glk::NaiveScreenSpaceAmbientOcclusion, glk::ScreenEffect, std::shared_ptr<glk::NaiveScreenSpaceAmbientOcclusion>>(glk_, "NaiveScreenSpaceAmbientOcclusion")
@@ -316,6 +473,7 @@ void define_glk(py::module_& m) {
     .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, "");
 
   // methods
+  glk_.def("get_data_path", glk::get_data_path, "");
   glk_.def("set_data_path", &glk::set_data_path, "");
   glk_.def(
     "create_pointcloud_buffer",

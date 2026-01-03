@@ -11,15 +11,15 @@ Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Ve
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
-  std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>> infos;
+  std::vector<Eigen::Vector3f> vertices;
+  std::vector<Eigen::Vector4f> colors;
+  std::vector<Eigen::Vector4i> infos;
   if (!line_strip) {
     vertices.assign(vertices_, vertices_ + num_points);
-    if(colors_) {
+    if (colors_) {
       colors.assign(colors_, colors_ + num_points);
     }
-    if(infos_) {
+    if (infos_) {
       infos.assign(infos_, infos_ + num_points);
     }
   } else {
@@ -41,7 +41,7 @@ Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Ve
 
   num_vertices = vertices.size();
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices_ext(vertices.size() * 4);
+  std::vector<Eigen::Vector3f> vertices_ext(vertices.size() * 4);
   for (int i = 0; i < vertices.size(); i += 2) {
     Eigen::Vector3f direction = vertices[i + 1] - vertices[i];
     Eigen::Vector3f axis = std::abs(direction.normalized().dot(Eigen::Vector3f::UnitZ())) < 0.9f ? Eigen::Vector3f::UnitZ() : Eigen::Vector3f::UnitX();
@@ -65,7 +65,7 @@ Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Ve
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices_ext.size() * 3, vertices_ext.data(), GL_STATIC_DRAW);
 
   if (!colors.empty()) {
-    std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors_ext(colors.size() * 4);
+    std::vector<Eigen::Vector4f> colors_ext(colors.size() * 4);
     for (int i = 0; i < colors.size(); i += 2) {
       for (int j = 0; j < 4; j++) {
         colors_ext[i * 4 + j * 2] = colors[i];
@@ -78,7 +78,7 @@ Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Ve
   }
 
   if (!infos.empty()) {
-    std::vector<Eigen::Vector4i, Eigen::aligned_allocator<Eigen::Vector4i>> infos_ext(infos.size() * 4);
+    std::vector<Eigen::Vector4i> infos_ext(infos.size() * 4);
     for (int i = 0; i < infos.size(); i += 2) {
       for (int j = 0; j < 4; j++) {
         infos_ext[i * 4 + j * 2] = infos[i];
@@ -122,7 +122,8 @@ Lines::Lines(float line_width, const Eigen::Vector3f* vertices_, const Eigen::Ve
 
 Lines::Lines(float line_width, const Eigen::Vector3f* vertices, int num_points, bool line_strip) : Lines(line_width, vertices, nullptr, nullptr, num_points, line_strip) {}
 
-Lines::Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip) : Lines(line_width, vertices, colors, nullptr, num_points, line_strip) {}
+Lines::Lines(float line_width, const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_points, bool line_strip)
+: Lines(line_width, vertices, colors, nullptr, num_points, line_strip) {}
 
 Lines::~Lines() {
   glDeleteBuffers(1, &vbo);

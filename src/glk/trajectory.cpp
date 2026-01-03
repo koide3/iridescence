@@ -7,9 +7,9 @@
 
 namespace glk {
 
-Trajectory::Trajectory(const std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>& trajectory) : trajectory(trajectory) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> line_vertices;
-  for(int i = 1; i < trajectory.size(); i++) {
+Trajectory::Trajectory(const std::vector<Eigen::Isometry3f>& trajectory) : trajectory(trajectory) {
+  std::vector<Eigen::Vector3f> line_vertices;
+  for (int i = 1; i < trajectory.size(); i++) {
     line_vertices.push_back(trajectory[i - 1].translation());
     line_vertices.push_back(trajectory[i].translation());
   }
@@ -22,8 +22,8 @@ Trajectory::Trajectory(int num_frames, const std::function<Eigen::Isometry3f(int
     trajectory[i] = adapter(i);
   }
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> line_vertices;
-  for(int i = 1; i < trajectory.size(); i++) {
+  std::vector<Eigen::Vector3f> line_vertices;
+  for (int i = 1; i < trajectory.size(); i++) {
     line_vertices.push_back(trajectory[i - 1].translation());
     line_vertices.push_back(trajectory[i].translation());
   }
@@ -34,7 +34,7 @@ Trajectory::~Trajectory() {}
 
 void Trajectory::draw(glk::GLSLShader& shader) const {
   shader.set_uniform("color_mode", 2);
-  for(int i = 0; i < trajectory.size(); i++) {
+  for (int i = 0; i < trajectory.size(); i++) {
     shader.set_uniform("model_matrix", trajectory[i].matrix());
     glk::Primitives::coordinate_system()->draw(shader);
   }

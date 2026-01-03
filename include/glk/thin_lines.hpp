@@ -21,10 +21,15 @@ public:
   ThinLines(const float* vertices, int num_vertices, bool line_strip = false);
   ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip = false);
   ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
+  ThinLines(const float* vertices, const float* colors, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
 
   ThinLines(const Eigen::Vector3f* vertices, int num_vertices, bool line_strip = false);
   ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, bool line_strip = false);
   ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
+  ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, bool line_strip = false);
+  ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, bool line_strip = false);
+  ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
+  ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
 
   template <typename T1, int D1>
   ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, int num_vertices, bool line_strip = false);
@@ -40,6 +45,14 @@ public:
     const unsigned int* indices,
     int num_indices,
     bool line_strip = false);
+  template <typename T1, int D1>
+  ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const float* cmap, int num_vertices, bool line_strip = false);
+  template <typename T1, int D1>
+  ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const double* cmap, int num_vertices, bool line_strip = false);
+  template <typename T1, int D1>
+  ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
+  template <typename T1, int D1>
+  ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const double* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip = false);
 
   template <typename T1, int D1, typename Allocator>
   ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, bool line_strip = false);
@@ -53,6 +66,14 @@ public:
     const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
     const std::vector<unsigned int>& indices,
     bool line_strip = false);
+  template <typename T1, int D1, typename Allocator>
+  ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<float>& cmap, bool line_strip = false);
+  template <typename T1, int D1, typename Allocator>
+  ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<double>& cmap, bool line_strip = false);
+  template <typename T1, int D1, typename Allocator>
+  ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<float>& cmap, const std::vector<unsigned int>& indices, bool line_strip = false);
+  template <typename T1, int D1, typename Allocator>
+  ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<double>& cmap, const std::vector<unsigned int>& indices, bool line_strip = false);
 
   virtual ~ThinLines() override;
 
@@ -73,6 +94,7 @@ private:
   GLuint vao;   // vertex array object
   GLuint vbo;   // vertices
   GLuint cbo;   // colors
+  GLuint cmbo;  // colormap
   GLuint ebo;   // indices
 };
 
@@ -110,6 +132,22 @@ ThinLines::ThinLines(
     num_indices,
     line_strip) {}
 
+template <typename T1, int D1>
+ThinLines::ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const float* cmap, int num_vertices, bool line_strip)
+: ThinLines(convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), cmap, num_vertices, nullptr, 0, line_strip) {}
+
+template <typename T1, int D1>
+ThinLines::ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
+: ThinLines(convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), cmap, num_vertices, indices, num_indices, line_strip) {}
+
+template <typename T1, int D1>
+ThinLines::ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const double* cmap, int num_vertices, bool line_strip)
+: ThinLines(convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), cmap, num_vertices, nullptr, 0, line_strip) {}
+
+template <typename T1, int D1>
+ThinLines::ThinLines(const Eigen::Matrix<T1, D1, 1>* vertices, const double* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
+: ThinLines(convert_to_vector<float, 3, 1>(vertices, num_vertices).data(), cmap, num_vertices, indices, num_indices, line_strip) {}
+
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, bool line_strip) : ThinLines(vertices.data(), vertices.size(), line_strip) {}
 
@@ -128,6 +166,22 @@ ThinLines::ThinLines(
   const std::vector<unsigned int>& indices,
   bool line_strip)
 : ThinLines(vertices.data(), colors.data(), vertices.size(), indices.data(), indices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator>
+ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<float>& cmap, bool line_strip)
+: ThinLines(vertices.data(), cmap.data(), vertices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator>
+ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<float>& cmap, const std::vector<unsigned int>& indices, bool line_strip)
+: ThinLines(vertices.data(), cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator>
+ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<double>& cmap, bool line_strip)
+: ThinLines(vertices.data(), cmap.data(), vertices.size(), line_strip) {}
+
+template <typename T1, int D1, typename Allocator>
+ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<double>& cmap, const std::vector<unsigned int>& indices, bool line_strip)
+: ThinLines(vertices.data(), cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip) {}
 
 }  // namespace glk
 

@@ -26,14 +26,14 @@ OrbitCameraControlXZ::~OrbitCameraControlXZ() {}
 void OrbitCameraControlXZ::drag(const Eigen::Vector2f& p, int button) {
   Eigen::Vector2f rel = p - drag_last_pos;
 
-  if(left_button_down) {
+  if (left_button_down && right_button_down) {
+    center.y() -= rel[1] * distance * 0.001f;
+  } else if (left_button_down) {
     theta -= rel[0] * 0.01f;
     phi -= rel[1] * 0.01f;
 
     phi = std::min(M_PI_2 - 0.01, std::max(-M_PI_2 + 0.01, phi));
-  }
-
-  if(middle_button_down) {
+  } else if (middle_button_down || right_button_down) {
     center += Eigen::AngleAxisf(theta + M_PI_2, -Eigen::Vector3f::UnitY()) * Eigen::Vector3f(rel[1], 0.0f, rel[0]) * distance * 0.001f;
   }
 
@@ -53,7 +53,6 @@ Eigen::Matrix4f OrbitCameraControlXZ::view_matrix() const {
   glm::mat4 mat = glm::lookAt(glm::vec3(eye[0], eye[1], eye[2]), glm::vec3(center_[0], center_[1], center_[2]), glm::vec3(up[0], up[1], up[2]));
   return Eigen::Map<Eigen::Matrix4f>(glm::value_ptr(mat)).eval();
 }
-
 
 void OrbitCameraControlXZ::load(std::istream& ist) {
   OrbitCameraControlXY::load(ist);

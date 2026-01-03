@@ -280,6 +280,18 @@ void LightViewerContext::set_bg_texture(const std::shared_ptr<glk::Texture>& bg_
   canvas->set_bg_texture(bg_texture);
 }
 
+void LightViewerContext::set_rainbow_range(const Eigen::Vector2f& minmax_z) {
+  shader_setting().set_rainbow_range(minmax_z);
+}
+
+void LightViewerContext::set_rainbow_axis(const Eigen::Vector3f& axis) {
+  shader_setting().set_rainbow_axis(axis);
+}
+
+void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  shader_setting().set_point_shape(point_size, metric, circle);
+}
+
 void LightViewerContext::enable_decimal_rendering() {
   decimal_rendering = true;
 }
@@ -516,21 +528,6 @@ std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(dou
   canvas->camera_control = fps_camera_control;
   canvas->projection_control = fps_camera_control;
   return fps_camera_control;
-}
-
-void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
-  shader_setting().set_point_size(point_size);
-  if (metric) {
-    shader_setting().set_point_scale_metric();
-  } else {
-    shader_setting().set_point_scale_screenspace();
-  }
-
-  if (circle) {
-    shader_setting().set_point_shape_circle();
-  } else {
-    shader_setting().set_point_shape_rectangle();
-  }
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
