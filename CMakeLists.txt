@@ -90,6 +90,8 @@ if(MSVC)
   add_compile_definitions(_USE_MATH_DEFINES)
   add_compile_options(/wd4018 /wd4244 /wd4267 /wd4305 /wd4312)
   add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+  # Enable parallel compilation
+  add_compile_options(/MP)
 else()
   list(APPEND EXTRA_LIBRARIES dl)
   list(APPEND EXTRA_LIBRARIES pthread)
