@@ -4,6 +4,9 @@ Changelog for package iridescence
 
 Forthcoming
 -----------
+* 1.0.1
+* add set_colormap_range
+* Contributors: k.koide
 
 1.0.0 (2026-01-03)
 ------------------
