@@ -288,6 +288,10 @@ void LightViewerContext::set_rainbow_axis(const Eigen::Vector3f& axis) {
   shader_setting().set_rainbow_axis(axis);
 }
 
+void LightViewerContext::set_colormap_range(const Eigen::Vector2f& minmax) {
+  shader_setting().set_colormap_range(minmax);
+}
+
 void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
   shader_setting().set_point_shape(point_size, metric, circle);
 }

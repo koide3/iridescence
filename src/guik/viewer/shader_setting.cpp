@@ -84,6 +84,10 @@ ShaderSetting& ShaderSetting::set_rainbow_axis(const Eigen::Vector3f& axis) {
   return add("colormap_axis", axis);
 }
 
+ShaderSetting& ShaderSetting::set_colormap_range(const Eigen::Vector2f& minmax) {
+  return add("cmap_range", minmax);
+}
+
 float ShaderSetting::point_scale() const {
   auto& p = params[1];
   return p.get_value<float>();

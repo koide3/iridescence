@@ -92,6 +92,9 @@ public:
   /// @brief Set axis of color mapping for RAINBOW mode.
   void set_rainbow_axis(const Eigen::Vector3f& axis);
 
+  /// @brief Set range of color mapping for VERTEX_COLORMAP mode.
+  void set_colormap_range(const Eigen::Vector2f& minmax);
+
   /// @brief Set point shape properties.
   /// @param point_size   Point size
   /// @param metric       If true, point size is in the metric unit [m], otherwise in pixel unit.

@@ -349,6 +349,9 @@ public:
   /// @brief Set RAINBOW coloring axis.
   ShaderSetting& set_rainbow_axis(const Eigen::Vector3f& axis);
 
+  /// @brief  Set VERTEX_COLORMAP color range.
+  ShaderSetting& set_colormap_range(const Eigen::Vector2f& minmax);
+
   // Point size and scale
   /// @brief Get point size scale factor.
   float point_scale() const;
