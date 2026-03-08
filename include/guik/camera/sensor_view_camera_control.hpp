@@ -34,8 +34,22 @@ public:
   /// @brief Set the raw sensor pose (T_world_sensor).
   void set_sensor_pose(const Eigen::Isometry3f& T_world_sensor);
 
+  /// @brief Set the raw sensor pose using a generic transform.
+  template <typename Transform>
+  void set_sensor_pose(const Transform& T_world_sensor) {
+    Eigen::Isometry3f T(T_world_sensor.template cast<float>().matrix());
+    set_sensor_pose(T);
+  }
+
   /// @brief Set the transform from sensor frame to camera frame (T_sensor_camera).
   void set_sensor_camera_transform(const Eigen::Isometry3f& T_sensor_camera);
+
+  /// @brief Set the transform from sensor frame to camera frame using a generic transform.
+  template <typename Transform>
+  void set_sensor_camera_transform(const Transform& T_sensor_camera) {
+    Eigen::Isometry3f T(T_sensor_camera.template cast<float>().matrix());
+    set_sensor_camera_transform(T);
+  }
 
   virtual void mouse(const Eigen::Vector2f& p, int button, bool down) override;
   virtual void drag(const Eigen::Vector2f& p, int button) override;
