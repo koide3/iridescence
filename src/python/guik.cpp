@@ -18,6 +18,7 @@
 #include <guik/camera/arcball_camera_control.hpp>
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
+#include <guik/camera/sensor_view_camera_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
@@ -274,7 +275,8 @@ void define_guik(py::module_& m) {
   // guik::CameraControl
   py::class_<guik::CameraControl, std::shared_ptr<guik::CameraControl>>(guik_, "CameraControl")
     .def("reset_center", &guik::CameraControl::reset_center)
-    .def("lookat", &guik::CameraControl::lookat)
+    .def("lookat", [](guik::CameraControl& control, const Eigen::Vector3f& pt) { control.lookat(pt); })
+    .def("lookat", [](guik::CameraControl& control, const Eigen::Matrix4f& T_world_sensor) { control.lookat(Eigen::Isometry3f(T_world_sensor)); })
     .def("view_matrix", &guik::CameraControl::view_matrix);
   py::class_<guik::OrbitCameraControlXY, guik::CameraControl, std::shared_ptr<guik::OrbitCameraControlXY>>(guik_, "OrbitCameraControlXY");
   py::class_<guik::OrbitCameraControlXZ, guik::CameraControl, std::shared_ptr<guik::OrbitCameraControlXZ>>(guik_, "OrbitCameraControlXZ");
@@ -286,6 +288,13 @@ void define_guik(py::module_& m) {
     .def("set_pose", &guik::FPSCameraControl::set_pose)
     .def("set_mouse_senstivity", &guik::FPSCameraControl::set_mouse_senstivity)
     .def("set_translation_speed", &guik::FPSCameraControl::set_translation_speed);
+  py::class_<guik::SensorViewCameraControl, guik::CameraControl, std::shared_ptr<guik::SensorViewCameraControl>>(guik_, "SensorViewCameraControl")
+    .def("set_sensor_pose", [](guik::SensorViewCameraControl& control, const Eigen::Isometry3f& T_world_sensor) { control.set_sensor_pose(T_world_sensor); })
+    .def(
+      "set_sensor_camera_transform",
+      [](guik::SensorViewCameraControl& control, const Eigen::Isometry3f& T_sensor_camera) { control.set_sensor_camera_transform(T_sensor_camera); })
+    .def("set_smoothing_factor", &guik::SensorViewCameraControl::set_smoothing_factor)
+    .def("set_z_axis_alignment", &guik::SensorViewCameraControl::set_z_axis_alignment);
 
   // guik::HoveredDrawings
   py::class_<guik::HoveredDrawings, std::shared_ptr<guik::HoveredDrawings>>(guik_, "HoveredDrawings")  //
