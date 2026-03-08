@@ -535,6 +535,13 @@ void define_guik(py::module_& m) {
       py::arg("theta") = 0.0,
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_fps_camera_control", &guik::LightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0)
+    .def(
+      "use_sensor_view_camera_control",
+      &guik::LightViewerContext::use_sensor_view_camera_control,
+      "",
+      py::arg("T_sensor_camera"),
+      py::arg("smoothing_factor_trans") = 0.75,
+      py::arg("smoothing_factor_rot") = 0.9)
 
     .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
 
@@ -797,6 +804,12 @@ void define_guik(py::module_& m) {
       py::arg("theta") = 0.0,
       py::arg("phi") = -60.0 * M_PI / 180.0)
     .def("use_fps_camera_control", &guik::AsyncLightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0)
+    .def(
+      "use_sensor_view_camera_control",
+      &guik::AsyncLightViewerContext::use_sensor_view_camera_control,
+      py::arg("T_sensor_camera"),
+      py::arg("smoothing_factor_trans") = 0.75,
+      py::arg("smoothing_factor_rot") = 0.9)
 
     .def("update_drawable_setting", &guik::AsyncLightViewerContext::update_drawable_setting, py::arg("name"), py::arg("setting"))
 

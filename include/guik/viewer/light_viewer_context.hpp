@@ -30,6 +30,7 @@ class OrbitCameraControlXZ;
 class TopDownCameraControl;
 class ArcBallCameraControl;
 class FPSCameraControl;
+class SensorViewCameraControl;
 
 /// @brief Viewer context.
 class LightViewerContext {
@@ -188,6 +189,11 @@ public:
   void reset_center();
   /// @brief Make the camera look at a point.
   void lookat(const Eigen::Vector3f& pt);
+  /// @brief Make the camera look at a transform.
+  void lookat(const Eigen::Isometry3f& T_world_sensor);
+  /// @brief Make the camera look at a transform.
+  void lookat(const Eigen::Isometry3d& T_world_sensor);
+
   /// @brief Make the camera look at a point.
   template <typename Vector>
   void lookat(const Vector& pt) {
@@ -205,6 +211,11 @@ public:
   std::shared_ptr<ArcBallCameraControl> use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   /// @brief Use FPS game-like camera control.
   std::shared_ptr<FPSCameraControl> use_fps_camera_control(double fovy_deg = 60.0);
+  /// @brief Use sensor-view camera control that follows a given sensor pose.
+  std::shared_ptr<SensorViewCameraControl> use_sensor_view_camera_control(
+    const Eigen::Isometry3f& T_sensor_camera = Eigen::Translation3f(-5.0f, 0.0f, 0.1f) * Eigen::Isometry3f::Identity(),
+    double smoothing_factor_trans = 0.75,
+    double smoothing_factor_rot = 0.9);
 
   /// @brief Get underlying GLCanvas.
   guik::GLCanvas& get_canvas();
@@ -413,11 +424,11 @@ public:
   void update_wire_frustum(const std::string& name, const ShaderSetting& shader_setting);
 
 protected:
-  std::string context_name;                  ///< Viewer context name
-  Eigen::Vector2i canvas_rect_min;           ///< Top-left corner of the canvas rectangle
-  Eigen::Vector2i canvas_rect_max;           ///< Bottom-right corner of the canvas rectangle
-  std::unique_ptr<guik::GLCanvas> canvas;    ///< GL canvas
-  guik::ShaderSetting global_shader_setting; ///< Global shader setting
+  std::string context_name;                   ///< Viewer context name
+  Eigen::Vector2i canvas_rect_min;            ///< Top-left corner of the canvas rectangle
+  Eigen::Vector2i canvas_rect_max;            ///< Bottom-right corner of the canvas rectangle
+  std::unique_ptr<guik::GLCanvas> canvas;     ///< GL canvas
+  guik::ShaderSetting global_shader_setting;  ///< Global shader setting
 
   bool show_window;
   bool draw_xy_grid;

@@ -74,6 +74,12 @@ public:
     const auto ptf = pt.eval().template cast<float>();
     lookat(ptf);
   }
+
+  /// @brief Make the camera look at a transform.
+  void lookat(const Eigen::Isometry3f& T_world_sensor);
+  /// @brief Make the camera look at a transform.
+  void lookat(const Eigen::Isometry3d& T_world_sensor);
+
   /// @brief Use orbit camera control (XY plane) useful for systems in which XYZ = front-left-up like LiDAR odometry.
   void use_orbit_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   /// @brief Use orbit camera control (XZ plane) useful for systems in which XYZ = right-down-forward like visual odometry.
@@ -84,6 +90,14 @@ public:
   void use_arcball_camera_control(double distance = 80.0, double theta = 0.0, double phi = -60.0f * M_PI / 180.0f);
   /// @brief Use FPS game-like camera control.
   void use_fps_camera_control(double fovy_deg = 60.0);
+  /// @brief Use TPS-like sensor-view camera control .
+  /// @param T_sensor_camera         Initial transform from sensor frame to camera frame.
+  /// @param smoothing_factor_trans  Smoothing factor for translation in [0, 1]. 0 = no smoothing (instant snap), 1 = maximum smoothing (very slow follow).
+  /// @param smoothing_factor_rot    Smoothing factor for rotation in [0, 1]. 0 = no smoothing (instant snap), 1 = maximum smoothing (very slow follow).
+  void use_sensor_view_camera_control(
+    const Eigen::Isometry3f& T_sensor_camera = Eigen::Translation3f(-5.0f, 0.0f, 0.1f) * Eigen::Isometry3f::Identity(),
+    double smoothing_factor_trans = 0.75,
+    double smoothing_factor_rot = 0.9);
 
   /// @brief Update a drawable's shader setting.
   void update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting);
