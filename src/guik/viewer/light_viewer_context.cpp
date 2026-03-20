@@ -13,6 +13,7 @@
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
+#include <guik/camera/sensor_view_camera_control.hpp>
 #include <guik/camera/basic_projection_control.hpp>
 
 namespace guik {
@@ -258,6 +259,14 @@ void LightViewerContext::draw_gl() {
 
 void LightViewerContext::lookat(const Eigen::Vector3f& pt) {
   canvas->camera_control->lookat(pt);
+}
+
+void LightViewerContext::lookat(const Eigen::Isometry3f& T_world_sensor) {
+  canvas->camera_control->lookat(T_world_sensor);
+}
+
+void LightViewerContext::lookat(const Eigen::Isometry3d& T_world_sensor) {
+  canvas->camera_control->lookat(T_world_sensor);
 }
 
 void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
@@ -532,6 +541,13 @@ std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(dou
   canvas->camera_control = fps_camera_control;
   canvas->projection_control = fps_camera_control;
   return fps_camera_control;
+}
+
+std::shared_ptr<SensorViewCameraControl>
+LightViewerContext::use_sensor_view_camera_control(const Eigen::Isometry3f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+  auto sensor_view_camera_control = std::make_shared<guik::SensorViewCameraControl>(T_sensor_camera, smoothing_factor_trans, smoothing_factor_rot);
+  canvas->camera_control = sensor_view_camera_control;
+  return sensor_view_camera_control;
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

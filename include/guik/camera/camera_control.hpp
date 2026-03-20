@@ -27,6 +27,13 @@ public:
   /// @param pt The point to look at, in world coordinates.
   virtual void lookat(const Eigen::Vector3f& pt) {}
 
+  /// @brief Move the camera to look at the given transform. The camera will look at the translation part of the
+  ///        transform, and optionally align its orientation with the rotation part.
+  /// @param T_world_sensor The transform to look at, in world coordinates.
+  virtual void lookat(const Eigen::Isometry3f& T_world_sensor) { lookat(T_world_sensor.translation()); }
+
+  virtual void lookat(const Eigen::Isometry3d& T_world_sensor) { lookat(T_world_sensor.cast<float>()); }
+
   /// @brief Mouse event callback. This method is called when a mouse button is pressed or released.
   /// @param p       The current mouse position in screen coordinates (pixels).
   /// @param button  The mouse button index (0: left, 1: right, 2: middle).

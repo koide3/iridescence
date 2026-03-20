@@ -85,6 +85,14 @@ void AsyncLightViewerContext::lookat(const Eigen::Vector3f& pt) {
   guik::viewer()->invoke([=] { context->lookat(pt); });
 }
 
+void AsyncLightViewerContext::lookat(const Eigen::Isometry3f& T_world_sensor) {
+  guik::viewer()->invoke([=] { context->lookat(T_world_sensor); });
+}
+
+void AsyncLightViewerContext::lookat(const Eigen::Isometry3d& T_world_sensor) {
+  guik::viewer()->invoke([=] { context->lookat(T_world_sensor); });
+}
+
 void AsyncLightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
   guik::viewer()->invoke([=] { context->use_orbit_camera_control(distance, theta, phi); });
 }
@@ -103,6 +111,10 @@ void AsyncLightViewerContext::use_arcball_camera_control(double distance, double
 
 void AsyncLightViewerContext::use_fps_camera_control(double fovy_deg) {
   guik::viewer()->invoke([=] { context->use_fps_camera_control(fovy_deg); });
+}
+
+void AsyncLightViewerContext::use_sensor_view_camera_control(const Eigen::Isometry3f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+  guik::viewer()->invoke([=] { context->use_sensor_view_camera_control(T_sensor_camera, smoothing_factor_trans, smoothing_factor_rot); });
 }
 
 void AsyncLightViewerContext::update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting) {

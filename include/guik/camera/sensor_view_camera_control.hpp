@@ -41,6 +41,10 @@ public:
     set_sensor_pose(T);
   }
 
+  /// @brief Same as set_sensor_pose.
+  /// @param T_world_sensor
+  virtual void lookat(const Eigen::Isometry3f& T_world_sensor) override { set_sensor_pose(T_world_sensor); }
+
   /// @brief Set the transform from sensor frame to camera frame (T_sensor_camera).
   void set_sensor_camera_transform(const Eigen::Isometry3f& T_sensor_camera);
 

@@ -1,5 +1,4 @@
 #include <glk/voxelmap.hpp>
-#include <glk/async_buffer_copy.hpp>
 
 namespace glk {
 
@@ -33,31 +32,21 @@ VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double r
   this->num_voxels = num_voxels;
   vao = vbo = ebo_voxels = ebo_edges = 0;
 
-  std::vector<Eigen::Vector3f> vertices(num_voxels * 8);     // 8 vertices per voxel
-  std::vector<unsigned int> voxel_indices(num_voxels * 36);  // 12 triangles per voxel, 3 vertices per triangle
-  std::vector<unsigned int> edge_indices(num_voxels * 24);   // 12 edges per voxel, 2 vertices per edge
+  const float res = static_cast<float>(resolution);
 
-  // fill vertices
+  // Pre-compute vertex offsets with float resolution (avoid repeated double->float conversion)
   const std::array<Eigen::Vector3f, 8> vertex_offsets = {
     Eigen::Vector3f(0.0f, 0.0f, 0.0f),
-    Eigen::Vector3f(resolution, 0.0f, 0.0f),
-    Eigen::Vector3f(resolution, resolution, 0.0f),
-    Eigen::Vector3f(0.0f, resolution, 0.0f),
-    Eigen::Vector3f(0.0f, 0.0f, resolution),
-    Eigen::Vector3f(resolution, 0.0f, resolution),
-    Eigen::Vector3f(resolution, resolution, resolution),
-    Eigen::Vector3f(0.0f, resolution, resolution),
+    Eigen::Vector3f(res, 0.0f, 0.0f),
+    Eigen::Vector3f(res, res, 0.0f),
+    Eigen::Vector3f(0.0f, res, 0.0f),
+    Eigen::Vector3f(0.0f, 0.0f, res),
+    Eigen::Vector3f(res, 0.0f, res),
+    Eigen::Vector3f(res, res, res),
+    Eigen::Vector3f(0.0f, res, res),
   };
 
-  for (int i = 0; i < num_voxels; i++) {
-    const Eigen::Vector3f origin = voxel_coords[i].cast<float>() * resolution;
-    for (int j = 0; j < 8; j++) {
-      vertices[i * 8 + j] = origin + vertex_offsets[j];
-    }
-  }
-
-  // fill voxel_indices
-  const std::array<unsigned int, 36> voxel_index_offsets = {
+  static constexpr std::array<unsigned int, 36> voxel_index_offsets = {
     0, 1, 2, 0, 2, 3,  //
     4, 5, 6, 4, 6, 7,  //
     0, 1, 5, 0, 5, 4,  //
@@ -66,43 +55,80 @@ VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double r
     3, 0, 4, 3, 4, 7,  //
   };
 
-  for (int i = 0; i < num_voxels; i++) {
-    for (int j = 0; j < 36; j++) {
-      voxel_indices[i * 36 + j] = i * 8 + voxel_index_offsets[j];
-    }
-  }
-
-  // fill edge_indices
-  const std::array<unsigned int, 24> edge_index_offsets = {
+  static constexpr std::array<unsigned int, 24> edge_index_offsets = {
     0, 1, 1, 2, 2, 3, 3, 0,  //
     4, 5, 5, 6, 6, 7, 7, 4,  //
     0, 4, 1, 5, 2, 6, 3, 7,  //
   };
 
-  for (int i = 0; i < num_voxels; i++) {
-    for (int j = 0; j < 24; j++) {
-      edge_indices[i * 24 + j] = i * 8 + edge_index_offsets[j];
-    }
-  }
+  const GLsizeiptr vertex_buf_size = static_cast<GLsizeiptr>(sizeof(Eigen::Vector3f)) * num_voxels * 8;
+  const GLsizeiptr voxel_idx_buf_size = static_cast<GLsizeiptr>(sizeof(unsigned int)) * num_voxels * 36;
+  const GLsizeiptr edge_idx_buf_size = static_cast<GLsizeiptr>(sizeof(unsigned int)) * num_voxels * 24;
+  constexpr GLbitfield map_flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
 
-  // create buffers
+  // Create all GL objects and allocate buffers upfront
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
   glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Eigen::Vector3f) * vertices.size(), nullptr, GL_STATIC_DRAW);
-  write_buffer_async(GL_ARRAY_BUFFER, sizeof(Eigen::Vector3f) * vertices.size(), vertices.data());
-
   glGenBuffers(1, &ebo_voxels);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_voxels);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * voxel_indices.size(), nullptr, GL_STATIC_DRAW);
-  write_buffer_async(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * voxel_indices.size(), voxel_indices.data());
-
   glGenBuffers(1, &ebo_edges);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, vertex_buf_size, nullptr, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_voxels);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, voxel_idx_buf_size, nullptr, GL_STATIC_DRAW);
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_edges);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * edge_indices.size(), nullptr, GL_STATIC_DRAW);
-  write_buffer_async(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * edge_indices.size(), edge_indices.data());
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, edge_idx_buf_size, nullptr, GL_STATIC_DRAW);
+
+  // Map all three buffers simultaneously
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  auto* vertices = static_cast<Eigen::Vector3f*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, vertex_buf_size, map_flags));
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_voxels);
+  auto* voxel_indices = static_cast<unsigned int*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, voxel_idx_buf_size, map_flags));
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_edges);
+  auto* edge_indices = static_cast<unsigned int*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, edge_idx_buf_size, map_flags));
+
+  // Fill face indices
+  for (int i = 0; i < num_voxels; i++) {
+    const unsigned int base = i * 8;
+    unsigned int* dst = voxel_indices + i * 36;
+    for (int j = 0; j < 36; j++) {
+      dst[j] = base + voxel_index_offsets[j];
+    }
+  }
+
+  // Fill edge indices
+  for (int i = 0; i < num_voxels; i++) {
+    const unsigned int base = i * 8;
+    unsigned int* dst = edge_indices + i * 24;
+    for (int j = 0; j < 24; j++) {
+      dst[j] = base + edge_index_offsets[j];
+    }
+  }
+
+  // Fill vertices
+  for (int i = 0; i < num_voxels; i++) {
+    const Eigen::Vector3f origin = voxel_coords[i].cast<float>() * res;
+    Eigen::Vector3f* dst = vertices + i * 8;
+    for (int j = 0; j < 8; j++) {
+      dst[j] = origin + vertex_offsets[j];
+    }
+  }
+
+  // Unmap all buffers (driver can now DMA the data to VRAM)
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glUnmapBuffer(GL_ARRAY_BUFFER);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_voxels);
+  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_edges);
+  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
