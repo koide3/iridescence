@@ -30,14 +30,19 @@ GLSLShader::~GLSLShader() {
   }
 }
 
-bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type) {
+bool GLSLShader::attach_source(
+  const std::string& filename,
+  const std::unordered_set<std::string>& include_filenames,
+  const std::string& defines,
+  const std::vector<std::pair<std::string, std::string>>& replaces,
+  GLuint shader_type) {
   std::unordered_map<std::string, std::string> include_map;
   for (const auto& include_filename : include_filenames) {
     const std::string filename = std::filesystem::path(include_filename).filename().string();
     include_map[filename] = include_filename;
   }
 
-  GLuint shader = read_shader_from_file(filename, include_map, defines, shader_type);
+  GLuint shader = read_shader_from_file(filename, include_map, defines, replaces, shader_type);
   if (shader == GL_FALSE) {
     return false;
   }
@@ -50,6 +55,7 @@ bool GLSLShader::attach_source(
   const std::vector<std::string>& filenames,
   const std::unordered_set<std::string>& include_filenames,
   const std::string& defines,
+  const std::vector<std::pair<std::string, std::string>>& replaces,
   GLuint shader_type) {
   for (const auto& filename : filenames) {
     if (!attach_source(filename, include_filenames, defines, shader_type)) {
@@ -57,6 +63,18 @@ bool GLSLShader::attach_source(
     }
   }
   return true;
+}
+
+bool GLSLShader::attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type) {
+  return attach_source(filename, include_filenames, defines, {}, shader_type);
+}
+
+bool GLSLShader::attach_source(
+  const std::vector<std::string>& filenames,
+  const std::unordered_set<std::string>& include_filenames,
+  const std::string& defines,
+  GLuint shader_type) {
+  return attach_source(filenames, include_filenames, defines, {}, shader_type);
 }
 
 bool GLSLShader::attach_source(const std::string& filename, GLuint shader_type) {
@@ -289,8 +307,12 @@ void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, cons
   glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
 }
 
-GLuint
-GLSLShader::read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, const std::string& defines, GLuint shader_type) {
+GLuint GLSLShader::read_shader_from_file(
+  const std::string& filename,
+  const std::unordered_map<std::string, std::string>& include_map,
+  const std::string& defines,
+  const std::vector<std::pair<std::string, std::string>>& replaces,
+  GLuint shader_type) {
   GLuint shader_id = glCreateShader(shader_type);
 
   const auto read_source = [](const std::string& filename) -> std::string {
@@ -337,6 +359,10 @@ GLSLShader::read_shader_from_file(const std::string& filename, const std::unorde
     sst << match.suffix();
 
     source = sst.str();
+  }
+
+  for (const auto& replace : replaces) {
+    source = std::regex_replace(source, std::regex(replace.first), replace.second);
   }
 
   GLint result = GL_FALSE;

@@ -28,6 +28,19 @@ public:
   bool attach_source(const std::string& filename, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type);
   bool attach_source(const std::vector<std::string>& filenames, const std::unordered_set<std::string>& include_filenames, const std::string& defines, GLuint shader_type);
 
+  bool attach_source(
+    const std::string& filename,
+    const std::unordered_set<std::string>& include_filenames,
+    const std::string& defines,
+    const std::vector<std::pair<std::string, std::string>>& replaces,
+    GLuint shader_type);
+  bool attach_source(
+    const std::vector<std::string>& filenames,
+    const std::unordered_set<std::string>& include_filenames,
+    const std::string& defines,
+    const std::vector<std::pair<std::string, std::string>>& replaces,
+    GLuint shader_type);
+
   bool add_feedback_varying(const std::string& name);
 
   bool link_program();
@@ -142,7 +155,12 @@ public:
   void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);
 
 private:
-  GLuint read_shader_from_file(const std::string& filename, const std::unordered_map<std::string, std::string>& include_map, const std::string& defines, GLuint shader_type);
+  GLuint read_shader_from_file(
+    const std::string& filename,
+    const std::unordered_map<std::string, std::string>& include_map,
+    const std::string& defines,
+    const std::vector<std::pair<std::string, std::string>>& replaces,
+    GLuint shader_type);
 
   template <typename T>
   void set_uniform_cache(std::uint64_t h, const T& value) {
