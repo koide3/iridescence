@@ -143,6 +143,7 @@ add_library(iridescence
   src/glk/trajectory.cpp
   src/glk/gridmap.cpp
   src/glk/voxelmap.cpp
+  src/glk/experimental/aug_voxelmap.cpp
   src/glk/drawable_container.cpp
   src/glk/async_buffer_copy.cpp
   src/glk/pointcloud_buffer.cpp
