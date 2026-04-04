@@ -39,6 +39,7 @@ in float vert_cmap;
 out vec4 frag_color;
 out vec2 frag_texcoord;
 out vec3 frag_normal;
+out vec3 frag_vert_position;
 
 vec4 rainbow(float val, vec2 range) {
     float p = (val - range[0]) / (range[1] - range[0]);
@@ -49,6 +50,7 @@ void main() {
     vec4 world_position = model_matrix * vec4(vert_position, 1.0);
     vec3 frag_world_position = world_position.xyz;
     gl_Position = projection_matrix * view_matrix * world_position;
+    frag_vert_position = vert_position;
 
     switch(color_mode) {
         case 0:
