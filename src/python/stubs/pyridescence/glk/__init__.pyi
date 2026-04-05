@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy
 import typing
 from . import primitives
-__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'Drawable', 'GREAN_YELLOW', 'HELIX', 'JET', 'Lines', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PUBUGN', 'PointCloudBuffer', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'VEGETATION', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
+__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'Drawable', 'GREAN_YELLOW', 'HELIX', 'JET', 'Lines', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PUBUGN', 'PointCloudBuffer', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'VEGETATION','VoxelMap', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
 class COLORMAP:
     """
     Members:
@@ -198,6 +198,20 @@ class ScreenSpaceLighting(ScreenEffect):
             ...
         @property
         def value(self) -> int:
+            ...
+    class VoxelMapOptions:
+        def __init__(self):
+            ...
+        def set_voxel_alpha(self, alpha: float):
+            ...
+        def set_voxel_color(self, color: numpy.ndarray[np.int32[4,1]]):
+            ...
+        def set_edge_alpha(self, alpha: float):
+            ...
+        def set_edge_color(self, color: numpy.ndarray[np.int32[4,1]]):
+            ...
+    class VoxelMap(Drawable):
+        def __init__(voxels: numpy.ndarray[np.int32[m, 3]], int num_voxels, voxel_resolution: float, voxel_options:VoxelMapOptions = VoxelMapOptions()):
             ...
     class IRIDESCENCE_MODEL:
         """

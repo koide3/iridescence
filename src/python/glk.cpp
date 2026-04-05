@@ -9,6 +9,7 @@
 #include <glk/texture.hpp>
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/voxelmap.hpp>
 #include <glk/io/ply_io.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/screen_effect.hpp>
@@ -17,7 +18,6 @@
 #include <glk/effects/screen_space_lighting.hpp>
 
 namespace py = pybind11;
-
 bool check_valid_points(const py::array_t<float, py::array::c_style | py::array::forcecast>& points) {
   if (points.ndim() != 2) {
     std::cerr << "points must be 2-dimensional (ndim=" << points.ndim() << ")" << std::endl;
@@ -37,6 +37,18 @@ bool check_valid_colors(const py::array_t<float, py::array::c_style | py::array:
   }
   if (points.shape(1) != 4) {
     std::cerr << "points must have 4 columns (cols=" << points.shape(1) << ")" << std::endl;
+    return false;
+  }
+  return true;
+}
+
+bool check_valid_voxels(const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels){
+  if (voxels.ndim() != 2){
+    std::cerr << "voxels must be 2-dimensional (ndim=" << voxels.ndim() << ")" << std::endl;
+    return false;
+  }
+  if (voxels.shape(1) != 3){
+    std::cerr << "voxels must have 3 columns (cols=" << voxels.shape(1) << ")" << std::endl;
     return false;
   }
   return true;
@@ -334,6 +346,45 @@ void define_glk(py::module_& m) {
       },
       py::arg("attribute_name"),
       py::arg("data"));
+
+  // glk::VoxelMapOptions
+  py::class_<glk::VoxelMapOptions, std::shared_ptr<glk::VoxelMapOptions>>(glk_, "VoxelMapOptions")
+    .def(py::init<>())
+    .def("set_voxel_alpha", &glk::VoxelMapOptions::set_voxel_alpha,  py::arg("alpha"))
+    .def("set_voxel_color", &glk::VoxelMapOptions::set_voxel_color, py::arg("color"))
+    .def("set_edge_alpha", &glk::VoxelMapOptions::set_edge_alpha,  py::arg("alpha"))
+    .def("set_edge_color", &glk::VoxelMapOptions::set_edge_color, py::arg("color"))
+    .def_readwrite("edge_line_width", &glk::VoxelMapOptions::edge_line_width);
+
+  // glk::VoxelMap
+  py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap")
+    .def(
+      py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options){
+        if(!check_valid_voxels(voxels)){
+          throw std::runtime_error("invalid voxels array");
+        }
+
+        int n = voxels.shape(0);
+        std::vector<Eigen::Vector3i> voxels_vec(n);
+
+        for (int i = 0; i < n; i++){
+          voxels_vec[i] = Eigen::Vector3i(voxels.at(i, 0), voxels.at(i, 1), voxels.at(i, 2));
+        }
+
+        return std::make_shared<glk::VoxelMap>(voxels_vec.data(), voxels_vec.size(), resolution, voxel_options);
+      }),
+      py::arg("voxels"),
+      py::arg("resolution"),
+      py::arg("voxel_options") = glk::VoxelMapOptions()
+    )
+    .def(
+      py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options){     
+        return std::make_shared<glk::VoxelMap>(voxels.data(), voxels.size(), resolution, voxel_options);
+      }),
+      py::arg("voxels"),
+      py::arg("resolution"),
+      py::arg("voxel_options") = glk::VoxelMapOptions()
+    );
 
   // glk::Texture
   py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture")
