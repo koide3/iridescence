@@ -776,6 +776,9 @@ void define_guik(py::module_& m) {
         if (ys.empty()) {
           viewer.update_plot_stairs(plot_name, label, xs, stairs_flags);
         } else {
+          if (xs.size() != ys.size()) {
+            throw py::value_error("update_plot_stairs requires xs and ys to have the same length");
+          }
           viewer.update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
         }
       },
