@@ -556,7 +556,18 @@ void define_guik(py::module_& m) {
 
     .def("pick_info", &guik::LightViewerContext::pick_info, py::arg("p"), py::arg("window") = 2)
     .def("pick_depth", &guik::LightViewerContext::pick_depth, py::arg("p"), py::arg("window") = 2)
-    .def("pick_point", &guik::LightViewerContext::pick_point, py::arg("button") = 0, py::arg("window") = 2)
+    .def(
+      "pick_point",
+      [](guik::LightViewerContext& context, int button, int window) {
+        const auto& io = ImGui::GetIO();
+        const int mouse_button_count = static_cast<int>(IM_ARRAYSIZE(io.MouseClicked));
+        if (button < 0 || button >= mouse_button_count) {
+          throw py::value_error("button out of range");
+        }
+        return context.pick_point(button, window);
+      },
+      py::arg("button") = 0,
+      py::arg("window") = 2)
     .def("unproject", &guik::LightViewerContext::unproject, py::arg("p"), py::arg("depth"))
 
     .def(
