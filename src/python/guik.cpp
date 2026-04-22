@@ -556,6 +556,18 @@ void define_guik(py::module_& m) {
 
     .def("pick_info", &guik::LightViewerContext::pick_info, py::arg("p"), py::arg("window") = 2)
     .def("pick_depth", &guik::LightViewerContext::pick_depth, py::arg("p"), py::arg("window") = 2)
+    .def(
+      "pick_point",
+      [](guik::LightViewerContext& context, int button, int window) {
+        const auto& io = ImGui::GetIO();
+        const int mouse_button_count = static_cast<int>(IM_ARRAYSIZE(io.MouseClicked));
+        if (button < 0 || button >= mouse_button_count) {
+          throw py::value_error("button out of range");
+        }
+        return context.pick_point(button, window);
+      },
+      py::arg("button") = 0,
+      py::arg("window") = 2)
     .def("unproject", &guik::LightViewerContext::unproject, py::arg("p"), py::arg("depth"))
 
     .def(
@@ -682,10 +694,20 @@ void define_guik(py::module_& m) {
 
     .def("spin_until_click", &guik::LightViewer::spin_until_click)
     .def("toggle_spin_once", &guik::LightViewer::toggle_spin_once)
+    .def("invoke", &guik::LightViewer::invoke, py::arg("func"))
+    .def("invoke_after_rendering", &guik::LightViewer::invoke_after_rendering, py::arg("func"))
+    .def("invoke_once", &guik::LightViewer::invoke_once, py::arg("label"), py::arg("func"))
 
     .def("clear_images", &guik::LightViewer::clear_images)
     .def("remove_image", &guik::LightViewer::remove_image)
     .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0, py::arg("order") = -1)
+    .def("clear_plots", &guik::LightViewer::clear_plots, py::arg("clear_settings") = true)
+    .def("remove_plot", &guik::LightViewer::remove_plot, py::arg("plot_name"), py::arg("label") = "")
+    .def("setup_plot", &guik::LightViewer::setup_plot, py::arg("plot_name"), py::arg("width"), py::arg("height"), py::arg("plot_flags") = 0, py::arg("x_flags") = 0, py::arg("y_flags") = 0, py::arg("order") = -1)
+    .def("link_plot_axis", &guik::LightViewer::link_plot_axis, py::arg("plot_name"), py::arg("link_id"), py::arg("axis"))
+    .def("link_plot_axes", &guik::LightViewer::link_plot_axes, py::arg("plot_name"), py::arg("link_id"), py::arg("axes") = -1)
+    .def("setup_legend", &guik::LightViewer::setup_legend, py::arg("plot_name"), py::arg("loc"), py::arg("flags") = 0)
+    .def("setup_plot_group_order", &guik::LightViewer::setup_plot_group_order, py::arg("group_name"), py::arg("order"))
 
     .def(
       "update_plot_line",
@@ -753,6 +775,29 @@ void define_guik(py::module_& m) {
       py::arg("x_range") = Eigen::Vector2d(0.0, 0.0),
       py::arg("y_range") = Eigen::Vector2d(0.0, 0.0),
       py::arg("histogram_flags") = 0)
+    .def(
+      "update_plot_stairs",
+      [](
+        guik::LightViewer& viewer,
+        const std::string& plot_name,
+        const std::string& label,
+        const std::vector<double>& xs,
+        const std::vector<double>& ys,
+        int stairs_flags) {
+        if (ys.empty()) {
+          viewer.update_plot_stairs(plot_name, label, xs, stairs_flags);
+        } else {
+          if (xs.size() != ys.size()) {
+            throw py::value_error("update_plot_stairs requires xs and ys to have the same length");
+          }
+          viewer.update_plot_stairs(plot_name, label, xs, ys, stairs_flags);
+        }
+      },
+      py::arg("plot_name"),
+      py::arg("label"),
+      py::arg("xs"),
+      py::arg("ys") = std::vector<double>(),
+      py::arg("stairs_flags") = 0)
 
     .def("fit_plot", &guik::LightViewer::fit_plot, py::arg("plot_name"))
     .def("fit_all_plots", &guik::LightViewer::fit_all_plots)
