@@ -1009,15 +1009,19 @@ void define_guik(py::module_& m) {
           }
         }
 
+        const unsigned int* index_ptr = indices.empty() ? nullptr : indices.data();
+
         if (vertices.cols() == 3) {
-          context.update_thin_lines(name, vertices.data(), colors.data(), vertices.rows(), indices.data(), indices.size(), line_strip, line_width, shader_setting);
+          const float* color_ptr = colors.size() ? colors.data() : nullptr;
+          context.update_thin_lines(name, vertices.data(), color_ptr, vertices.rows(), index_ptr, indices.size(), line_strip, line_width, shader_setting);
         } else {
+          const Eigen::Vector4f* color_ptr = colors.size() ? reinterpret_cast<const Eigen::Vector4f*>(colors.data()) : nullptr;
           context.update_thin_lines(
             name,
             reinterpret_cast<const Eigen::Vector4f*>(vertices.data()),
-            reinterpret_cast<const Eigen::Vector4f*>(colors.data()),
+            color_ptr,
             vertices.rows(),
-            indices.data(),
+            index_ptr,
             indices.size(),
             line_strip,
             line_width,
