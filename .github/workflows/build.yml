@@ -20,7 +20,9 @@ jobs:
           { "ubuntu": "jammy", "file": "ubuntu" },
           { "ubuntu": "jammy", "file": "ubuntu_llvm" },
           { "ubuntu": "noble", "file": "ubuntu" },
-          { "ubuntu": "noble", "file": "ubuntu_llvm" }
+          { "ubuntu": "noble", "file": "ubuntu_llvm" },
+          { "ubuntu": "resolute", "file": "ubuntu" },
+          { "ubuntu": "resolute", "file": "ubuntu_llvm" }
         ]
 
     steps:
