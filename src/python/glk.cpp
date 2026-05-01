@@ -154,7 +154,7 @@ void define_glk(py::module_& m) {
     // pyplot-like constructor
     .def(
       py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, bool line_strip, float line_width) {
-        int size = std::max(x.size(), std::max(y.size(), z.size()));
+        int size = std::max({(int)x.size(), (int)y.size(), (int)z.size(), (int)c.size()});
         if (x.size()) {
           size = std::min<int>(size, x.size());
         }
@@ -163,6 +163,9 @@ void define_glk(py::module_& m) {
         }
         if (z.size()) {
           size = std::min<int>(size, z.size());
+        }
+        if (c.size()) {
+          size = std::min<int>(size, c.size());
         }
 
         Eigen::Matrix<float, -1, 3, Eigen::RowMajor> vertices = Eigen::Matrix<float, -1, 3, Eigen::RowMajor>::Zero(size, 3);
@@ -176,9 +179,9 @@ void define_glk(py::module_& m) {
           vertices.col(2) = z.topRows(size);
         }
 
-        if (c.size()) {
+        if (c.size() && size > 0) {
           std::vector<Eigen::Vector4f> colors(size, Eigen::Vector4f::Zero());
-          for (int i = 0; i < size && i < c.size(); i++) {
+          for (int i = 0; i < size; i++) {
             colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
           }
 
