@@ -570,7 +570,7 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<float>& 
 }
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector2f>& vectors, const char* debug_msg) {
-  glUniform2fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  glUniform2fv(uniform(name, debug_msg), vectors.size(), reinterpret_cast<const float*>(vectors.data()));
   set_uniform_cache(name, vectors);
 }
 
@@ -579,7 +579,7 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::V
 }
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector3f>& vectors, const char* debug_msg) {
-  glUniform3fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  glUniform3fv(uniform(name, debug_msg), vectors.size(), reinterpret_cast<const float*>(vectors.data()));
   set_uniform_cache(name, vectors);
 }
 
@@ -588,7 +588,7 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::V
 }
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector4f>& vectors, const char* debug_msg) {
-  glUniform4fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
+  glUniform4fv(uniform(name, debug_msg), vectors.size(), reinterpret_cast<const float*>(vectors.data()));
   set_uniform_cache(name, vectors);
 }
 

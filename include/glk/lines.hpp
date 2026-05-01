@@ -90,7 +90,7 @@ Lines::Lines(float line_width, const std::vector<Eigen::Matrix<T1, D1, 1>, Alloc
 
 template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2>
 Lines::Lines(float line_width, const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator1>& vertices, const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors, bool line_strip)
-: Lines(line_width, vertices.data(), colors.data(), vertices.size(), line_strip) {}
+: Lines(line_width, vertices.data(), colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(), vertices.size(), line_strip) {}
 
 template <typename T1, int D1, typename Allocator1, typename T2, int D2, typename Allocator2, typename Allocator3>
 Lines::Lines(
@@ -99,7 +99,7 @@ Lines::Lines(
   const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
   const std::vector<Eigen::Vector4i, Allocator3>& infos,
   bool line_strip)
-: Lines(line_width, vertices.data(), colors.data(), infos.data(), vertices.size(), line_strip) {}
+: Lines(line_width, vertices.data(), colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(), infos.empty() ? static_cast<const Eigen::Vector4i*>(nullptr) : infos.data(), vertices.size(), line_strip) {}
 
 }  // namespace glk
 

@@ -14,7 +14,7 @@ std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointClou
   for (int i = 0; i < cloud.size(); i++) {
     points[i] = cloud[i].getVector3fMap();
   }
-  return std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
+  return std::make_shared<PointCloudBuffer>(points.empty() ? nullptr : points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
 }
 
 template <>
@@ -31,8 +31,10 @@ inline std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::Po
     normals[i] = cloud[i].getNormalVector3fMap();
   }
 
-  auto cloud_buffer = std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
-  cloud_buffer->add_normals(normals[0].data(), sizeof(Eigen::Vector3f), normals.size());
+  auto cloud_buffer = std::make_shared<PointCloudBuffer>(points.empty() ? nullptr : points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
+  if (!normals.empty()) {
+    cloud_buffer->add_normals(normals[0].data(), sizeof(Eigen::Vector3f), normals.size());
+  }
 
   return cloud_buffer;
 }
@@ -47,8 +49,10 @@ std::shared_ptr<PointCloudBuffer> create_colored_point_cloud_buffer(const pcl::P
     colors[i] = Eigen::Vector4f(cloud[i].r, cloud[i].g, cloud[i].b, cloud[i].a) / 255.0f;
   }
 
-  auto cloud_buffer = std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), points.size());
-  cloud_buffer->add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+  auto cloud_buffer = std::make_shared<PointCloudBuffer>(points.empty() ? nullptr : points[0].data(), sizeof(Eigen::Vector3f), points.size());
+  if (!colors.empty()) {
+    cloud_buffer->add_color(colors[0].data(), sizeof(Eigen::Vector4f), colors.size());
+  }
 
   return cloud_buffer;
 }

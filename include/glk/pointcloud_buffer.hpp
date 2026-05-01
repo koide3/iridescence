@@ -132,11 +132,13 @@ PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {
+  if (normals.empty()) return;
   add_normals(normals[0].data(), sizeof(float) * N, normals.size());
 }
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<double, N, 1>, Allocator>& normals) {
+  if (normals.empty()) return;
   std::vector<Eigen::Vector3f> normals_f(normals.size());
   std::transform(normals.begin(), normals.end(), normals_f.begin(), [](const Eigen::Matrix<double, N, 1>& n) { return n.template head<3>().template cast<float>(); });
   add_normals(normals_f[0].data(), sizeof(Eigen::Vector3f), normals_f.size());
@@ -144,6 +146,7 @@ void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<double, N, 1>
 
 template <int N>
 void PointCloudBuffer::add_normals(const Eigen::Matrix<float, N, 1>* normals, int num_points) {
+  if (num_points <= 0) return;
   add_normals(normals->data(), sizeof(float) * N, num_points);
 }
 
@@ -162,7 +165,7 @@ void PointCloudBuffer::add_color(const std::vector<Eigen::Matrix<Scalar, 4, 1>, 
 template <typename Scalar, int D, typename Allocator>
 void PointCloudBuffer::add_buffer(const std::string& attribute_name, const std::vector<Eigen::Matrix<Scalar, D, 1>, Allocator>& data) {
   if constexpr (std::is_same<Scalar, float>::value) {
-    add_buffer(attribute_name, D, data[0].data(), sizeof(float) * D, data.size());
+    add_buffer(attribute_name, D, data.empty() ? nullptr : data[0].data(), sizeof(float) * D, data.size());
   } else {
     std::vector<Eigen::Matrix<float, D, 1>> data_f(data.size());
     std::transform(data.begin(), data.end(), data_f.begin(), [](const Eigen::Matrix<double, D, 1>& p) { return p.template cast<float>(); });
