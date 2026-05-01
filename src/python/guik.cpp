@@ -649,6 +649,55 @@ void define_guik(py::module_& m) {
       py::arg("line_strip") = false,
       py::arg("shader_setting") = guik::ShaderSetting())
 
+    .def(
+      "update_thin_lines",
+      [](
+        guik::LightViewerContext& context,
+        const std::string& name,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& vertices,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& colors,
+        const std::vector<unsigned int>& indices,
+        bool line_strip,
+        float line_width,
+        const guik::ShaderSetting& shader_setting) -> std::shared_ptr<glk::ThinLines> {
+        if (vertices.cols() != 3 && vertices.cols() != 4) {
+          std::cerr << "warning: vertices must be Nx3 or Nx4" << std::endl;
+          return nullptr;
+        }
+        if (colors.size()) {
+          if (colors.rows() != vertices.rows()) {
+            std::cerr << "warning: colors must have the same number of rows as vertices" << std::endl;
+            return nullptr;
+          }
+          if (colors.cols() != 4) {
+            std::cerr << "warning: colors must be Nx4" << std::endl;
+            return nullptr;
+          }
+        }
+
+        if (vertices.cols() == 3) {
+          return context.update_thin_lines(name, vertices.data(), colors.data(), vertices.rows(), indices.data(), indices.size(), line_strip, line_width, shader_setting);
+        } else {
+          return context.update_thin_lines(
+            name,
+            reinterpret_cast<const Eigen::Vector4f*>(vertices.data()),
+            reinterpret_cast<const Eigen::Vector4f*>(colors.data()),
+            vertices.rows(),
+            indices.data(),
+            indices.size(),
+            line_strip,
+            line_width,
+            shader_setting);
+        }
+      },
+      py::arg("name"),
+      py::arg("vertices"),
+      py::arg("colors") = Eigen::Matrix<float, -1, -1, Eigen::RowMajor>(),
+      py::arg("indices") = std::vector<unsigned int>(),
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f,
+      py::arg("shader_setting") = guik::ShaderSetting())
+
     .def("update_icosahedron", &guik::LightViewerContext::update_icosahedron)
     .def("update_sphere", &guik::LightViewerContext::update_sphere)
     .def("update_cube", &guik::LightViewerContext::update_cube)
@@ -929,6 +978,55 @@ void define_guik(py::module_& m) {
       py::arg("colors") = Eigen::Matrix<float, -1, -1, Eigen::RowMajor>(),
       py::arg("indices") = std::vector<unsigned int>(),
       py::arg("line_strip") = false,
+      py::arg("shader_setting") = guik::ShaderSetting())
+
+    .def(
+      "update_thin_lines",
+      [](
+        guik::AsyncLightViewerContext& context,
+        const std::string& name,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& vertices,
+        const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& colors,
+        const std::vector<unsigned int>& indices,
+        bool line_strip,
+        float line_width,
+        const guik::ShaderSetting& shader_setting) {
+        if (vertices.cols() != 3 && vertices.cols() != 4) {
+          std::cerr << "warning: vertices must be Nx3 or Nx4" << std::endl;
+          return;
+        }
+        if (colors.size()) {
+          if (colors.rows() != vertices.rows()) {
+            std::cerr << "warning: colors must have the same number of rows as vertices" << std::endl;
+            return;
+          }
+          if (colors.cols() != 4) {
+            std::cerr << "warning: colors must be Nx4" << std::endl;
+            return;
+          }
+        }
+
+        if (vertices.cols() == 3) {
+          context.update_thin_lines(name, vertices.data(), colors.data(), vertices.rows(), indices.data(), indices.size(), line_strip, line_width, shader_setting);
+        } else {
+          context.update_thin_lines(
+            name,
+            reinterpret_cast<const Eigen::Vector4f*>(vertices.data()),
+            reinterpret_cast<const Eigen::Vector4f*>(colors.data()),
+            vertices.rows(),
+            indices.data(),
+            indices.size(),
+            line_strip,
+            line_width,
+            shader_setting);
+        }
+      },
+      py::arg("name"),
+      py::arg("vertices"),
+      py::arg("colors") = Eigen::Matrix<float, -1, -1, Eigen::RowMajor>(),
+      py::arg("indices") = std::vector<unsigned int>(),
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f,
       py::arg("shader_setting") = guik::ShaderSetting())
 
     .def("update_icosahedron", &guik::AsyncLightViewerContext::update_icosahedron)

@@ -7,15 +7,24 @@
 
 namespace glk {
 
-ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip) : ThinLines(vertices, nullptr, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const float* vertices, int num_vertices, bool line_strip, float line_width) : ThinLines(vertices, nullptr, num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip) : ThinLines(vertices, colors, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, bool line_strip, float line_width)
+: ThinLines(vertices, colors, num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: ThinLines(vertices, colors, nullptr, num_vertices, indices, num_indices, line_strip) {}
+ThinLines::ThinLines(const float* vertices, const float* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip, float line_width)
+: ThinLines(vertices, colors, nullptr, num_vertices, indices, num_indices, line_strip, line_width) {}
 
-ThinLines::ThinLines(const float* vertices, const float* colors, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: line_width(1.0f) {
+ThinLines::ThinLines(
+  const float* vertices,
+  const float* colors,
+  const float* cmap,
+  int num_vertices,
+  const unsigned int* indices,
+  int num_indices,
+  bool line_strip,
+  float line_width)
+: line_width(line_width) {
   this->num_vertices = num_vertices;
   this->num_indices = num_indices;
   this->mode = line_strip ? GL_LINE_STRIP : GL_LINES;
@@ -56,25 +65,33 @@ ThinLines::ThinLines(const float* vertices, const float* colors, const float* cm
   glBindVertexArray(0);
 }
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, int num_vertices, bool line_strip) : ThinLines(vertices->data(), nullptr, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, int num_vertices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), nullptr, num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, bool line_strip)
-: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const Eigen::Vector4f* colors, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, indices, num_indices, line_strip) {}
+ThinLines::ThinLines(
+  const Eigen::Vector3f* vertices,
+  const Eigen::Vector4f* colors,
+  int num_vertices,
+  const unsigned int* indices,
+  int num_indices,
+  bool line_strip,
+  float line_width)
+: ThinLines(vertices->data(), colors ? colors->data() : nullptr, num_vertices, indices, num_indices, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, bool line_strip)
-: ThinLines(vertices->data(), nullptr, cmap, num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), nullptr, cmap, num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: ThinLines(vertices->data(), nullptr, cmap, num_vertices, indices, num_indices, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const float* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), nullptr, cmap, num_vertices, indices, num_indices, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, bool line_strip)
-: ThinLines(vertices->data(), nullptr, convert_scalars<float>(cmap, num_vertices).data(), num_vertices, nullptr, 0, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), nullptr, convert_scalars<float>(cmap, num_vertices).data(), num_vertices, nullptr, 0, line_strip, line_width) {}
 
-ThinLines::ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip)
-: ThinLines(vertices->data(), nullptr, convert_scalars<float>(cmap, num_vertices).data(), num_vertices, indices, num_indices, line_strip) {}
+ThinLines::ThinLines(const Eigen::Vector3f* vertices, const double* cmap, int num_vertices, const unsigned int* indices, int num_indices, bool line_strip, float line_width)
+: ThinLines(vertices->data(), nullptr, convert_scalars<float>(cmap, num_vertices).data(), num_vertices, indices, num_indices, line_strip, line_width) {}
 
 ThinLines::~ThinLines() {
   if (cbo) {

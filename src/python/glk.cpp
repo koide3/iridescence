@@ -42,12 +42,12 @@ bool check_valid_colors(const py::array_t<float, py::array::c_style | py::array:
   return true;
 }
 
-bool check_valid_voxels(const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels){
-  if (voxels.ndim() != 2){
+bool check_valid_voxels(const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels) {
+  if (voxels.ndim() != 2) {
     std::cerr << "voxels must be 2-dimensional (ndim=" << voxels.ndim() << ")" << std::endl;
     return false;
   }
-  if (voxels.shape(1) != 3){
+  if (voxels.shape(1) != 3) {
     std::cerr << "voxels must have 3 columns (cols=" << voxels.shape(1) << ")" << std::endl;
     return false;
   }
@@ -104,20 +104,22 @@ void define_glk(py::module_& m) {
   // glk::ThinLines
   py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines")
     .def(
-      py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points, bool line_strip) {
+      py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points, bool line_strip, float line_width) {
         if (!check_valid_points(points)) {
           throw std::runtime_error("invalid points array");
         }
 
-        return std::make_shared<glk::ThinLines>(points.data(), points.shape(0), line_strip);
+        return std::make_shared<glk::ThinLines>(points.data(), points.shape(0), line_strip, line_width);
       }),
       py::arg("points"),
-      py::arg("line_strip") = false)
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f)
     .def(
       py::init([](
                  const py::array_t<float, py::array::c_style | py::array::forcecast>& points,
                  const py::array_t<float, py::array::c_style | py::array::forcecast>& colors,
-                 bool line_strip) {
+                 bool line_strip,
+                 float line_width) {
         if (!check_valid_points(points)) {
           throw std::runtime_error("invalid points array");
         }
@@ -128,27 +130,30 @@ void define_glk(py::module_& m) {
           throw std::runtime_error("points and colors must have the same number of rows");
         }
 
-        return std::make_shared<glk::ThinLines>(points.data(), colors.data(), points.shape(0), line_strip);
+        return std::make_shared<glk::ThinLines>(points.data(), colors.data(), points.shape(0), line_strip, line_width);
       }),
       py::arg("points"),
       py::arg("colors"),
-      py::arg("line_strip") = false)
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f)
     .def(
-      py::init([](const std::vector<Eigen::Vector3f>& points, bool line_strip) { return std::make_shared<glk::ThinLines>(points, line_strip); }),
+      py::init([](const std::vector<Eigen::Vector3f>& points, bool line_strip, float line_width) { return std::make_shared<glk::ThinLines>(points, line_strip, line_width); }),
       "",
       py::arg("points"),
-      py::arg("line_strip") = false)
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f)
     .def(
-      py::init([](const std::vector<Eigen::Vector3f>& points, const std::vector<Eigen::Vector4f>& colors, bool line_strip) {
-        return std::make_shared<glk::ThinLines>(points, colors, line_strip);
+      py::init([](const std::vector<Eigen::Vector3f>& points, const std::vector<Eigen::Vector4f>& colors, bool line_strip, float line_width) {
+        return std::make_shared<glk::ThinLines>(points, colors, line_strip, line_width);
       }),
       "",
       py::arg("points"),
       py::arg("colors"),
-      py::arg("line_strip") = false)
+      py::arg("line_strip") = false,
+      py::arg("line_width") = 1.0f)
     // pyplot-like constructor
     .def(
-      py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, bool line_strip) {
+      py::init([](const Eigen::VectorXf& x, const Eigen::VectorXf& y, const Eigen::VectorXf& z, const Eigen::VectorXf& c, bool line_strip, float line_width) {
         int size = std::max(x.size(), std::max(y.size(), z.size()));
         if (x.size()) {
           size = std::min<int>(size, x.size());
@@ -177,17 +182,18 @@ void define_glk(py::module_& m) {
             colors[i] = glk::colormapf(glk::COLORMAP::TURBO, c[i]);
           }
 
-          return std::make_shared<glk::ThinLines>(vertices.data(), colors[0].data(), size, line_strip);
+          return std::make_shared<glk::ThinLines>(vertices.data(), colors[0].data(), size, line_strip, line_width);
         }
 
-        return std::make_shared<glk::ThinLines>(vertices.data(), size, line_strip);
+        return std::make_shared<glk::ThinLines>(vertices.data(), size, line_strip, line_width);
       }),
       "",
       py::arg("x") = Eigen::VectorXf(),
       py::arg("y") = Eigen::VectorXf(),
       py::arg("z") = Eigen::VectorXf(),
       py::arg("c") = Eigen::VectorXf(),
-      py::arg("line_strip") = true)
+      py::arg("line_strip") = true,
+      py::arg("line_width") = 1.0f)
     .def("set_line_width", &glk::ThinLines::set_line_width, py::arg("width"));
 
   // glk::Lines
@@ -350,24 +356,24 @@ void define_glk(py::module_& m) {
   // glk::VoxelMapOptions
   py::class_<glk::VoxelMapOptions, std::shared_ptr<glk::VoxelMapOptions>>(glk_, "VoxelMapOptions")
     .def(py::init<>())
-    .def("set_voxel_alpha", &glk::VoxelMapOptions::set_voxel_alpha,  py::arg("alpha"))
+    .def("set_voxel_alpha", &glk::VoxelMapOptions::set_voxel_alpha, py::arg("alpha"))
     .def("set_voxel_color", &glk::VoxelMapOptions::set_voxel_color, py::arg("color"))
-    .def("set_edge_alpha", &glk::VoxelMapOptions::set_edge_alpha,  py::arg("alpha"))
+    .def("set_edge_alpha", &glk::VoxelMapOptions::set_edge_alpha, py::arg("alpha"))
     .def("set_edge_color", &glk::VoxelMapOptions::set_edge_color, py::arg("color"))
     .def_readwrite("edge_line_width", &glk::VoxelMapOptions::edge_line_width);
 
   // glk::VoxelMap
   py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap")
     .def(
-      py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options){
-        if(!check_valid_voxels(voxels)){
+      py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options) {
+        if (!check_valid_voxels(voxels)) {
           throw std::runtime_error("invalid voxels array");
         }
 
         int n = voxels.shape(0);
         std::vector<Eigen::Vector3i> voxels_vec(n);
 
-        for (int i = 0; i < n; i++){
+        for (int i = 0; i < n; i++) {
           voxels_vec[i] = Eigen::Vector3i(voxels.at(i, 0), voxels.at(i, 1), voxels.at(i, 2));
         }
 
@@ -375,16 +381,14 @@ void define_glk(py::module_& m) {
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("voxel_options") = glk::VoxelMapOptions()
-    )
+      py::arg("voxel_options") = glk::VoxelMapOptions())
     .def(
-      py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options){     
+      py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options) {
         return std::make_shared<glk::VoxelMap>(voxels.data(), voxels.size(), resolution, voxel_options);
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("voxel_options") = glk::VoxelMapOptions()
-    );
+      py::arg("voxel_options") = glk::VoxelMapOptions());
 
   // glk::Texture
   py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture")
