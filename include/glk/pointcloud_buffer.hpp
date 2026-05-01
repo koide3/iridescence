@@ -132,13 +132,17 @@ PointCloudBuffer::PointCloudBuffer(const std::vector<Eigen::Matrix<Scalar, Dim, 
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<float, N, 1>, Allocator>& normals) {
-  if (normals.empty()) return;
+  if (normals.empty()) {
+    return;
+  }
   add_normals(normals[0].data(), sizeof(float) * N, normals.size());
 }
 
 template <int N, typename Allocator>
 void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<double, N, 1>, Allocator>& normals) {
-  if (normals.empty()) return;
+  if (normals.empty()) {
+    return;
+  }
   std::vector<Eigen::Vector3f> normals_f(normals.size());
   std::transform(normals.begin(), normals.end(), normals_f.begin(), [](const Eigen::Matrix<double, N, 1>& n) { return n.template head<3>().template cast<float>(); });
   add_normals(normals_f[0].data(), sizeof(Eigen::Vector3f), normals_f.size());
@@ -146,7 +150,9 @@ void PointCloudBuffer::add_normals(const std::vector<Eigen::Matrix<double, N, 1>
 
 template <int N>
 void PointCloudBuffer::add_normals(const Eigen::Matrix<float, N, 1>* normals, int num_points) {
-  if (num_points <= 0) return;
+  if (num_points <= 0) {
+    return;
+  }
   add_normals(normals->data(), sizeof(float) * N, num_points);
 }
 

@@ -596,7 +596,15 @@ std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     const auto colors_4f = colors ? glk::convert_to_vector<float, 4, 1>(colors, num_points) : std::vector<Eigen::Vector4f>{};
-    return update_thin_lines(name, points_3f.data(), colors_4f.empty() ? static_cast<const float*>(nullptr) : colors_4f.data(), num_points, indices, num_indices, line_strip, shader_setting);
+    return update_thin_lines(
+      name,
+      points_3f.data(),
+      colors_4f.empty() ? static_cast<const float*>(nullptr) : colors_4f.data(),
+      num_points,
+      indices,
+      num_indices,
+      line_strip,
+      shader_setting);
   }
 }
 
@@ -634,7 +642,15 @@ std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const std::vector<unsigned int>& indices,
   bool line_strip,
   const ShaderSetting& shader_setting) {
-  return update_thin_lines(name, points.data(), colors.empty() ? static_cast<const Color*>(nullptr) : colors.data(), points.size(), indices.data(), indices.size(), line_strip, shader_setting);
+  return update_thin_lines(
+    name,
+    points.data(),
+    colors.empty() ? static_cast<const Color*>(nullptr) : colors.data(),
+    points.size(),
+    indices.data(),
+    indices.size(),
+    line_strip,
+    shader_setting);
 }
 
 // ThinLines (with line_width)
@@ -697,7 +713,16 @@ std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   } else {
     const auto points_3f = glk::convert_to_vector<float, 3, 1>(points, num_points);
     const auto colors_4f = colors ? glk::convert_to_vector<float, 4, 1>(colors, num_points) : std::vector<Eigen::Vector4f>{};
-    return update_thin_lines(name, points_3f.data(), colors_4f.empty() ? static_cast<const float*>(nullptr) : colors_4f.data(), num_points, indices, num_indices, line_strip, line_width, shader_setting);
+    return update_thin_lines(
+      name,
+      points_3f.data(),
+      colors_4f.empty() ? static_cast<const float*>(nullptr) : colors_4f.data(),
+      num_points,
+      indices,
+      num_indices,
+      line_strip,
+      line_width,
+      shader_setting);
   }
 }
 
@@ -747,7 +772,16 @@ std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   bool line_strip,
   float line_width,
   const ShaderSetting& shader_setting) {
-  return update_thin_lines(name, points.data(), colors.empty() ? static_cast<const Color*>(nullptr) : colors.data(), points.size(), indices.data(), indices.size(), line_strip, line_width, shader_setting);
+  return update_thin_lines(
+    name,
+    points.data(),
+    colors.empty() ? static_cast<const Color*>(nullptr) : colors.data(),
+    points.size(),
+    indices.data(),
+    indices.size(),
+    line_strip,
+    line_width,
+    shader_setting);
 }
 
 }  // namespace guik

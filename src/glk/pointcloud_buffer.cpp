@@ -53,9 +53,11 @@ PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<float, 3, -1>& points) : 
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Matrix<double, 3, -1>& points) : PointCloudBuffer(points.cast<float>().eval()) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3f* points, int num_points) : PointCloudBuffer(num_points > 0 ? points->data() : nullptr, sizeof(Eigen::Vector3f), num_points) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3f* points, int num_points)
+: PointCloudBuffer(num_points > 0 ? points->data() : nullptr, sizeof(Eigen::Vector3f), num_points) {}
 
-PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points) : PointCloudBuffer(num_points > 0 ? points->data() : nullptr, sizeof(Eigen::Vector4f), num_points) {}
+PointCloudBuffer::PointCloudBuffer(const Eigen::Vector4f* points, int num_points)
+: PointCloudBuffer(num_points > 0 ? points->data() : nullptr, sizeof(Eigen::Vector4f), num_points) {}
 
 PointCloudBuffer::PointCloudBuffer(const Eigen::Vector3d* points, int num_points) : PointCloudBuffer(convert_to_vector<float, 3, 1>(points, num_points)) {}
 
@@ -245,12 +247,16 @@ void PointCloudBuffer::update_buffer_with_indices(const std::string& attribute_n
 }
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector3f* points, const unsigned int* indices, int num_indices) {
-  if (num_indices <= 0) return;
+  if (num_indices <= 0) {
+    return;
+  }
   update_points_with_indices(points[0].data(), sizeof(float) * 3, indices, num_indices);
 }
 
 void PointCloudBuffer::update_points_with_indices(const Eigen::Vector4f* points, const unsigned int* indices, int num_indices) {
-  if (num_indices <= 0) return;
+  if (num_indices <= 0) {
+    return;
+  }
   update_points_with_indices(points[0].data(), sizeof(float) * 4, indices, num_indices);
 }
 
@@ -277,7 +283,9 @@ void PointCloudBuffer::update_points_with_indices(const float* data, int stride,
 }
 
 void PointCloudBuffer::update_color_with_indices(const Eigen::Vector4f* colors, const unsigned int* indices, int num_indices) {
-  if (num_indices <= 0) return;
+  if (num_indices <= 0) {
+    return;
+  }
   update_buffer_with_indices("vert_color", 4, colors[0].data(), sizeof(float) * 4, indices, num_indices);
 }
 

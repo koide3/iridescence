@@ -99,7 +99,13 @@ Lines::Lines(
   const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
   const std::vector<Eigen::Vector4i, Allocator3>& infos,
   bool line_strip)
-: Lines(line_width, vertices.data(), colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(), infos.empty() ? static_cast<const Eigen::Vector4i*>(nullptr) : infos.data(), vertices.size(), line_strip) {}
+: Lines(
+    line_width,
+    vertices.data(),
+    colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(),
+    infos.empty() ? static_cast<const Eigen::Vector4i*>(nullptr) : infos.data(),
+    vertices.size(),
+    line_strip) {}
 
 }  // namespace glk
 
