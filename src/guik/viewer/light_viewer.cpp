@@ -429,7 +429,10 @@ void LightViewer::remove_plot(const std::string& plot_name, const std::string& l
   }
 
   auto& data = found->second;
-  data.erase(std::find_if(data.begin(), data.end(), [&](const auto& p) { return p.second->label == label; }));
+  const auto itr = std::find_if(data.begin(), data.end(), [&](const auto& p) { return p.second->label == label; });
+  if (itr != data.end()) {
+    data.erase(itr);
+  }
 }
 
 void LightViewer::setup_plot(const std::string& plot_name, int width, int height, int plot_flags, int x_flags, int y_flags, int order) {
