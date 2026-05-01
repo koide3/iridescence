@@ -108,7 +108,7 @@ NormalDistributions::NormalDistributions(const float* means, const float* covs, 
 
 template <>
 NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 4, 1>* means, const Eigen::Matrix<float, 4, 4>* covs, int num_points, float scale)
-: NormalDistributions(means[0].data(), covs[0].data(), num_points, scale) {}
+: NormalDistributions(num_points > 0 ? means[0].data() : nullptr, num_points > 0 ? covs[0].data() : nullptr, num_points, scale) {}
 
 template <>
 NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 3, 1>* means, const Eigen::Matrix<float, 3, 3>* covs, int num_points, float scale)
