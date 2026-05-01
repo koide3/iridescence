@@ -196,10 +196,19 @@ void AsyncLightViewerContext::update_thin_lines(
   if (colors) {
     colors_buffer.assign(colors, colors + 4 * num_vertices);
   }
-  std::vector<unsigned int> indices_buffer(indices, indices + num_indices);
+  std::vector<unsigned int> indices_buffer;
+  if (indices && num_indices > 0) {
+    indices_buffer.assign(indices, indices + num_indices);
+  }
 
   guik::viewer()->invoke([=] {
-    auto thin_lines = std::make_shared<glk::ThinLines>(vertices_buffer.data(), colors_buffer.data(), num_vertices, indices_buffer.data(), num_indices, line_strip);
+    auto thin_lines = std::make_shared<glk::ThinLines>(
+      vertices_buffer.data(),
+      colors_buffer.empty() ? nullptr : colors_buffer.data(),
+      num_vertices,
+      indices_buffer.empty() ? nullptr : indices_buffer.data(),
+      num_indices,
+      line_strip);
     thin_lines->set_line_width(line_width);
     context->update_drawable(name, thin_lines, shader_setting);
   });
