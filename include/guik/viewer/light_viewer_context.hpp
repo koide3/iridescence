@@ -328,6 +328,7 @@ public:
   /// @param indices        Pointer to index data (array of unsigned int). If null, non-indexed drawing is used.
   /// @param num_indices    Number of indices
   /// @param line_strip     If true, line strip mode is used. Otherwise, line list mode is used.
+  /// @param line_width     Width of the lines in pixels.
   /// @param shader_setting Shader setting
   std::shared_ptr<glk::ThinLines> update_thin_lines(
     const std::string& name,
