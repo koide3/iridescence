@@ -116,7 +116,7 @@ void PointCloudBuffer::add_intensity(glk::COLORMAP colormap, const float* data, 
     colors[i] = glk::colormapf(colormap, scale * data[(stride / sizeof(float)) * i]);
   }
 
-  add_color(colors.empty() ? nullptr : colors[0].data(), sizeof(Eigen::Vector4f), num_points);
+  add_color(num_points <= 0 ? nullptr : colors[0].data(), sizeof(Eigen::Vector4f), num_points);
 }
 
 void PointCloudBuffer::set_colormap_buffer(const std::string& attribute_name) {
