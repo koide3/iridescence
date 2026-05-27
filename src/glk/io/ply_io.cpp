@@ -1,5 +1,6 @@
 #include <glk/io/ply_io.hpp>
 
+#include <cstdint>
 #include <vector>
 #include <unordered_map>
 #include <fstream>

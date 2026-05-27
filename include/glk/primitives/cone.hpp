@@ -9,12 +9,12 @@ namespace glk {
 
 class Cone {
 public:
-  Cone(int div=10) {
+  Cone(int div = 10) {
     vertices.push_back(Eigen::Vector3f::Zero());
     vertices.push_back(Eigen::Vector3f::UnitZ());
 
     double step = 2.0 * M_PI / div;
-    for(int i = 0; i < div; i++) {
+    for (int i = 0; i < div; i++) {
       double rad = step * i;
       vertices.push_back(Eigen::Vector3f(std::cos(rad), std::sin(rad), 0.0f));
 
@@ -32,7 +32,7 @@ public:
   }
 
 public:
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
+  std::vector<Eigen::Vector3f> vertices;
   std::vector<int> indices;
 };
 

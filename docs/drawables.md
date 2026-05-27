@@ -25,7 +25,7 @@ viewer->update_points("points", points, guik::Rainbow());
 std::vector<Eigen::Vector3f> means = ...;
 std::vector<Eigen::Matrix3f> covs = ...;
 float scale = 1.0f;
-viewer->update_normal_dists("normal_dists", means, covs, scale, guik::Rainbow());)
+viewer->update_normal_dists("normal_dists", means, covs, scale, guik::Rainbow());
 
 // ThinLine
 std::vector<Eigen::Vector3f> line_vertices = ...;

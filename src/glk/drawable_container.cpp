@@ -38,7 +38,7 @@ void DrawableContainer::draw(glk::GLSLShader& shader) const {
           continue;
         }
 
-        params[i]->set(shader);
+        params[i].set(shader);
       }
     }
 

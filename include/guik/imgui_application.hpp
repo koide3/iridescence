@@ -28,6 +28,7 @@ public:
   virtual void show_window();
   virtual void hide_window();
   virtual void maximize_window();
+  virtual void fullscreen_window();
   virtual void resize(const Eigen::Vector2i& size);
 
   void set_title(const std::string& title);

@@ -42,9 +42,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -54,6 +54,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);
@@ -109,9 +110,9 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -121,6 +122,7 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);
@@ -277,9 +279,9 @@ void GLCanvas::bind() {
   }
 
   shader->use();
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -536,7 +538,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
 
   std::vector<int> pixels = frame_buffer->color(info_buffer_id).read_pixels<int>(GL_RGBA_INTEGER, GL_INT, 4);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {
@@ -572,7 +574,7 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
 
   std::vector<float> pixels = frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {

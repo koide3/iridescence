@@ -27,6 +27,7 @@ private:
   class DrawableEditorWindow;
   class CameraSettingWindow;
   class PlotSettingWindow;
+  class ImGuiDemoWindows;
   class PointPickingWindow;
 
   std::unique_ptr<DisplaySettingWindow> display_setting_window;
@@ -35,6 +36,7 @@ private:
   std::unique_ptr<DrawableEditorWindow> drawable_editor_window;
   std::unique_ptr<CameraSettingWindow> camera_setting_window;
   std::unique_ptr<PlotSettingWindow> plot_setting_window;
+  std::unique_ptr<ImGuiDemoWindows> imgui_demo_windows;
   std::unique_ptr<PointPickingWindow> point_picking_window;
 };
 }  // namespace guik

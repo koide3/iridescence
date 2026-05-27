@@ -42,6 +42,10 @@ void AsyncLightViewerContext::set_colormap(glk::COLORMAP colormap) {
   guik::viewer()->invoke([=] { context->set_colormap(colormap); });
 }
 
+void AsyncLightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  guik::viewer()->invoke([=] { context->set_point_shape(point_size, metric, circle); });
+}
+
 void AsyncLightViewerContext::clear_drawables() {
   guik::viewer()->invoke([=] { context->clear_drawables(); });
 }
@@ -57,12 +61,36 @@ void AsyncLightViewerContext::remove_drawable(const std::regex& regex) {
   guik::viewer()->invoke([=] { context->remove_drawable(regex); });
 }
 
+void AsyncLightViewerContext::save_camera_settings(const std::string& path) {
+  guik::viewer()->invoke([=] { context->save_camera_settings(path); });
+}
+
+void AsyncLightViewerContext::load_camera_settings(const std::string& path) {
+  guik::viewer()->invoke([=] { context->load_camera_settings(path); });
+}
+
+void AsyncLightViewerContext::save_color_buffer(const std::string& filename) {
+  guik::viewer()->invoke([=] { context->save_color_buffer(filename); });
+}
+
+void AsyncLightViewerContext::save_depth_buffer(const std::string& filename, bool real_scale) {
+  guik::viewer()->invoke([=] { context->save_depth_buffer(filename, real_scale); });
+}
+
 void AsyncLightViewerContext::reset_center() {
   guik::viewer()->invoke([=] { context->reset_center(); });
 }
 
 void AsyncLightViewerContext::lookat(const Eigen::Vector3f& pt) {
   guik::viewer()->invoke([=] { context->lookat(pt); });
+}
+
+void AsyncLightViewerContext::lookat(const Eigen::Isometry3f& T_world_sensor) {
+  guik::viewer()->invoke([=] { context->lookat(T_world_sensor); });
+}
+
+void AsyncLightViewerContext::lookat(const Eigen::Isometry3d& T_world_sensor) {
+  guik::viewer()->invoke([=] { context->lookat(T_world_sensor); });
 }
 
 void AsyncLightViewerContext::use_orbit_camera_control(double distance, double theta, double phi) {
@@ -85,6 +113,10 @@ void AsyncLightViewerContext::use_fps_camera_control(double fovy_deg) {
   guik::viewer()->invoke([=] { context->use_fps_camera_control(fovy_deg); });
 }
 
+void AsyncLightViewerContext::use_sensor_view_camera_control(const Eigen::Isometry3f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+  guik::viewer()->invoke([=] { context->use_sensor_view_camera_control(T_sensor_camera, smoothing_factor_trans, smoothing_factor_rot); });
+}
+
 void AsyncLightViewerContext::update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting) {
   guik::viewer()->invoke([=] {
     auto drawable = context->find_drawable(name);
@@ -102,6 +134,24 @@ void AsyncLightViewerContext::update_points(const std::string& name, const float
 
   guik::viewer()->invoke([=] {
     auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(buffer.data(), stride, num_points);
+    context->update_drawable(name, cloud_buffer, shader_setting);
+  });
+}
+
+void AsyncLightViewerContext::update_points(
+  const std::string& name,
+  const float* vertices,
+  int vertex_stride,
+  const float* colors,
+  int color_stride,
+  int num_points,
+  const ShaderSetting& shader_setting) {
+  std::vector<float> vertex_buffer(vertices, vertices + vertex_stride / sizeof(float) * num_points);
+  std::vector<float> color_buffer(colors, colors + color_stride / sizeof(float) * num_points);
+
+  guik::viewer()->invoke([=] {
+    auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(vertex_buffer.data(), vertex_stride, num_points);
+    cloud_buffer->add_color(color_buffer.data(), color_stride, num_points);
     context->update_drawable(name, cloud_buffer, shader_setting);
   });
 }
@@ -138,6 +188,7 @@ void AsyncLightViewerContext::update_thin_lines(
   const unsigned int* indices,
   int num_indices,
   bool line_strip,
+  float line_width,
   const ShaderSetting& shader_setting) {
   //
   std::vector<float> vertices_buffer(vertices, vertices + 3 * num_vertices);
@@ -145,12 +196,34 @@ void AsyncLightViewerContext::update_thin_lines(
   if (colors) {
     colors_buffer.assign(colors, colors + 4 * num_vertices);
   }
-  std::vector<unsigned int> indices_buffer(indices, indices + num_indices);
+  std::vector<unsigned int> indices_buffer;
+  if (indices && num_indices > 0) {
+    indices_buffer.assign(indices, indices + num_indices);
+  }
 
   guik::viewer()->invoke([=] {
-    auto thin_lines = std::make_shared<glk::ThinLines>(vertices_buffer.data(), colors_buffer.data(), num_vertices, indices_buffer.data(), num_indices, line_strip);
+    auto thin_lines = std::make_shared<glk::ThinLines>(
+      vertices_buffer.data(),
+      colors_buffer.empty() ? nullptr : colors_buffer.data(),
+      num_vertices,
+      indices_buffer.empty() ? nullptr : indices_buffer.data(),
+      num_indices,
+      line_strip);
+    thin_lines->set_line_width(line_width);
     context->update_drawable(name, thin_lines, shader_setting);
   });
+}
+
+void AsyncLightViewerContext::update_thin_lines(
+  const std::string& name,
+  const float* vertices,
+  const float* colors,
+  int num_vertices,
+  const unsigned int* indices,
+  int num_indices,
+  bool line_strip,
+  const ShaderSetting& shader_setting) {
+  update_thin_lines(name, vertices, colors, num_vertices, indices, num_indices, line_strip, 1.0f, shader_setting);
 }
 
 // Primitives

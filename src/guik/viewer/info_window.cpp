@@ -125,6 +125,8 @@ std::string LightViewer::InfoWindow::get_gpu_info() const {
     sst << "GPU " << std::setfill(' ') << std::setw(5) << tokens[2] << "    ";
     sst << "Memory (" << std::setfill(' ') << std::setw(10) << tokens[4] << " / " << std::setfill(' ') << std::setw(10) << tokens[5] << ")";
   }
+
+  pclose(fp);
 #endif
 
   if (sst.str().empty()) {

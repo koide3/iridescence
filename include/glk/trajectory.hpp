@@ -13,7 +13,7 @@ class ThinLines;
 
 class Trajectory : public glk::Drawable {
 public:
-  Trajectory(const std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>& trajectory);
+  Trajectory(const std::vector<Eigen::Isometry3f>& trajectory);
   Trajectory(int num_frames, const std::function<Eigen::Isometry3f(int)>& adapter);
 
   virtual ~Trajectory();
@@ -22,9 +22,8 @@ public:
 
 private:
   std::unique_ptr<glk::ThinLines> lines;
-  std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>> trajectory;
+  std::vector<Eigen::Isometry3f> trajectory;
 };
-}
-
+}  // namespace glk
 
 #endif

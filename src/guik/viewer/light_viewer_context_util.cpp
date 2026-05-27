@@ -40,10 +40,24 @@ std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
   const unsigned int* indices,
   int num_indices,
   bool line_strip,
+  float line_width,
   const ShaderSetting& shader_setting) {
   auto thin_lines = std::make_shared<glk::ThinLines>(vertices, colors, num_vertices, indices, num_indices, line_strip);
+  thin_lines->set_line_width(line_width);
   update_drawable(name, thin_lines, shader_setting);
   return thin_lines;
+}
+
+std::shared_ptr<glk::ThinLines> LightViewerContext::update_thin_lines(
+  const std::string& name,
+  const float* vertices,
+  const float* colors,
+  int num_vertices,
+  const unsigned int* indices,
+  int num_indices,
+  bool line_strip,
+  const ShaderSetting& shader_setting) {
+  return update_thin_lines(name, vertices, colors, num_vertices, indices, num_indices, line_strip, 1.0f, shader_setting);
 }
 
 // Primitives

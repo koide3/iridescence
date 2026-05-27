@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
                      .translate(std::cos(t) * 10.0f, std::sin(t) * 10.0f, 0.0f)
                      .scale(1.0f, 1.0f, 20.0f)
                      // Mark as dynamic object
-                     .dymamic_object();
+                     .dynamic_object();
 
     viewer->update_cube("cube", setting);
   }

@@ -5,7 +5,7 @@
 
 namespace guik {
 
-// generate a unique name
+/// @brief Generate a unique name
 std::string anon();
 
 }

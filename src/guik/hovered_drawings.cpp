@@ -27,7 +27,7 @@ struct HoveredDrawingsData {
   std::vector<std::shared_ptr<HoveredDrawing>> drawable_drawings;
 
   std::vector<int> removed_drawing_ids;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> pts;
+  std::vector<Eigen::Vector4f> pts;
   std::vector<std::shared_ptr<HoveredDrawing>> drawings;
 };
 
@@ -185,7 +185,7 @@ void HoveredDrawings::clear() {
 
 std::function<void()> HoveredDrawings::create_callback() {
   return [data = data] {
-    std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> all_pts;
+    std::vector<Eigen::Vector4f> all_pts;
     std::vector<std::shared_ptr<HoveredDrawing>> all_drawings;
 
     all_pts.reserve(data->pts.size() + data->drawable_names.size());

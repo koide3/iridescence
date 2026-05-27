@@ -38,7 +38,7 @@ void MeshModel::draw(glk::GLSLShader& shader) const {
           continue;
         }
 
-        settings[material_id].params[i]->set(shader);
+        settings[material_id].params[i].set(shader);
       }
     }
 

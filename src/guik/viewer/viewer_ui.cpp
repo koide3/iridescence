@@ -45,6 +45,11 @@ public:
 
     ImGui::Begin("display setting", &show_window, ImGuiWindowFlags_AlwaysAutoResize);
 
+    Eigen::Vector4f clear_color = viewer->get_canvas().clear_color;
+    if (ImGui::ColorEdit4("Clear color", clear_color.data())) {
+      viewer->get_canvas().clear_color = clear_color;
+    }
+
     auto colormap_modes = glk::colormap_names();
     if (ImGui::Combo("Colormap mode", &colormap_mode, colormap_modes.data(), colormap_modes.size())) {
       viewer->set_colormap(static_cast<glk::COLORMAP>(colormap_mode));
@@ -57,11 +62,32 @@ public:
       viewer->shader_setting().add("colormap_axis", axis);
     }
 
+    ImGui::Separator();
+
+    auto point_scale_mode = viewer->shader_setting().get<int>("point_scale_mode");
+    if (!point_scale_mode) {
+      point_scale_mode = 1;
+    }
+    if (ImGui::Combo("Point scale mode", &point_scale_mode.value(), "SCREENSPACE\0METRIC\0")) {
+      viewer->shader_setting().add("point_scale_mode", *point_scale_mode);
+      if (*point_scale_mode == guik::PointScaleMode::METRIC) {
+        viewer->shader_setting().set_point_size(0.05f);  // 5 cm
+      }
+    }
+
+    auto point_shape_mode = viewer->shader_setting().get<int>("point_shape_mode");
+    if (!point_shape_mode) {
+      point_shape_mode = 1;
+    }
+    if (ImGui::Combo("Point shape mode", &point_shape_mode.value(), "RECTANGLE\0CIRCLE\0")) {
+      viewer->shader_setting().add("point_shape_mode", *point_shape_mode);
+    }
+
     auto point_size = viewer->shader_setting().get<float>("point_size");
     if (!point_size) {
-      point_size = 10.0f;
+      point_size = 0.025f;
     }
-    if (ImGui::DragFloat("Point size", &point_size.value(), 0.1f)) {
+    if (ImGui::DragFloat("Point size", &point_size.value(), 0.001f, 0.0f, 1000.0f)) {
       viewer->shader_setting().add("point_size", *point_size);
     }
 
@@ -76,6 +102,15 @@ public:
 
     ImGui::SameLine();
     ImGui::Checkbox("Auto", &auto_range);
+
+    auto cmap_range = viewer->shader_setting().get<Eigen::Vector2f>("cmap_range");
+    if (!cmap_range) {
+      cmap_range = Eigen::Vector2f(0.0f, 1.0f);
+    }
+
+    if (ImGui::DragFloatRange2("cmap_range", cmap_range->data(), cmap_range->data() + 1, 0.01f)) {
+      viewer->shader_setting().add("cmap_range", *cmap_range);
+    }
 
     if (auto_range) {
       Eigen::Vector3f axis = Eigen::Vector3f::Zero();
@@ -478,14 +513,7 @@ public:
     }
     recent_files.push(filename);
 
-    std::ofstream ofs(filename);
-    auto projection = viewer->get_projection_control();
-    ofs << "ProjectionControl: " << projection->name() << std::endl;
-    ofs << (*projection) << std::endl;
-
-    auto view = viewer->get_camera_control();
-    ofs << "CameraControl: " << view->name() << std::endl;
-    ofs << (*view) << std::endl;
+    viewer->save_camera_settings(filename);
   }
 
   void load_camera() {
@@ -498,42 +526,7 @@ public:
     }
     recent_files.push(filenames.front());
 
-    std::ifstream ifs(filenames.front());
-
-    // load projection setting
-    std::shared_ptr<guik::ProjectionControl> proj(new guik::BasicProjectionControl(viewer->canvas_size()));
-    ifs >> (*proj);
-    viewer->set_projection_control(proj);
-
-    std::string line;
-    while (!ifs.eof() && std::getline(ifs, line)) {
-      if (line.find("CameraControl") == std::string::npos) {
-        continue;
-      }
-
-      std::stringstream sst(line);
-      std::string token, type;
-      sst >> token >> type;
-
-      std::shared_ptr<guik::CameraControl> camera_control;
-      if (type == "OrbitCameraControlXY") {
-        camera_control.reset(new guik::OrbitCameraControlXY());
-      } else if (type == "OrbitCameraControlXZ") {
-        camera_control.reset(new guik::OrbitCameraControlXZ());
-      } else if (type == "TopDownCameraControl") {
-        camera_control.reset(new guik::TopDownCameraControl());
-      } else if (type == "ArcBallCameraControl") {
-        camera_control.reset(new guik::ArcBallCameraControl());
-      }
-
-      if (camera_control == nullptr) {
-        std::cerr << "error: unknown camera control type(" << type << ")" << std::endl;
-        break;
-      }
-
-      ifs >> (*camera_control);
-      viewer->set_camera_control(camera_control);
-    }
+    viewer->load_camera_settings(filenames.front());
   }
 
 private:
@@ -600,6 +593,67 @@ private:
   bool show_window;
 };
 
+class LightViewer::ViewerUI::ImGuiDemoWindows {
+public:
+  ImGuiDemoWindows(guik::LightViewer* viewer) : viewer(viewer) {
+    show_demo_window = false;
+    show_metrics_window = false;
+    show_about_window = false;
+    show_misc_window = false;
+  }
+
+  ~ImGuiDemoWindows() {}
+
+  void menu_item() {
+    if (ImGui::BeginMenu("ImGui")) {
+      if (ImGui::MenuItem("Demo window")) {
+        show_demo_window = !show_demo_window;
+      }
+
+      if (ImGui::MenuItem("Metrics window")) {
+        show_metrics_window = !show_metrics_window;
+      }
+
+      if (ImGui::MenuItem("About window")) {
+        show_about_window = !show_about_window;
+      }
+
+      if (ImGui::MenuItem("Miscellaneous")) {
+        show_misc_window = !show_misc_window;
+      }
+
+      ImGui::EndMenu();
+    }
+  }
+  void draw_ui() {
+    if (show_demo_window) {
+      ImGui::ShowDemoWindow(&show_demo_window);
+    }
+
+    if (show_metrics_window) {
+      ImGui::ShowMetricsWindow(&show_metrics_window);
+    }
+
+    if (show_about_window) {
+      ImGui::ShowAboutWindow(&show_about_window);
+    }
+
+    if (show_misc_window) {
+      if (ImGui::Begin("Miscellaneous", &show_misc_window, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::ShowFontSelector("Font Selector");
+        ImGui::ShowStyleEditor();
+      }
+    }
+  }
+
+private:
+  LightViewer* viewer;
+  bool show_demo_window;
+  bool show_metrics_window;
+  bool show_about_window;
+  bool show_misc_window;
+};
+
 class LightViewer::ViewerUI::PointPickingWindow {
 public:
   PointPickingWindow(guik::LightViewer* viewer) : viewer(viewer) {
@@ -654,6 +708,7 @@ LightViewer::ViewerUI::ViewerUI(guik::LightViewer* viewer) : viewer(viewer) {
   drawable_editor_window.reset(new DrawableEditorWindow(viewer));
   camera_setting_window.reset(new CameraSettingWindow(viewer));
   plot_setting_window.reset(new PlotSettingWindow(viewer));
+  imgui_demo_windows.reset(new ImGuiDemoWindows(viewer));
   point_picking_window.reset(new PointPickingWindow(viewer));
 }
 /**
@@ -674,6 +729,7 @@ bool LightViewer::ViewerUI::draw_ui() {
   drawable_filter_window->draw_ui();
   drawable_editor_window->draw_ui();
   camera_setting_window->draw_ui();
+  imgui_demo_windows->draw_ui();
   point_picking_window->draw_ui();
 
   return true;
@@ -754,6 +810,7 @@ bool LightViewer::ViewerUI::draw_main_menu_bar() {
   }
 
   if (ImGui::BeginMenu("Utility")) {
+    imgui_demo_windows->menu_item();
     point_picking_window->menu_item();
     ImGui::EndMenu();
   }
