@@ -39,6 +39,16 @@ public:
   /// @brief Set colormap used for RAINBOW and VERTEX_COLORMAP modes.
   void set_colormap(glk::COLORMAP colormap);
 
+  /// @brief Enable partial rendering.
+  /// @param clear_thresh Threshold for clearing the partial rendering buffer.
+  void enable_partial_rendering(double clear_thresh = 1e-6);
+  /// @brief Disable partial rendering.
+  void disable_partial_rendering();
+  /// @brief Enable backface culling. Fragments with back-facing normals will not be rendered.
+  void enable_backface_culling();
+  /// @brief Disable backface culling.
+  void disable_backface_culling();
+
   /// @brief Set point shape properties.
   /// @param point_size   Point size
   /// @param metric       If true, point size is in the metric unit [m], otherwise in pixel unit.

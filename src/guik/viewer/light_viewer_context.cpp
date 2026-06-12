@@ -325,6 +325,15 @@ void LightViewerContext::disable_partial_rendering() {
   canvas->disable_partial_rendering();
 }
 
+void LightViewerContext::enable_backface_culling() {
+  canvas->enable_backface_culling();
+}
+
+void LightViewerContext::disable_backface_culling() {
+  canvas->disable_backface_culling();
+}
+
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }
@@ -335,6 +344,10 @@ bool LightViewerContext::info_buffer_enabled() const {
 
 bool LightViewerContext::partial_rendering_enabled() const {
   return canvas->partial_rendering_enabled();
+}
+
+bool LightViewerContext::backface_culling_enabled() const {
+  return canvas->backface_culling_enabled();
 }
 
 const glk::Texture& LightViewerContext::color_buffer() const {

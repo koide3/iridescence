@@ -42,6 +42,22 @@ void AsyncLightViewerContext::set_colormap(glk::COLORMAP colormap) {
   guik::viewer()->invoke([=] { context->set_colormap(colormap); });
 }
 
+void AsyncLightViewerContext::enable_partial_rendering(double clear_thresh) {
+  guik::viewer()->invoke([=] { context->enable_partial_rendering(clear_thresh); });
+}
+
+void AsyncLightViewerContext::disable_partial_rendering() {
+  guik::viewer()->invoke([=] { context->disable_partial_rendering(); });
+}
+
+void AsyncLightViewerContext::enable_backface_culling() {
+  guik::viewer()->invoke([=] { context->enable_backface_culling(); });
+}
+
+void AsyncLightViewerContext::disable_backface_culling() {
+  guik::viewer()->invoke([=] { context->disable_backface_culling(); });
+}
+
 void AsyncLightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
   guik::viewer()->invoke([=] { context->set_point_shape(point_size, metric, circle); });
 }

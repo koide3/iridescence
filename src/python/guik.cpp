@@ -481,6 +481,9 @@ void define_guik(py::module_& m) {
     .def("enable_info_buffer", &guik::LightViewerContext::enable_info_buffer)
     .def("enable_partial_rendering", &guik::LightViewerContext::enable_partial_rendering, py::arg("clear_thresh") = 1e-6)
     .def("disable_partial_rendering", &guik::LightViewerContext::disable_partial_rendering)
+    .def("enable_backface_culling", &guik::LightViewerContext::enable_backface_culling)
+    .def("disable_backface_culling", &guik::LightViewerContext::disable_backface_culling)
+    .def("backface_culling_enabled", &guik::LightViewerContext::backface_culling_enabled)
 
     .def("color_buffer", &guik::LightViewerContext::color_buffer)
     .def("depth_buffer", &guik::LightViewerContext::depth_buffer)
