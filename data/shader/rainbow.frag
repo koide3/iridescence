@@ -39,7 +39,7 @@ void main() {
         }
     }
 
-    if (backface_culling_enabled && length(frag_normal_view) > 0.1) {
+    if (backface_culling_enabled && length(frag_normal_view) > 1e-3) {
         if (frag_normal_view.z <= 0.0) {
             discard;
         }

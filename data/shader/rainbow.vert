@@ -85,7 +85,7 @@ void main() {
         frag_normal = vec3(0.0, 0.0, 0.0);
     }
 
-    if (backface_culling_enabled && length(frag_normal) > 0.1) {
+    if (backface_culling_enabled && length(frag_normal) > 1e-3) {
         frag_normal_view = normalize((view_matrix * vec4(frag_normal, 0.0)).xyz);
     } else {
         frag_normal_view = vec3(0.0, 0.0, 0.0);
