@@ -118,6 +118,9 @@ public:
   void enable_backface_culling();
   /// @brief Disable backface culling.
   void disable_backface_culling();
+  /// @brief Set the range of normal.z for backface culling. Fragments with normal.z outside the range will be culled when backface culling is enabled.
+  /// @param range [min, max] range of normal.z for backface culling
+  void set_backface_culling_range(const Eigen::Vector2f& range);
 
   /// @brief Whether normal buffer is enabled.
   bool normal_buffer_enabled() const;

@@ -6,6 +6,7 @@ uniform int dynamic_object;
 uniform bool normal_enabled;
 uniform bool partial_rendering_enabled;
 uniform bool backface_culling_enabled;
+uniform vec2 backface_culling_range; // [min, max] range of normal.z for backface culling
 
 // point_scale_mode = 0 : screen space scale
 // point_scale_mode = 1 : metric scale
@@ -40,7 +41,7 @@ void main() {
     }
 
     if (backface_culling_enabled && length(frag_normal_view) > 1e-3) {
-        if (frag_normal_view.z <= 0.0) {
+        if (frag_normal_view.z < backface_culling_range.x || frag_normal_view.z > backface_culling_range.y) {
             discard;
         }
     }

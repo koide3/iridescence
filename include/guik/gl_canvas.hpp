@@ -39,6 +39,7 @@ public:
   void clear_partial_rendering();
   void enable_backface_culling();
   void disable_backface_culling();
+  void set_backface_culling_range(const Eigen::Vector2f& range);
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
@@ -80,6 +81,8 @@ public:
   int dynamic_flag_buffer_id;
 
   bool is_backface_culling_enabled;
+  Eigen::Vector2f backface_culling_range;
+
   bool is_partial_rendering_enabled;
   bool clear_partial_rendering_flag;
   double partial_rendering_clear_thresh;

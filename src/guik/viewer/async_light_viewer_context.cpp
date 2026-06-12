@@ -58,6 +58,10 @@ void AsyncLightViewerContext::disable_backface_culling() {
   guik::viewer()->invoke([=] { context->disable_backface_culling(); });
 }
 
+void AsyncLightViewerContext::set_backface_culling_range(const Eigen::Vector2f& range) {
+  guik::viewer()->invoke([=] { context->set_backface_culling_range(range); });
+}
+
 void AsyncLightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
   guik::viewer()->invoke([=] { context->set_point_shape(point_size, metric, circle); });
 }

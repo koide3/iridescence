@@ -333,6 +333,9 @@ void LightViewerContext::disable_backface_culling() {
   canvas->disable_backface_culling();
 }
 
+void LightViewerContext::set_backface_culling_range(const Eigen::Vector2f& range) {
+  canvas->set_backface_culling_range(range);
+}
 
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
