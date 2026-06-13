@@ -77,6 +77,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   normal_buffer_id = info_buffer_id = dynamic_flag_buffer_id = 0;
   last_projection_view_matrix.setIdentity();
 
+  is_backface_culling_enabled = false;
+  backface_culling_range = Eigen::Vector2f(0.0f, 1.1f);
+
   is_partial_rendering_enabled = false;
   clear_partial_rendering_flag = false;
   partial_rendering_clear_thresh = 1e-6;
@@ -197,6 +200,18 @@ void GLCanvas::clear_partial_rendering() {
   clear_partial_rendering_flag = true;
 }
 
+void GLCanvas::enable_backface_culling() {
+  is_backface_culling_enabled = true;
+}
+
+void GLCanvas::disable_backface_culling() {
+  is_backface_culling_enabled = false;
+}
+
+void GLCanvas::set_backface_culling_range(const Eigen::Vector2f& range) {
+  backface_culling_range = range;
+}
+
 bool GLCanvas::normal_buffer_enabled() const {
   return normal_buffer_id > 0;
 }
@@ -207,6 +222,10 @@ bool GLCanvas::info_buffer_enabled() const {
 
 bool GLCanvas::partial_rendering_enabled() const {
   return is_partial_rendering_enabled;
+}
+
+bool GLCanvas::backface_culling_enabled() const {
+  return is_backface_culling_enabled;
 }
 
 const glk::Texture& GLCanvas::color_buffer() const {
@@ -292,6 +311,8 @@ void GLCanvas::bind() {
   shader->set_uniform("info_enabled", info_buffer_id > 0);
   shader->set_uniform("normal_enabled", normal_buffer_id > 0);
   shader->set_uniform("partial_rendering_enabled", is_partial_rendering_enabled);
+  shader->set_uniform("backface_culling_enabled", is_backface_culling_enabled);
+  shader->set_uniform("backface_culling_range", backface_culling_range);
 
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);

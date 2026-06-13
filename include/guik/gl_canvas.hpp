@@ -37,10 +37,14 @@ public:
   void enable_partial_rendering(double clear_thresh = 1e-6);
   void disable_partial_rendering();
   void clear_partial_rendering();
+  void enable_backface_culling();
+  void disable_backface_culling();
+  void set_backface_culling_range(const Eigen::Vector2f& range);
 
   bool normal_buffer_enabled() const;
   bool info_buffer_enabled() const;
   bool partial_rendering_enabled() const;
+  bool backface_culling_enabled() const;
 
   const glk::Texture& color_buffer() const;
   const glk::Texture& depth_buffer() const;
@@ -75,6 +79,9 @@ public:
   int normal_buffer_id;
   int info_buffer_id;
   int dynamic_flag_buffer_id;
+
+  bool is_backface_culling_enabled;
+  Eigen::Vector2f backface_culling_range;
 
   bool is_partial_rendering_enabled;
   bool clear_partial_rendering_flag;

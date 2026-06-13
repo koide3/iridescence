@@ -114,6 +114,13 @@ public:
   void enable_partial_rendering(double clear_thresh = 1e-6);
   /// @brief Disable partial rendering.
   void disable_partial_rendering();
+  /// @brief Enable backface culling. Fragments with back-facing normals will not be rendered.
+  void enable_backface_culling();
+  /// @brief Disable backface culling.
+  void disable_backface_culling();
+  /// @brief Set the range of normal.z for backface culling. Fragments with normal.z outside the range will be culled when backface culling is enabled.
+  /// @param range [min, max] range of normal.z for backface culling
+  void set_backface_culling_range(const Eigen::Vector2f& range);
 
   /// @brief Whether normal buffer is enabled.
   bool normal_buffer_enabled() const;
@@ -121,6 +128,8 @@ public:
   bool info_buffer_enabled() const;
   /// @brief  Whether partial rendering is enabled.
   bool partial_rendering_enabled() const;
+  /// @brief  Whether backface culling is enabled.
+  bool backface_culling_enabled() const;
 
   /// @brief Color buffer.
   const glk::Texture& color_buffer() const;
