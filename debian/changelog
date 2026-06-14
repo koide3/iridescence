@@ -1,3 +1,9 @@
+libiridescence (1.0.2-1ppa1~resolute1) resolute; urgency=medium
+
+  * backface culling
+
+ -- Kenji Koide <k.koide@aist.go.jp>  Sun, 14 Jun 2026 19:21:51 +0900
+
 libiridescence (1.0.2-1ppa1~noble1) noble; urgency=medium
 
   * backface culling
