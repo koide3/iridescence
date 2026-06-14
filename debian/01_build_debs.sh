@@ -6,6 +6,11 @@ pushd .
 
 cd ..
 
+dch -v $1 $2 -D resolute
+git add debian/changelog
+git commit -m "update debian/changelog for resolute"
+gbp buildpackage -S -sa --git-upstream-tag='v%(version)s' --git-submodules
+
 dch -v $1 $2 -D noble
 git add debian/changelog
 git commit -m "update debian/changelog for noble"
