@@ -20,25 +20,31 @@ uniform mat4 projection_matrix;
 // colormode = 1 : material_color
 // colormode = 2 : vert_color
 // colormode = 3 : texture_color
+// colormode = 4 : vert_cmap (color map)
 uniform int color_mode;
 uniform vec4 material_color;
 uniform sampler2D colormap_sampler;
 uniform sampler2D texture_sampler;
 
 uniform vec2 z_range;
+uniform vec2 cmap_range;
 uniform vec3 colormap_axis;
+uniform bool backface_culling_enabled;
 
 in vec3 vert_position;
 in vec4 vert_color;
 in vec2 vert_texcoord;
 in vec3 vert_normal;
+in float vert_cmap;
 
 out vec4 frag_color;
 out vec2 frag_texcoord;
-out vec3 frag_normal;
+out vec3 frag_normal;           // normal in world space
+out vec3 frag_normal_view;      // normal in view space
+out vec3 frag_vert_position;    // the original vertex position (model space)
 
-vec4 rainbow(vec3 position) {
-    float p = (dot(position, colormap_axis) - z_range[0]) / (z_range[1] - z_range[0]);
+vec4 rainbow(float val, vec2 range) {
+    float p = (val - range[0]) / (range[1] - range[0]);
     return texture(colormap_sampler, vec2(p, 0.0));
 }
 
@@ -46,10 +52,11 @@ void main() {
     vec4 world_position = model_matrix * vec4(vert_position, 1.0);
     vec3 frag_world_position = world_position.xyz;
     gl_Position = projection_matrix * view_matrix * world_position;
+    frag_vert_position = vert_position;
 
     switch(color_mode) {
         case 0:
-            frag_color = rainbow(frag_world_position);
+            frag_color = rainbow(dot(frag_world_position, colormap_axis), z_range);
             frag_color.a = material_color.a;
             break;
 
@@ -64,14 +71,26 @@ void main() {
         case 3:
             frag_texcoord = vert_texcoord;
             break;
+
+        case 4:
+            frag_color = rainbow(vert_cmap, cmap_range);
+            frag_color.a = material_color.a;
+            break;
     }
 
-    if(normal_enabled) {
+    if(normal_enabled || backface_culling_enabled) {
         mat3 normal_matrix = transpose(inverse(mat3(model_matrix)));
         frag_normal = normal_matrix * vert_normal;
     } else {
         frag_normal = vec3(0.0, 0.0, 0.0);
     }
+
+    if (backface_culling_enabled && length(frag_normal) > 1e-3) {
+        frag_normal_view = normalize((view_matrix * vec4(frag_normal, 0.0)).xyz);
+    } else {
+        frag_normal_view = vec3(0.0, 0.0, 0.0);
+    }
+
 
     if (point_scale_mode == 0) {
         vec3 ndc = gl_Position.xyz / gl_Position.w;

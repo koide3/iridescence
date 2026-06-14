@@ -101,8 +101,8 @@ GridMap::~GridMap() {
 }
 
 void GridMap::init_vao(double resolution, int width, int height) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> texcoords;
+  std::vector<Eigen::Vector3f> vertices;
+  std::vector<Eigen::Vector2f> texcoords;
 
   vertices.push_back(Eigen::Vector3f(-resolution * width / 2, -resolution * height / 2, 0.0f));
   vertices.push_back(Eigen::Vector3f(resolution * width / 2, -resolution * height / 2, 0.0f));

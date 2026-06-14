@@ -20,6 +20,7 @@ OrbitCameraControlXY::OrbitCameraControlXY(double distance, double theta, double
   this->phi = phi;
 
   left_button_down = false;
+  right_button_down = false;
   middle_button_down = false;
 }
 
@@ -34,10 +35,13 @@ void OrbitCameraControlXY::lookat(const Eigen::Vector3f& pt) {
 }
 
 void OrbitCameraControlXY::mouse(const Eigen::Vector2f& p, int button, bool down) {
-  if(button == 0) {
+  if (button == 0) {
     left_button_down = down;
   }
-  if(button == 2) {
+  if (button == 1) {
+    right_button_down = down;
+  }
+  if (button == 2) {
     middle_button_down = down;
   }
   drag_last_pos = p;
@@ -46,14 +50,14 @@ void OrbitCameraControlXY::mouse(const Eigen::Vector2f& p, int button, bool down
 void OrbitCameraControlXY::drag(const Eigen::Vector2f& p, int button) {
   Eigen::Vector2f rel = p - drag_last_pos;
 
-  if(left_button_down) {
+  if (left_button_down && right_button_down) {
+    center.z() += rel[1] * distance * 0.001f;
+  } else if (left_button_down) {
     theta -= rel[0] * 0.01f;
     phi -= rel[1] * 0.01f;
 
     phi = std::min(M_PI_2 - 0.01, std::max(-M_PI_2 + 0.01, phi));
-  }
-
-  if(middle_button_down) {
+  } else if (middle_button_down || right_button_down) {
     center += Eigen::AngleAxisf(theta + M_PI_2, Eigen::Vector3f::UnitZ()) * Eigen::Vector3f(-rel[0], rel[1], 0.0f) * distance * 0.001f;
   }
 
@@ -61,9 +65,9 @@ void OrbitCameraControlXY::drag(const Eigen::Vector2f& p, int button) {
 }
 
 void OrbitCameraControlXY::scroll(const Eigen::Vector2f& rel) {
-  if(rel[0] > 0) {
+  if (rel[0] > 0) {
     distance = distance * 0.8f;
-  } else if(rel[0] < 0) {
+  } else if (rel[0] < 0) {
     distance = distance * 1.2f;
   }
 
@@ -71,9 +75,9 @@ void OrbitCameraControlXY::scroll(const Eigen::Vector2f& rel) {
 }
 
 void OrbitCameraControlXY::updown(double p) {
-  if(p > 0) {
+  if (p > 0) {
     distance = distance * 0.998f;
-  } else if(p < 0) {
+  } else if (p < 0) {
     distance = distance * 1.002f;
   }
 

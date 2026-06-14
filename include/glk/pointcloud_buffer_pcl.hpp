@@ -8,25 +8,25 @@
 
 namespace glk {
 
-template<typename PointT>
+template <typename PointT>
 std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<PointT>& cloud) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points(cloud.size());
-  for(int i = 0; i < cloud.size(); i++) {
+  std::vector<Eigen::Vector3f> points(cloud.size());
+  for (int i = 0; i < cloud.size(); i++) {
     points[i] = cloud[i].getVector3fMap();
   }
   return std::make_shared<PointCloudBuffer>(points[0].data(), sizeof(Eigen::Vector3f), cloud.size());
 }
 
-template<>
+template <>
 inline std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<pcl::PointXYZ>& cloud) {
   return std::make_shared<PointCloudBuffer>(&cloud.at(0).x, sizeof(pcl::PointXYZ), cloud.size());
 }
 
-template<>
+template <>
 inline std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::PointCloud<pcl::PointNormal>& cloud) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points(cloud.size());
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> normals(cloud.size());
-  for(int i = 0; i < cloud.size(); i++) {
+  std::vector<Eigen::Vector3f> points(cloud.size());
+  std::vector<Eigen::Vector3f> normals(cloud.size());
+  for (int i = 0; i < cloud.size(); i++) {
     points[i] = cloud[i].getVector3fMap();
     normals[i] = cloud[i].getNormalVector3fMap();
   }
@@ -37,12 +37,12 @@ inline std::shared_ptr<PointCloudBuffer> create_point_cloud_buffer(const pcl::Po
   return cloud_buffer;
 }
 
-template<typename PointT>
+template <typename PointT>
 std::shared_ptr<PointCloudBuffer> create_colored_point_cloud_buffer(const pcl::PointCloud<PointT>& cloud) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points(cloud.size());
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(cloud.size());
+  std::vector<Eigen::Vector3f> points(cloud.size());
+  std::vector<Eigen::Vector4f> colors(cloud.size());
 
-  for(int i = 0; i < cloud.size(); i++) {
+  for (int i = 0; i < cloud.size(); i++) {
     points[i] = cloud[i].getVector3fMap();
     colors[i] = Eigen::Vector4f(cloud[i].r, cloud[i].g, cloud[i].b, cloud[i].a) / 255.0f;
   }

@@ -13,6 +13,7 @@
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/arcball_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
+#include <guik/camera/sensor_view_camera_control.hpp>
 #include <guik/camera/basic_projection_control.hpp>
 
 namespace guik {
@@ -260,6 +261,14 @@ void LightViewerContext::lookat(const Eigen::Vector3f& pt) {
   canvas->camera_control->lookat(pt);
 }
 
+void LightViewerContext::lookat(const Eigen::Isometry3f& T_world_sensor) {
+  canvas->camera_control->lookat(T_world_sensor);
+}
+
+void LightViewerContext::lookat(const Eigen::Isometry3d& T_world_sensor) {
+  canvas->camera_control->lookat(T_world_sensor);
+}
+
 void LightViewerContext::set_draw_xy_grid(bool draw_xy_grid) {
   this->draw_xy_grid = draw_xy_grid;
 }
@@ -278,6 +287,22 @@ const std::shared_ptr<glk::ScreenEffect>& LightViewerContext::get_screen_effect(
 
 void LightViewerContext::set_bg_texture(const std::shared_ptr<glk::Texture>& bg_texture) {
   canvas->set_bg_texture(bg_texture);
+}
+
+void LightViewerContext::set_rainbow_range(const Eigen::Vector2f& minmax_z) {
+  shader_setting().set_rainbow_range(minmax_z);
+}
+
+void LightViewerContext::set_rainbow_axis(const Eigen::Vector3f& axis) {
+  shader_setting().set_rainbow_axis(axis);
+}
+
+void LightViewerContext::set_colormap_range(const Eigen::Vector2f& minmax) {
+  shader_setting().set_colormap_range(minmax);
+}
+
+void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
+  shader_setting().set_point_shape(point_size, metric, circle);
 }
 
 void LightViewerContext::enable_decimal_rendering() {
@@ -300,6 +325,18 @@ void LightViewerContext::disable_partial_rendering() {
   canvas->disable_partial_rendering();
 }
 
+void LightViewerContext::enable_backface_culling() {
+  canvas->enable_backface_culling();
+}
+
+void LightViewerContext::disable_backface_culling() {
+  canvas->disable_backface_culling();
+}
+
+void LightViewerContext::set_backface_culling_range(const Eigen::Vector2f& range) {
+  canvas->set_backface_culling_range(range);
+}
+
 bool LightViewerContext::normal_buffer_enabled() const {
   return canvas->normal_buffer_enabled();
 }
@@ -310,6 +347,10 @@ bool LightViewerContext::info_buffer_enabled() const {
 
 bool LightViewerContext::partial_rendering_enabled() const {
   return canvas->partial_rendering_enabled();
+}
+
+bool LightViewerContext::backface_culling_enabled() const {
+  return canvas->backface_culling_enabled();
 }
 
 const glk::Texture& LightViewerContext::color_buffer() const {
@@ -518,19 +559,11 @@ std::shared_ptr<FPSCameraControl> LightViewerContext::use_fps_camera_control(dou
   return fps_camera_control;
 }
 
-void LightViewerContext::set_point_shape(float point_size, bool metric, bool circle) {
-  shader_setting().set_point_size(point_size);
-  if (metric) {
-    shader_setting().set_point_scale_metric();
-  } else {
-    shader_setting().set_point_scale_screenspace();
-  }
-
-  if (circle) {
-    shader_setting().set_point_shape_circle();
-  } else {
-    shader_setting().set_point_shape_rectangle();
-  }
+std::shared_ptr<SensorViewCameraControl>
+LightViewerContext::use_sensor_view_camera_control(const Eigen::Isometry3f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+  auto sensor_view_camera_control = std::make_shared<guik::SensorViewCameraControl>(T_sensor_camera, smoothing_factor_trans, smoothing_factor_rot);
+  canvas->camera_control = sensor_view_camera_control;
+  return sensor_view_camera_control;
 }
 
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {

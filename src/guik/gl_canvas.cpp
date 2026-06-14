@@ -42,9 +42,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -54,6 +54,7 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);
@@ -75,6 +76,9 @@ GLCanvas::GLCanvas(const Eigen::Vector2i& size, const std::string& shader_name, 
 
   normal_buffer_id = info_buffer_id = dynamic_flag_buffer_id = 0;
   last_projection_view_matrix.setIdentity();
+
+  is_backface_culling_enabled = false;
+  backface_culling_range = Eigen::Vector2f(0.0f, 1.1f);
 
   is_partial_rendering_enabled = false;
   clear_partial_rendering_flag = false;
@@ -109,9 +113,9 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
 
   shader->use();
 
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -121,6 +125,7 @@ bool GLCanvas::load_shader(const std::string& shader_name) {
   shader->set_uniform("color_mode", 0);
   shader->set_uniform("material_color", Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
   shader->set_uniform("z_range", Eigen::Vector2f(-3.0f, 5.0f));
+  shader->set_uniform("cmap_range", Eigen::Vector2f(0.0f, 1.0f));
   shader->set_uniform("colormap_axis", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
 
   shader->set_uniform("colormap_sampler", 0);
@@ -195,6 +200,18 @@ void GLCanvas::clear_partial_rendering() {
   clear_partial_rendering_flag = true;
 }
 
+void GLCanvas::enable_backface_culling() {
+  is_backface_culling_enabled = true;
+}
+
+void GLCanvas::disable_backface_culling() {
+  is_backface_culling_enabled = false;
+}
+
+void GLCanvas::set_backface_culling_range(const Eigen::Vector2f& range) {
+  backface_culling_range = range;
+}
+
 bool GLCanvas::normal_buffer_enabled() const {
   return normal_buffer_id > 0;
 }
@@ -205,6 +222,10 @@ bool GLCanvas::info_buffer_enabled() const {
 
 bool GLCanvas::partial_rendering_enabled() const {
   return is_partial_rendering_enabled;
+}
+
+bool GLCanvas::backface_culling_enabled() const {
+  return is_backface_culling_enabled;
 }
 
 const glk::Texture& GLCanvas::color_buffer() const {
@@ -277,9 +298,9 @@ void GLCanvas::bind() {
   }
 
   shader->use();
-  shader->set_uniform("point_scale_mode", 0);
-  shader->set_uniform("point_shape_mode", 0);
-  shader->set_uniform("point_size", 10.0f);
+  shader->set_uniform("point_scale_mode", 1);
+  shader->set_uniform("point_shape_mode", 1);
+  shader->set_uniform("point_size", 0.025f);
   shader->set_uniform("point_scale", 1.0f);
   shader->set_uniform("point_size_offset", 0.0f);
 
@@ -290,6 +311,8 @@ void GLCanvas::bind() {
   shader->set_uniform("info_enabled", info_buffer_id > 0);
   shader->set_uniform("normal_enabled", normal_buffer_id > 0);
   shader->set_uniform("partial_rendering_enabled", is_partial_rendering_enabled);
+  shader->set_uniform("backface_culling_enabled", is_backface_culling_enabled);
+  shader->set_uniform("backface_culling_range", backface_culling_range);
 
   shader->set_uniform("colormap_sampler", 0);
   shader->set_uniform("texture_sampler", 1);
@@ -536,7 +559,7 @@ Eigen::Vector4i GLCanvas::pick_info(const Eigen::Vector2i& p, int window) const 
 
   std::vector<int> pixels = frame_buffer->color(info_buffer_id).read_pixels<int>(GL_RGBA_INTEGER, GL_INT, 4);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {
@@ -572,7 +595,7 @@ float GLCanvas::pick_depth(const Eigen::Vector2i& p, int window) const {
 
   std::vector<float> pixels = frame_buffer->depth().read_pixels<float>(GL_DEPTH_COMPONENT, GL_FLOAT, 1);
 
-  std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i>> ps;
+  std::vector<Eigen::Vector2i> ps;
 
   for (int i = -window; i <= window; i++) {
     for (int j = -window; j <= window; j++) {

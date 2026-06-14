@@ -53,7 +53,12 @@ public:
   void set_light_color(int i, const Eigen::Vector4f& color);
 
   virtual void set_size(const Eigen::Vector2i& size) override;
-  virtual void draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer = nullptr) override;
+  virtual void draw(
+    const TextureRenderer& renderer,
+    const glk::Texture& color_texture,
+    const glk::Texture& depth_texture,
+    const TextureRendererInput::Ptr& input,
+    glk::FrameBuffer* frame_buffer = nullptr) override;
 
 private:
   bool load_shader();
@@ -76,9 +81,9 @@ private:
   bool light_updated;
   std::vector<int> light_directional;
   std::vector<float> light_range;
-  std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> light_attenuation;
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> light_pos;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_color;
+  std::vector<Eigen::Vector2f> light_attenuation;
+  std::vector<Eigen::Vector3f> light_pos;
+  std::vector<Eigen::Vector4f> light_color;
 };
 
 }  // namespace glk

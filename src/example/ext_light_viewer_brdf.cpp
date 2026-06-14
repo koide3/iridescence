@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 
   bool rotate_lights = true;
   const int num_lights = 8;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> light_colors(num_lights);
+  std::vector<Eigen::Vector4f> light_colors(num_lights);
   for (int i = 0; i < num_lights; i++) {
     light_colors[i] = glk::colormap_categoricalf(glk::COLORMAP::TURBO, i, num_lights);
   }

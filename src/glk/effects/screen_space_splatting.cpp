@@ -24,84 +24,86 @@ ScreenSpaceSplatting::ScreenSpaceSplatting(const Eigen::Vector2i& size) {
 
   query.reset(new glk::Query());
 
-  if(!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
+  if (!texture_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/texture.frag")) {
     abort();
   }
 
-  if(!position_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/calc_pos.frag")) {
+  if (!position_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/calc_pos.frag")) {
     abort();
   }
 
-  if(!white_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
+  if (!white_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
     abort();
   }
 
-  if(!increment_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
+  if (!increment_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/one_float.frag")) {
     abort();
   }
 
-  if(!point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.vert", GL_VERTEX_SHADER) ||
-     !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.geom", GL_GEOMETRY_SHADER) ||
-     !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.frag", GL_FRAGMENT_SHADER) ||
-     !point_extraction_shader.add_feedback_varying("vert_out") || !point_extraction_shader.link_program()) {
+  if (
+    !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.vert", GL_VERTEX_SHADER) ||
+    !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.geom", GL_GEOMETRY_SHADER) ||
+    !point_extraction_shader.attach_source(get_data_path() + "/shader/splat/extract_points.frag", GL_FRAGMENT_SHADER) ||
+    !point_extraction_shader.add_feedback_varying("vert_out") || !point_extraction_shader.link_program()) {
     abort();
   }
 
-  if(!initial_radius_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/initial_radius.frag")) {
+  if (!initial_radius_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/initial_radius.frag")) {
     abort();
   }
 
-  if(!distribution_shader.init(get_data_path() + "/shader/splat/distribution")) {
+  if (!distribution_shader.init(get_data_path() + "/shader/splat/distribution")) {
     abort();
   }
 
-  if(!gathering_shader.init(get_data_path() + "/shader/splat/gathering")) {
+  if (!gathering_shader.init(get_data_path() + "/shader/splat/gathering")) {
     abort();
   }
 
-  if(!bounds_update_shader.init(get_data_path() + "/shader/splat/tex2screen_test_finalized.vert", get_data_path() + "/shader/splat/update_bounds.frag")) {
+  if (!bounds_update_shader.init(get_data_path() + "/shader/splat/tex2screen_test_finalized.vert", get_data_path() + "/shader/splat/update_bounds.frag")) {
     abort();
   }
 
-  if(!farthest_point_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/farthest_point.frag")) {
+  if (!farthest_point_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/farthest_point.frag")) {
     abort();
   }
 
-  if(!radius_finalization_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/finalize_radius.frag")) {
+  if (!radius_finalization_shader.init(get_data_path() + "/shader/splat/tex2screen.vert", get_data_path() + "/shader/splat/finalize_radius.frag")) {
     abort();
   }
 
-  if(!gaussian_gathering_shader.init(get_data_path() + "/shader/splat/gathering.vert", get_data_path() + "/shader/splat/gaussian_gathering.frag")) {
+  if (!gaussian_gathering_shader.init(get_data_path() + "/shader/splat/gathering.vert", get_data_path() + "/shader/splat/gaussian_gathering.frag")) {
     abort();
   }
 
-  if(!gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/tex2screen.vert", GL_VERTEX_SHADER) ||
-     !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/gaussian_finalization.frag", GL_FRAGMENT_SHADER) ||
-     !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/eigen.frag", GL_FRAGMENT_SHADER) ||
-     !gaussian_finalization_shader.link_program()) {
+  if (
+    !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/tex2screen.vert", GL_VERTEX_SHADER) ||
+    !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/gaussian_finalization.frag", GL_FRAGMENT_SHADER) ||
+    !gaussian_finalization_shader.attach_source(get_data_path() + "/shader/splat/eigen.frag", GL_FRAGMENT_SHADER) || !gaussian_finalization_shader.link_program()) {
     abort();
   }
 
-  if(!splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
-     !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
-     !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat_first.frag", GL_FRAGMENT_SHADER) ||
-     !splatting_first_shader.link_program()) {
+  if (
+    !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
+    !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
+    !splatting_first_shader.attach_source(get_data_path() + "/shader/splat/splat_first.frag", GL_FRAGMENT_SHADER) || !splatting_first_shader.link_program()) {
     abort();
   }
 
-  if(!splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
-     !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
-     !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat_second.frag", GL_FRAGMENT_SHADER) ||
-     !splatting_second_shader.link_program()) {
+  if (
+    !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.vert", GL_VERTEX_SHADER) ||
+    !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat.geom", GL_GEOMETRY_SHADER) ||
+    !splatting_second_shader.attach_source(get_data_path() + "/shader/splat/splat_second.frag", GL_FRAGMENT_SHADER) || !splatting_second_shader.link_program()) {
     abort();
   }
 
-  if(!splatting_finalization_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/finalize_splat.frag")) {
+  if (!splatting_finalization_shader.init(get_data_path() + "/shader/texture.vert", get_data_path() + "/shader/splat/finalize_splat.frag")) {
     abort();
   }
 
-  if(!debug_shader.attach_source(get_data_path() + "/shader/texture.vert", GL_VERTEX_SHADER) || !debug_shader.attach_source(get_data_path() + "/shader/splat/debug.frag", GL_FRAGMENT_SHADER) ||
-     !debug_shader.link_program()) {
+  if (
+    !debug_shader.attach_source(get_data_path() + "/shader/texture.vert", GL_VERTEX_SHADER) ||
+    !debug_shader.attach_source(get_data_path() + "/shader/splat/debug.frag", GL_FRAGMENT_SHADER) || !debug_shader.link_program()) {
     abort();
   }
 
@@ -197,9 +199,9 @@ void ScreenSpaceSplatting::set_size(const Eigen::Vector2i& size) {
   position_buffer.reset(new glk::FrameBuffer(size, 0, true));
   position_buffer->add_color_buffer(0, GL_RGBA32F, GL_RGB, GL_FLOAT).set_filer_mode(GL_NEAREST);
 
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> sampling_points;
-  for(int y = 0; y < size[1]; y += steps * subsample_steps) {
-    for(int x = 0; x < size[0]; x += steps * subsample_steps) {
+  std::vector<Eigen::Vector3f> sampling_points;
+  for (int y = 0; y < size[1]; y += steps * subsample_steps) {
+    for (int x = 0; x < size[0]; x += steps * subsample_steps) {
       Eigen::Array3d pt = step_size * Eigen::Array3d(x, y, 0) + step_size * 0.5;
       sampling_points.push_back(pt.cast<float>());
     }
@@ -398,7 +400,7 @@ void ScreenSpaceSplatting::estimate_knn_radius() {
   glDepthMask(GL_FALSE);
 
   // ping pong
-  for(int i = 0; i < num_iterations; i++) {
+  for (int i = 0; i < num_iterations; i++) {
     auto& radius_buffer_front = i % 2 == 0 ? radius_buffer_ping : radius_buffer_pong;
     auto& radius_buffer_back = i % 2 == 0 ? radius_buffer_pong : radius_buffer_ping;
 
@@ -629,7 +631,12 @@ void ScreenSpaceSplatting::render_splatting(GLProfiler& prof, const glk::Texture
   glDisable(GL_BLEND);
 }
 
-void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Texture& color_texture, const glk::Texture& depth_texture, const TextureRendererInput::Ptr& input, glk::FrameBuffer* frame_buffer) {
+void ScreenSpaceSplatting::draw(
+  const TextureRenderer& renderer,
+  const glk::Texture& color_texture,
+  const glk::Texture& depth_texture,
+  const TextureRendererInput::Ptr& input,
+  glk::FrameBuffer* frame_buffer) {
   glDisable(GL_DEPTH_TEST);
 
   color_texture.set_filer_mode(GL_NEAREST);
@@ -638,7 +645,7 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
   // uniform variables
   const auto view_matrix = input->get<Eigen::Matrix4f>("view_matrix");
   const auto projection_matrix = input->get<Eigen::Matrix4f>("projection_matrix");
-  if(!view_matrix || !projection_matrix) {
+  if (!view_matrix || !projection_matrix) {
     std::cerr << bold_red << "error: view and projection matrices must be set" << reset << std::endl;
     return;
   }
@@ -762,7 +769,5 @@ void ScreenSpaceSplatting::draw(const TextureRenderer& renderer, const glk::Text
     frame_buffer->unbind();
   }
   */
-
-
 }
 }  // namespace glk

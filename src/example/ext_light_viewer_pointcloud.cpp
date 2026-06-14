@@ -18,9 +18,9 @@ int main(int argc, char** argv) {
   std::vector<std::string> filenames;
 
   viewer->register_ui_callback("cloud_loader", [&]() {
-    if(ImGui::Button("load")) {
+    if (ImGui::Button("load")) {
       std::vector<std::string> results = pfd::open_file("choose PCD file").result();
-      if(!results.empty()) {
+      if (!results.empty()) {
         filenames.push_back(results[0]);
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
         // viewer->update_drawable(results[0], cloud_buffer, guik::FlatColor(Eigen::Vector4f::Random(), Eigen::Translation3f(1.0f, 1.0f, 1.0f)).add("point_scale", 5.0f));
 
         // with point color
-        // std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors(cloud->size());
+        // std::vector<Eigen::Vector4f> colors(cloud->size());
         // for(int i = 0; i < cloud->size(); i++) {
         //   colors[i] = cloud->at(i).getVector4fMap() * 0.1f;
         // }
@@ -55,10 +55,10 @@ int main(int argc, char** argv) {
       }
     }
 
-    for(int i = 0; i < filenames.size(); i++) {
+    for (int i = 0; i < filenames.size(); i++) {
       std::string button_name = "remove##" + std::to_string(i);
       std::string filename = filenames[i];
-      if(ImGui::Button(button_name.c_str())) {
+      if (ImGui::Button(button_name.c_str())) {
         viewer->remove_drawable(filenames[i]);
         filenames.erase(filenames.begin() + i);
       }

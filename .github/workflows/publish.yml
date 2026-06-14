@@ -27,6 +27,9 @@ jobs:
           - os: ubuntu-latest
             python: cp313
             arch: x86_64
+          - os: ubuntu-latest
+            python: cp314
+            arch: x86_64
           # Linux aarch64
           - os: ubuntu-latest
             python: cp310
@@ -39,6 +42,9 @@ jobs:
             arch: aarch64
           - os: ubuntu-latest
             python: cp313
+            arch: aarch64
+          - os: ubuntu-latest
+            python: cp314
             arch: aarch64
           # Windows
           - os: windows-latest
@@ -53,7 +59,9 @@ jobs:
           - os: windows-latest
             python: cp313
             arch: AMD64
-
+          - os: windows-latest
+            python: cp314
+            arch: AMD64
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,7 +79,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_BUILD: ${{ matrix.python }}-*
           CIBW_ARCHS: ${{ matrix.arch }}

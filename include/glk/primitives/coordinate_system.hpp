@@ -29,8 +29,8 @@ public:
   }
 
 public:
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> vertices;
-  std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f>> colors;
+  std::vector<Eigen::Vector3f> vertices;
+  std::vector<Eigen::Vector4f> colors;
 };
 }  // namespace glk
 

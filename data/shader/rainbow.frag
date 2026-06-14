@@ -5,6 +5,8 @@ uniform int dynamic_object;
 
 uniform bool normal_enabled;
 uniform bool partial_rendering_enabled;
+uniform bool backface_culling_enabled;
+uniform vec2 backface_culling_range; // [min, max] range of normal.z for backface culling
 
 // point_scale_mode = 0 : screen space scale
 // point_scale_mode = 1 : metric scale
@@ -22,7 +24,8 @@ uniform sampler2D texture_sampler;
 
 in vec4 frag_color;
 in vec2 frag_texcoord;
-in vec3 frag_normal;
+in vec3 frag_normal;            // normal in world space
+in vec3 frag_normal_view;       // normal in view space
 
 layout (location=0) out vec4 color;
 layout (location=1) out ivec4 info;
@@ -33,6 +36,12 @@ void main() {
     // TODO: check if gl_PointCoord.xy == 0 for non-point primitives on non-NVIDIA GPUs
     if (point_shape_mode == 1 && (gl_PointCoord.x != 0 || gl_PointCoord.y != 0)) {
         if (length(gl_PointCoord.xy - vec2(0.5, 0.5)) > 0.5) {
+            discard;
+        }
+    }
+
+    if (backface_culling_enabled && length(frag_normal_view) > 1e-3) {
+        if (frag_normal_view.z < backface_culling_range.x || frag_normal_view.z > backface_culling_range.y) {
             discard;
         }
     }

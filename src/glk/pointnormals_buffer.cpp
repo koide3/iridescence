@@ -5,7 +5,7 @@
 namespace glk {
 
 PointNormalsBuffer::PointNormalsBuffer(const float* vertices, size_t vertex_stride, const float* normals, size_t normal_stride, int num_points, double normal_length) {
-  std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> lines(num_points * 2);
+  std::vector<Eigen::Vector3f> lines(num_points * 2);
 
   for (int i = 0; i < num_points; i++) {
     lines[i * 2] = Eigen::Map<const Eigen::Vector3f>(vertices + i * vertex_stride / sizeof(float));
@@ -22,15 +22,7 @@ PointNormalsBuffer::PointNormalsBuffer(
   double normal_length)
 : PointNormalsBuffer(vertices[0].data(), sizeof(Eigen::Vector3f), normals[0].data(), sizeof(Eigen::Vector3f), vertices.size(), normal_length) {}
 
-template PointNormalsBuffer::PointNormalsBuffer(
-  const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& vertices,
-  const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& normals,
-  double normal_length);
-
-template PointNormalsBuffer::PointNormalsBuffer(
-  const std::vector<Eigen::Vector3f, std::allocator<Eigen::Vector3f>>& vertices,
-  const std::vector<Eigen::Vector3f, std::allocator<Eigen::Vector3f>>& normals,
-  double normal_length);
+template PointNormalsBuffer::PointNormalsBuffer(const std::vector<Eigen::Vector3f>& vertices, const std::vector<Eigen::Vector3f>& normals, double normal_length);
 
 PointNormalsBuffer::~PointNormalsBuffer() {}
 

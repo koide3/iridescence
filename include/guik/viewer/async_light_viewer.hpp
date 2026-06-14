@@ -30,28 +30,88 @@ public:
   /// @brief Wait while a toggle checkbox is checked
   static void toggle_wait();
 
+  /// @brief Invoke a task in the visualization thread.
   void invoke(const std::function<void()>& func);
+  /// @brief Invoke a task after rendering in the visualization thread.
   void invoke_after_rendering(const std::function<void()>& func);
+  /// @brief Invoke a labeled task only once in the life time of the viewer.
   void invoke_once(const std::string& label, const std::function<void()>& func);
 
+  /// @brief Clear all images.
   void clear_images();
+  /// @brief Remove an image by name.
   void remove_image(const std::string& name);
+  /// @brief Register or update an image.
+  /// @param name   Name of the image.
+  /// @param width  Image width.
+  /// @param height Image height.
+  /// @param rgba_bytes  Image data in RGBA format.
+  /// @param scale  Scale factor for displaying the image. If negative, auto scale is used.
+  /// @param order  Display order. Images with smaller order values are displayed first. If -1, the image is added to the end of the display order.
   void update_image(const std::string& name, int width, int height, const std::vector<unsigned char>& rgba_bytes, double scale = -1.0, int order = -1);
 
   // Plotting methods
+  /// @brief Clear all plots.
+  /// @param clear_settings  If true, clear plot settings as well.
   void clear_plots(bool clear_settings = true);
+  /// @brief Remove a plot by name.
+  /// @param plot_name  Name of the plot to be removed.
+  /// @param label      If non-empty, remove only the plot with the specified label in the plot group.
   void remove_plot(const std::string& plot_name, const std::string& label = "");
+  /// @brief Setup a plot.
+  /// @param plot_name  Name of the plot.
+  /// @param width      Width of the plot [pixels].
+  /// @param height     Height of the plot [pixels].
+  /// @param plot_flags Flags for the plot.
+  /// @param x_flags    Flags for the x-axis.
+  /// @param y_flags    Flags for the y-axis.
+  /// @param order      Display order of the plot. Plots with smaller order values are displayed first. If -1, the plot is added to the end of the display order.
   void setup_plot(const std::string& plot_name, int width, int height, int plot_flags = 0, int x_flags = 0, int y_flags = 0, int order = -1);
+  /// @brief Link an axis of a plot to a link ID.
+  /// @param plot_name  Name of the plot.
+  /// @param link_id    Link ID.
+  /// @param axis       Axis to be linked (ImAxis_X1, ImAxis_X2, ImAxis_Y1, or ImAxis_Y2).
   void link_plot_axis(const std::string& plot_name, int link_id, int axis);
+  /// @brief Link multiple axes of a plot to a link ID.
+  /// @param plot_name  Name of the plot.
+  /// @param link_id    Link ID.
+  /// @param axes       Bitwise OR of axes to be linked (ImAxis_X1, ImAxis_X2, ImAxis_Y1, and/or ImAxis_Y2).
   void link_plot_axes(const std::string& plot_name, int link_id, int axes = -1);
+  /// @brief Setup the legend for a plot.
+  /// @param plot_name  Name of the plot.
+  /// @param loc        Location of the legend.
+  /// @param flags      Flags for the legend.
   void setup_legend(const std::string& plot_name, int loc, int flags = 0);
+  /// @brief Fit the plot view to the data range.
+  /// @param plot_name  Name of the plot.
   void fit_plot(const std::string& plot_name);
+  /// @brief Fit all plots to their data ranges.
   void fit_all_plots();
+  /// @brief Setup the plot group order.
+  /// @param group_name  Name of the plot group.
+  /// @param order       Display order of the plot group. Plot groups with smaller order values are displayed first.
   void setup_plot_group_order(const std::string& group_name, int order);
 
   // Update plot methods
+  /// @brief Update a plot with new data.
+  /// @param plot_name  Name of the plot.
+  /// @param label      Label.
+  /// @param plot       Plot data.
   void update_plot(const std::string& plot_name, const std::string& label, const std::shared_ptr<const PlotData>& plot);
+  /// @brief Update a line plot.
+  /// @param plot_name     Name of the plot.
+  /// @param label         Label.
+  /// @param ys            Y data.
+  /// @param line_flags    Flags for the line plot.
+  /// @param max_num_data  Maximum number of data points to be displayed.
   void update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int line_flags = 0, size_t max_num_data = 2048);
+  /// @brief Update a line plot.
+  /// @param plot_name     Name of the plot.
+  /// @param label         Label.
+  /// @param xs            X data.
+  /// @param ys            Y data.
+  /// @param line_flags    Flags for the line plot.
+  /// @param max_num_data  Maximum number of data points to be displayed.
   void update_plot_line(
     const std::string& plot_name,
     const std::string& label,
@@ -59,10 +119,39 @@ public:
     const std::vector<double>& ys,
     int line_flags = 0,
     size_t max_num_data = 2048);
+  /// @brief Update a scatter plot.
+  /// @param plot_name     Name of the plot.
+  /// @param label         Label.
+  /// @param ys            Y data.
+  /// @param scatter_flags Flags for the scatter plot.
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int scatter_flags = 0);
+  /// @brief Update a scatter plot.
+  /// @param plot_name     Name of the plot.
+  /// @param label         Label.
+  /// @param xs            X data.
+  /// @param ys            Y data.
+  /// @param scatter_flags Flags for the scatter plot.
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int scatter_flags = 0);
+  /// @brief Update a stairs plot.
+  /// @param plot_name   Name of the plot.
+  /// @param label       Label.
+  /// @param ys          Y data.
+  /// @param stairs_flags  Flags for the stairs plot.
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& ys, int stairs_flags = 0);
+  /// @brief Update a stairs plot.
+  /// @param plot_name     Name of the plot.
+  /// @param label         Label.
+  /// @param xs            X data.
+  /// @param ys            Y data.
+  /// @param stairs_flags  Flags for the stairs plot.
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags = 0);
+  /// @brief Update a histogram plot.
+  /// @param plot_name      Name of the plot.
+  /// @param label          Label.
+  /// @param xs             Data to be histogrammed.
+  /// @param bins           Number of bins.
+  /// @param range          Data range of the histogram.
+  /// @param histogram_flags  Flags for the histogram plot.
   void update_plot_histogram(
     const std::string& plot_name,
     const std::string& label,
@@ -70,6 +159,7 @@ public:
     int bins = -2,
     const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
     int histogram_flags = 0);
+  /// @brief  Update a 2D histogram plot.
   void update_plot_histogram(
     const std::string& plot_name,
     const std::string& label,
@@ -82,9 +172,11 @@ public:
     int histogram_flags = 0);
 
   // Update plot template methods
+  /// @brief Update a line plot.
   template <typename T>
   auto update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int line_flags = 0, size_t max_num_data = 8192 * 12)
     -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
+  /// @brief Update a line plot.
   template <typename T1, typename T2>
   void update_plot_line(
     const std::string& plot_name,
@@ -93,6 +185,7 @@ public:
     const std::vector<T2>& ys,
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
+  /// @brief Update a line plot.
   template <typename T, int D, typename Alloc>
   void update_plot_line(
     const std::string& plot_name,
@@ -101,6 +194,7 @@ public:
     int line_flags = 0,
     size_t max_num_data = 8192 * 12);
 
+  /// @brief Update a line plot.
   template <typename T, typename Func>
   auto
   update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
@@ -114,6 +208,7 @@ public:
     }
     update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
   }
+  /// @brief Update a line plot.
   template <typename T, typename Func>
   auto
   update_plot_line(const std::string& plot_name, const std::string& label, const std::vector<T>& data, const Func& transform, int line_flags = 0, size_t max_num_data = 8192 * 12)
@@ -128,13 +223,17 @@ public:
     update_plot_line(plot_name, label, xs, ys, line_flags, max_num_data);
   }
 
+  /// @brief Update a scatter plot.
   template <typename T>
   auto update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int scatter_flags = 0)
     -> std::enable_if_t<std::is_arithmetic_v<T>, void>;
+  /// @brief Update a scatter plot.
   template <typename T1, typename T2>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int scatter_flags = 0);
+  /// @brief Update a scatter plot.
   template <typename T, int D, typename Alloc>
   void update_plot_scatter(const std::string& plot_name, const std::string& label, const std::vector<Eigen::Matrix<T, D, 1>, Alloc>& data, int scatter_flags = 0);
+  /// @brief Update a scatter plot.
   template <typename T, typename Func>
   auto update_plot_scatter(
     const std::string& plot_name,
@@ -152,6 +251,7 @@ public:
     }
     update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
   }
+  /// @brief Update a scatter plot.
   template <typename T, typename Func>
   auto update_plot_scatter(
     const std::string& plot_name,
@@ -170,10 +270,13 @@ public:
     update_plot_scatter(plot_name, label, xs, ys, scatter_flags);
   }
 
+  /// @brief Update a stairs plot.
   template <typename T>
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T>& ys, int stairs_flags = 0);
+  /// @brief Update a stairs plot.
   template <typename T1, typename T2>
   void update_plot_stairs(const std::string& plot_name, const std::string& label, const std::vector<T1>& xs, const std::vector<T2>& ys, int stairs_flags = 0);
+  /// @brief Update a histogram plot.
   template <typename T>
   void update_plot_histogram(
     const std::string& plot_name,
@@ -182,6 +285,7 @@ public:
     int bins = -2,
     const Eigen::Vector2d& range = Eigen::Vector2d(0.0, 0.0),
     int histogram_flags = 0);
+  /// @brief  Update a 2D histogram plot.
   template <typename T1, typename T2>
   void update_plot_histogram(
     const std::string& plot_name,
@@ -195,8 +299,25 @@ public:
     int histogram_flags = 0);
 
   // Set plot style methods
+  /// @brief Set the style for a plot.
+  /// @param plot_name  Name of the plot.
+  /// @param label      Label.
+  /// @param style      Plot style.
   void set_plot_style(const std::string& plot_name, const std::string& label, const PlotStyleConstPtr& style);
+  /// @brief  Set the line style for a plot.
+  /// @param plot_name  Name of the plot.
+  /// @param label      Label.
+  /// @param color      Line color.
+  /// @param weight     Line weight.
   void set_line_style(const std::string& plot_name, const std::string& label, const Eigen::Vector4f& color = Eigen::Vector4f(0, 0, 0, -1), float weight = -1);
+  /// @brief  Set the scatter style for a plot.
+  /// @param plot_name  Name of the plot.
+  /// @param label      Label.
+  /// @param marker     Marker style.
+  /// @param size       Marker size.
+  /// @param fill       Marker fill color.
+  /// @param weight     Marker outline weight.
+  /// @param outline    Marker outline color.
   void set_scatter_style(
     const std::string& plot_name,
     const std::string& label,
@@ -206,8 +327,8 @@ public:
     float weight = -1,
     const Eigen::Vector4f& outline = Eigen::Vector4f(0, 0, 0, -1));
 
-  // This method causes synchronization with the visualization thread.
-  // Do not call this frequently.
+  /// @brief Create a async sub viewer context.
+  /// @note  This method causes synchronization with the visualization thread. Do not call this frequently.
   AsyncLightViewerContext async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
 private:

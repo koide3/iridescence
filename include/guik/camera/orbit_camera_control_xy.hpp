@@ -5,6 +5,11 @@
 
 namespace guik {
 
+/// @brief Orbit camera control (Up vector is locked to Z axis)
+///        Left button: rotate (pan/tilt)
+///        Middle or Right button: XY translate
+///        Middle &  Right button: Z translate
+///        Scroll wheel: zoom in/out
 class OrbitCameraControlXY : public CameraControl {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -40,6 +45,7 @@ protected:
   Eigen::Vector2f drag_last_pos;
 
   bool left_button_down;
+  bool right_button_down;
   double theta;
   double phi;
 

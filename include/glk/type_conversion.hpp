@@ -7,6 +7,13 @@
 
 namespace glk {
 
+template <typename Dst, typename Src>
+std::vector<Dst> convert_scalars(const Src* data, int num_data) {
+  std::vector<Dst> converted(num_data);
+  std::copy(data, data + num_data, converted.begin());
+  return converted;
+}
+
 template <typename Dst_Scalar, int Dst_Dim, typename Src_Scalar, int Src_Dim, template <class> class Allocator>
 std::enable_if_t<
   std::is_same<Dst_Scalar, Src_Scalar>::value && Dst_Dim == Src_Dim,
