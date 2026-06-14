@@ -1,3 +1,9 @@
+libiridescence (1.0.2-1ppa1~jammy1) jammy; urgency=medium
+
+  * backface culling
+
+ -- Kenji Koide <k.koide@aist.go.jp>  Sun, 14 Jun 2026 18:38:10 +0900
+
 libiridescence (0.1.9-1ppa1~noble2) noble; urgency=medium
 
   * Fix build configuration for Noble
