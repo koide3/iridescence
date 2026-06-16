@@ -1,5 +1,6 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <ImGuizmo.h>
 #include <glk/io/png_io.hpp>
