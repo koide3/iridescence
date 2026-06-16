@@ -681,11 +681,19 @@ bool LightViewer::toggle_spin_once() {
 
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if (!callback) {
-    ui_callbacks.erase(name);
+    auto found = std::find_if(ui_callbacks.begin(), ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+    if (found != ui_callbacks.end()) {
+      ui_callbacks.erase(found);
+    }
     return;
   }
 
-  ui_callbacks[name] = callback;
+  auto found = std::find_if(ui_callbacks.begin(), ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+  if (found != ui_callbacks.end()) {
+    (*found).second = callback;
+  } else {
+    ui_callbacks.emplace_back(name, callback);
+  }
 }
 
 void LightViewer::show_viewer_ui() {

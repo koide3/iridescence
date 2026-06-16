@@ -426,7 +426,7 @@ private:
 
   bool toggle_spin_stop_flag;
 
-  std::unordered_map<std::string, std::function<void()>> ui_callbacks;
+  std::vector<std::pair<std::string, std::function<void()>>> ui_callbacks;
 
   std::unordered_map<std::string, std::tuple<double, std::shared_ptr<glk::Texture>, int>> images;
   std::vector<std::shared_ptr<glk::Texture>> images_in_rendering;

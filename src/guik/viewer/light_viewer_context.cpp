@@ -124,11 +124,19 @@ void LightViewerContext::append_text(const std::string& text) {
 
 void LightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if (!callback) {
-    sub_ui_callbacks.erase(name);
+    auto found = std::find_if(sub_ui_callbacks.begin(), sub_ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+    if (found != sub_ui_callbacks.end()) {
+      sub_ui_callbacks.erase(found);
+    }
     return;
   }
 
-  sub_ui_callbacks[name] = callback;
+  auto found = std::find_if(sub_ui_callbacks.begin(), sub_ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+  if (found != sub_ui_callbacks.end()) {
+    (*found).second = callback;
+  } else {
+    sub_ui_callbacks.emplace_back(name, callback);
+  }
 }
 
 void LightViewerContext::remove_ui_callback(const std::string& name) {
