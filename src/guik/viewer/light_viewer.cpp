@@ -3,6 +3,7 @@
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <algorithm>
 #include <regex>
 #include <chrono>
 #include <numeric>
@@ -82,12 +83,12 @@ void LightViewer::draw_ui() {
   }
 
   // To allow removing a callback from a callback call, avoid directly iterating over ui_callbacks
-  std::vector<const std::function<void()>*> callbacks;
+  std::vector<std::function<void()>> callbacks;
   for (const auto& callback : ui_callbacks) {
-    callbacks.emplace_back(&callback.second);
+    callbacks.emplace_back(callback.second);
   }
   for (const auto& callback : callbacks) {
-    (*callback)();
+    callback();
   }
 
   // viewer UI
@@ -681,11 +682,19 @@ bool LightViewer::toggle_spin_once() {
 
 void LightViewer::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if (!callback) {
-    ui_callbacks.erase(name);
+    auto found = std::find_if(ui_callbacks.begin(), ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+    if (found != ui_callbacks.end()) {
+      ui_callbacks.erase(found);
+    }
     return;
   }
 
-  ui_callbacks[name] = callback;
+  auto found = std::find_if(ui_callbacks.begin(), ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+  if (found != ui_callbacks.end()) {
+    (*found).second = callback;
+  } else {
+    ui_callbacks.emplace_back(name, callback);
+  }
 }
 
 void LightViewer::show_viewer_ui() {

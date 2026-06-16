@@ -1,5 +1,6 @@
 #include <guik/viewer/light_viewer_context.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <ImGuizmo.h>
 #include <glk/io/png_io.hpp>
@@ -124,11 +125,19 @@ void LightViewerContext::append_text(const std::string& text) {
 
 void LightViewerContext::register_ui_callback(const std::string& name, const std::function<void()>& callback) {
   if (!callback) {
-    sub_ui_callbacks.erase(name);
+    auto found = std::find_if(sub_ui_callbacks.begin(), sub_ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+    if (found != sub_ui_callbacks.end()) {
+      sub_ui_callbacks.erase(found);
+    }
     return;
   }
 
-  sub_ui_callbacks[name] = callback;
+  auto found = std::find_if(sub_ui_callbacks.begin(), sub_ui_callbacks.end(), [&](const auto& p) { return p.first == name; });
+  if (found != sub_ui_callbacks.end()) {
+    (*found).second = callback;
+  } else {
+    sub_ui_callbacks.emplace_back(name, callback);
+  }
 }
 
 void LightViewerContext::remove_ui_callback(const std::string& name) {
@@ -157,13 +166,13 @@ void LightViewerContext::draw_ui() {
   canvas_rect_min = Eigen::Vector2i(rect_min.x, rect_min.y);
   canvas_rect_max = Eigen::Vector2i(rect_max.x, rect_max.y);
 
-  std::vector<const std::function<void()>*> callbacks;
+  std::vector<std::function<void()>> callbacks;
   for (const auto& callback : sub_ui_callbacks) {
-    callbacks.emplace_back(&callback.second);
+    callbacks.emplace_back(callback.second);
   }
 
   for (const auto& callback : callbacks) {
-    (*callback)();
+    callback();
   }
 
   ImGui::EndChild();

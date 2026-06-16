@@ -528,7 +528,7 @@ protected:
 
   std::mutex sub_texts_mutex;
   std::deque<std::string> sub_texts;
-  std::unordered_map<std::string, std::function<void()>> sub_ui_callbacks;
+  std::vector<std::pair<std::string, std::function<void()>>> sub_ui_callbacks;
 };
 
 // template methods
