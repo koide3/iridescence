@@ -213,7 +213,7 @@ ThinLines::ThinLines(
   const std::vector<Eigen::Matrix<T2, D2, 1>, Allocator2>& colors,
   bool line_strip,
   float line_width)
-: ThinLines(vertices.data(), colors.data(), vertices.size(), line_strip, line_width) {}
+: ThinLines(vertices.data(), colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(), vertices.size(), line_strip, line_width) {}
 
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<unsigned int>& indices, bool line_strip, float line_width)
@@ -226,11 +226,18 @@ ThinLines::ThinLines(
   const std::vector<unsigned int>& indices,
   bool line_strip,
   float line_width)
-: ThinLines(vertices.data(), colors.data(), vertices.size(), indices.data(), indices.size(), line_strip, line_width) {}
+: ThinLines(
+    vertices.data(),
+    colors.empty() ? static_cast<const Eigen::Matrix<T2, D2, 1>*>(nullptr) : colors.data(),
+    vertices.size(),
+    indices.data(),
+    indices.size(),
+    line_strip,
+    line_width) {}
 
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<float>& cmap, bool line_strip, float line_width)
-: ThinLines(vertices.data(), cmap.data(), vertices.size(), line_strip, line_width) {}
+: ThinLines(vertices.data(), cmap.empty() ? nullptr : cmap.data(), vertices.size(), line_strip, line_width) {}
 
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(
@@ -239,11 +246,11 @@ ThinLines::ThinLines(
   const std::vector<unsigned int>& indices,
   bool line_strip,
   float line_width)
-: ThinLines(vertices.data(), cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip, line_width) {}
+: ThinLines(vertices.data(), cmap.empty() ? nullptr : cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip, line_width) {}
 
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(const std::vector<Eigen::Matrix<T1, D1, 1>, Allocator>& vertices, const std::vector<double>& cmap, bool line_strip, float line_width)
-: ThinLines(vertices.data(), cmap.data(), vertices.size(), line_strip, line_width) {}
+: ThinLines(vertices.data(), cmap.empty() ? nullptr : cmap.data(), vertices.size(), line_strip, line_width) {}
 
 template <typename T1, int D1, typename Allocator>
 ThinLines::ThinLines(
@@ -252,7 +259,7 @@ ThinLines::ThinLines(
   const std::vector<unsigned int>& indices,
   bool line_strip,
   float line_width)
-: ThinLines(vertices.data(), cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip, line_width) {}
+: ThinLines(vertices.data(), cmap.empty() ? nullptr : cmap.data(), vertices.size(), indices.data(), indices.size(), line_strip, line_width) {}
 
 }  // namespace glk
 

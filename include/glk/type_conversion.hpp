@@ -47,7 +47,7 @@ std::enable_if_t<
   std::is_same<Dst_Scalar, Src_Scalar>::value,  //
   std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>>>
 convert_to_vector(const Eigen::Matrix<Src_Scalar, Src_Rows, Src_Cols>* points, int num_points) {
-  if (points == nullptr) {
+  if (num_points <= 0) {
     return std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>>(num_points);
   }
 
@@ -76,7 +76,7 @@ std::enable_if_t<
   !std::is_same<Dst_Scalar, Src_Scalar>::value,  //
   std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>>>
 convert_to_vector(const Eigen::Matrix<Src_Scalar, Src_Rows, Src_Cols>* points, int num_points) {
-  if (points == nullptr) {
+  if (num_points <= 0) {
     return std::vector<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>, Allocator<Eigen::Matrix<Dst_Scalar, Dst_Rows, Dst_Cols>>>(num_points);
   }
 

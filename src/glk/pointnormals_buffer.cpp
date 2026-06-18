@@ -20,7 +20,13 @@ PointNormalsBuffer::PointNormalsBuffer(
   const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& vertices,
   const std::vector<Eigen::Vector3f, Allocator<Eigen::Vector3f>>& normals,
   double normal_length)
-: PointNormalsBuffer(vertices[0].data(), sizeof(Eigen::Vector3f), normals[0].data(), sizeof(Eigen::Vector3f), vertices.size(), normal_length) {}
+: PointNormalsBuffer(
+    vertices.empty() ? nullptr : vertices[0].data(),
+    sizeof(Eigen::Vector3f),
+    normals.empty() ? nullptr : normals[0].data(),
+    sizeof(Eigen::Vector3f),
+    vertices.size(),
+    normal_length) {}
 
 template PointNormalsBuffer::PointNormalsBuffer(const std::vector<Eigen::Vector3f>& vertices, const std::vector<Eigen::Vector3f>& normals, double normal_length);
 
