@@ -98,8 +98,9 @@ void SensorViewCameraControl::scroll(const Eigen::Vector2f& rel) {
 }
 
 Eigen::Vector2f SensorViewCameraControl::depth_range() const {
-  double dist = init_distance * distance_scale;
-  return Eigen::Vector2f(dist / 10.0f, dist * 100.0f);
+  // double dist = init_distance * distance_scale;
+  // return Eigen::Vector2f(dist / 10.0f, dist * 100.0f);
+  return Eigen::Vector2f(0.1f, 1000.0f);
 }
 
 Eigen::Matrix4f SensorViewCameraControl::view_matrix() const {

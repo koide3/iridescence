@@ -227,10 +227,10 @@ public:
     double smoothing_factor_trans = 0.75,
     double smoothing_factor_rot = 0.9);
 
-    /// @brief Use perspective projection control.
-  std::shared_ptr<BasicProjectionControl> use_perspective_projection_control(float fovy_deg = 30.0f, float near = 1.0f, float far = 1000.0f);
+  /// @brief Use perspective projection control.
+  std::shared_ptr<BasicProjectionControl> use_perspective_projection_control(float fovy_deg = 30.0f, float near_ = 1.0f, float far_ = 1000.0f);
   /// @brief Use orthographic projection control.
-  std::shared_ptr<BasicProjectionControl> use_orthographic_projection_control(float width = 10.0f, float near = 1.0f, float far = 1000.0f);
+  std::shared_ptr<BasicProjectionControl> use_orthographic_projection_control(float width = 10.0f, float near_ = 1.0f, float far_ = 1000.0f);
 
   /// @brief Get underlying GLCanvas.
   guik::GLCanvas& get_canvas();

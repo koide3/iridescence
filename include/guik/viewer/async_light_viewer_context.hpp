@@ -112,9 +112,9 @@ public:
     double smoothing_factor_rot = 0.9);
 
   /// @brief Use perspective projection control.
-  void use_perspective_projection_control(float fovy_deg = 30.0f, float near = 1.0f, float far = 1000.0f);
+  void use_perspective_projection_control(float fovy_deg = 30.0f, float near_ = 1.0f, float far_ = 1000.0f);
   /// @brief Use orthographic projection control.
-  void use_orthographic_projection_control(float width = 10.0f, float near = 1.0f, float far = 1000.0f);
+  void use_orthographic_projection_control(float width = 10.0f, float near_ = 1.0f, float far_ = 1000.0f);
 
   /// @brief Update a drawable's shader setting.
   void update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting);
