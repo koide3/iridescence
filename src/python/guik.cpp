@@ -19,6 +19,7 @@
 #include <guik/camera/topdown_camera_control.hpp>
 #include <guik/camera/fps_camera_control.hpp>
 #include <guik/camera/sensor_view_camera_control.hpp>
+#include <guik/camera/basic_projection_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
@@ -296,6 +297,9 @@ void define_guik(py::module_& m) {
     .def("set_smoothing_factor", &guik::SensorViewCameraControl::set_smoothing_factor)
     .def("set_z_axis_alignment", &guik::SensorViewCameraControl::set_z_axis_alignment);
 
+  py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
+  py::class_<guik::BasicProjectionControl, guik::ProjectionControl, std::shared_ptr<guik::BasicProjectionControl>>(guik_, "BasicProjectionControl");
+
   // guik::HoveredDrawings
   py::class_<guik::HoveredDrawings, std::shared_ptr<guik::HoveredDrawings>>(guik_, "HoveredDrawings")  //
     .def(
@@ -426,9 +430,6 @@ void define_guik(py::module_& m) {
     .def("clear", &guik::HoveredDrawings::clear)
     .def("create_callback", &guik::HoveredDrawings::create_callback);
 
-  // guik::ProjectionControl
-  py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
-
   // guik::Application
   py::class_<guik::Application, std::unique_ptr<guik::Application, py::nodelete>>(guik_, "Application")
     .def("ok", &guik::Application::ok)
@@ -483,7 +484,11 @@ void define_guik(py::module_& m) {
     .def("disable_partial_rendering", &guik::LightViewerContext::disable_partial_rendering)
     .def("enable_backface_culling", &guik::LightViewerContext::enable_backface_culling)
     .def("disable_backface_culling", &guik::LightViewerContext::disable_backface_culling)
-    .def("set_backface_culling_range", [](guik::LightViewerContext& context, float min_depth, float max_depth) { context.set_backface_culling_range(Eigen::Vector2f(min_depth, max_depth)); }, py::arg("min_depth"), py::arg("max_depth"))
+    .def(
+      "set_backface_culling_range",
+      [](guik::LightViewerContext& context, float min_depth, float max_depth) { context.set_backface_culling_range(Eigen::Vector2f(min_depth, max_depth)); },
+      py::arg("min_depth"),
+      py::arg("max_depth"))
     .def("backface_culling_enabled", &guik::LightViewerContext::backface_culling_enabled)
 
     .def("color_buffer", &guik::LightViewerContext::color_buffer)
@@ -555,6 +560,19 @@ void define_guik(py::module_& m) {
       py::arg("T_sensor_camera"),
       py::arg("smoothing_factor_trans") = 0.75,
       py::arg("smoothing_factor_rot") = 0.9)
+
+    .def(
+      "use_perspective_projection_control",
+      &guik::LightViewerContext::use_perspective_projection_control,
+      py::arg("fovy_deg") = 30.0f,
+      py::arg("near") = 1.0f,
+      py::arg("far") = 1000.0f)
+    .def(
+      "use_orthographic_projection_control",
+      &guik::LightViewerContext::use_orthographic_projection_control,
+      py::arg("width") = 10.0f,
+      py::arg("near") = 1.0f,
+      py::arg("far") = 1000.0f)
 
     .def("set_point_shape", &guik::LightViewerContext::set_point_shape, py::arg("point_size") = 1.0f, py::arg("metric") = true, py::arg("circle") = true)
 
@@ -759,7 +777,16 @@ void define_guik(py::module_& m) {
     .def("update_image", &guik::LightViewer::update_image, py::arg("name"), py::arg("image"), py::arg("scale") = -1.0, py::arg("order") = -1)
     .def("clear_plots", &guik::LightViewer::clear_plots, py::arg("clear_settings") = true)
     .def("remove_plot", &guik::LightViewer::remove_plot, py::arg("plot_name"), py::arg("label") = "")
-    .def("setup_plot", &guik::LightViewer::setup_plot, py::arg("plot_name"), py::arg("width"), py::arg("height"), py::arg("plot_flags") = 0, py::arg("x_flags") = 0, py::arg("y_flags") = 0, py::arg("order") = -1)
+    .def(
+      "setup_plot",
+      &guik::LightViewer::setup_plot,
+      py::arg("plot_name"),
+      py::arg("width"),
+      py::arg("height"),
+      py::arg("plot_flags") = 0,
+      py::arg("x_flags") = 0,
+      py::arg("y_flags") = 0,
+      py::arg("order") = -1)
     .def("link_plot_axis", &guik::LightViewer::link_plot_axis, py::arg("plot_name"), py::arg("link_id"), py::arg("axis"))
     .def("link_plot_axes", &guik::LightViewer::link_plot_axes, py::arg("plot_name"), py::arg("link_id"), py::arg("axes") = -1)
     .def("setup_legend", &guik::LightViewer::setup_legend, py::arg("plot_name"), py::arg("loc"), py::arg("flags") = 0)
@@ -833,13 +860,7 @@ void define_guik(py::module_& m) {
       py::arg("histogram_flags") = 0)
     .def(
       "update_plot_stairs",
-      [](
-        guik::LightViewer& viewer,
-        const std::string& plot_name,
-        const std::string& label,
-        const std::vector<double>& xs,
-        const std::vector<double>& ys,
-        int stairs_flags) {
+      [](guik::LightViewer& viewer, const std::string& plot_name, const std::string& label, const std::vector<double>& xs, const std::vector<double>& ys, int stairs_flags) {
         if (ys.empty()) {
           viewer.update_plot_stairs(plot_name, label, xs, stairs_flags);
         } else {
@@ -920,6 +941,19 @@ void define_guik(py::module_& m) {
       py::arg("T_sensor_camera"),
       py::arg("smoothing_factor_trans") = 0.75,
       py::arg("smoothing_factor_rot") = 0.9)
+
+    .def(
+      "use_perspective_projection_control",
+      &guik::AsyncLightViewerContext::use_perspective_projection_control,
+      py::arg("fovy_deg") = 30.0f,
+      py::arg("near") = 1.0f,
+      py::arg("far") = 1000.0f)
+    .def(
+      "use_orthographic_projection_control",
+      &guik::AsyncLightViewerContext::use_orthographic_projection_control,
+      py::arg("width") = 10.0f,
+      py::arg("near") = 1.0f,
+      py::arg("far") = 1000.0f)
 
     .def("update_drawable_setting", &guik::AsyncLightViewerContext::update_drawable_setting, py::arg("name"), py::arg("setting"))
 
