@@ -575,6 +575,24 @@ LightViewerContext::use_sensor_view_camera_control(const Eigen::Isometry3f& T_se
   return sensor_view_camera_control;
 }
 
+std::shared_ptr<BasicProjectionControl> LightViewerContext::use_perspective_projection_control(float fovy_deg, float near , float far ) {
+  auto proj = std::make_shared<guik::BasicProjectionControl>(canvas->size);
+  proj->set_projection_mode(0);
+  proj->set_fovy(fovy_deg);
+  proj->set_depth_range(Eigen::Vector2f(near, far));
+  canvas->projection_control = proj;
+  return proj;
+}
+
+std::shared_ptr<BasicProjectionControl> LightViewerContext::use_orthographic_projection_control(float width, float near, float far) {
+  auto proj = std::make_shared<guik::BasicProjectionControl>(canvas->size);
+  proj->set_projection_mode(1);
+  proj->set_ortho_width(width);
+  proj->set_depth_range(Eigen::Vector2f(near, far));
+  canvas->projection_control = proj;
+  return proj;
+}
+
 Eigen::Vector4i LightViewerContext::pick_info(const Eigen::Vector2i& p, int window) const {
   return canvas->pick_info(p, window);
 }
