@@ -19,7 +19,8 @@ public:
     override_edge_color(true),
     edge_color_mode(0),
     edge_color(1.0f, 1.0f, 1.0f, 1.0f),
-    edge_line_width(2.0) {}
+    edge_line_width(2.0),
+    cull_hidden_faces(true) {}
 
 public:
   void set_voxel_alpha(float alpha);
@@ -42,6 +43,8 @@ public:
   Eigen::Vector4f edge_color;     // used when edge_color_mode == 1
 
   double edge_line_width;
+
+  bool cull_hidden_faces;  // if true, faces/edges shared between adjacent voxels are not generated (faster rendering)
 };
 
 class VoxelMap : public Drawable {
@@ -59,6 +62,8 @@ private:
 private:
   VoxelMapOptions options;
   int num_voxels;
+  int num_voxel_indices;  // number of triangle indices actually generated (after culling)
+  int num_edge_indices;   // number of line indices actually generated (after culling)
 
   GLuint vao;
   GLuint vbo;
