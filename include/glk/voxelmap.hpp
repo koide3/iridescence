@@ -2,6 +2,7 @@
 #define GLK_VOXELMAP_HPP
 
 #include <memory>
+#include <vector>
 #include <glk/drawable.hpp>
 
 namespace glk {
@@ -20,7 +21,7 @@ public:
     edge_color_mode(0),
     edge_color(1.0f, 1.0f, 1.0f, 1.0f),
     edge_line_width(2.0),
-    cull_hidden_faces(true) {}
+    cull_hidden_faces(false) {}
 
 public:
   void set_voxel_alpha(float alpha);
@@ -50,6 +51,7 @@ public:
 class VoxelMap : public Drawable {
 public:
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options = VoxelMapOptions());
+  VoxelMap(const std::vector<Eigen::Vector3i>& voxel_coords, double resolution, const VoxelMapOptions& options = VoxelMapOptions());
 
   virtual ~VoxelMap();
 
