@@ -137,6 +137,14 @@ void AsyncLightViewerContext::use_sensor_view_camera_control(const Eigen::Isomet
   guik::viewer()->invoke([=] { context->use_sensor_view_camera_control(T_sensor_camera, smoothing_factor_trans, smoothing_factor_rot); });
 }
 
+void AsyncLightViewerContext::use_perspective_projection_control(float fovy_deg, float near_, float far_) {
+  guik::viewer()->invoke([=] { context->use_perspective_projection_control(fovy_deg, near_, far_); });
+}
+
+void AsyncLightViewerContext::use_orthographic_projection_control(float width, float near_, float far_) {
+  guik::viewer()->invoke([=] { context->use_orthographic_projection_control(width, near_, far_); });
+}
+
 void AsyncLightViewerContext::update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting) {
   guik::viewer()->invoke([=] {
     auto drawable = context->find_drawable(name);
