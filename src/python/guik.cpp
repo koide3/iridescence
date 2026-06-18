@@ -430,9 +430,6 @@ void define_guik(py::module_& m) {
     .def("clear", &guik::HoveredDrawings::clear)
     .def("create_callback", &guik::HoveredDrawings::create_callback);
 
-  // guik::ProjectionControl
-  py::class_<guik::ProjectionControl, std::shared_ptr<guik::ProjectionControl>>(guik_, "ProjectionControl");
-
   // guik::Application
   py::class_<guik::Application, std::unique_ptr<guik::Application, py::nodelete>>(guik_, "Application")
     .def("ok", &guik::Application::ok)
