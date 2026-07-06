@@ -1,34 +1,15 @@
 #include <glk/voxelmap.hpp>
 
+#include <glk/console_colors.hpp>
+
 namespace glk {
 
-void VoxelMapOptions::set_voxel_alpha(float alpha) {
-  override_voxel_color = true;
-  voxel_color.w() = alpha;
+VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options)
+: VoxelMap(voxel_coords, num_voxels, resolution, options.to_mesh_rendering_options()) {
+  std::cerr << glk::console::yellow << "warning: VoxelMapOptions is deprecated. Use MeshRenderingOptions instead." << glk::console::reset << std::endl;
 }
 
-void VoxelMapOptions::set_voxel_color(const Eigen::Vector4f& color) {
-  override_voxel_color_mode = true;
-  override_voxel_color = true;
-
-  voxel_color_mode = 1;  // flat_color
-  voxel_color = color;
-}
-
-void VoxelMapOptions::set_edge_alpha(float alpha) {
-  override_edge_color = true;
-  edge_color.w() = alpha;
-}
-
-void VoxelMapOptions::set_edge_color(const Eigen::Vector4f& color) {
-  override_edge_color_mode = true;
-  override_edge_color = true;
-
-  edge_color_mode = 1;  // flat_color
-  edge_color = color;
-}
-
-VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options) : options(options) {
+VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options) : options(options) {
   this->num_voxels = num_voxels;
   vao = vbo = ebo_voxels = ebo_edges = 0;
 
@@ -159,12 +140,12 @@ void VoxelMap::draw(glk::GLSLShader& shader) const {
   glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   // draw voxels
-  if (options.draw_voxels) {
-    if (options.override_voxel_color_mode) {
-      shader.set_uniform("color_mode", options.voxel_color_mode);
+  if (options.draw_faces) {
+    if (options.override_face_color_mode) {
+      shader.set_uniform("color_mode", options.face_color_mode);
     }
-    if (options.override_voxel_color) {
-      shader.set_uniform("material_color", options.voxel_color);
+    if (options.override_face_color) {
+      shader.set_uniform("material_color", options.face_color);
     }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_voxels);

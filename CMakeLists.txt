@@ -136,12 +136,14 @@ add_library(iridescence
   # glk
   src/glk/path_std.cpp
   src/glk/hash.cpp
+  src/glk/mesh_rendering_options.cpp
   src/glk/mesh.cpp
   src/glk/mesh_model.cpp
   src/glk/lines.cpp
   src/glk/thin_lines.cpp
   src/glk/trajectory.cpp
   src/glk/gridmap.cpp
+  src/glk/elevation_map.cpp
   src/glk/voxelmap.cpp
   src/glk/drawable_container.cpp
   src/glk/async_buffer_copy.cpp

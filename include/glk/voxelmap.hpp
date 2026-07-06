@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <glk/drawable.hpp>
+#include <glk/mesh_rendering_options.hpp>
 
 namespace glk {
 
@@ -19,7 +20,17 @@ public:
     override_edge_color(true),
     edge_color_mode(0),
     edge_color(1.0f, 1.0f, 1.0f, 1.0f),
-    edge_line_width(2.0) {}
+    edge_line_width(2.0) {
+    std::cerr << "warning: VoxelMapOptions is deprecated. Use MeshRenderingOptions instead." << std::endl;
+  }
+
+  MeshRenderingOptions to_mesh_rendering_options() const {
+    static_assert(sizeof(VoxelMapOptions) == sizeof(MeshRenderingOptions), "VoxelMapOptions and MeshRenderingOptions must have the same size.");
+
+    MeshRenderingOptions opts;
+    memcpy(&opts, this, sizeof(VoxelMapOptions));
+    return opts;
+  }
 
 public:
   void set_voxel_alpha(float alpha);
@@ -46,6 +57,7 @@ public:
 
 class VoxelMap : public Drawable {
 public:
+  VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options = VoxelMapOptions());
 
   virtual ~VoxelMap();
@@ -57,7 +69,7 @@ private:
   VoxelMap& operator=(const VoxelMap&);
 
 private:
-  VoxelMapOptions options;
+  MeshRenderingOptions options;
   int num_voxels;
 
   GLuint vao;

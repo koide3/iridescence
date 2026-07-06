@@ -16,8 +16,30 @@ class Texture;
 class Mesh : public Drawable {
 public:
   Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, int num_vertices, const void* indices, int num_indices, bool wireframe = false);
-  Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, const void* colors, int color_stride, int num_vertices, const void* indices, int num_indices, bool wireframe = false);
-  Mesh(const void* vertices, int vertex_stride, const void* normals, int normal_stride, const void* colors, int color_stride, const void* tex_coords, int tex_coord_stride, int num_vertices, const void* indices, int num_indices, bool wireframe = false);
+  Mesh(
+    const void* vertices,
+    int vertex_stride,
+    const void* normals,
+    int normal_stride,
+    const void* colors,
+    int color_stride,
+    int num_vertices,
+    const void* indices,
+    int num_indices,
+    bool wireframe = false);
+  Mesh(
+    const void* vertices,
+    int vertex_stride,
+    const void* normals,
+    int normal_stride,
+    const void* colors,
+    int color_stride,
+    const void* tex_coords,
+    int tex_coord_stride,
+    int num_vertices,
+    const void* indices,
+    int num_indices,
+    bool wireframe = false);
 
   template <template <class> class Alloc>
   Mesh(
