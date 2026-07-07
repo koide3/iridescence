@@ -2,6 +2,9 @@
 #define GLK_VOXELMAP_HPP
 
 #include <memory>
+#include <cstring>
+#include <iostream>
+
 #include <glk/drawable.hpp>
 #include <glk/mesh_rendering_options.hpp>
 
