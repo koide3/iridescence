@@ -2,6 +2,7 @@
 #define GLK_VOXELMAP_HPP
 
 #include <memory>
+#include <vector>
 #include <cstring>
 #include <iostream>
 

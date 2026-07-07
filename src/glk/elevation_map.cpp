@@ -80,6 +80,10 @@ void ElevationMapBuilder::set_cmap(const std::vector<Vector>& cells, int cmap_in
   if (!average) {
     for (size_t i = 0; i < cell_indices.size(); ++i) {
       const std::uint64_t index = cell_indices[i];
+      if (index == std::numeric_limits<std::uint64_t>::max()) {
+        continue;
+      }
+
       color_map.data()[index] = cells[i][cmap_index];  // Assuming the color value is stored in the specified index
     }
   } else {
@@ -88,6 +92,10 @@ void ElevationMapBuilder::set_cmap(const std::vector<Vector>& cells, int cmap_in
 
     for (size_t i = 0; i < cell_indices.size(); ++i) {
       const std::uint64_t index = cell_indices[i];
+      if (index == std::numeric_limits<std::uint64_t>::max()) {
+        continue;
+      }
+
       color_map.data()[index] += cells[i][cmap_index];  // Assuming the color value is stored in the specified index
       counts.data()[index] += 1.0f;
     }
@@ -102,22 +110,30 @@ void ElevationMapBuilder::filter_elevation_map(bool process_valid_cells) {
   const bool cmap_exists = (color_map.size() > 0);
 
   Eigen::Array<float, -1, -1, Eigen::RowMajor> filtered_map = elevation_map;
-  for (int y = 1; y < size.y() - 1; y++) {
-    for (int x = 1; x < size.x() - 1; x++) {
+  for (int y = shift; y < size.y() - shift; y++) {
+    for (int x = shift; x < size.x() - shift; x++) {
       if (!process_valid_cells && std::isfinite(elevation_map(y, x))) {
         continue;  // Skip valid cells if process_valid_cells is false
       }
 
       Eigen::Array<float, WindowSize, WindowSize, Eigen::RowMajor> neighbors = elevation_map.block<WindowSize, WindowSize>(y - shift, x - shift);
       const Eigen::Array<bool, WindowSize, WindowSize> valid_mask = neighbors.isFinite();
+      const int valid_count = valid_mask.count();
+      if (valid_count == 0) {
+        filtered_map(y, x) = std::numeric_limits<float>::quiet_NaN();
+        if (cmap_exists) {
+          color_map(y, x) = std::numeric_limits<float>::quiet_NaN();
+        }
+        continue;
+      }
 
       neighbors = valid_mask.select(neighbors, Eigen::Array<float, WindowSize, WindowSize>::Zero());
-      filtered_map(y, x) = neighbors.sum() / static_cast<float>(valid_mask.count());
+      filtered_map(y, x) = neighbors.sum() / static_cast<float>(valid_count);
 
       if (cmap_exists) {
         Eigen::Array<float, WindowSize, WindowSize, Eigen::RowMajor> cmap_neighbors = color_map.block<WindowSize, WindowSize>(y - shift, x - shift);
         cmap_neighbors = valid_mask.select(cmap_neighbors, Eigen::Array<float, WindowSize, WindowSize>::Zero());
-        color_map(y, x) = cmap_neighbors.sum() / static_cast<float>(valid_mask.count());
+        color_map(y, x) = cmap_neighbors.sum() / static_cast<float>(valid_count);
       }
     }
   }

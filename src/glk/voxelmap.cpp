@@ -1,5 +1,10 @@
 #include <glk/voxelmap.hpp>
 
+#include <array>
+#include <vector>
+#include <cmath>
+#include <limits>
+#include <stdexcept>
 #include <glk/console_colors.hpp>
 
 namespace glk {
