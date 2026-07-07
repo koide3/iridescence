@@ -14,10 +14,15 @@ ElevationMapBuilder::~ElevationMapBuilder() {}
 
 template <typename Vector>
 std::vector<std::uint64_t> ElevationMapBuilder::calc_cell_indices(const std::vector<Vector>& cells) const {
+  const auto fast_floor = [](const Eigen::Array2f& x) -> Eigen::Array2i {
+    const Eigen::Array2i ncoord = x.cast<int>();
+    return ncoord - (x < ncoord.cast<float>()).cast<int>();
+  };
+
   std::vector<std::uint64_t> cell_indices(cells.size());
   for (size_t i = 0; i < cells.size(); ++i) {
     Eigen::Vector2f cell_pos(cells[i][0], cells[i][1]);
-    Eigen::Vector2i cell_index = ((cell_pos - origin) * inv_resolution).cast<int>();
+    Eigen::Vector2i cell_index = fast_floor((cell_pos - origin) * inv_resolution);
     if (cell_index.x() < 0 || cell_index.x() >= size.x() || cell_index.y() < 0 || cell_index.y() >= size.y()) {
       cell_indices[i] = std::numeric_limits<std::uint64_t>::max();  // Out of bounds
     } else {
@@ -100,7 +105,7 @@ void ElevationMapBuilder::set_cmap(const std::vector<Vector>& cells, int cmap_in
       counts.data()[index] += 1.0f;
     }
 
-    this->color_map = (counts > 0.5f).select(color_map / counts, this->color_map);
+    color_map = (counts > 0.5f).select(color_map / counts, color_map).eval();
   }
 }
 
@@ -110,6 +115,8 @@ void ElevationMapBuilder::filter_elevation_map(bool process_valid_cells) {
   const bool cmap_exists = (color_map.size() > 0);
 
   Eigen::Array<float, -1, -1, Eigen::RowMajor> filtered_map = elevation_map;
+  Eigen::Array<float, -1, -1, Eigen::RowMajor> filtered_cmap = color_map;
+
   for (int y = shift; y < size.y() - shift; y++) {
     for (int x = shift; x < size.x() - shift; x++) {
       if (!process_valid_cells && std::isfinite(elevation_map(y, x))) {
@@ -120,10 +127,6 @@ void ElevationMapBuilder::filter_elevation_map(bool process_valid_cells) {
       const Eigen::Array<bool, WindowSize, WindowSize> valid_mask = neighbors.isFinite();
       const int valid_count = valid_mask.count();
       if (valid_count == 0) {
-        filtered_map(y, x) = std::numeric_limits<float>::quiet_NaN();
-        if (cmap_exists) {
-          color_map(y, x) = std::numeric_limits<float>::quiet_NaN();
-        }
         continue;
       }
 
@@ -133,12 +136,13 @@ void ElevationMapBuilder::filter_elevation_map(bool process_valid_cells) {
       if (cmap_exists) {
         Eigen::Array<float, WindowSize, WindowSize, Eigen::RowMajor> cmap_neighbors = color_map.block<WindowSize, WindowSize>(y - shift, x - shift);
         cmap_neighbors = valid_mask.select(cmap_neighbors, Eigen::Array<float, WindowSize, WindowSize>::Zero());
-        color_map(y, x) = cmap_neighbors.sum() / static_cast<float>(valid_count);
+        filtered_cmap(y, x) = cmap_neighbors.sum() / static_cast<float>(valid_count);
       }
     }
   }
 
   elevation_map = std::move(filtered_map);
+  color_map = std::move(filtered_cmap);
 }
 
 template std::vector<std::uint64_t> ElevationMapBuilder::calc_cell_indices(const std::vector<Eigen::Matrix<float, 2, 1>>& cells) const;
