@@ -4,6 +4,23 @@
 
 namespace glk {
 
+MeshRenderingOptions VoxelMapOptions::to_mesh_rendering_options() const {
+  MeshRenderingOptions opts;
+  opts.draw_faces = draw_voxels;
+  opts.override_face_color_mode = override_voxel_color_mode;
+  opts.override_face_color = override_voxel_color;
+  opts.face_color_mode = voxel_color_mode;
+  opts.face_color = voxel_color;
+
+  opts.draw_edges = draw_edges;
+  opts.override_edge_color_mode = override_edge_color_mode;
+  opts.override_edge_color = override_edge_color;
+  opts.edge_color_mode = edge_color_mode;
+  opts.edge_color = edge_color;
+  opts.edge_line_width = edge_line_width;
+  return opts;
+}
+
 void VoxelMapOptions::set_voxel_alpha(float alpha) {
   draw_voxels = true;
   override_voxel_color = true;

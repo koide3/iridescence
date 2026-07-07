@@ -24,13 +24,7 @@ public:
     std::cerr << "warning: VoxelMapOptions is deprecated. Use MeshRenderingOptions instead." << std::endl;
   }
 
-  MeshRenderingOptions to_mesh_rendering_options() const {
-    static_assert(sizeof(VoxelMapOptions) == sizeof(MeshRenderingOptions), "VoxelMapOptions and MeshRenderingOptions must have the same size.");
-
-    MeshRenderingOptions opts;
-    memcpy(&opts, this, sizeof(VoxelMapOptions));
-    return opts;
-  }
+  MeshRenderingOptions to_mesh_rendering_options() const;
 
 public:
   void set_voxel_alpha(float alpha);
