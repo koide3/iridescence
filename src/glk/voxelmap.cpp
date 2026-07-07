@@ -4,6 +4,36 @@
 
 namespace glk {
 
+void VoxelMapOptions::set_voxel_alpha(float alpha) {
+  draw_voxels = true;
+  override_voxel_color = true;
+  voxel_color.w() = alpha;
+}
+
+void VoxelMapOptions::set_voxel_color(const Eigen::Vector4f& color) {
+  draw_voxels = true;
+  override_voxel_color_mode = true;
+  override_voxel_color = true;
+
+  voxel_color_mode = 1;  // flat_color
+  voxel_color = color;
+}
+
+void VoxelMapOptions::set_edge_alpha(float alpha) {
+  draw_edges = true;
+  override_edge_color = true;
+  edge_color.w() = alpha;
+}
+
+void VoxelMapOptions::set_edge_color(const Eigen::Vector4f& color) {
+  draw_edges = true;
+  override_edge_color_mode = true;
+  override_edge_color = true;
+
+  edge_color_mode = 1;  // flat_color
+  edge_color = color;
+}
+
 VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options)
 : VoxelMap(voxel_coords, num_voxels, resolution, options.to_mesh_rendering_options()) {
   std::cerr << glk::console::yellow << "warning: VoxelMapOptions is deprecated. Use MeshRenderingOptions instead." << glk::console::reset << std::endl;

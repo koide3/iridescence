@@ -58,6 +58,8 @@ public:
 class VoxelMap : public Drawable {
 public:
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
+
+  // Deprecated constructor
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options = VoxelMapOptions());
 
   virtual ~VoxelMap();
