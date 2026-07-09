@@ -51,6 +51,10 @@ public:
   template <int WindowSize = 3>
   void filter_elevation_map(bool process_valid_cells = true);
 
+  /// @brief Replace the color map with its gradient magnitude.
+  template <int WindowSize = 3>
+  void calc_cmap_gradient();
+
 public:
   double resolution;      // Resolution of the map
   double inv_resolution;  // Inverse of the resolution

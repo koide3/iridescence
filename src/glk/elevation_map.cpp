@@ -1,5 +1,7 @@
 #include <glk/elevation_map.hpp>
 
+#include <Eigen/Dense>
+
 namespace glk {
 
 ElevationMapBuilder::ElevationMapBuilder(double resolution, const Eigen::Vector2i& size, const Eigen::Vector2f& origin)
@@ -145,6 +147,52 @@ void ElevationMapBuilder::filter_elevation_map(bool process_valid_cells) {
   color_map = std::move(filtered_cmap);
 }
 
+template <int WindowSize>
+void ElevationMapBuilder::calc_cmap_gradient() {
+  if (color_map.size() == 0) {
+    return;
+  }
+
+  const int shift = WindowSize / 2;
+  Eigen::Array<float, -1, -1, Eigen::RowMajor> gradient_map = Eigen::Array<float, -1, -1, Eigen::RowMajor>::Constant(size.y(), size.x(), std::numeric_limits<float>::quiet_NaN());
+
+  for (int y = shift; y < size.y() - shift; y++) {
+    for (int x = shift; x < size.x() - shift; x++) {
+      if (!std::isfinite(color_map(y, x))) {
+        continue;  // Skip cells without a valid color value
+      }
+
+      // Fit a local plane cmap = a * dx + b * dy + c to the finite neighbors and use the plane slope (a, b) as the gradient.
+      Eigen::Matrix3d AtA = Eigen::Matrix3d::Zero();
+      Eigen::Vector3d Atb = Eigen::Vector3d::Zero();
+      int valid_count = 0;
+
+      for (int dy = -shift; dy <= shift; dy++) {
+        for (int dx = -shift; dx <= shift; dx++) {
+          const float value = color_map(y + dy, x + dx);
+          if (!std::isfinite(value)) {
+            continue;  // Ignore NaN cells
+          }
+
+          const Eigen::Vector3d a(dx * resolution, dy * resolution, 1.0);
+          AtA += a * a.transpose();
+          Atb += a * static_cast<double>(value);
+          valid_count++;
+        }
+      }
+
+      if (valid_count < 3) {
+        continue;  // Not enough valid neighbors to estimate a gradient
+      }
+
+      const Eigen::Vector3d coeffs = AtA.ldlt().solve(Atb);
+      gradient_map(y, x) = static_cast<float>(std::sqrt(coeffs.x() * coeffs.x() + coeffs.y() * coeffs.y()));
+    }
+  }
+
+  color_map = std::move(gradient_map);
+}
+
 template std::vector<std::uint64_t> ElevationMapBuilder::calc_cell_indices(const std::vector<Eigen::Matrix<float, 2, 1>>& cells) const;
 template std::vector<std::uint64_t> ElevationMapBuilder::calc_cell_indices(const std::vector<Eigen::Matrix<float, 3, 1>>& cells) const;
 template std::vector<std::uint64_t> ElevationMapBuilder::calc_cell_indices(const std::vector<Eigen::Matrix<float, 6, 1>>& cells) const;
@@ -163,6 +211,10 @@ template void ElevationMapBuilder::set_cmap(const std::vector<Eigen::Matrix<floa
 template void ElevationMapBuilder::filter_elevation_map<3>(bool process_valid_cells);
 template void ElevationMapBuilder::filter_elevation_map<5>(bool process_valid_cells);
 template void ElevationMapBuilder::filter_elevation_map<7>(bool process_valid_cells);
+
+template void ElevationMapBuilder::calc_cmap_gradient<3>();
+template void ElevationMapBuilder::calc_cmap_gradient<5>();
+template void ElevationMapBuilder::calc_cmap_gradient<7>();
 
 ElevationMap::ElevationMap(const ElevationMapBuilder& builder, const MeshRenderingOptions& options)
 : options(options),
