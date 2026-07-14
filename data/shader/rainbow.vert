@@ -59,7 +59,7 @@ vec3 get_vertex_position(vec3 v) {
 void main() {
     vec4 world_position = model_matrix * vec4(get_vertex_position(vert_position), 1.0);
     vec3 frag_world_position = world_position.xyz;
-    gl_Position = projection_matrix * view_matrix * world_position;
+    gl_Position = projection_matrix * (view_matrix * world_position);
     frag_vert_position = vert_position;
 
     switch(color_mode) {
