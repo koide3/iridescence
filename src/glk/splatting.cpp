@@ -77,6 +77,10 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
     shader->set_uniform("partial_rendering_enabled", 0);
   }
 
+  shader->set_uniform("texture_enabled", texture ? 1 : 0);
+  shader->set_uniform("vert_radius_enabled", vert_radius_enabled);
+  shader->set_uniform("point_radius", point_radius);
+
   const bool cull_was_enabled = glIsEnabled(GL_CULL_FACE);
   glDisable(GL_CULL_FACE);
 
