@@ -48,8 +48,16 @@ vec4 rainbow(float val, vec2 range) {
     return texture(colormap_sampler, vec2(p, 0.0));
 }
 
+// #include <rainbow_custom.vert>
+
+#ifndef OVERRIDE_VERTEX_POSITION
+vec3 get_vertex_position(vec3 v) {
+    return v;
+}
+#endif
+
 void main() {
-    vec4 world_position = model_matrix * vec4(vert_position, 1.0);
+    vec4 world_position = model_matrix * vec4(get_vertex_position(vert_position), 1.0);
     vec3 frag_world_position = world_position.xyz;
     gl_Position = projection_matrix * view_matrix * world_position;
     frag_vert_position = vert_position;
@@ -90,7 +98,6 @@ void main() {
     } else {
         frag_normal_view = vec3(0.0, 0.0, 0.0);
     }
-
 
     if (point_scale_mode == 0) {
         vec3 ndc = gl_Position.xyz / gl_Position.w;

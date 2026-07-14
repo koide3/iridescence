@@ -344,12 +344,17 @@ GLuint GLSLShader::read_shader_from_file(
     } else {
       const auto found = include_map.find(include_filename);
       if (found == include_map.end()) {
-        return GL_FALSE;
-      }
-
-      include_source = read_source(found->second);
-      if (include_source.empty()) {
-        return GL_FALSE;
+        if (include_filename.find("custom") == std::string::npos) {
+          std::cerr << bold_red << "error: failed to find include file " << include_filename << reset << std::endl;
+          return GL_FALSE;
+        }
+        include_source = "// no custom code provided";
+      } else {
+        include_source = read_source(found->second);
+        if (include_source.empty()) {
+          std::cerr << bold_red << "error: failed to read include file " << found->second << reset << std::endl;
+          return GL_FALSE;
+        }
       }
     }
 

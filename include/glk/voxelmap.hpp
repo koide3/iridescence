@@ -56,9 +56,10 @@ public:
 class VoxelMap : public Drawable {
 public:
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
+  VoxelMap(const std::vector<Eigen::Vector3i>& voxel_coords, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
 
   // Deprecated constructor
-  VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options = VoxelMapOptions());
+  VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options);
 
   virtual ~VoxelMap();
 
@@ -76,6 +77,36 @@ private:
   GLuint vbo;
   GLuint ebo_voxels;
   GLuint ebo_edges;
+};
+
+class VoxelMap2 : public Drawable {
+public:
+  VoxelMap2(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
+  VoxelMap2(const std::vector<Eigen::Vector3i>& voxel_coords, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
+
+  // Deprecated constructor
+  VoxelMap2(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const VoxelMapOptions& options);
+
+  virtual ~VoxelMap2();
+
+  virtual void draw(glk::GLSLShader& shader) const override;
+
+private:
+  VoxelMap2(const VoxelMap2&);
+  VoxelMap2& operator=(const VoxelMap2&);
+
+private:
+  static std::shared_ptr<glk::GLSLShader> shader;
+
+  MeshRenderingOptions options;
+  float resolution;
+  int num_voxels;
+
+  GLuint vao;
+  GLuint cube_vbo;
+  GLuint cube_ebo_faces;
+  GLuint cube_ebo_edges;
+  GLuint coords_vbo;
 };
 
 }  // namespace glk
