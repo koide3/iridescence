@@ -83,15 +83,16 @@ VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double r
   }
 
   // Pre-compute vertex offsets with float resolution (avoid repeated double->float conversion)
+  const float res = resolution;
   const std::array<Eigen::Vector3f, 8> cube_vertices = {
     Eigen::Vector3f(0.0f, 0.0f, 0.0f),
-    Eigen::Vector3f(1.0f, 0.0f, 0.0f),
-    Eigen::Vector3f(1.0f, 1.0f, 0.0f),
-    Eigen::Vector3f(0.0f, 1.0f, 0.0f),
-    Eigen::Vector3f(0.0f, 0.0f, 1.0f),
-    Eigen::Vector3f(1.0f, 0.0f, 1.0f),
-    Eigen::Vector3f(1.0f, 1.0f, 1.0f),
-    Eigen::Vector3f(0.0f, 1.0f, 1.0f),
+    Eigen::Vector3f(res, 0.0f, 0.0f),
+    Eigen::Vector3f(res, res, 0.0f),
+    Eigen::Vector3f(0.0f, res, 0.0f),
+    Eigen::Vector3f(0.0f, 0.0f, res),
+    Eigen::Vector3f(res, 0.0f, res),
+    Eigen::Vector3f(res, res, res),
+    Eigen::Vector3f(0.0f, res, res),
   };
 
   static constexpr std::array<unsigned int, 36> cube_face_indices = {
