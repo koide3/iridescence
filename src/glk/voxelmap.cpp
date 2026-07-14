@@ -5,8 +5,8 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <unordered_set>
 #include <glk/path.hpp>
-#include <glk/async_buffer_copy.hpp>
 #include <glk/console_colors.hpp>
 
 namespace glk {
@@ -82,7 +82,7 @@ VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double r
     shader->link_program();
   }
 
-  // Pre-compute vertex offsets with float resolution (avoid repeated double->float conversion)
+  // Pre-compute vertex offsets with float resolution
   const float res = resolution;
   const std::array<Eigen::Vector3f, 8> cube_vertices = {
     Eigen::Vector3f(0.0f, 0.0f, 0.0f),
@@ -109,8 +109,6 @@ VoxelMap::VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double r
     4, 5, 5, 6, 6, 7, 7, 4,  //
     0, 4, 1, 5, 2, 6, 3, 7,  //
   };
-
-  constexpr GLbitfield map_flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
 
   // Create all GL objects and allocate buffers upfront
   glGenVertexArrays(1, &vao);
@@ -162,20 +160,8 @@ VoxelMap::~VoxelMap() {
 
 void VoxelMap::draw(glk::GLSLShader& shader_) const {
   shader->use();
-  shader->set_uniform("normal_enabled", shader_.get_uniform_cache<bool>(glk::hash("normal_enabled")));
-  shader->set_uniform("model_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("model_matrix")));
-  shader->set_uniform("view_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("view_matrix")));
-  shader->set_uniform("projection_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("projection_matrix")));
 
-  shader->set_uniform("color_mode", shader_.get_uniform_cache<int>(glk::hash("color_mode")));
-  shader->set_uniform("material_color", shader_.get_uniform_cache<Eigen::Vector4f>(glk::hash("material_color")));
-  shader->set_uniform("colormap_sampler", shader_.get_uniform_cache<int>(glk::hash("colormap_sampler")));
-  shader->set_uniform("texture_sampler", shader_.get_uniform_cache<int>(glk::hash("texture_sampler")));
-
-  shader->set_uniform("z_range", shader_.get_uniform_cache<Eigen::Vector2f>(glk::hash("z_range")));
-  shader->set_uniform("cmap_range", shader_.get_uniform_cache<Eigen::Vector2f>(glk::hash("cmap_range")));
-  shader->set_uniform("colormap_axis", shader_.get_uniform_cache<Eigen::Vector3f>(glk::hash("colormap_axis")));
-
+  shader_.copy_cached_uniforms(*shader);
   shader->set_uniform("voxel_resolution", resolution);
 
   glBindVertexArray(vao);
@@ -192,7 +178,7 @@ void VoxelMap::draw(glk::GLSLShader& shader_) const {
 
   // Per-instance voxel coordinates (advance once per voxel)
   glBindBuffer(GL_ARRAY_BUFFER, coords_vbo);
-  glVertexAttribIPointer(voxel_coord_loc, 3, GL_INT, 0, 0);
+  glVertexAttribIPointer(voxel_coord_loc, 3, GL_INT, sizeof(Eigen::Vector3i), 0);
   glVertexAttribDivisor(voxel_coord_loc, 1);
 
   // draw voxels

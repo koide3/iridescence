@@ -472,6 +472,12 @@ Eigen::Matrix4f GLSLShader::get_uniform_matrix4f(const std::string& name) {
   return mat;
 }
 
+void GLSLShader::copy_cached_uniforms(GLSLShader& other) const {
+  for (const auto& pair : uniform_variable_cache) {
+    std::visit([&](const auto& value) { other.set_uniform(pair.first, value); }, pair.second);
+  }
+}
+
 void GLSLShader::set_uniform(std::uint64_t name, int value, const char* debug_msg) {
   glUniform1i(uniform(name, debug_msg), value);
   set_uniform_cache(name, value);
@@ -558,7 +564,6 @@ void GLSLShader::set_uniform(const std::string& name, const Eigen::Matrix4f& mat
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<int>& vectors, const char* debug_msg) {
   glUniform1iv(uniform(name, debug_msg), vectors.size(), vectors.data());
-  set_uniform_cache(name, vectors);
 }
 
 void GLSLShader::set_uniform(const std::string& name, const std::vector<int>& vectors) {
@@ -567,7 +572,6 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<int>& ve
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<float>& vectors, const char* debug_msg) {
   glUniform1fv(uniform(name, debug_msg), vectors.size(), vectors.data());
-  set_uniform_cache(name, vectors);
 }
 
 void GLSLShader::set_uniform(const std::string& name, const std::vector<float>& vectors) {
@@ -576,7 +580,6 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<float>& 
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector2f>& vectors, const char* debug_msg) {
   glUniform2fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
-  set_uniform_cache(name, vectors);
 }
 
 void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector2f>& vectors) {
@@ -585,7 +588,6 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::V
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector3f>& vectors, const char* debug_msg) {
   glUniform3fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
-  set_uniform_cache(name, vectors);
 }
 
 void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector3f>& vectors) {
@@ -594,7 +596,6 @@ void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::V
 
 void GLSLShader::set_uniform(std::uint64_t name, const std::vector<Eigen::Vector4f>& vectors, const char* debug_msg) {
   glUniform4fv(uniform(name, debug_msg), vectors.size(), vectors[0].data());
-  set_uniform_cache(name, vectors);
 }
 
 void GLSLShader::set_uniform(const std::string& name, const std::vector<Eigen::Vector4f>& vectors) {

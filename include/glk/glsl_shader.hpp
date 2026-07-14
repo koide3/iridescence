@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <optional>
+#include <variant>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -74,6 +75,8 @@ public:
   Eigen::Matrix4f get_uniform_matrix4f(std::uint64_t name);
   Eigen::Matrix4f get_uniform_matrix4f(const std::string& name);
 
+  void copy_cached_uniforms(GLSLShader& other) const;
+
   template <typename T>
   T get_uniform_cache(std::uint64_t name) const {
     const auto found = std::find_if(uniform_variable_cache.begin(), uniform_variable_cache.end(), [=](const auto& pair) { return pair.first == name; });
@@ -81,7 +84,8 @@ public:
       std::cerr << "warning: failed to find uniform variable cache " << name << std::endl;
       return T();
     }
-    return *reinterpret_cast<const T*>(found->second.get());
+
+    return std::get<T>(found->second);
   }
 
   template <typename T>
@@ -90,7 +94,9 @@ public:
     if (found == uniform_variable_cache.end()) {
       return std::nullopt;
     }
-    return *reinterpret_cast<const T*>(found->second.get());
+
+    auto value = std::get_if<T>(&found->second);
+    return value ? std::optional<T>(*value) : std::nullopt;
   }
 
   // int
@@ -164,15 +170,17 @@ private:
 
   template <typename T>
   void set_uniform_cache(std::uint64_t h, const T& value) {
-    const auto found = std::find_if(uniform_variable_cache.begin(), uniform_variable_cache.end(), [&h](const auto& pair) { return pair.first == h; });
+    auto found = std::find_if(uniform_variable_cache.begin(), uniform_variable_cache.end(), [&h](const auto& pair) { return pair.first == h; });
     if (found != uniform_variable_cache.end()) {
-      *reinterpret_cast<T*>(found->second.get()) = value;
+      found->second = value;
     } else {
-      uniform_variable_cache.emplace_back(h, glk::make_shared<T>(value));
+      uniform_variable_cache.emplace_back(h, value);
     }
   }
 
 private:
+  using UniformCacheVariant = std::variant<int, float, Eigen::Vector2f, Eigen::Vector3f, Eigen::Vector4f, Eigen::Vector2i, Eigen::Vector3i, Eigen::Vector4i, Eigen::Matrix4f>;
+
   std::vector<GLuint> shaders;
   std::vector<std::string> feedback_varyings;
 
@@ -181,7 +189,7 @@ private:
   std::vector<std::pair<std::uint64_t, GLint>> uniform_cache;
 
   std::vector<std::pair<std::uint64_t, GLint>> subroutine_cache;
-  std::vector<std::pair<std::uint64_t, std::shared_ptr<void>>> uniform_variable_cache;
+  std::vector<std::pair<std::uint64_t, UniformCacheVariant>> uniform_variable_cache;
 };
 
 }  // namespace glk

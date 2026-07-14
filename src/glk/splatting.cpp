@@ -61,6 +61,8 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
   }
 
   shader->use();
+  shader_.copy_cached_uniforms(*shader);
+
   if (shader_.get_uniform_cache<int>(glk::hash("info_enabled"))) {
     shader->set_uniform("info_enabled", 1);
     shader->set_uniform("info_values", shader_.get_uniform_cache<Eigen::Vector4i>(glk::hash("info_values")));
@@ -74,22 +76,6 @@ void Splatting::draw(glk::GLSLShader& shader_) const {
   } else {
     shader->set_uniform("partial_rendering_enabled", 0);
   }
-
-  shader->set_uniform("normal_enabled", shader_.get_uniform_cache<int>(glk::hash("normal_enabled")));
-  shader->set_uniform("texture_enabled", texture ? 1 : 0);
-
-  shader->set_uniform("vert_radius_enabled", vert_radius_enabled);
-  shader->set_uniform("point_radius", point_radius);
-
-  shader->set_uniform("color_mode", shader_.get_uniform_cache<int>(glk::hash("color_mode")));
-  shader->set_uniform("z_range", shader_.get_uniform_cache<Eigen::Vector2f>(glk::hash("z_range")));
-  shader->set_uniform("cmap_range", shader_.get_uniform_cache<Eigen::Vector2f>(glk::hash("cmap_range")));
-  shader->set_uniform("colormap_axis", shader_.get_uniform_cache<Eigen::Vector3f>(glk::hash("colormap_axis")));
-
-  shader->set_uniform("model_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("model_matrix")));
-  shader->set_uniform("view_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("view_matrix")));
-  shader->set_uniform("projection_matrix", shader_.get_uniform_cache<Eigen::Matrix4f>(glk::hash("projection_matrix")));
-  shader->set_uniform("material_color", shader_.get_uniform_cache<Eigen::Vector4f>(glk::hash("material_color")));
 
   const bool cull_was_enabled = glIsEnabled(GL_CULL_FACE);
   glDisable(GL_CULL_FACE);
