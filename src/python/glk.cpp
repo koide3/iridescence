@@ -11,6 +11,7 @@
 #include <glk/pointcloud_buffer.hpp>
 #include <glk/voxelmap.hpp>
 #include <glk/io/ply_io.hpp>
+#include <glk/mesh_rendering_options.hpp>
 #include <glk/primitives/primitives.hpp>
 #include <glk/effects/screen_effect.hpp>
 #include <glk/effects/naive_screen_space_ambient_occlusion.hpp>
@@ -365,10 +366,19 @@ void define_glk(py::module_& m) {
     .def("set_edge_color", &glk::VoxelMapOptions::set_edge_color, py::arg("color"))
     .def_readwrite("edge_line_width", &glk::VoxelMapOptions::edge_line_width);
 
+  // glk::MeshRenderingOptions
+  py::class_<glk::MeshRenderingOptions, std::shared_ptr<glk::MeshRenderingOptions>>(glk_, "MeshRenderingOptions")
+    .def(py::init<>())
+    .def("set_face_alpha", &glk::MeshRenderingOptions::set_face_alpha, py::arg("alpha"))
+    .def("set_face_color", &glk::MeshRenderingOptions::set_face_color, py::arg("color"))
+    .def("set_edge_alpha", &glk::MeshRenderingOptions::set_edge_alpha, py::arg("alpha"))
+    .def("set_edge_color", &glk::MeshRenderingOptions::set_edge_color, py::arg("color"))
+    .def_readwrite("edge_line_width", &glk::MeshRenderingOptions::edge_line_width);
+
   // glk::VoxelMap
   py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap")
     .def(
-      py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options) {
+      py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::MeshRenderingOptions& mesh_options) {
         if (!check_valid_voxels(voxels)) {
           throw std::runtime_error("invalid voxels array");
         }
@@ -380,18 +390,18 @@ void define_glk(py::module_& m) {
           voxels_vec[i] = Eigen::Vector3i(voxels.at(i, 0), voxels.at(i, 1), voxels.at(i, 2));
         }
 
-        return std::make_shared<glk::VoxelMap>(voxels_vec.data(), voxels_vec.size(), resolution, voxel_options);
+        return std::make_shared<glk::VoxelMap>(voxels_vec.data(), voxels_vec.size(), resolution, mesh_options);
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("voxel_options") = glk::VoxelMapOptions())
+      py::arg("mesh_options") = glk::MeshRenderingOptions())
     .def(
-      py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::VoxelMapOptions& voxel_options) {
+      py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::MeshRenderingOptions& voxel_options) {
         return std::make_shared<glk::VoxelMap>(voxels.data(), voxels.size(), resolution, voxel_options);
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("voxel_options") = glk::VoxelMapOptions());
+      py::arg("voxel_options") = glk::MeshRenderingOptions());
 
   // glk::Texture
   py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture")
