@@ -4,6 +4,7 @@
 #include <pybind11/eigen.h>
 
 #include <iostream>
+#include <algorithm>
 #include <glk/path.hpp>
 #include <glk/lines.hpp>
 #include <glk/texture.hpp>
@@ -578,6 +579,70 @@ void define_glk(py::module_& m) {
   primitives_.def("wire_frustum", [] { return glk::Primitives::wire_frustum(); });
 
   // IO
+  // glk::PLYPropertyType
+  py::enum_<glk::PLYPropertyType>(glk_, "PLYPropertyType")
+    .value("CHAR", glk::PLYPropertyType::CHAR)
+    .value("UCHAR", glk::PLYPropertyType::UCHAR)
+    .value("SHORT", glk::PLYPropertyType::SHORT)
+    .value("USHORT", glk::PLYPropertyType::USHORT)
+    .value("INT", glk::PLYPropertyType::INT)
+    .value("UINT", glk::PLYPropertyType::UINT)
+    .value("FLOAT", glk::PLYPropertyType::FLOAT)
+    .value("DOUBLE", glk::PLYPropertyType::DOUBLE)
+    .export_values();
+
+  // glk::PLYGenericPropertyBuffer
+  py::class_<glk::PLYGenericPropertyBuffer, std::shared_ptr<glk::PLYGenericPropertyBuffer>>(glk_, "PLYGenericPropertyBuffer")
+    .def_property_readonly("name", [](glk::PLYGenericPropertyBuffer& self) { return self.name; })
+    .def_property_readonly("type", [](glk::PLYGenericPropertyBuffer& self) { return self.type(); })
+    .def_property_readonly("size", [](glk::PLYGenericPropertyBuffer& self) { return self.size(); })
+    .def(
+      "as_uint8",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<unsigned char> {
+        const unsigned char* data = self.get<unsigned char>();
+        return std::vector<unsigned char>(data, data + self.size());
+      })
+    .def(
+      "as_int8",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<char> {
+        const char* data = self.get<char>();
+        return std::vector<char>(data, data + self.size());
+      })
+    .def(
+      "as_uint16",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<unsigned short> {
+        const unsigned short* data = self.get<unsigned short>();
+        return std::vector<unsigned short>(data, data + self.size());
+      })
+    .def(
+      "as_int16",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<short> {
+        const short* data = self.get<short>();
+        return std::vector<short>(data, data + self.size());
+      })
+    .def(
+      "as_uint32",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<unsigned int> {
+        const unsigned int* data = self.get<unsigned int>();
+        return std::vector<unsigned int>(data, data + self.size());
+      })
+    .def(
+      "as_int32",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<int> {
+        const int* data = self.get<int>();
+        return std::vector<int>(data, data + self.size());
+      })
+    .def(
+      "as_float",
+      [](glk::PLYGenericPropertyBuffer& self) -> std::vector<float> {
+        const float* data = self.get<float>();
+        return std::vector<float>(data, data + self.size());
+      })
+    .def("as_double", [](glk::PLYGenericPropertyBuffer& self) -> std::vector<double> {
+      const double* data = self.get<double>();
+      return std::vector<double>(data, data + self.size());
+    });
+
   // glk::PLYData
   py::class_<glk::PLYData, std::shared_ptr<glk::PLYData>>(glk_, "PLYData")  //
     .def(py::init<>())
@@ -647,10 +712,19 @@ void define_glk(py::module_& m) {
           self.indices[i] = indices[i];
         }
       })
+    .def_property_readonly("properties", [](glk::PLYData& self) { return self.properties; })
     .def_property(
       "comments",
       [](glk::PLYData& self) -> std::vector<std::string> { return self.comments; },
-      [](glk::PLYData& self, const std::vector<std::string>& comments) { self.comments = comments; });
+      [](glk::PLYData& self, const std::vector<std::string>& comments) { self.comments = comments; })
+    .def("get_prop", [](glk::PLYData& self, const std::string& name) -> std::shared_ptr<glk::PLYGenericPropertyBuffer> {
+      for (const auto& prop : self.properties) {
+        if (prop->name == name) {
+          return prop;
+        }
+      }
+      return nullptr;
+    });
 
   glk_.def("load_ply", &glk::load_ply, py::arg("filename"));
   glk_.def("save_ply", &glk::save_ply, py::arg("filename"), py::arg("ply"), py::arg("binary") = true);
