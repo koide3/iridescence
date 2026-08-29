@@ -27,6 +27,23 @@ namespace py = pybind11;
 
 static bool is_first = true;
 
+template <typename Color>
+void define_flat_color(py::module_& guik_, const std::string& name) {
+  py::class_<Color, guik::FlatColor, std::shared_ptr<Color>>(guik_, name.c_str())
+    .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
+    .def(
+      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new Color(mat);
+      }),
+      py::arg("scale") = 1.0,
+      py::arg("trans") = Eigen::Vector3f::Zero(),
+      py::arg("rot") = Eigen::Matrix3f::Identity());
+}
+
 guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
   if (is_first) {
     py::gil_scoped_acquire acquire;
@@ -194,61 +211,14 @@ void define_guik(py::module_& m) {
       py::arg("rot") = Eigen::Matrix3f::Identity());
 
   // Flat colors
-  py::class_<guik::FlatRed, guik::FlatColor, std::shared_ptr<guik::FlatRed>>(guik_, "FlatRed")
-    .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>())
-    .def(
-      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
-        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-        mat.block<3, 3>(0, 0) = scale * rot;
-        mat.block<3, 1>(0, 3) = trans;
-        return new guik::FlatRed(mat);
-      }),
-      py::arg("scale") = 1.0,
-      py::arg("trans") = Eigen::Vector3f::Zero(),
-      py::arg("rot") = Eigen::Matrix3f::Identity());
-
-  py::class_<guik::FlatGreen, guik::FlatColor, std::shared_ptr<guik::FlatGreen>>(guik_, "FlatGreen")
-    .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>())
-    .def(
-      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
-        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-        mat.block<3, 3>(0, 0) = scale * rot;
-        mat.block<3, 1>(0, 3) = trans;
-        return new guik::FlatGreen(mat);
-      }),
-      py::arg("scale") = 1.0,
-      py::arg("trans") = Eigen::Vector3f::Zero(),
-      py::arg("rot") = Eigen::Matrix3f::Identity());
-
-  py::class_<guik::FlatBlue, guik::FlatColor, std::shared_ptr<guik::FlatBlue>>(guik_, "FlatBlue")
-    .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>())
-    .def(
-      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
-        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-        mat.block<3, 3>(0, 0) = scale * rot;
-        mat.block<3, 1>(0, 3) = trans;
-        return new guik::FlatBlue(mat);
-      }),
-      py::arg("scale") = 1.0,
-      py::arg("trans") = Eigen::Vector3f::Zero(),
-      py::arg("rot") = Eigen::Matrix3f::Identity());
-
-  py::class_<guik::FlatOrange, guik::FlatColor, std::shared_ptr<guik::FlatOrange>>(guik_, "FlatOrange")
-    .def(py::init<>())
-    .def(py::init<Eigen::Matrix4f>())
-    .def(
-      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
-        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-        mat.block<3, 3>(0, 0) = scale * rot;
-        mat.block<3, 1>(0, 3) = trans;
-        return new guik::FlatOrange(mat);
-      }),
-      py::arg("scale") = 1.0,
-      py::arg("trans") = Eigen::Vector3f::Zero(),
-      py::arg("rot") = Eigen::Matrix3f::Identity());
+  define_flat_color<guik::FlatRed>(guik_, "FlatRed");
+  define_flat_color<guik::FlatGreen>(guik_, "FlatGreen");
+  define_flat_color<guik::FlatBlue>(guik_, "FlatBlue");
+  define_flat_color<guik::FlatOrange>(guik_, "FlatOrange");
+  define_flat_color<guik::FlatWhite>(guik_, "FlatWhite");
+  define_flat_color<guik::FlatGray>(guik_, "FlatGray");
+  define_flat_color<guik::FlatDarkGray>(guik_, "FlatDarkGray");
+  define_flat_color<guik::FlatBlack>(guik_, "FlatBlack");
 
   // guik::ModelControl
   py::class_<guik::ModelControl>(guik_, "ModelControl")
@@ -1163,6 +1133,8 @@ void define_guik(py::module_& m) {
       [](guik::AsyncLightViewer& viewer, const std::string& name, const std::tuple<int, int>& size) {
         return viewer.async_sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size)));
       })
+
+    .def("remove_async_sub_viewer", &guik::AsyncLightViewer::remove_async_sub_viewer, py::arg("name"))
 
     .def(
       "update_plot_line",

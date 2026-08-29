@@ -255,4 +255,8 @@ AsyncLightViewerContext AsyncLightViewer::async_sub_viewer(const std::string& co
   return AsyncLightViewerContext(sub_viewer.get());
 }
 
+void AsyncLightViewer::remove_async_sub_viewer(const std::string& context_name) {
+  guik::viewer()->invoke([=] { guik::viewer()->remove_sub_viewer(context_name); });
+}
+
 }  // namespace guik
