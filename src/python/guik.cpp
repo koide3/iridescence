@@ -1134,6 +1134,8 @@ void define_guik(py::module_& m) {
         return viewer.async_sub_viewer(name, Eigen::Vector2i(std::get<0>(size), std::get<1>(size)));
       })
 
+    .def("remove_async_sub_viewer", &guik::AsyncLightViewer::remove_async_sub_viewer, py::arg("name"))
+
     .def(
       "update_plot_line",
       [](

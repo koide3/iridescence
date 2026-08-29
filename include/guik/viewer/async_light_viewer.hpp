@@ -331,6 +331,10 @@ public:
   /// @note  This method causes synchronization with the visualization thread. Do not call this frequently.
   AsyncLightViewerContext async_sub_viewer(const std::string& context_name, const Eigen::Vector2i& canvas_size = Eigen::Vector2i(-1, -1));
 
+  /// @brief Remove an async sub viewer context.
+  /// @param context_name Name of the context to be removed.
+  void remove_async_sub_viewer(const std::string& context_name);
+
 private:
   void ui_callback();
 
