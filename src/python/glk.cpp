@@ -296,22 +296,28 @@ void define_glk(py::module_& m) {
     .def(py::init([](const std::vector<Eigen::Vector3f>& points) { return std::make_shared<glk::PointCloudBuffer>(points); }), py::arg("points"))
     .def(
       "add_normals",
-      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& normals) { buffer.add_normals(normals); },
-      py::arg("normals"))
-    .def(
-      "add_normals",
       [](glk::PointCloudBuffer& buffer, const py::array_t<float, py::array::c_style | py::array::forcecast>& normals) {
         if (!check_valid_points(normals)) {
           throw std::runtime_error("invalid normals array");
         }
 
-        std::vector<Eigen::Vector3f> normals_vec(normals.shape(0));
-        for (int i = 0; i < normals.shape(0); i++) {
-          normals_vec[i] = Eigen::Vector3f(normals.at(i, 0), normals.at(i, 1), normals.at(i, 2));
-        }
-        buffer.add_normals(normals_vec);
+        buffer.add_normals(normals.data(), sizeof(float) * normals.shape(1), normals.shape(0));
       },
       py::arg("normals"))
+    .def(
+      "add_normals",
+      [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& normals) { buffer.add_normals(normals); },
+      py::arg("normals"))
+    .def(
+      "add_color",
+      [](glk::PointCloudBuffer& buffer, const py::array_t<float, py::array::c_style | py::array::forcecast>& colors) {
+        if (!check_valid_colors(colors)) {
+          throw std::runtime_error("invalid colors array");
+        }
+
+        buffer.add_color(colors.data(), sizeof(float) * colors.shape(1), colors.shape(0));
+      },
+      py::arg("colors"))
     .def(
       "add_color",
       [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector3f>& colors) {
@@ -323,20 +329,6 @@ void define_glk(py::module_& m) {
     .def(
       "add_color",
       [](glk::PointCloudBuffer& buffer, const std::vector<Eigen::Vector4f>& colors) { buffer.add_color(colors); },
-      py::arg("colors"))
-    .def(
-      "add_color",
-      [](glk::PointCloudBuffer& buffer, const py::array_t<float, py::array::c_style | py::array::forcecast>& colors) {
-        if (!check_valid_colors(colors)) {
-          throw std::runtime_error("invalid colors array");
-        }
-
-        std::vector<Eigen::Vector4f> colors_vec(colors.shape(0));
-        for (int i = 0; i < colors.shape(0); i++) {
-          colors_vec[i] = Eigen::Vector4f(colors.at(i, 0), colors.at(i, 1), colors.at(i, 2), colors.at(i, 3));
-        }
-        buffer.add_color(colors_vec);
-      },
       py::arg("colors"))
     .def(
       "add_intensity",
