@@ -34,10 +34,133 @@ Application ::~Application() {
   glfwTerminate();
 }
 
+// Retrieve monitor that contains most of a window.
+static bool glfw_get_window_monitor(GLFWmonitor** monitor, GLFWwindow* window) {
+    bool success = false;
+
+    int window_rectangle[4] = {0};
+    glfwGetWindowPos(window, &window_rectangle[0], &window_rectangle[1]);
+    glfwGetWindowSize(window, &window_rectangle[2], &window_rectangle[3]);
+
+    int monitors_size = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitors_size);
+
+    GLFWmonitor* closest_monitor = NULL;
+    int max_overlap_area = 0;
+
+    for (int i = 0; i < monitors_size; ++i)
+    {
+        int monitor_rectangle[4] = {0};
+        glfwGetMonitorWorkarea(monitors[i], &monitor_rectangle[0], &monitor_rectangle[1], &monitor_rectangle[2], &monitor_rectangle[3]);
+
+        const GLFWvidmode* monitor_video_mode = glfwGetVideoMode(monitors[i]);
+
+        if (
+            !(
+                ((window_rectangle[0] + window_rectangle[2]) < monitor_rectangle[0]) ||
+                (window_rectangle[0] > (monitor_rectangle[0] + monitor_rectangle[2])) ||
+                ((window_rectangle[1] + window_rectangle[3]) < monitor_rectangle[1]) ||
+                (window_rectangle[1] > (monitor_rectangle[1] + monitor_rectangle[3]))
+            )
+        ) {
+            int intersection_rectangle[4] = {0};
+
+            // x, width
+            if (window_rectangle[0] < monitor_rectangle[0])
+            {
+                intersection_rectangle[0] = monitor_rectangle[0];
+
+                if ((window_rectangle[0] + window_rectangle[2]) < (monitor_rectangle[0] + monitor_rectangle[2]))
+                {
+                    intersection_rectangle[2] = (window_rectangle[0] + window_rectangle[2]) - intersection_rectangle[0];
+                }
+                else
+                {
+                    intersection_rectangle[2] = monitor_rectangle[2];
+                }
+            }
+            else
+            {
+                intersection_rectangle[0] = window_rectangle[0];
+
+                if ((monitor_rectangle[0] + monitor_rectangle[2]) < (window_rectangle[0] + window_rectangle[2]))
+                {
+                    intersection_rectangle[2] = (monitor_rectangle[0] + monitor_rectangle[2]) - intersection_rectangle[0];
+                }
+                else
+                {
+                    intersection_rectangle[2] = window_rectangle[2];
+                }
+            }
+
+            // y, height
+            if (window_rectangle[1] < monitor_rectangle[1])
+            {
+                intersection_rectangle[1] = monitor_rectangle[1];
+
+                if ((window_rectangle[1] + window_rectangle[3]) < (monitor_rectangle[1] + monitor_rectangle[3]))
+                {
+                    intersection_rectangle[3] = (window_rectangle[1] + window_rectangle[3]) - intersection_rectangle[1];
+                }
+                else
+                {
+                    intersection_rectangle[3] = monitor_rectangle[3];
+                }
+            }
+            else
+            {
+                intersection_rectangle[1] = window_rectangle[1];
+
+                if ((monitor_rectangle[1] + monitor_rectangle[3]) < (window_rectangle[1] + window_rectangle[3]))
+                {
+                    intersection_rectangle[3] = (monitor_rectangle[1] + monitor_rectangle[3]) - intersection_rectangle[1];
+                }
+                else
+                {
+                    intersection_rectangle[3] = window_rectangle[3];
+                }
+            }
+
+            int overlap_area = intersection_rectangle[2] * intersection_rectangle[3];
+            if (overlap_area > max_overlap_area)
+            {
+                closest_monitor = monitors[i];
+                max_overlap_area = overlap_area;
+            }
+        }
+    }
+
+    if (closest_monitor)
+    {
+        *monitor = closest_monitor;
+        success = true;
+    }
+
+    // true: monitor contains the monitor the window is most on
+    // false: monitor is unmodified
+    return success;
+}
+
 // dirty implementation
 std::unordered_map<GLFWwindow*, Application*> appmap;
 void fb_size_callback(GLFWwindow* window, int width, int height) {
-  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width, height));
+  int window_w, window_h;
+  glfwGetWindowSize(window, &window_w, &window_h);
+
+  float xscale = 1.0f, yscale = 1.0f;
+  if (window_w > 0 && window_h > 0) {
+    // Match ImGui's DisplayFramebufferScale (framebuffer pixels / window points).
+    xscale = static_cast<float>(width) / static_cast<float>(window_w);
+    yscale = static_cast<float>(height) / static_cast<float>(window_h);
+  } else {
+    // Fallback when window size is not yet available.
+    GLFWmonitor* screen;
+    if (glfw_get_window_monitor(&screen, window)) {
+      glfwGetMonitorContentScale(screen, &xscale, &yscale);
+    }
+  }
+
+  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(static_cast<int>(width / xscale), static_cast<int>(height / yscale)));
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background, const std::string& title) {
@@ -48,7 +171,7 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
   if (background) {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -99,6 +222,12 @@ Eigen::Vector2i Application::framebuffer_size() const {
 
 void Application::framebuffer_size_callback(const Eigen::Vector2i& size) {
   std::cout << "FB:" << size.transpose() << std::endl;
+}
+
+void Application::sync_framebuffer_size() {
+  int fb_w, fb_h;
+  glfwGetFramebufferSize(window, &fb_w, &fb_h);
+  fb_size_callback(window, fb_w, fb_h);
 }
 
 void Application::enable_docking() {
