@@ -144,15 +144,23 @@ static bool glfw_get_window_monitor(GLFWmonitor** monitor, GLFWwindow* window) {
 // dirty implementation
 std::unordered_map<GLFWwindow*, Application*> appmap;
 void fb_size_callback(GLFWwindow* window, int width, int height) {
-  float xscale = 1, yscale = 1;
+  int window_w, window_h;
+  glfwGetWindowSize(window, &window_w, &window_h);
 
-  // retrieve display scaling factor (needed on macos, otherwise resizing breaks mouse
-  // interaction)
-  GLFWmonitor* screen;
-  if (glfw_get_window_monitor(&screen, window)) {
+  float xscale = 1.0f, yscale = 1.0f;
+  if (window_w > 0 && window_h > 0) {
+    // Match ImGui's DisplayFramebufferScale (framebuffer pixels / window points).
+    xscale = static_cast<float>(width) / static_cast<float>(window_w);
+    yscale = static_cast<float>(height) / static_cast<float>(window_h);
+  } else {
+    // Fallback when window size is not yet available.
+    GLFWmonitor* screen;
+    if (glfw_get_window_monitor(&screen, window)) {
       glfwGetMonitorContentScale(screen, &xscale, &yscale);
+    }
   }
-  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(width/xscale, height/yscale));
+
+  appmap[window]->framebuffer_size_callback(Eigen::Vector2i(static_cast<int>(width / xscale), static_cast<int>(height / yscale)));
 }
 
 bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bool background, const std::string& title) {
@@ -214,6 +222,12 @@ Eigen::Vector2i Application::framebuffer_size() const {
 
 void Application::framebuffer_size_callback(const Eigen::Vector2i& size) {
   std::cout << "FB:" << size.transpose() << std::endl;
+}
+
+void Application::sync_framebuffer_size() {
+  int fb_w, fb_h;
+  glfwGetFramebufferSize(window, &fb_w, &fb_h);
+  fb_size_callback(window, fb_w, fb_h);
 }
 
 void Application::enable_docking() {

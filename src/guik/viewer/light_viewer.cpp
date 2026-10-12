@@ -56,10 +56,14 @@ bool LightViewer::init(const Eigen::Vector2i& size, const char* glsl_version, bo
   // GL::Renderer::setClearColor(0x474747_rgbf); // lightwave
   // GL::Renderer::setClearColor(0x3a3a3a_rgbf); // blender
 
-  if (!LightViewerContext::init_canvas(size)) {
+  if (!LightViewerContext::init_canvas(window_size())) {
     close();
     return false;
   }
+
+  // The framebuffer size callback is registered after glfwCreateWindow, so the
+  // initial framebuffer size event is missed. Sync canvas size now.
+  sync_framebuffer_size();
 
   return true;
 }
