@@ -10,6 +10,7 @@
 #include <glk/texture.hpp>
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
+#include <glk/drawable_container.hpp>
 #include <guik/recent_files.hpp>
 #include <guik/model_control.hpp>
 #include <guik/hovered_drawings.hpp>
@@ -22,6 +23,8 @@
 #include <guik/camera/basic_projection_control.hpp>
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
+
+#include "py_drawable.hpp"
 
 namespace py = pybind11;
 
@@ -191,6 +194,21 @@ void define_guik(py::module_& m) {
       py::arg("trans") = Eigen::Vector3f::Zero(),
       py::arg("rot") = Eigen::Matrix3f::Identity());
 
+  // guik::TextureColor
+  py::class_<guik::TextureColor, guik::ShaderSetting, std::shared_ptr<guik::TextureColor>>(guik_, "TextureColor")
+    .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>())
+    .def(
+      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::TextureColor(mat);
+      }),
+      py::arg("scale") = 1.0,
+      py::arg("trans") = Eigen::Vector3f::Zero(),
+      py::arg("rot") = Eigen::Matrix3f::Identity());
+
   // guik::FlatColor
   py::class_<guik::FlatColor, guik::ShaderSetting, std::shared_ptr<guik::FlatColor>>(guik_, "FlatColor")
     .def(py::init<float, float, float, float>(), py::arg("r"), py::arg("g"), py::arg("b"), py::arg("a"))
@@ -219,6 +237,25 @@ void define_guik(py::module_& m) {
   define_flat_color<guik::FlatGray>(guik_, "FlatGray");
   define_flat_color<guik::FlatDarkGray>(guik_, "FlatDarkGray");
   define_flat_color<guik::FlatBlack>(guik_, "FlatBlack");
+
+  // glk::DrawableContainer::push_back(drawable, shader_setting)
+  // Defined here (not in define_glk()) so that guik.ShaderSetting is registered before this binding
+  py::reinterpret_borrow<py::class_<glk::DrawableContainer, glk::Drawable, std::shared_ptr<glk::DrawableContainer>>>(py::type::of<glk::DrawableContainer>())
+    .def(
+      "push_back",
+      [](glk::DrawableContainer& container, const py::object& drawable, const guik::ShaderSetting& shader_setting) {
+        container.push_back(keep_python_drawable_alive(drawable), shader_setting);
+      },
+      py::arg("drawable"),
+      py::arg("shader_setting"),
+      R"doc(Add a drawable to the container with a shader setting.
+
+The shader setting is copied, and later changes to it are not reflected.
+
+Args:
+    drawable: Drawable to be added.
+    shader_setting: Shader setting to be used when drawing the drawable.
+)doc");
 
   // guik::ModelControl
   py::class_<guik::ModelControl>(guik_, "ModelControl")
@@ -461,10 +498,26 @@ void define_guik(py::module_& m) {
       py::arg("max_depth"))
     .def("backface_culling_enabled", &guik::LightViewerContext::backface_culling_enabled)
 
-    .def("color_buffer", &guik::LightViewerContext::color_buffer)
-    .def("depth_buffer", &guik::LightViewerContext::depth_buffer)
-    .def("normal_buffer", &guik::LightViewerContext::normal_buffer)
-    .def("info_buffer", &guik::LightViewerContext::info_buffer)
+    .def("color_buffer", &guik::LightViewerContext::color_buffer, py::return_value_policy::reference_internal)
+    .def("depth_buffer", &guik::LightViewerContext::depth_buffer, py::return_value_policy::reference_internal)
+    .def(
+      "normal_buffer",
+      [](const guik::LightViewerContext& context) -> const glk::Texture& {
+        if (!context.normal_buffer_enabled()) {
+          throw std::runtime_error("normal buffer is not enabled. Call enable_normal_buffer() first");
+        }
+        return context.normal_buffer();
+      },
+      py::return_value_policy::reference_internal)
+    .def(
+      "info_buffer",
+      [](const guik::LightViewerContext& context) -> const glk::Texture& {
+        if (!context.info_buffer_enabled()) {
+          throw std::runtime_error("info buffer is not enabled. Call enable_info_buffer() first");
+        }
+        return context.info_buffer();
+      },
+      py::return_value_policy::reference_internal)
 
     .def("clear_drawables", [](guik::LightViewerContext& context) { context.clear_drawables(); })
 
@@ -481,7 +534,14 @@ void define_guik(py::module_& m) {
       },
       py::arg("pattern"),
       py::arg("regex") = false)
-    .def("update_drawable", &guik::LightViewerContext::update_drawable)
+    .def(
+      "update_drawable",
+      [](guik::LightViewerContext& context, const std::string& name, const py::object& drawable, const guik::ShaderSetting& shader_setting) {
+        context.update_drawable(name, keep_python_drawable_alive(drawable), shader_setting);
+      },
+      py::arg("name"),
+      py::arg("drawable"),
+      py::arg("shader_setting") = guik::ShaderSetting())
 
     .def("clear_drawable_filters", &guik::LightViewerContext::clear_drawable_filters)
     .def("register_drawable_filter", &guik::LightViewerContext::register_drawable_filter)
@@ -580,14 +640,14 @@ void define_guik(py::module_& m) {
         const std::string& name,
         const std::vector<Eigen::Vector3f>& points,
         const std::vector<Eigen::Matrix3f>& covs,
-        float scale,
+        float sigma,
         const guik::ShaderSetting& shader_setting) {
         if (covs.size() != points.size()) {
           std::cerr << "warning: covs must have the same number of rows as points" << std::endl;
           return;
         }
 
-        context.update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
+        context.update_normal_dists(name, points.data(), covs.data(), points.size(), sigma, shader_setting);
       })
 
     .def(
@@ -597,14 +657,14 @@ void define_guik(py::module_& m) {
         const std::string& name,
         const std::vector<Eigen::Vector4f>& points,
         const std::vector<Eigen::Matrix4f>& covs,
-        float scale,
+        float sigma,
         const guik::ShaderSetting& shader_setting) {
         if (covs.size() != points.size()) {
           std::cerr << "warning: covs must have the same number of rows as points" << std::endl;
           return;
         }
 
-        context.update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
+        context.update_normal_dists(name, points.data(), covs.data(), points.size(), sigma, shader_setting);
       })
 
     .def(
@@ -963,14 +1023,14 @@ void define_guik(py::module_& m) {
         const std::string& name,
         const std::vector<Eigen::Vector3f>& points,
         const std::vector<Eigen::Matrix3f>& covs,
-        float scale,
+        float sigma,
         const guik::ShaderSetting& shader_setting) {
         if (covs.size() != points.size()) {
           std::cerr << "warning: covs must have the same number of rows as points" << std::endl;
           return;
         }
 
-        context.update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
+        context.update_normal_dists(name, points.data(), covs.data(), points.size(), sigma, shader_setting);
       })
 
     .def(
@@ -980,14 +1040,14 @@ void define_guik(py::module_& m) {
         const std::string& name,
         const std::vector<Eigen::Vector4f>& points,
         const std::vector<Eigen::Matrix4f>& covs,
-        float scale,
+        float sigma,
         const guik::ShaderSetting& shader_setting) {
         if (covs.size() != points.size()) {
           std::cerr << "warning: covs must have the same number of rows as points" << std::endl;
           return;
         }
 
-        context.update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
+        context.update_normal_dists(name, points.data(), covs.data(), points.size(), sigma, shader_setting);
       })
 
     .def(
@@ -1228,15 +1288,17 @@ void define_guik(py::module_& m) {
     py::arg("size") = Eigen::Vector2i(1920, 1080),
     py::arg("background") = false,
     py::arg("title") = "screen");
-  guik_.def("destroy", &guik::destroy, "");
+  guik_.def("destroy", &guik::destroy, "Destroy the viewer");
+  guik_.def("running", &guik::running, "Check if the viewer is currently running");
   guik_.def(
     "async_viewer",
     [](const Eigen::Vector2i& size, bool background, const std::string& title) { return async_instance(size, background, title); },
     py::arg("size") = Eigen::Vector2i(1920, 1080),
     py::arg("background") = false,
     py::arg("title") = "screen");
-  guik_.def("async_destroy", &guik::async_destroy, "");
+  guik_.def("async_destroy", &guik::async_destroy, "Destroy the async viewer");
   guik_.def("async_wait", &guik::async_wait, "");
+  guik_.def("async_running", &guik::async_running, "Check if the async viewer is currently running");
 
   auto atexit = py::module_::import("atexit");
   atexit.attr("register")(py::cpp_function([]() {

@@ -21,9 +21,9 @@ void LightViewerContext::update_normal_dists(
   const Eigen::Matrix<Scalar, Dim, 1>* points,
   const Eigen::Matrix<Scalar, Dim, Dim>* covs,
   int num_points,
-  float scale,
+  float sigma,
   const ShaderSetting& shader_setting) {
-  update_drawable(name, std::make_shared<glk::NormalDistributions>(points, covs, num_points, scale), shader_setting);
+  update_drawable(name, std::make_shared<glk::NormalDistributions>(points, covs, num_points, sigma), shader_setting);
 }
 
 template void LightViewerContext::update_normal_dists(const std::string&, const Eigen::Matrix<float, 3, 1>*, const Eigen::Matrix<float, 3, 3>*, int, float, const ShaderSetting&);

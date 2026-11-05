@@ -159,7 +159,7 @@ public:
   /// @param points         Point mean array
   /// @param covs           Point covariance array
   /// @param num_points     Number of points
-  /// @param scale          Scale of the normal distributions
+  /// @param sigma          Size of the ellipsoids in standard deviations (e.g., 3.0 renders 3-sigma ellipsoids)
   /// @param shader_setting Shader setting
   template <typename Scalar, int Dim>
   void update_normal_dists(
@@ -167,7 +167,7 @@ public:
     const Eigen::Matrix<Scalar, Dim, 1>* points,
     const Eigen::Matrix<Scalar, Dim, Dim>* covs,
     int num_points,
-    float scale,
+    float sigma,
     const ShaderSetting& shader_setting);
 
   /// @brief Register or update a normal distribution set.
@@ -176,7 +176,7 @@ public:
     const std::string& name,
     const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
     const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
-    float scale,
+    float sigma,
     const ShaderSetting& shader_setting);
 
   // ThinLines
@@ -417,9 +417,9 @@ void AsyncLightViewerContext::update_normal_dists(
   const std::string& name,
   const std::vector<Eigen::Matrix<Scalar, Dim, 1>, Alloc1>& points,
   const std::vector<Eigen::Matrix<Scalar, Dim, Dim>, Alloc2>& covs,
-  float scale,
+  float sigma,
   const ShaderSetting& shader_setting) {
-  update_normal_dists(name, points.data(), covs.data(), points.size(), scale, shader_setting);
+  update_normal_dists(name, points.data(), covs.data(), points.size(), sigma, shader_setting);
 }
 
 // ThinLines

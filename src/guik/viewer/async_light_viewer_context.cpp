@@ -190,12 +190,12 @@ void AsyncLightViewerContext::update_normal_dists(
   const Eigen::Matrix<Scalar, Dim, 1>* points,
   const Eigen::Matrix<Scalar, Dim, Dim>* covs,
   int num_points,
-  float scale,
+  float sigma,
   const ShaderSetting& shader_setting) {
   std::vector<Eigen::Matrix<Scalar, Dim, 1>> points_buffer(points, points + num_points);
   std::vector<Eigen::Matrix<Scalar, Dim, Dim>> covs_buffer(covs, covs + num_points);
   guik::viewer()->invoke(
-    [=] { context->update_drawable(name, std::make_shared<glk::NormalDistributions>(points_buffer.data(), covs_buffer.data(), num_points, scale), shader_setting); });
+    [=] { context->update_drawable(name, std::make_shared<glk::NormalDistributions>(points_buffer.data(), covs_buffer.data(), num_points, sigma), shader_setting); });
 }
 
 template void

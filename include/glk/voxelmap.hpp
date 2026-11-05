@@ -53,9 +53,20 @@ public:
   double edge_line_width;
 };
 
+/// @brief VoxelMap is a drawable that represents a set of voxels as cubes.
 class VoxelMap : public Drawable {
 public:
+  /// @brief Constructor
+  /// @param voxel_coords  Integer coordinates of the voxels
+  /// @param num_voxels    Number of voxels
+  /// @param resolution    Size of each voxel (cube) in world units
+  /// @param options       Rendering options for the voxels and edges
   VoxelMap(const Eigen::Vector3i* voxel_coords, int num_voxels, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
+
+  /// @brief Constructor
+  /// @param voxel_coords  Integer coordinates of the voxels
+  /// @param resolution    Size of each voxel (cube) in world units
+  /// @param options       Rendering options for the voxels and edges
   VoxelMap(const std::vector<Eigen::Vector3i>& voxel_coords, double resolution, const MeshRenderingOptions& options = MeshRenderingOptions());
 
   // Deprecated constructor
