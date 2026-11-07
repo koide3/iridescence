@@ -1,0 +1,17 @@
+<map id="guik::CameraControl" name="guik::CameraControl">
+<area shape="rect" id="Node000001" title="Base class for camera control. This class defines the interface for controlling the camera in the vie..." alt="" coords="5,136,161,164"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1ArcBallCameraControl.html" title=" " alt="" coords="224,5,425,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,123,150,82,178,61,208,43,242,32,238,35,210,48,181,65,153,86,109,127"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1FPSCameraControl.html" title=" " alt="" coords="235,57,414,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="127,127,208,95,255,84,251,87,210,100,130,132"/>
+<area shape="rect" id="Node000004" href="$classguik_1_1OrbitCameraControlXY.html" title="Orbit camera control (Up vector is locked to Z axis) Left button: rotate (pan/tilt) Middle or Right b..." alt="" coords="222,109,426,137"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="175,137,224,133,220,136,177,142"/>
+<area shape="rect" id="Node000006" href="$classguik_1_1SensorViewCameraControl.html" title="Camera control that orbits around a tracked sensor pose. The camera always looks at the sensor positi..." alt="" coords="209,161,440,189"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="176,157,211,162,206,164,177,162"/>
+<area shape="rect" id="Node000007" href="$classguik_1_1StaticCameraControl.html" title=" " alt="" coords="228,213,420,241"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="129,167,209,198,256,212,250,213,208,203,129,173"/>
+<area shape="rect" id="Node000008" href="$classguik_1_1TopDownCameraControl.html" title=" " alt="" coords="217,265,432,293"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="108,172,154,213,181,233,210,250,243,265,238,265,208,255,178,238,150,217,107,177"/>
+<area shape="rect" id="Node000005" href="$classguik_1_1OrbitCameraControlXZ.html" title=" " alt="" coords="488,109,693,137"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="442,121,490,123,485,124,442,126"/>
+</map>

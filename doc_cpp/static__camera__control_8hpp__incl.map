@@ -1,0 +1,17 @@
+<map id="/home/runner/work/iridescence/iridescence/include/guik/camera/static_camera_control.hpp" name="/home/runner/work/iridescence/iridescence/include/guik/camera/static_camera_control.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="59,5,310,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,208,97,235"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,69,71,197,67,193,160,66"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="121,208,248,235"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,66,187,193,182,191,182,69"/>
+<area shape="rect" id="Node000004" href="$camera__control_8hpp.html" title=" " alt="" coords="227,115,382,160"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="222,65,269,105,264,105,220,70"/>
+<area shape="poly" id="edge7_Node000004_Node000002" title=" " alt="" coords="238,163,107,205,105,200,236,158"/>
+<area shape="poly" id="edge8_Node000004_Node000003" title=" " alt="" coords="275,159,217,201,215,196,270,161"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="272,208,348,235"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="308,158,310,194,306,191,304,162"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="371,208,451,235"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="333,158,384,198,379,198,332,163"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="474,208,558,235"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="361,158,471,202,466,202,360,163"/>
+</map>

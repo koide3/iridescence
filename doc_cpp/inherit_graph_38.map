@@ -1,0 +1,19 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classguik_1_1HoveredDrawing.html" title=" " alt="" coords="5,188,172,216"/>
+<area shape="rect" id="Node000001" href="$classguik_1_1HoveredCircle.html" title=" " alt="" coords="244,5,394,33"/>
+<area shape="poly" id="edge40_Node000000_Node000001" title=" " alt="" coords="103,173,149,108,181,73,218,44,247,32,243,35,221,48,185,77,153,111,107,176"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1HoveredCross.html" title=" " alt="" coords="245,57,393,85"/>
+<area shape="poly" id="edge41_Node000000_Node000002" title=" " alt="" coords="112,175,159,134,218,95,252,84,248,87,221,100,163,138,116,179"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1HoveredFilledRect.html" title=" " alt="" coords="231,109,407,137"/>
+<area shape="poly" id="edge42_Node000000_Node000003" title=" " alt="" coords="135,179,219,147,262,136,258,139,221,152,138,184"/>
+<area shape="rect" id="Node000004" href="$classguik_1_1HoveredFilledTriangle.html" title=" " alt="" coords="220,161,418,189"/>
+<area shape="poly" id="edge43_Node000000_Node000004" title=" " alt="" coords="186,188,221,185,217,188,188,193"/>
+<area shape="rect" id="Node000005" href="$classguik_1_1HoveredImage.html" title=" " alt="" coords="242,213,396,241"/>
+<area shape="poly" id="edge44_Node000000_Node000005" title=" " alt="" coords="187,210,244,218,239,220,188,215"/>
+<area shape="rect" id="Node000006" href="$classguik_1_1HoveredRect.html" title=" " alt="" coords="248,265,390,293"/>
+<area shape="poly" id="edge45_Node000000_Node000006" title=" " alt="" coords="138,219,221,250,263,264,258,265,219,255,138,225"/>
+<area shape="rect" id="Node000007" href="$classguik_1_1HoveredText.html" title=" " alt="" coords="249,317,388,345"/>
+<area shape="poly" id="edge46_Node000000_Node000007" title=" " alt="" coords="115,224,163,264,221,302,253,317,248,317,218,307,160,269,114,229"/>
+<area shape="rect" id="Node000008" href="$classguik_1_1HoveredTriangle.html" title=" " alt="" coords="237,369,400,397"/>
+<area shape="poly" id="edge47_Node000000_Node000008" title=" " alt="" coords="106,227,153,292,185,326,221,354,247,369,242,369,218,359,181,330,149,295,104,232"/>
+</map>

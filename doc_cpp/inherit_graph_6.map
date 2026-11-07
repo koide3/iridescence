@@ -1,0 +1,37 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classglk_1_1Drawable.html" title=" " alt="" coords="5,421,117,449"/>
+<area shape="rect" id="Node000001" href="$classglk_1_1DrawableContainer.html" title="Container to store multiple drawables and draw them in order. It can also store a shader setting for ..." alt="" coords="182,5,356,33"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="64,406,76,322,98,214,126,112,144,71,163,44,183,31,180,36,167,48,148,74,132,113,103,215,82,323,69,406"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1ElevationMap.html" title="Elevation map." alt="" coords="200,57,338,85"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="60,405,64,342,78,258,91,214,109,171,133,131,163,96,180,84,201,76,198,80,182,88,166,100,137,134,114,174,96,216,83,260,69,342,65,406"/>
+<area shape="rect" id="Node000003" href="$classglk_1_1GridMap.html" title="GridMap is a drawable that represents a 2D grid map with color values. It assumes that pixel values a..." alt="" coords="217,109,322,137"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="61,405,69,350,85,281,99,245,115,209,137,177,163,148,188,132,219,125,215,128,190,137,166,152,141,180,120,212,103,247,91,283,74,351,67,406"/>
+<area shape="rect" id="Node000004" href="$classglk_1_1IndexedPointCloudBuffer.html" title="IndexedPointCloudBuffer is a drawable that represents a point cloud with an index buffer...." alt="" coords="165,161,374,189"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="64,406,74,361,93,305,122,248,141,222,163,200,186,187,182,192,166,204,145,226,126,251,98,307,79,362,69,407"/>
+<area shape="rect" id="Node000005" href="$classglk_1_1Lines.html" title="A class to draw a set of lines." alt="" coords="228,213,311,241"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="68,406,81,370,101,329,128,287,163,252,194,236,229,228,226,232,196,241,166,256,132,290,106,331,86,372,73,407"/>
+<area shape="rect" id="Node000006" href="$classglk_1_1Mesh.html" title=" " alt="" coords="227,265,312,293"/>
+<area shape="poly" id="edge6_Node000000_Node000006" title=" " alt="" coords="74,406,110,354,135,327,163,304,194,289,229,282,225,285,196,294,166,308,138,330,114,357,79,409"/>
+<area shape="rect" id="Node000007" href="$classglk_1_1MeshModel.html" title=" " alt="" coords="207,317,332,345"/>
+<area shape="poly" id="edge7_Node000000_Node000007" title=" " alt="" coords="86,410,121,381,164,355,209,341,205,345,166,360,125,385,90,413"/>
+<area shape="rect" id="Node000008" href="$classglk_1_1NormalDistributions.html" title="A drawable class to render a set of normal distributions as ellipsoids. This class efficiently perfor..." alt="" coords="179,369,360,397"/>
+<area shape="poly" id="edge8_Node000000_Node000008" title=" " alt="" coords="130,416,212,396,209,400,133,420"/>
+<area shape="rect" id="Node000009" href="$classglk_1_1NormalDistributions__old.html" title="Old CPU implementation of NormalDistributions (slower). The arguments are the same as NormalDistribut..." alt="" coords="166,421,373,449"/>
+<area shape="poly" id="edge9_Node000000_Node000009" title=" " alt="" coords="131,433,167,433,163,437,134,437"/>
+<area shape="rect" id="Node000010" href="$classglk_1_1PointCloudBuffer.html" title=" " alt="" coords="190,473,348,501"/>
+<area shape="poly" id="edge10_Node000000_Node000010" title=" " alt="" coords="131,450,213,471,208,474,132,455"/>
+<area shape="rect" id="Node000011" href="$classglk_1_1PointCorrespondences.html" title=" " alt="" coords="172,525,366,553"/>
+<area shape="poly" id="edge11_Node000000_Node000011" title=" " alt="" coords="87,457,125,485,166,510,199,524,194,526,163,515,121,489,89,462"/>
+<area shape="rect" id="Node000012" href="$classglk_1_1PointNormalsBuffer.html" title="PointNormalsBuffer is a drawable that represents a point cloud with normals." alt="" coords="181,577,358,605"/>
+<area shape="poly" id="edge12_Node000000_Node000012" title=" " alt="" coords="77,460,114,513,138,540,166,562,192,576,187,578,163,567,135,544,110,517,77,465"/>
+<area shape="rect" id="Node000013" href="$classglk_1_1Splatting.html" title=" " alt="" coords="216,629,323,657"/>
+<area shape="poly" id="edge13_Node000000_Node000013" title=" " alt="" coords="70,461,86,498,106,539,132,580,166,614,190,628,218,637,213,639,188,632,163,619,128,583,101,542,81,500,71,466"/>
+<area shape="rect" id="Node000014" href="$classglk_1_1ThinLines.html" title="A class to draw a set of GL_LINES." alt="" coords="214,681,325,709"/>
+<area shape="poly" id="edge14_Node000000_Node000014" title=" " alt="" coords="67,461,79,508,98,563,126,619,145,644,166,666,189,680,216,690,211,691,187,685,163,671,141,648,122,622,93,565,74,510,67,467"/>
+<area shape="rect" id="Node000015" href="$classglk_1_1Trajectory.html" title=" " alt="" coords="213,733,326,761"/>
+<area shape="poly" id="edge15_Node000000_Node000015" title=" " alt="" coords="64,462,74,519,91,588,103,624,120,658,141,690,166,718,188,732,215,742,210,743,186,737,163,723,137,694,115,661,99,626,85,589,69,520,64,468"/>
+<area shape="rect" id="Node000016" href="$classglk_1_1TransformFeedback.html" title=" " alt="" coords="181,785,358,813"/>
+<area shape="poly" id="edge16_Node000000_Node000016" title=" " alt="" coords="62,462,69,528,83,611,96,654,114,697,137,736,166,771,185,785,179,785,163,774,133,739,109,699,91,656,78,612,64,529,62,467"/>
+<area shape="rect" id="Node000017" href="$classglk_1_1VoxelMap.html" title="VoxelMap is a drawable that represents a set of voxels as cubes." alt="" coords="213,837,326,865"/>
+<area shape="poly" id="edge17_Node000000_Node000017" title=" " alt="" coords="66,462,82,547,103,655,132,757,148,796,167,823,188,837,215,848,210,848,186,842,163,826,144,799,126,759,98,656,76,548,66,467"/>
+</map>

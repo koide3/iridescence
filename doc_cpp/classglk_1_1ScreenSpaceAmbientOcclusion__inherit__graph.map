@@ -1,0 +1,5 @@
+<map id="glk::ScreenSpaceAmbientOcclusion" name="glk::ScreenSpaceAmbientOcclusion">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,256,109"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1ScreenEffect.html" title=" " alt="" coords="65,5,196,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,47,133,82,128,79,129,51"/>
+</map>

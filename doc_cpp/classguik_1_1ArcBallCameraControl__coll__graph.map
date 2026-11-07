@@ -1,0 +1,5 @@
+<map id="guik::ArcBallCameraControl" name="guik::ArcBallCameraControl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,207,109"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1CameraControl.html" title="Base class for camera control. This class defines the interface for controlling the camera in the vie..." alt="" coords="28,5,184,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,47,108,82,104,79,104,51"/>
+</map>

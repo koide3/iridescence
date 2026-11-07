@@ -1,0 +1,20 @@
+<map id="/home/runner/work/iridescence/iridescence/include/guik/viewer/anonymous.hpp" name="/home/runner/work/iridescence/iridescence/include/guik/viewer/anonymous.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="131,5,353,67"/>
+<area shape="rect" id="Node000002" href="$light__viewer__context_8hpp.html" title=" " alt="" coords="123,115,361,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,80,245,115,239,114,241,85"/>
+<area shape="rect" id="Node000003" href="$async__light__viewer__context_8hpp.html" title=" " alt="" coords="8,225,230,303"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="198,189,162,226,158,223,201,185"/>
+<area shape="rect" id="Node000005" href="$light__viewer_8hpp.html" title=" " alt="" coords="255,233,477,295"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="285,185,336,232,331,233,285,190"/>
+<area shape="rect" id="Node000004" href="$async__light__viewer_8hpp.html" title=" " alt="" coords="5,351,231,413"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="120,317,121,352,116,350,118,322"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="286,304,184,353,181,348,290,300"/>
+<area shape="rect" id="Node000006" href="$hovered__drawings_8hpp.html" title=" " alt="" coords="255,351,477,413"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="368,308,368,352,364,350,364,313"/>
+<area shape="rect" id="Node000008" href="$info__window_8hpp.html" title=" " alt="" coords="502,351,724,413"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="444,299,551,350,546,351,443,304"/>
+<area shape="rect" id="Node000009" href="$viewer__ui_8hpp.html" title=" " alt="" coords="748,351,970,413"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="493,292,736,349,750,354,745,354,735,354,492,297"/>
+<area shape="rect" id="Node000007" href="$hovered__primitives_8hpp.html" title=" " alt="" coords="255,461,477,523"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="368,427,368,462,364,459,364,431"/>
+</map>

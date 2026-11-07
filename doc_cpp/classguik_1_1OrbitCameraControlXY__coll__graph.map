@@ -1,0 +1,5 @@
+<map id="guik::OrbitCameraControlXY" name="guik::OrbitCameraControlXY">
+<area shape="rect" id="Node000001" title="Orbit camera control (Up vector is locked to Z axis) Left button: rotate (pan/tilt) Middle or Right b..." alt="" coords="5,81,210,109"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1CameraControl.html" title="Base class for camera control. This class defines the interface for controlling the camera in the vie..." alt="" coords="30,5,185,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,47,110,82,105,79,106,51"/>
+</map>

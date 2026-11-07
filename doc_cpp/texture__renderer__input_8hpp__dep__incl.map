@@ -1,0 +1,44 @@
+<map id="/home/runner/work/iridescence/iridescence/include/glk/texture_renderer_input.hpp" name="/home/runner/work/iridescence/iridescence/include/glk/texture_renderer_input.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="968,5,1190,67"/>
+<area shape="rect" id="Node000002" href="$texture__renderer_8hpp.html" title=" " alt="" coords="968,115,1190,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1080,80,1082,116,1077,113,1078,85"/>
+<area shape="rect" id="Node000003" href="$screen__effect_8hpp.html" title=" " alt="" coords="895,225,1117,286"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1052,188,1028,226,1024,222,1048,192"/>
+<area shape="rect" id="Node000010" href="$gl__canvas_8hpp.html" title=" " alt="" coords="1540,343,1762,404"/>
+<area shape="poly" id="edge23_Node000002_Node000010" title=" " alt="" coords="1170,180,1577,342,1572,343,1170,186"/>
+<area shape="rect" id="Node000004" href="$naive__screen__space__ambient__occlusion_8hpp.html" title=" " alt="" coords="1293,334,1516,413"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1130,288,1283,332,1296,337,1290,338,1281,337,1130,294"/>
+<area shape="rect" id="Node000005" href="$plain__rendering_8hpp.html" title=" " alt="" coords="5,343,228,404"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="877,263,747,273,587,287,413,308,241,337,209,344,206,340,240,332,412,303,586,282,746,268,882,261"/>
+<area shape="rect" id="Node000006" href="$screen__scape__attribute__estimation_8hpp.html" title=" " alt="" coords="252,334,477,413"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="877,272,695,299,490,337,478,340,476,335,489,332,694,294,881,269"/>
+<area shape="rect" id="Node000007" href="$screen__space__ambient__occlusion_8hpp.html" title=" " alt="" coords="501,334,724,413"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="882,292,736,337,725,340,723,335,734,332,887,290"/>
+<area shape="rect" id="Node000008" href="$screen__space__lighting_8hpp.html" title=" " alt="" coords="747,343,992,404"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="961,295,907,345,903,340,957,298"/>
+<area shape="rect" id="Node000009" href="$screen__space__splatting_8hpp.html" title=" " alt="" coords="1016,343,1270,404"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="1053,294,1110,343,1105,342,1053,299"/>
+<area shape="poly" id="edge9_Node000003_Node000010" title=" " alt="" coords="1132,268,1320,293,1528,332,1561,342,1555,342,1527,337,1319,298,1133,273"/>
+<area shape="rect" id="Node000011" href="$light__viewer_8hpp.html" title=" " alt="" coords="1657,689,1880,750"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1730,411,1756,433,1776,460,1788,489,1795,520,1798,584,1791,643,1780,690,1776,687,1786,642,1793,584,1790,521,1783,491,1772,462,1753,436,1729,416"/>
+<area shape="rect" id="Node000017" href="$light__viewer__context_8hpp.html" title=" " alt="" coords="1422,571,1659,632"/>
+<area shape="poly" id="edge16_Node000010_Node000017" title=" " alt="" coords="1575,412,1550,436,1531,462,1522,489,1521,517,1531,571,1527,569,1516,518,1517,488,1526,460,1546,433,1571,415"/>
+<area shape="rect" id="Node000019" href="$shader__setting_8hpp.html" title=" " alt="" coords="1540,461,1762,523"/>
+<area shape="poly" id="edge20_Node000010_Node000019" title=" " alt="" coords="1653,418,1653,462,1649,459,1650,422"/>
+<area shape="rect" id="Node000012" href="$hovered__drawings_8hpp.html" title=" " alt="" coords="2151,807,2373,869"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="1895,748,2138,804,2153,810,2148,810,2137,810,1895,753"/>
+<area shape="rect" id="Node000014" href="$async__light__viewer_8hpp.html" title=" " alt="" coords="1408,807,1633,869"/>
+<area shape="poly" id="edge13_Node000011_Node000014" title=" " alt="" coords="1693,757,1586,809,1584,804,1688,758"/>
+<area shape="rect" id="Node000015" href="$info__window_8hpp.html" title=" " alt="" coords="1657,807,1880,869"/>
+<area shape="poly" id="edge14_Node000011_Node000015" title=" " alt="" coords="1770,764,1771,808,1766,805,1767,768"/>
+<area shape="rect" id="Node000016" href="$viewer__ui_8hpp.html" title=" " alt="" coords="1904,807,2126,869"/>
+<area shape="poly" id="edge15_Node000011_Node000016" title=" " alt="" coords="1847,755,1954,807,1948,806,1846,760"/>
+<area shape="rect" id="Node000013" href="$hovered__primitives_8hpp.html" title=" " alt="" coords="2151,917,2373,978"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="2264,882,2264,918,2260,914,2260,886"/>
+<area shape="poly" id="edge19_Node000017_Node000011" title=" " alt="" coords="1614,637,1712,689,1706,688,1613,642"/>
+<area shape="rect" id="Node000018" href="$async__light__viewer__context_8hpp.html" title=" " alt="" coords="1409,680,1632,759"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="1535,646,1529,682,1525,678,1531,649"/>
+<area shape="poly" id="edge18_Node000018_Node000014" title=" " alt="" coords="1522,773,1523,808,1518,805,1519,777"/>
+<area shape="poly" id="edge21_Node000019_Node000011" title=" " alt="" coords="1675,534,1755,689,1750,687,1673,539"/>
+<area shape="poly" id="edge22_Node000019_Node000017" title=" " alt="" coords="1612,532,1573,572,1570,568,1607,535"/>
+</map>

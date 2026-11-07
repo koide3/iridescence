@@ -1,0 +1,11 @@
+<map id="/home/runner/work/iridescence/iridescence/include/glk/pointcloud_buffer.hpp" name="/home/runner/work/iridescence/iridescence/include/glk/pointcloud_buffer.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="406,5,628,67"/>
+<area shape="rect" id="Node000002" href="$screen__space__splatting_8hpp.html" title=" " alt="" coords="5,115,259,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="397,71,241,117,240,112,392,72"/>
+<area shape="rect" id="Node000003" href="$indexed__pointcloud__buffer_8hpp.html" title=" " alt="" coords="283,115,506,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="474,76,430,117,428,112,469,78"/>
+<area shape="rect" id="Node000004" href="$pointcloud__buffer__cuda_8hpp.html" title=" " alt="" coords="530,115,752,177"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="564,75,609,115,604,114,563,80"/>
+<area shape="rect" id="Node000005" href="$pointcloud__buffer__pcl_8hpp.html" title=" " alt="" coords="777,115,999,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="636,69,787,114,781,114,636,74"/>
+</map>
