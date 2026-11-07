@@ -10,7 +10,7 @@ cpp:
 .PHONY: py
 py:
 	@echo "Building Python documentation..."
-	mkdir -p build && cd build && cmake ../../ -DBUILD_PYTHON_BINDINGS=ON && make -j
+	mkdir -p build && cd build && cmake ../../ -DBUILD_PYTHON_BINDINGS=ON && make -j$$(nproc)
 	sphinx-build -b html . ./doc_py/
 
 .PHONY: mkdocs
