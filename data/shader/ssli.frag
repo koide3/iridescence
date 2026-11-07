@@ -22,6 +22,9 @@ uniform vec4 light_color[max_num_lights];
 
 uniform vec4 ambient_light_color;
 
+// If true, pixels with frag_position.w (depth) == 1.0 are treated as background
+uniform bool skip_background;
+
 in vec2 texcoord;
 
 layout(location = 0) out vec4 final_color;
@@ -62,12 +65,12 @@ void main() {
   vec3 frag_normal = normalize(texture(normal_sampler, texcoord).xyz);
   float frag_occlusion = texture(occlusion_sampler, texcoord).x;
 
-  /*
-  if(frag_position.w > 1.0 - 1e-5) {
+  // Background pixels have no valid position and normal. Keep the original color without lighting.
+  // frag_position.w holds the depth only for screen space attribute estimation (the splatting position buffer has no w component).
+  if(skip_background && frag_position.w > 1.0 - 1e-5) {
     final_color = frag_color;
     return;
   }
-  */
 
   vec4 color = vec4(0.0);
   for(int i = 0; i < num_lights; i++) {

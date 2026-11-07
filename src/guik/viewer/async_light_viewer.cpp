@@ -24,6 +24,7 @@ AsyncLightViewer::AsyncLightViewer(const Eigen::Vector2i& size, bool background,
 
     while (!kill_switch && viewer->spin_once()) {
     }
+    kill_switch = true;
     guik::destroy();
   });
 
@@ -99,6 +100,10 @@ void AsyncLightViewer::toggle_wait() {
   }
 
   inst->toggle_count--;
+}
+
+bool AsyncLightViewer::running() {
+  return inst && !inst->kill_switch;
 }
 
 void AsyncLightViewer::invoke(const std::function<void()>& func) {

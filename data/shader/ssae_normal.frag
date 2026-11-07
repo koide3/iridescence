@@ -11,7 +11,9 @@ in vec2 texcoord;
 layout(location = 0) out vec3 frag_normal;
 
 void main() {
+  // Background: output a zero normal (leaving the output unwritten results in undefined values)
   if(texture(depth_sampler, texcoord).x > 1.0 - 1e-5) {
+    frag_normal = vec3(0.0);
     return;
   }
 

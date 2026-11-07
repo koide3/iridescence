@@ -1,5 +1,7 @@
 #include <glk/normal_distributions.hpp>
 
+#include <Eigen/Eigenvalues>
+
 #include <glk/mesh.hpp>
 #include <glk/path.hpp>
 #include <glk/glsl_shader.hpp>
@@ -12,7 +14,7 @@ namespace glk {
 std::shared_ptr<glk::GLSLShader> NormalDistributions::vertices_shader;
 std::shared_ptr<glk::GLSLShader> NormalDistributions::indices_shader;
 
-NormalDistributions::NormalDistributions(const float* means, const float* covs, int num_points, float scale) {
+NormalDistributions::NormalDistributions(const float* means, const float* covs, int num_points, float sigma) {
   // Generate sphere mesh
   glk::Icosahedron icosahedron;
   icosahedron.subdivide();
@@ -60,7 +62,7 @@ NormalDistributions::NormalDistributions(const float* means, const float* covs, 
   vertices_shader->use();
   vertices_shader->set_uniform("num_means", num_points);
   vertices_shader->set_uniform("num_sphere_vertices", static_cast<int>(sphere_vertices.size()));
-  vertices_shader->set_uniform("scale", scale);
+  vertices_shader->set_uniform("sigma", sigma);
 
   sphere_vertex_buffer->bind(0);
   means_buffer->bind(1);
@@ -107,20 +109,20 @@ NormalDistributions::NormalDistributions(const float* means, const float* covs, 
 }
 
 template <>
-NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 4, 1>* means, const Eigen::Matrix<float, 4, 4>* covs, int num_points, float scale)
-: NormalDistributions(means[0].data(), covs[0].data(), num_points, scale) {}
+NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 4, 1>* means, const Eigen::Matrix<float, 4, 4>* covs, int num_points, float sigma)
+: NormalDistributions(means[0].data(), covs[0].data(), num_points, sigma) {}
 
 template <>
-NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 3, 1>* means, const Eigen::Matrix<float, 3, 3>* covs, int num_points, float scale)
-: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), scale) {}
+NormalDistributions::NormalDistributions(const Eigen::Matrix<float, 3, 1>* means, const Eigen::Matrix<float, 3, 3>* covs, int num_points, float sigma)
+: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), sigma) {}
 
 template <>
-NormalDistributions::NormalDistributions(const Eigen::Matrix<double, 3, 1>* means, const Eigen::Matrix<double, 3, 3>* covs, int num_points, float scale)
-: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), scale) {}
+NormalDistributions::NormalDistributions(const Eigen::Matrix<double, 3, 1>* means, const Eigen::Matrix<double, 3, 3>* covs, int num_points, float sigma)
+: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), sigma) {}
 
 template <>
-NormalDistributions::NormalDistributions(const Eigen::Matrix<double, 4, 1>* means, const Eigen::Matrix<double, 4, 4>* covs, int num_points, float scale)
-: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), scale) {}
+NormalDistributions::NormalDistributions(const Eigen::Matrix<double, 4, 1>* means, const Eigen::Matrix<double, 4, 4>* covs, int num_points, float sigma)
+: NormalDistributions(convert_to_vector<float, 4, 1>(means, num_points), convert_to_vector<float, 4, 4>(covs, num_points), sigma) {}
 
 NormalDistributions::~NormalDistributions() {
   glDeleteBuffers(1, &vbo);
@@ -147,7 +149,7 @@ void NormalDistributions::draw(glk::GLSLShader& shader) const {
 }
 
 template <typename T, int D>
-NormalDistributions_old::NormalDistributions_old(const Eigen::Matrix<T, D, 1>* means, const Eigen::Matrix<T, D, D>* covs, int num_points, float scale) {
+NormalDistributions_old::NormalDistributions_old(const Eigen::Matrix<T, D, 1>* means, const Eigen::Matrix<T, D, D>* covs, int num_points, float sigma) {
   glk::Icosahedron icosahedron;
   icosahedron.subdivide();
   icosahedron.subdivide();
@@ -163,7 +165,12 @@ NormalDistributions_old::NormalDistributions_old(const Eigen::Matrix<T, D, 1>* m
   for (int i = 0; i < num_points; i++) {
     Eigen::Matrix4f model_matrix = Eigen::Matrix4f::Identity();
     model_matrix.block<3, 1>(0, 3) = means[i].template cast<float>().template head<3>();
-    model_matrix.block<3, 3>(0, 0) = scale * covs[i].template cast<float>().template block<3, 3>(0, 0);
+    // Map the unit sphere to the sigma-sigma ellipsoid with the symmetric square root of the covariance (cov = L * L^T).
+    // Negative eigenvalues caused by rounding errors are clamped to zero.
+    // The iterative solver in double precision is used because computeDirect is inaccurate for repeated (e.g., zero) eigenvalues.
+    const Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eig(covs[i].template cast<double>().template block<3, 3>(0, 0));
+    const Eigen::Matrix3d sqrt_cov = eig.eigenvectors() * eig.eigenvalues().cwiseMax(0.0).cwiseSqrt().asDiagonal() * eig.eigenvectors().transpose();
+    model_matrix.block<3, 3>(0, 0) = sigma * sqrt_cov.cast<float>();
 
     vertices.middleCols(icosahedron.vertices.size() * i, icosahedron.vertices.size()) = model_matrix * sphere_vertices;
     indices.middleRows(icosahedron.indices.size() * i, icosahedron.indices.size()) = sphere_indices + icosahedron.vertices.size() * i;

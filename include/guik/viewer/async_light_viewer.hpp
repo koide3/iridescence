@@ -30,6 +30,9 @@ public:
   /// @brief Wait while a toggle checkbox is checked
   static void toggle_wait();
 
+  /// @brief Check if the viewer is currently running.
+  static bool running();
+
   /// @brief Invoke a task in the visualization thread.
   void invoke(const std::function<void()>& func);
   /// @brief Invoke a task after rendering in the visualization thread.
@@ -368,6 +371,10 @@ inline void async_wait_until_click() {
 
 inline void async_toggle_wait() {
   AsyncLightViewer::toggle_wait();
+}
+
+inline bool async_running() {
+  return AsyncLightViewer::running();
 }
 
 // Template methods

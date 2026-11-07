@@ -18,6 +18,7 @@
 
 namespace glk {
 
+/// @brief GLSLShader is a wrapper for OpenGL shader programs.
 class GLSLShader {
 public:
   GLSLShader();

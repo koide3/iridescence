@@ -327,6 +327,8 @@ void ScreenSpaceLighting::draw(
   lighting_shader.set_uniform("iridescence_sampler", 4);
 
   lighting_shader.set_uniform("view_point", view_point);
+  // Only the SSAE position buffer stores the depth in the w component
+  lighting_shader.set_uniform("skip_background", ssae ? 1 : 0);
 
   lighting_shader.set_uniform("albedo", albedo);
   lighting_shader.set_uniform("roughness", roughness);

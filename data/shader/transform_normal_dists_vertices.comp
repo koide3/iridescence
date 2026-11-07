@@ -4,7 +4,7 @@ layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 
 uniform int num_means;
 uniform int num_sphere_vertices;
-uniform float scale;
+uniform float sigma;
 
 layout(std430, binding=0) readonly buffer SphereVertices {
   vec4[] sphere_vertices;
@@ -22,6 +22,21 @@ layout(std430, binding=3) writeonly buffer OutputPoints {
   vec4[] points_out;
 };
 
+// Lower-triangular Cholesky factor L of a positive semi-definite covariance matrix (C = L * L^T).
+// The unit sphere is mapped to the 1-sigma ellipsoid by L.
+// Negative pivots caused by rounding errors are clamped to zero to handle degenerate (singular) covariances.
+mat3 cholesky(mat3 C) {
+  float l00 = sqrt(max(C[0][0], 0.0));
+  float l10 = l00 > 0.0 ? C[0][1] / l00 : 0.0;
+  float l20 = l00 > 0.0 ? C[0][2] / l00 : 0.0;
+  float l11 = sqrt(max(C[1][1] - l10 * l10, 0.0));
+  float l21 = l11 > 0.0 ? (C[1][2] - l20 * l10) / l11 : 0.0;
+  float l22 = sqrt(max(C[2][2] - l20 * l20 - l21 * l21, 0.0));
+
+  // GLSL matrices are column-major (mat3(column0, column1, column2))
+  return mat3(l00, l10, l20, 0.0, l11, l21, 0.0, 0.0, l22);
+}
+
 void main() {
   uint i = gl_GlobalInvocationID.x;
   if (i > num_means * num_sphere_vertices) {
@@ -33,7 +48,7 @@ void main() {
 
   vec3 vertex = sphere_vertices[vertex_id].xyz;
   vec3 trans = means[mean_id].xyz;
-  mat3 linear = scale * mat3(covs[mean_id]);
+  mat3 linear = sigma * cholesky(mat3(covs[mean_id]));
 
   vec3 transformed = linear * vertex + trans;
 

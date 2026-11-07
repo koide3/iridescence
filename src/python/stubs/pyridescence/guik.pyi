@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy
 import pyridescence.glk
 import typing
-__all__: list[str] = ['Application', 'ArcBallCameraControl', 'AsyncLightViewer', 'AsyncLightViewerContext', 'CIRCLE', 'CameraControl', 'FPSCameraControl', 'FlatBlue', 'FlatColor', 'FlatGreen', 'FlatOrange', 'FlatRed', 'HoveredDrawings', 'LightViewer', 'LightViewerContext', 'METRIC', 'ModelControl', 'OrbitCameraControlXY', 'OrbitCameraControlXZ', 'PointScaleMode', 'PointShapeMode', 'ProjectionControl', 'RECTANGLE', 'Rainbow', 'RecentFiles', 'SCREENSPACE', 'ShaderSetting', 'TopDownCameraControl', 'VertexColor', 'anon', 'async_destroy', 'async_viewer', 'async_wait', 'destroy', 'viewer']
+__all__: list[str] = ['Application', 'ArcBallCameraControl', 'AsyncLightViewer', 'AsyncLightViewerContext', 'CIRCLE', 'CameraControl', 'FPSCameraControl', 'FlatBlue', 'FlatColor', 'FlatGreen', 'FlatOrange', 'FlatRed', 'HoveredDrawings', 'LightViewer', 'LightViewerContext', 'METRIC', 'ModelControl', 'OrbitCameraControlXY', 'OrbitCameraControlXZ', 'PointScaleMode', 'PointShapeMode', 'ProjectionControl', 'RECTANGLE', 'Rainbow', 'RecentFiles', 'SCREENSPACE', 'ShaderSetting', 'TextureColor', 'TopDownCameraControl', 'VertexColor', 'anon', 'async_destroy', 'async_viewer', 'async_wait', 'destroy', 'viewer']
 class Application:
     def close(self) -> None:
         ...
@@ -423,7 +423,7 @@ class LightViewerContext:
         ...
     def update_cube(self, arg0: str, arg1: ShaderSetting) -> None:
         ...
-    def update_drawable(self, arg0: str, arg1: pyridescence.glk.Drawable, arg2: ShaderSetting) -> None:
+    def update_drawable(self, name: str, drawable: pyridescence.glk.Drawable, shader_setting: ShaderSetting = ...) -> None:
         ...
     def update_frustum(self, arg0: str, arg1: ShaderSetting) -> None:
         ...
@@ -682,6 +682,16 @@ class ShaderSetting:
     def translate(self, translation: numpy.ndarray[numpy.float32[3, 1]]) -> ShaderSetting:
         ...
     def translation(self) -> numpy.ndarray[numpy.float32[3, 1]]:
+        ...
+class TextureColor(ShaderSetting):
+    @typing.overload
+    def __init__(self) -> None:
+        ...
+    @typing.overload
+    def __init__(self, arg0: numpy.ndarray[numpy.float32[4, 4]]) -> None:
+        ...
+    @typing.overload
+    def __init__(self, scale: float = 1.0, trans: numpy.ndarray[numpy.float32[3, 1]] = ..., rot: numpy.ndarray[numpy.float32[3, 3]] = ...) -> None:
         ...
 class TopDownCameraControl(CameraControl):
     pass

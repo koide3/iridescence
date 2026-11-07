@@ -5,6 +5,29 @@
 
 namespace glk {
 
+namespace {
+
+/// @brief Temporarily set GL_PACK_ALIGNMENT or GL_UNPACK_ALIGNMENT and restore the previous value on destruction.
+/// @note  Pixel data handled by Texture is assumed to be tightly packed (no row padding).
+///        The default 4-byte alignment causes misaligned rows and buffer overruns for, e.g., GL_RGB + GL_UNSIGNED_BYTE with width % 4 != 0.
+class ScopedPixelAlignment {
+public:
+  ScopedPixelAlignment(GLenum pname, GLint alignment) : pname(pname), prev_alignment(4) {
+    glGetIntegerv(pname, &prev_alignment);
+    glPixelStorei(pname, alignment);
+  }
+  ~ScopedPixelAlignment() { glPixelStorei(pname, prev_alignment); }
+
+  ScopedPixelAlignment(const ScopedPixelAlignment&) = delete;
+  ScopedPixelAlignment& operator=(const ScopedPixelAlignment&) = delete;
+
+private:
+  const GLenum pname;
+  GLint prev_alignment;
+};
+
+}  // namespace
+
 Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint format, GLuint type, const void* pixels)
 : width(size[0]),
   height(size[1]),
@@ -13,7 +36,10 @@ Texture::Texture(const Eigen::Vector2i& size, GLuint internal_format, GLuint for
   type(type) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, pixels);
+  {
+    ScopedPixelAlignment unpack_alignment(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, size[0], size[1], 0, format, type, pixels);
+  }
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -118,6 +144,8 @@ std::vector<T> Texture::read_pixels(GLuint format, GLuint type, int num_elements
   }
 
   std::vector<T> pixels(width * height * num_elements);
+
+  ScopedPixelAlignment pack_alignment(GL_PACK_ALIGNMENT, 1);
   glBindTexture(GL_TEXTURE_2D, texture);
   glGetTexImage(GL_TEXTURE_2D, 0, format, type, pixels.data());
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -133,7 +161,10 @@ template std::vector<float> Texture::read_pixels(GLuint format, GLuint type, int
 Texture1D::Texture1D(int width, GLuint internal_format, GLuint format, GLuint type, const void* pixels) : width(width) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_1D, texture);
-  glTexImage1D(GL_TEXTURE_1D, 0, internal_format, width, 0, format, type, pixels);
+  {
+    ScopedPixelAlignment unpack_alignment(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage1D(GL_TEXTURE_1D, 0, internal_format, width, 0, format, type, pixels);
+  }
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
