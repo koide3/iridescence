@@ -35,6 +35,7 @@ public:
 
   Eigen::Vector2i framebuffer_size() const;
   virtual void framebuffer_size_callback(const Eigen::Vector2i& size);
+  void sync_framebuffer_size();
 
   void spin();
   bool spin_once();
