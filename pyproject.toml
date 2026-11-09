@@ -32,7 +32,8 @@ BUILD_PYTHON_BINDINGS = true
 BUILD_SHARED_LIBS = false
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y libpng-devel libjpeg-turbo-devel wayland-devel mesa-libGL-devel libX11-devel libXcursor-devel libXinerama-devel libXrandr-devel libXi-devel libxkbcommon-devel"
+# Retry yum install to tolerate transient mirror failures (e.g., empty repomd.xml)
+before-all = "for i in 1 2 3 4 5; do yum install -y libpng-devel libjpeg-turbo-devel wayland-devel mesa-libGL-devel libX11-devel libXcursor-devel libXinerama-devel libXrandr-devel libXi-devel libxkbcommon-devel && exit 0; echo \"yum install failed (attempt $i), retrying...\"; yum clean all; sleep 30; done; exit 1"
 
 [tool.cibuildwheel]
 manylinux-x86_64-image = "manylinux_2_28"
