@@ -237,6 +237,10 @@ set_target_properties(iridescence PROPERTIES
 )
 
 if(BUILD_PYTHON_BINDINGS)
+  # Use the modern FindPython module (Python_* variables)
+  if(NOT DEFINED PYBIND11_FINDPYTHON)
+    set(PYBIND11_FINDPYTHON ON)
+  endif()
   add_subdirectory(thirdparty/pybind11)
 
   pybind11_add_module(_pyridescence
