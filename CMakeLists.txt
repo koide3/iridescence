@@ -49,15 +49,17 @@ endif()
 
 if(NOT glfw3_FOUND)
   message(STATUS "System GLFW3 not found. Download GLFW 3.4.")
+  set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
   include(FetchContent)
   FetchContent_Populate(
     glfw3
     URL https://github.com/glfw/glfw/archive/refs/tags/3.4.tar.gz
   )
-  add_subdirectory("${glfw3_SOURCE_DIR}")
-  # set_target_properties(glm PROPERTIES
-  #   INTERFACE_INCLUDE_DIRECTORIES "${glm_SOURCE_DIR}"
-  # )
+  add_subdirectory("${glfw3_SOURCE_DIR}" "${glfw3_BINARY_DIR}")
+  # The bundled GLFW is not installed (GLFW_INSTALL=OFF), so keep it out of the install export set
+  set(IRIDESCENCE_GLFW_TARGET $<BUILD_INTERFACE:glfw>)
+else()
+  set(IRIDESCENCE_GLFW_TARGET glfw)
 endif()
 
 if(NOT Eigen3_FOUND)
@@ -219,7 +221,7 @@ target_include_directories(iridescence PUBLIC
 target_link_libraries(iridescence PUBLIC
   Eigen3::Eigen
   OpenGL::GL
-  glfw
+  ${IRIDESCENCE_GLFW_TARGET}
   ${EXTRA_LIBRARIES}
 )
 target_link_libraries(iridescence PRIVATE
@@ -236,16 +238,20 @@ set_target_properties(iridescence PROPERTIES
 )
 
 if(BUILD_PYTHON_BINDINGS)
+  # Use the modern FindPython module (Python_* variables)
+  if(NOT DEFINED PYBIND11_FINDPYTHON)
+    set(PYBIND11_FINDPYTHON ON)
+  endif()
   add_subdirectory(thirdparty/pybind11)
 
-  pybind11_add_module(pyridescence
+  pybind11_add_module(_pyridescence
     src/python/main.cpp
     src/python/glk.cpp
     src/python/guik.cpp
     src/python/pfd.cpp
     src/python/imgui.cpp
   )
-  target_link_libraries(pyridescence PRIVATE
+  target_link_libraries(_pyridescence PRIVATE
     iridescence
   )
 endif()
@@ -351,26 +357,32 @@ install(FILES
 )
 
 if(BUILD_PYTHON_BINDINGS)
-  if(DEFINED SKBUILD_PROJECT_NAME)
-    set(PYTHON_INSTALL_DIR .)
-  elseif(NOT DEFINED PYTHON_INSTALL_DIR)
-    set(PYTHON_INSTALL_DIR lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+  # Python package layout (pyridescence/):
+  #   _pyridescence.*  : extension module
+  #   __init__.py, *.pyi, py.typed : src/python/pyridescence
+  #   data/            : shaders, textures, models
+  #   examples/        : python examples
+  # Only the "python" component is installed into the wheel (see pyproject.toml).
+  if(SKBUILD)
+    set(PYRIDESCENCE_PKG_DIR pyridescence)
+  else()
+    if(NOT DEFINED PYTHON_INSTALL_DIR)
+      set(PYTHON_INSTALL_DIR lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+    endif()
+    set(PYRIDESCENCE_PKG_DIR ${PYTHON_INSTALL_DIR}/pyridescence)
   endif()
-  install(TARGETS pyridescence
-    LIBRARY DESTINATION ${PYTHON_INSTALL_DIR}
+
+  install(TARGETS _pyridescence
+    LIBRARY DESTINATION ${PYRIDESCENCE_PKG_DIR}
     COMPONENT python
   )
-
-  # install stubs in src/python/stubs
-  install(DIRECTORY src/python/stubs/ DESTINATION ${PYTHON_INSTALL_DIR})
-
-  # install example sources (cpp and py) into the wheel
-  if(DEFINED SKBUILD_PROJECT_NAME)
-    install(DIRECTORY src/example/
-      DESTINATION ${CMAKE_INSTALL_DATADIR}/iridescence/examples
-      FILES_MATCHING PATTERN "*.cpp" PATTERN "*.py"
-    )
-  endif()
+  install(DIRECTORY src/python/pyridescence/ DESTINATION ${PYRIDESCENCE_PKG_DIR} COMPONENT python)
+  install(DIRECTORY data/ DESTINATION ${PYRIDESCENCE_PKG_DIR}/data COMPONENT python)
+  install(DIRECTORY src/example/
+    DESTINATION ${PYRIDESCENCE_PKG_DIR}/examples
+    COMPONENT python
+    FILES_MATCHING PATTERN "*.py"
+  )
 endif()
 
 #############

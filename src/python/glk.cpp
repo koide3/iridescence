@@ -434,10 +434,10 @@ Returns:
     .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector4i& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"));
 
   // glk::Drawable
-  py::class_<glk::Drawable, PyDrawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable").def(py::init<>()).def("draw", &glk::Drawable::draw, py::arg("shader"));
+  py::class_<glk::Drawable, PyDrawable, py::smart_holder>(glk_, "Drawable").def(py::init<>()).def("draw", &glk::Drawable::draw, py::arg("shader"));
 
   // glk::ThinLines
-  py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines", "Drawable to draw a set of lines with GL_LINES (fixed width in pixels).")
+  py::class_<glk::ThinLines, glk::Drawable, py::smart_holder>(glk_, "ThinLines", "Drawable to draw a set of lines with GL_LINES (fixed width in pixels).")
     .def(
       py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points, bool line_strip, float line_width) {
         if (!check_valid_points(points)) {
@@ -535,7 +535,7 @@ Returns:
     .def("set_line_width", &glk::ThinLines::set_line_width, py::arg("width"));
 
   // glk::Lines
-  py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines", "Drawable to draw a set of lines as thick polygons (width in world units).")
+  py::class_<glk::Lines, glk::Drawable, py::smart_holder>(glk_, "Lines", "Drawable to draw a set of lines as thick polygons (width in world units).")
     .def(py::init<float, const std::vector<Eigen::Vector3f>&, const std::vector<Eigen::Vector4f>&>(), py::arg("thickness"), py::arg("vertices"), py::arg("colors"))
     .def(
       py::init([](
@@ -615,7 +615,7 @@ Returns:
       py::arg("line_strip") = true);
 
   // glk::PointCloudBuffer
-  py::class_<glk::PointCloudBuffer, glk::Drawable, std::shared_ptr<glk::PointCloudBuffer>>(glk_, "PointCloudBuffer")
+  py::class_<glk::PointCloudBuffer, glk::Drawable, py::smart_holder>(glk_, "PointCloudBuffer")
     .def(
       py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points) {
         if (!check_valid_points(points)) {
@@ -683,7 +683,7 @@ Returns:
       py::arg("data"));
 
   // glk::IndexedPointCloudBuffer
-  py::class_<glk::IndexedPointCloudBuffer, glk::Drawable, std::shared_ptr<glk::IndexedPointCloudBuffer>>(
+  py::class_<glk::IndexedPointCloudBuffer, glk::Drawable, py::smart_holder>(
     glk_,
     "IndexedPointCloudBuffer",
     R"doc(Drawable that represents a point cloud with an index buffer.
@@ -735,7 +735,7 @@ Args:
     .def("ebo_id", &glk::IndexedPointCloudBuffer::ebo_id, "OpenGL ID of the element (index) buffer.");
 
   // glk::PointNormalsBuffer
-  py::class_<glk::PointNormalsBuffer, glk::Drawable, std::shared_ptr<glk::PointNormalsBuffer>>(
+  py::class_<glk::PointNormalsBuffer, glk::Drawable, py::smart_holder>(
     glk_,
     "PointNormalsBuffer",
     R"doc(Drawable that visualizes point normals as line segments.
@@ -820,7 +820,7 @@ Args:
     .def_readwrite("edge_line_width", &glk::MeshRenderingOptions::edge_line_width);
 
   // glk::VoxelMap
-  py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap", "Drawable that represents a set of voxels as cubes.")
+  py::class_<glk::VoxelMap, glk::Drawable, py::smart_holder>(glk_, "VoxelMap", "Drawable that represents a set of voxels as cubes.")
     .def(
       py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::MeshRenderingOptions& mesh_options) {
         if (!check_valid_voxels(voxels)) {
@@ -1020,7 +1020,7 @@ Args:
     .def_property_readonly("count_map", [](const glk::ElevationMapBuilder& builder) -> MapArray { return builder.count_map; });
 
   // glk::ElevationMap
-  py::class_<glk::ElevationMap, glk::Drawable, std::shared_ptr<glk::ElevationMap>>(glk_, "ElevationMap", "Elevation map drawable.")
+  py::class_<glk::ElevationMap, glk::Drawable, py::smart_holder>(glk_, "ElevationMap", "Elevation map drawable.")
     .def(
       py::init<const glk::ElevationMapBuilder&, const glk::MeshRenderingOptions&>(),
       py::arg("builder"),
@@ -1033,7 +1033,7 @@ Args:
 )doc");
 
   // glk::GridMap
-  py::class_<glk::GridMap, glk::Drawable, std::shared_ptr<glk::GridMap>> gridmap(
+  py::class_<glk::GridMap, glk::Drawable, py::smart_holder> gridmap(
     glk_,
     "GridMap",
     R"doc(Drawable that represents a 2D grid map with color values.
@@ -1168,7 +1168,7 @@ Args:
 
   // glk::DrawableContainer
   // push_back(drawable, shader_setting) is defined in define_guik() because guik.ShaderSetting is not registered yet here
-  py::class_<glk::DrawableContainer, glk::Drawable, std::shared_ptr<glk::DrawableContainer>>(
+  py::class_<glk::DrawableContainer, glk::Drawable, py::smart_holder>(
     glk_,
     "DrawableContainer",
     R"doc(Container to store multiple drawables and draw them in order.
@@ -1186,10 +1186,10 @@ Args:
     skip_model_matrix_setting: If True, the model matrices of the shader settings stored in the container are not applied.
 )doc")
     .def(
-      py::init([](const std::vector<py::object>& drawables, bool skip_model_matrix_setting) {
+      py::init([](const std::vector<std::shared_ptr<glk::Drawable>>& drawables, bool skip_model_matrix_setting) {
         auto container = std::make_shared<glk::DrawableContainer>(skip_model_matrix_setting);
         for (const auto& drawable : drawables) {
-          container->push_back(keep_python_drawable_alive(drawable));
+          container->push_back(drawable);
         }
         return container;
       }),
@@ -1206,7 +1206,7 @@ Args:
     .def("clear", &glk::DrawableContainer::clear, "Clear all drawables in the container.")
     .def(
       "push_back",
-      [](glk::DrawableContainer& container, const py::object& drawable) { container.push_back(keep_python_drawable_alive(drawable)); },
+      [](glk::DrawableContainer& container, const std::shared_ptr<glk::Drawable>& drawable) { container.push_back(drawable); },
       py::arg("drawable"),
       R"doc(Add a drawable to the container.
 
