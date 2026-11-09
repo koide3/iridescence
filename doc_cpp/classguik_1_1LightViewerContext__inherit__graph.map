@@ -1,0 +1,5 @@
+<map id="guik::LightViewerContext" name="guik::LightViewerContext">
+<area shape="rect" id="Node000001" title="Viewer context." alt="" coords="5,5,191,33"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1LightViewer.html" title="Light viewer. The main visualization class in Iridescence." alt="" coords="31,81,165,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,47,100,82,96,80,96,51"/>
+</map>

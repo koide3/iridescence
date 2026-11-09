@@ -1,0 +1,7 @@
+<map id="guik::FlatGray" name="guik::FlatGray">
+<area shape="rect" id="Node000001" title="Flat light gray color." alt="" coords="23,157,136,184"/>
+<area shape="rect" id="Node000002" href="$structguik_1_1FlatColor.html" title="Flat coloring scheme that assigns a single color to the object. If the alpha value is less than 0...." alt="" coords="21,81,138,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,123,82,157,77,155,78,126"/>
+<area shape="rect" id="Node000003" href="$structguik_1_1ShaderSetting.html" title="Shader setting class that holds rendering settings." alt="" coords="5,5,154,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="81,46,82,81,77,80,78,51"/>
+</map>
