@@ -55,10 +55,11 @@ if(NOT glfw3_FOUND)
     glfw3
     URL https://github.com/glfw/glfw/archive/refs/tags/3.4.tar.gz
   )
-  add_subdirectory("${glfw3_SOURCE_DIR}")
-  # set_target_properties(glm PROPERTIES
-  #   INTERFACE_INCLUDE_DIRECTORIES "${glm_SOURCE_DIR}"
-  # )
+  add_subdirectory("${glfw3_SOURCE_DIR}" "${glfw3_BINARY_DIR}")
+  # The bundled GLFW is not installed (GLFW_INSTALL=OFF), so keep it out of the install export set
+  set(IRIDESCENCE_GLFW_TARGET $<BUILD_INTERFACE:glfw>)
+else()
+  set(IRIDESCENCE_GLFW_TARGET glfw)
 endif()
 
 if(NOT Eigen3_FOUND)
@@ -220,7 +221,7 @@ target_include_directories(iridescence PUBLIC
 target_link_libraries(iridescence PUBLIC
   Eigen3::Eigen
   OpenGL::GL
-  glfw
+  ${IRIDESCENCE_GLFW_TARGET}
   ${EXTRA_LIBRARIES}
 )
 target_link_libraries(iridescence PRIVATE
