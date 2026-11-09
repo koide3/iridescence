@@ -47,29 +47,32 @@ void define_flat_color(py::module_& guik_, const std::string& name) {
       py::arg("rot") = Eigen::Matrix3f::Identity());
 }
 
-guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
-  if (is_first) {
-    py::gil_scoped_acquire acquire;
-    py::object pyridescence = py::module::import("pyridescence_data");
-    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
-
-    glk::set_data_path(path.parent_path().string());
-    is_first = false;
+// Point glk to the data directory bundled in the wheel (pyridescence/data).
+// If the package data is not available (e.g., plain CMake install), keep the default search in glk::get_data_path().
+void set_data_path_from_package() {
+  if (!is_first) {
+    return;
   }
+  is_first = false;
+
+  py::gil_scoped_acquire acquire;
+  try {
+    py::object data = py::module::import("pyridescence.data");
+    std::filesystem::path path(data.attr("__file__").cast<std::string>());
+    glk::set_data_path(path.parent_path().string());
+  } catch (const py::error_already_set&) {
+  }
+}
+
+guik::LightViewer* instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
+  set_data_path_from_package();
 
   static guik::LightViewer* inst = guik::LightViewer::instance(size, background, title);
   return inst;
 }
 
 guik::AsyncLightViewer* async_instance(const Eigen::Vector2i& size, bool background, const std::string& title) {
-  if (is_first) {
-    py::gil_scoped_acquire acquire;
-    py::object pyridescence = py::module::import("pyridescence_data");
-    std::filesystem::path path(pyridescence.attr("__file__").cast<std::string>());
-
-    glk::set_data_path(path.parent_path().string());
-    is_first = false;
-  }
+  set_data_path_from_package();
 
   return guik::AsyncLightViewer::instance(size, background, title);
 }

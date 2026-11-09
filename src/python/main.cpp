@@ -21,16 +21,10 @@ void define_guik(py::module_& m);
 void define_pfd(py::module_& m);
 void define_imgui(py::module_& m);
 
-PYBIND11_MODULE(pyridescence, m) {
+PYBIND11_MODULE(_pyridescence, m) {
   // modules
   define_glk(m);
   define_guik(m);
   define_pfd(m);
   define_imgui(m);
-
-#ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
 }

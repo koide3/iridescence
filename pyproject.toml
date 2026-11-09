@@ -1,6 +1,31 @@
 [build-system]
-requires = ["setuptools", "scikit-build>=0.13", "scikit-build-core >=0.10", "pybind11 >2.10.0"]
-build-backend = "scikit_build_core.setuptools.build_meta"
+requires = ["scikit-build-core>=0.11", "pybind11>2.10.0"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pyridescence"
+dynamic = ["version"]
+description = "3D visualization library for rapid prototyping of 3D algorithms"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kenji Koide", email = "k.koide@aist.go.jp" }]
+requires-python = ">=3.8"
+dependencies = ["numpy"]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.16"
+# Install only the python component (pyridescence/ package). C++ headers, libs, and cmake configs are excluded.
+install.components = ["python"]
+# Python sources are installed by CMake (see CMakeLists.txt)
+wheel.packages = []
+sdist.exclude = ["/.venv", "/build", "/site", "/dist", "/docker", "/*.egg-info", "*.whl", "/imgui.ini"]
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "CMakeLists.txt"
+regex = 'project\(iridescence VERSION (?P<value>[0-9.]+)'
 
 [tool.scikit-build.cmake.define]
 BUILD_PYTHON_BINDINGS = true
