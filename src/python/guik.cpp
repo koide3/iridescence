@@ -24,7 +24,6 @@
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
-#include "py_drawable.hpp"
 
 namespace py = pybind11;
 
@@ -354,11 +353,11 @@ If the alpha value is less than 0.999, the object is rendered as transparent.
 
   // glk::DrawableContainer::push_back(drawable, shader_setting)
   // Defined here (not in define_glk()) so that guik.ShaderSetting is registered before this binding
-  py::reinterpret_borrow<py::class_<glk::DrawableContainer, glk::Drawable, std::shared_ptr<glk::DrawableContainer>>>(py::type::of<glk::DrawableContainer>())
+  py::reinterpret_borrow<py::class_<glk::DrawableContainer, glk::Drawable, py::smart_holder>>(py::type::of<glk::DrawableContainer>())
     .def(
       "push_back",
-      [](glk::DrawableContainer& container, const py::object& drawable, const guik::ShaderSetting& shader_setting) {
-        container.push_back(keep_python_drawable_alive(drawable), shader_setting);
+      [](glk::DrawableContainer& container, const std::shared_ptr<glk::Drawable>& drawable, const guik::ShaderSetting& shader_setting) {
+        container.push_back(drawable, shader_setting);
       },
       py::arg("drawable"),
       py::arg("shader_setting"),
@@ -742,8 +741,8 @@ Args:
 )doc")
     .def(
       "update_drawable",
-      [](guik::LightViewerContext& context, const std::string& name, const py::object& drawable, const guik::ShaderSetting& shader_setting) {
-        context.update_drawable(name, keep_python_drawable_alive(drawable), shader_setting);
+      [](guik::LightViewerContext& context, const std::string& name, const std::shared_ptr<glk::Drawable>& drawable, const guik::ShaderSetting& shader_setting) {
+        context.update_drawable(name, drawable, shader_setting);
       },
       py::arg("name"),
       py::arg("drawable"),

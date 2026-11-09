@@ -662,7 +662,7 @@ class DrawableContainer(Drawable):
             skip_model_matrix_setting: If True, the model matrices of the shader settings stored in the container are not applied.
         """
     @typing.overload
-    def __init__(self, drawables: collections.abc.Sequence[typing.Any], skip_model_matrix_setting: bool = True) -> None:
+    def __init__(self, drawables: collections.abc.Sequence[Drawable], skip_model_matrix_setting: bool = True) -> None:
         """
         Create a container with drawables.
         
@@ -677,7 +677,7 @@ class DrawableContainer(Drawable):
         Clear all drawables in the container.
         """
     @typing.overload
-    def push_back(self, drawable: typing.Any) -> None:
+    def push_back(self, drawable: Drawable) -> None:
         """
         Add a drawable to the container.
         
@@ -685,7 +685,7 @@ class DrawableContainer(Drawable):
             drawable: Drawable to be added.
         """
     @typing.overload
-    def push_back(self, drawable: typing.Any, shader_setting: pyridescence.guik.ShaderSetting) -> None:
+    def push_back(self, drawable: Drawable, shader_setting: pyridescence.guik.ShaderSetting) -> None:
         """
         Add a drawable to the container with a shader setting.
         

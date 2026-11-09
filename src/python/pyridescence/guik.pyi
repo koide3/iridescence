@@ -937,7 +937,7 @@ class LightViewerContext:
         """
         Register or update a cube primitive.
         """
-    def update_drawable(self, name: str, drawable: typing.Any, shader_setting: ShaderSetting = ...) -> None:
+    def update_drawable(self, name: str, drawable: pyridescence.glk.Drawable, shader_setting: ShaderSetting = ...) -> None:
         """
         Register or update a drawable.
         
