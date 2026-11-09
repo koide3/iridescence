@@ -44,7 +44,7 @@ namespace glk {
 ///
 /// Copying (cached) uniform variables from another shader
 /// ---
-/// dst_shader->copy_cached_uniforms(src_shader);
+/// src_shader->copy_cached_uniforms(dst_shader);
 /// ---
 class GLSLShader {
 public:

@@ -72,10 +72,10 @@ class ImVec2:
         Return a buffer object that exposes the underlying memory of the object.
         """
     @typing.overload
-    def __init__(self, arg0: float, arg1: float) -> None:
+    def __init__(self, x: float, y: float) -> None:
         ...
     @typing.overload
-    def __init__(self, arg0: numpy.ndarray[numpy.float32]) -> None:
+    def __init__(self, xy: numpy.ndarray[numpy.float32]) -> None:
         ...
     def __release_buffer__(self, buffer):
         """
@@ -91,10 +91,10 @@ class ImVec4:
         Return a buffer object that exposes the underlying memory of the object.
         """
     @typing.overload
-    def __init__(self, arg0: float, arg1: float, arg2: float, arg3: float) -> None:
+    def __init__(self, x: float, y: float, z: float, w: float) -> None:
         ...
     @typing.overload
-    def __init__(self, arg0: numpy.ndarray[numpy.float32]) -> None:
+    def __init__(self, xyzw: numpy.ndarray[numpy.float32]) -> None:
         ...
     def __release_buffer__(self, buffer):
         """
@@ -427,9 +427,9 @@ def is_mouse_released(button: int) -> bool:
     ...
 def is_popup_open(name: str, flags: int = 0) -> bool:
     ...
-def is_rect_visible(arg0: numpy.ndarray[numpy.float32[2, 1]]) -> bool:
+def is_rect_visible(size: numpy.ndarray[numpy.float32[2, 1]]) -> bool:
     ...
-def is_rect_visible_pos_size(arg0: numpy.ndarray[numpy.float32[2, 1]], arg1: numpy.ndarray[numpy.float32[2, 1]]) -> bool:
+def is_rect_visible_pos_size(pos: numpy.ndarray[numpy.float32[2, 1]], size: numpy.ndarray[numpy.float32[2, 1]]) -> bool:
     ...
 def is_window_appearing() -> bool:
     ...

@@ -259,7 +259,25 @@ void define_glk(py::module_& m) {
 
   // classes
   // glk::GLSLShader
-  py::class_<glk::GLSLShader>(glk_, "GLSLShader")
+  py::class_<glk::GLSLShader>(glk_, "GLSLShader", R"doc(Wrapper for OpenGL shader programs.
+
+Building a shader program:
+    shader = glk.GLSLShader()
+    shader.attach_source("vertex_shader.glsl", gl.VERTEX_SHADER)
+    shader.attach_source("fragment_shader.glsl", gl.FRAGMENT_SHADER)
+    shader.link_program()
+
+Shader source code can also be given as a string with attach_source_code().
+
+Getting attribute and uniform locations:
+    shader.use()
+    position_loc = shader.attrib("position")
+    model_matrix_loc = shader.uniform("model_matrix")
+    shader.unuse()
+
+Copying (cached) uniform variables from another shader:
+    src_shader.copy_cached_uniforms(dst_shader)
+)doc")
     .def(py::init<>())
     .def(
       "attach_source",
@@ -276,7 +294,19 @@ void define_glk(py::module_& m) {
       py::arg("shader_type"),
       py::arg("include_filenames") = std::vector<std::string>(),
       py::arg("defines") = "",
-      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>())
+      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>(),
+      R"doc(Attach shader source code from a file, with optional include files, defines, and replacements.
+
+Args:
+    filename: Filename of the shader source file to attach.
+    shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+    include_filenames: Filenames of the include files to be inserted into the shader source code.
+    defines: Preprocessor definitions to be added to the shader source code.
+    replaces: Pairs of strings representing text replacements to be made in the shader source code.
+
+Returns:
+    True if the shader source file was successfully attached, False otherwise.
+)doc")
     .def(
       "attach_source",
       [](
@@ -292,49 +322,122 @@ void define_glk(py::module_& m) {
       py::arg("shader_type"),
       py::arg("include_filenames") = std::vector<std::string>(),
       py::arg("defines") = "",
-      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>())
-    .def("attach_source_code", &glk::GLSLShader::attach_source_code, py::arg("source_code"), py::arg("shader_type"))
-    .def("link_program", &glk::GLSLShader::link_program)
-    .def("init", py::overload_cast<const std::string&>(&glk::GLSLShader::init), py::arg("shader_path"))
+      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>(),
+      R"doc(Attach shader source code from multiple files, with optional include files, defines, and replacements.
+
+Args:
+    filenames: Filenames of the shader source files to attach.
+    shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+    include_filenames: Filenames of the include files to be inserted into the shader source code.
+    defines: Preprocessor definitions to be added to the shader source code.
+    replaces: Pairs of strings representing text replacements to be made in the shader source code.
+
+Returns:
+    True if all shader source files were successfully attached, False otherwise.
+)doc")
     .def(
-      "init",
-      py::overload_cast<const std::string&, const std::string&>(&glk::GLSLShader::init),
-      py::arg("vertex_shader_path"),
-      py::arg("fragment_shader_path"))
+      "attach_source_code",
+      &glk::GLSLShader::attach_source_code,
+      py::arg("source_code"),
+      py::arg("shader_type"),
+      R"doc(Attach shader source code from a string.
+
+Args:
+    source_code: Source code text.
+    shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+
+Returns:
+    True if the shader source code was successfully attached, False otherwise.
+)doc")
+    .def("link_program", &glk::GLSLShader::link_program, "Link attached shaders into a shader program. Returns True if linking is successful.")
+    .def("init", py::overload_cast<const std::string&>(&glk::GLSLShader::init), py::arg("shader_path"))
+    .def("init", py::overload_cast<const std::string&, const std::string&>(&glk::GLSLShader::init), py::arg("vertex_shader_path"), py::arg("fragment_shader_path"))
     .def(
       "init",
       py::overload_cast<const std::vector<std::string>&, const std::vector<std::string>&>(&glk::GLSLShader::init),
       py::arg("vertex_shader_paths"),
       py::arg("fragment_shader_paths"))
-    .def("id", &glk::GLSLShader::id)
-    .def("use", &glk::GLSLShader::use)
-    .def("unuse", &glk::GLSLShader::unuse)
-    .def("attrib", [](glk::GLSLShader& shader, const std::string& name) { return shader.attrib(name); }, py::arg("name"))
-    .def("uniform", [](glk::GLSLShader& shader, const std::string& name) { return shader.uniform(name); }, py::arg("name"))
-    .def("get_uniformi", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniformi(name); }, py::arg("name"))
-    .def("get_uniformf", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniformf(name); }, py::arg("name"))
-    .def("get_uniform4f", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform4f(name); }, py::arg("name"))
-    .def("get_uniform_matrix4f", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform_matrix4f(name); }, py::arg("name"))
-    .def("copy_cached_uniforms", &glk::GLSLShader::copy_cached_uniforms, py::arg("other"))
+    .def("id", &glk::GLSLShader::id, "OpenGL shader program ID.")
+    .def("use", &glk::GLSLShader::use, "Use the shader in the OpenGL context.")
+    .def("unuse", &glk::GLSLShader::unuse, "Unuse the shader.")
+    .def(
+      "attrib",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.attrib(name); },
+      py::arg("name"))
+    .def(
+      "uniform",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.uniform(name); },
+      py::arg("name"))
+    .def(
+      "get_uniformi",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniformi(name); },
+      py::arg("name"))
+    .def(
+      "get_uniformf",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniformf(name); },
+      py::arg("name"))
+    .def(
+      "get_uniform4f",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform4f(name); },
+      py::arg("name"))
+    .def(
+      "get_uniform_matrix4f",
+      [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform_matrix4f(name); },
+      py::arg("name"))
+    .def(
+      "copy_cached_uniforms",
+      &glk::GLSLShader::copy_cached_uniforms,
+      py::arg("other"),
+      "Copy the cached uniform variables of this shader to other. other must be in use (other.use()) when calling this.")
     // Float vector overloads come before int ones so that lists and float64 arrays are converted to float vectors.
     // Pass np.int32 arrays to set integer vector uniforms.
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, int value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, float value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector2f& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector3f& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector4f& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Matrix4f& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector2i& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
-    .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector3i& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, int value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, float value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector2f& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector3f& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector4f& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Matrix4f& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector2i& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
+    .def(
+      "set_uniform",
+      [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector3i& value) { shader.set_uniform(name, value); },
+      py::arg("name"),
+      py::arg("value"))
     .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, const Eigen::Vector4i& value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"));
 
   // glk::Drawable
-  py::class_<glk::Drawable, PyDrawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable")
-    .def(py::init<>())
-    .def("draw", &glk::Drawable::draw, py::arg("shader"));
+  py::class_<glk::Drawable, PyDrawable, std::shared_ptr<glk::Drawable>>(glk_, "Drawable").def(py::init<>()).def("draw", &glk::Drawable::draw, py::arg("shader"));
 
   // glk::ThinLines
-  py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines")
+  py::class_<glk::ThinLines, glk::Drawable, std::shared_ptr<glk::ThinLines>>(glk_, "ThinLines", "Drawable to draw a set of lines with GL_LINES (fixed width in pixels).")
     .def(
       py::init([](const py::array_t<float, py::array::c_style | py::array::forcecast>& points, bool line_strip, float line_width) {
         if (!check_valid_points(points)) {
@@ -432,7 +535,7 @@ void define_glk(py::module_& m) {
     .def("set_line_width", &glk::ThinLines::set_line_width, py::arg("width"));
 
   // glk::Lines
-  py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines")
+  py::class_<glk::Lines, glk::Drawable, std::shared_ptr<glk::Lines>>(glk_, "Lines", "Drawable to draw a set of lines as thick polygons (width in world units).")
     .def(py::init<float, const std::vector<Eigen::Vector3f>&, const std::vector<Eigen::Vector4f>&>(), py::arg("thickness"), py::arg("vertices"), py::arg("colors"))
     .def(
       py::init([](
@@ -522,7 +625,6 @@ void define_glk(py::module_& m) {
         return std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * points.shape(1), points.shape(0));
       }),
       py::arg("points"))
-    .def(py::init<const std::vector<Eigen::Vector3f>&>())
     .def(py::init([](const std::vector<Eigen::Vector3f>& points) { return std::make_shared<glk::PointCloudBuffer>(points); }), py::arg("points"))
     .def(
       "add_normals",
@@ -574,7 +676,7 @@ void define_glk(py::module_& m) {
       py::arg("scale") = 1.0f)
     .def(
       "add_buffer",
-      [](glk::PointCloudBuffer& buffer, const std::string& attribute_name, const Eigen::MatrixXf& data) {
+      [](glk::PointCloudBuffer& buffer, const std::string& attribute_name, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& data) {
         buffer.add_buffer(attribute_name, data.cols(), data.data(), sizeof(float) * data.cols(), data.rows());
       },
       py::arg("attribute_name"),
@@ -698,7 +800,7 @@ Args:
 )doc");
 
   // glk::VoxelMapOptions
-  py::class_<glk::VoxelMapOptions, std::shared_ptr<glk::VoxelMapOptions>>(glk_, "VoxelMapOptions")
+  py::class_<glk::VoxelMapOptions, std::shared_ptr<glk::VoxelMapOptions>>(glk_, "VoxelMapOptions", "Deprecated. Use MeshRenderingOptions instead.")
     .def(py::init<>())
     .def("set_voxel_alpha", &glk::VoxelMapOptions::set_voxel_alpha, py::arg("alpha"))
     .def("set_voxel_color", &glk::VoxelMapOptions::set_voxel_color, py::arg("color"))
@@ -707,7 +809,7 @@ Args:
     .def_readwrite("edge_line_width", &glk::VoxelMapOptions::edge_line_width);
 
   // glk::MeshRenderingOptions
-  py::class_<glk::MeshRenderingOptions, std::shared_ptr<glk::MeshRenderingOptions>>(glk_, "MeshRenderingOptions")
+  py::class_<glk::MeshRenderingOptions, std::shared_ptr<glk::MeshRenderingOptions>>(glk_, "MeshRenderingOptions", "Options for rendering meshes.")
     .def(py::init<>())
     .def("set_face_alpha", &glk::MeshRenderingOptions::set_face_alpha, py::arg("alpha"))
     .def("set_face_color", &glk::MeshRenderingOptions::set_face_color, py::arg("color"))
@@ -718,7 +820,7 @@ Args:
     .def_readwrite("edge_line_width", &glk::MeshRenderingOptions::edge_line_width);
 
   // glk::VoxelMap
-  py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap")
+  py::class_<glk::VoxelMap, glk::Drawable, std::shared_ptr<glk::VoxelMap>>(glk_, "VoxelMap", "Drawable that represents a set of voxels as cubes.")
     .def(
       py::init([](const py::array_t<int, py::array::c_style | py::array::forcecast>& voxels, float resolution, const glk::MeshRenderingOptions& mesh_options) {
         if (!check_valid_voxels(voxels)) {
@@ -736,19 +838,44 @@ Args:
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("mesh_options") = glk::MeshRenderingOptions())
+      py::arg("mesh_options") = glk::MeshRenderingOptions(),
+      R"doc(Create a voxel map.
+
+Args:
+    voxels: Integer coordinates of the voxels (N x 3 array).
+    resolution: Size of each voxel (cube) in world units.
+    mesh_options: Rendering options for the voxels and edges.
+)doc")
     .def(
       py::init([](const std::vector<Eigen::Vector3i>& voxels, float resolution, const glk::MeshRenderingOptions& voxel_options) {
         return std::make_shared<glk::VoxelMap>(voxels.data(), voxels.size(), resolution, voxel_options);
       }),
       py::arg("voxels"),
       py::arg("resolution"),
-      py::arg("voxel_options") = glk::MeshRenderingOptions());
+      py::arg("voxel_options") = glk::MeshRenderingOptions(),
+      R"doc(Create a voxel map.
+
+Args:
+    voxels: List of integer coordinates of the voxels.
+    resolution: Size of each voxel (cube) in world units.
+    voxel_options: Rendering options for the voxels and edges.
+)doc");
 
   // glk::ElevationMapBuilder
   using MapArray = Eigen::Array<float, -1, -1, Eigen::RowMajor>;
-  py::class_<glk::ElevationMapBuilder, std::shared_ptr<glk::ElevationMapBuilder>>(glk_, "ElevationMapBuilder")
-    .def(py::init<double, const Eigen::Vector2i&, const Eigen::Vector2f&>(), py::arg("resolution"), py::arg("size"), py::arg("origin"))
+  py::class_<glk::ElevationMapBuilder, std::shared_ptr<glk::ElevationMapBuilder>>(glk_, "ElevationMapBuilder", "Builder for an elevation map.")
+    .def(
+      py::init<double, const Eigen::Vector2i&, const Eigen::Vector2f&>(),
+      py::arg("resolution"),
+      py::arg("size"),
+      py::arg("origin"),
+      R"doc(Create an elevation map builder.
+
+Args:
+    resolution: Resolution of the map (size of each cell).
+    size: Size of the map in number of cells (width, height).
+    origin: Top-left corner of the map in world coordinates.
+)doc")
     .def(
       "calc_cell_indices",
       [](const glk::ElevationMapBuilder& builder, const py::array_t<float, py::array::c_style | py::array::forcecast>& cells) {
@@ -764,7 +891,15 @@ Args:
         const auto cell_indices = builder.calc_cell_indices(cells_vec);
         return py::array_t<std::uint64_t>(cell_indices.size(), cell_indices.data());
       },
-      py::arg("cells"))
+      py::arg("cells"),
+      R"doc(Calculate the cell indices for a given set of cells.
+
+Args:
+    cells: Cells for which to calculate the indices (N x M array, M >= 2). cells[i, 0] and cells[i, 1] are the x and y coordinates of the cell in world coordinates.
+
+Returns:
+    Indices of the cells in the elevation map.
+)doc")
     .def(
       "set_elevation",
       [](
@@ -779,7 +914,15 @@ Args:
       py::arg("cells"),
       py::arg("elevation_index"),
       py::arg("cell_indices"),
-      py::arg("average") = false)
+      py::arg("average") = false,
+      R"doc(Set the elevation values for the given cells in the elevation map.
+
+Args:
+    cells: Cells (N x M array, or 1-dimensional array of size N).
+    elevation_index: Column index of the elevation value in cells (i.e., cells[i, elevation_index] is the elevation value of i-th cell).
+    cell_indices: Indices of the cells in the elevation map (calculated by calc_cell_indices()).
+    average: If False, the elevation values are set directly. Otherwise, the elevation values of each cell are averaged.
+)doc")
     .def(
       "set_cmap",
       [](
@@ -794,7 +937,15 @@ Args:
       py::arg("cells"),
       py::arg("cmap_index"),
       py::arg("cell_indices"),
-      py::arg("average") = false)
+      py::arg("average") = false,
+      R"doc(Set the color values for the given cells in the elevation map.
+
+Args:
+    cells: Cells (N x M array, or 1-dimensional array of size N).
+    cmap_index: Column index of the color value in cells (i.e., cells[i, cmap_index] is the color value of i-th cell).
+    cell_indices: Indices of the cells in the elevation map (calculated by calc_cell_indices()).
+    average: If False, the color values are set directly. Otherwise, the color values of each cell are averaged.
+)doc")
     .def(
       "filter_elevation_map",
       [](glk::ElevationMapBuilder& builder, bool process_valid_cells, int window_size) {
@@ -813,7 +964,13 @@ Args:
         }
       },
       py::arg("process_valid_cells") = true,
-      py::arg("window_size") = 3)
+      py::arg("window_size") = 3,
+      R"doc(Apply local averaging filter to the elevation (and color) map.
+
+Args:
+    process_valid_cells: If True, all cells are processed (smoothed). If False, only invalid cells (NaN) are processed.
+    window_size: Size of the filter window (3, 5, or 7).
+)doc")
     .def(
       "calc_cmap_gradient",
       [](glk::ElevationMapBuilder& builder, int window_size) {
@@ -831,7 +988,12 @@ Args:
             throw std::runtime_error("window_size must be 3, 5, or 7 (window_size=" + std::to_string(window_size) + ")");
         }
       },
-      py::arg("window_size") = 3)
+      py::arg("window_size") = 3,
+      R"doc(Replace the color map with its gradient magnitude.
+
+Args:
+    window_size: Size of the filter window (3, 5, or 7).
+)doc")
     .def_readonly("resolution", &glk::ElevationMapBuilder::resolution)
     .def_readonly("size", &glk::ElevationMapBuilder::size)
     .def_readonly("origin", &glk::ElevationMapBuilder::origin)
@@ -858,8 +1020,17 @@ Args:
     .def_property_readonly("count_map", [](const glk::ElevationMapBuilder& builder) -> MapArray { return builder.count_map; });
 
   // glk::ElevationMap
-  py::class_<glk::ElevationMap, glk::Drawable, std::shared_ptr<glk::ElevationMap>>(glk_, "ElevationMap")
-    .def(py::init<const glk::ElevationMapBuilder&, const glk::MeshRenderingOptions&>(), py::arg("builder"), py::arg("options") = glk::MeshRenderingOptions());
+  py::class_<glk::ElevationMap, glk::Drawable, std::shared_ptr<glk::ElevationMap>>(glk_, "ElevationMap", "Elevation map drawable.")
+    .def(
+      py::init<const glk::ElevationMapBuilder&, const glk::MeshRenderingOptions&>(),
+      py::arg("builder"),
+      py::arg("options") = glk::MeshRenderingOptions(),
+      R"doc(Create an elevation map.
+
+Args:
+    builder: Builder containing the elevation map data.
+    options: Rendering options.
+)doc");
 
   // glk::GridMap
   py::class_<glk::GridMap, glk::Drawable, std::shared_ptr<glk::GridMap>> gridmap(
@@ -1042,10 +1213,7 @@ Args:
 Args:
     drawable: Drawable to be added.
 )doc")
-    .def_readwrite(
-      "skip_model_matrix",
-      &glk::DrawableContainer::skip_model_matrix,
-      "If True, the model matrices of the shader settings stored in the container are not applied.");
+    .def_readwrite("skip_model_matrix", &glk::DrawableContainer::skip_model_matrix, "If True, the model matrices of the shader settings stored in the container are not applied.");
 
   // glk::Texture
   py::class_<glk::Texture, std::shared_ptr<glk::Texture>>(glk_, "Texture", R"doc(2D OpenGL texture.
@@ -1213,7 +1381,16 @@ Returns:
 
       return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, format, GL_UNSIGNED_BYTE, arr.data());
     },
-    py::arg("image_uint8"));
+    py::arg("image_uint8"),
+    R"doc(Create an RGBA8 texture from a uint8 image.
+
+Args:
+    image_uint8: Image of shape (height, width) or (height, width, channels).
+                 3- and 4-channel images are interpreted as BGR and BGRA (OpenCV order).
+
+Returns:
+    Created texture, or None if the image shape is invalid.
+)doc");
 
   glk_.def(
     "create_texture_f",
@@ -1251,7 +1428,16 @@ Returns:
 
       return std::make_shared<glk::Texture>(Eigen::Vector2i(width, height), GL_RGBA, format, GL_FLOAT, arr.data());
     },
-    py::arg("image_float"));
+    py::arg("image_float"),
+    R"doc(Create an RGBA8 texture from a float image.
+
+Args:
+    image_float: Image of shape (height, width) or (height, width, channels) with values in [0, 1].
+                 3- and 4-channel images are interpreted as BGR and BGRA (OpenCV order).
+
+Returns:
+    Created texture, or None if the image shape is invalid.
+)doc");
 
   // glk::ScreenEffect
   py::class_<glk::ScreenEffect, std::shared_ptr<glk::ScreenEffect>>(glk_, "ScreenEffect");
@@ -1289,21 +1475,30 @@ Returns:
     .export_values();
 
   ssli.def(py::init<>())
-    .def("num_lights", &glk::ScreenSpaceLighting::num_lights, "")
-    .def("set_diffuse_model", &glk::ScreenSpaceLighting::set_diffuse_model)
-    .def("set_specular_model", &glk::ScreenSpaceLighting::set_specular_model)
-    .def("set_occlusion_model", &glk::ScreenSpaceLighting::set_occlusion_model)
-    .def("set_iridescence_model", &glk::ScreenSpaceLighting::set_iridescence_model)
+    .def("num_lights", &glk::ScreenSpaceLighting::num_lights, "Number of lights.")
+    .def("set_diffuse_model", &glk::ScreenSpaceLighting::set_diffuse_model, py::arg("model"))
+    .def("set_specular_model", &glk::ScreenSpaceLighting::set_specular_model, py::arg("model"))
+    .def("set_occlusion_model", &glk::ScreenSpaceLighting::set_occlusion_model, py::arg("model"))
+    .def("set_iridescence_model", &glk::ScreenSpaceLighting::set_iridescence_model, py::arg("model"))
     .def(
       "set_light",
       [](glk::ScreenSpaceLighting& effect, int i, const Eigen::Vector3f& pos, const Eigen::Vector4f& color) { return effect.set_light(i, pos, color); },
-      "")
-    .def("set_albedo", &glk::ScreenSpaceLighting::set_albedo, "")
-    .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, "");
+      py::arg("i"),
+      py::arg("pos"),
+      py::arg("color"),
+      R"doc(Set a point light.
+
+Args:
+    i: Light index.
+    pos: Light position.
+    color: Light color (RGBA).
+)doc")
+    .def("set_albedo", &glk::ScreenSpaceLighting::set_albedo, py::arg("albedo"))
+    .def("set_roughness", &glk::ScreenSpaceLighting::set_roughness, py::arg("roughness"));
 
   // methods
-  glk_.def("get_data_path", glk::get_data_path, "");
-  glk_.def("set_data_path", &glk::set_data_path, "");
+  glk_.def("get_data_path", glk::get_data_path, "Get the path to the data directory (shaders, fonts, etc.).");
+  glk_.def("set_data_path", &glk::set_data_path, py::arg("data_path"), "Set the path to the data directory (shaders, fonts, etc.).");
   glk_.def(
     "create_pointcloud_buffer",
     [](const Eigen::Matrix<float, -1, 3, Eigen::RowMajor>& points, const Eigen::Matrix<float, -1, 4, Eigen::RowMajor>& colors) -> std::shared_ptr<glk::PointCloudBuffer> {
@@ -1313,9 +1508,14 @@ Returns:
       }
       return cloud_buffer;
     },
-    "",
     py::arg("points"),
-    py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>());
+    py::arg("colors") = Eigen::Matrix<float, -1, 4, Eigen::RowMajor>(),
+    R"doc(Create a point cloud buffer.
+
+Args:
+    points: Point positions (N x 3 array).
+    colors: Point colors (N x 4 array). Ignored if the number of rows differs from that of points.
+)doc");
 
   // colormaps
   glk_.def("colormap", &glk::colormap, py::arg("colormap_type"), py::arg("x"));
@@ -1404,7 +1604,12 @@ Returns:
     });
 
   // glk::PLYData
-  py::class_<glk::PLYData, std::shared_ptr<glk::PLYData>>(glk_, "PLYData")  //
+  py::class_<glk::PLYData, std::shared_ptr<glk::PLYData>>(glk_, "PLYData", R"doc(PLY data.
+
+When saving, primary properties (vertices, normals...) are first written, and then the generic properties are written to the file.
+If a property exists in both generic and primary properties, the primary property is prioritized
+(e.g., vertices[:, 0] overwrites properties[name == "x"]).
+)doc")  //
     .def(py::init<>())
     .def_property(
       "vertices",
@@ -1477,27 +1682,70 @@ Returns:
       "comments",
       [](glk::PLYData& self) -> std::vector<std::string> { return self.comments; },
       [](glk::PLYData& self, const std::vector<std::string>& comments) { self.comments = comments; })
-    .def("get_prop", [](glk::PLYData& self, const std::string& name) -> std::shared_ptr<glk::PLYGenericPropertyBuffer> {
-      for (const auto& prop : self.properties) {
-        if (prop->name == name) {
-          return prop;
+    .def(
+      "get_prop",
+      [](glk::PLYData& self, const std::string& name) -> std::shared_ptr<glk::PLYGenericPropertyBuffer> {
+        for (const auto& prop : self.properties) {
+          if (prop->name == name) {
+            return prop;
+          }
         }
+        return nullptr;
+      },
+      py::arg("name"),
+      "Get a generic property by name. Returns None if not found.");
+
+  glk_.def(
+    "load_ply",
+    &glk::load_ply,
+    py::arg("filename"),
+    R"doc(Load a PLY file.
+
+Args:
+    filename: File path.
+
+Returns:
+    PLY data if successful, None otherwise.
+)doc");
+  glk_.def(
+    "save_ply",
+    &glk::save_ply,
+    py::arg("filename"),
+    py::arg("ply"),
+    py::arg("binary") = true,
+    R"doc(Save a PLY file.
+
+Args:
+    filename: File path.
+    ply: PLY data.
+    binary: If True, save in binary format. Otherwise, save in ASCII format.
+
+Returns:
+    True if successful, False otherwise.
+)doc");
+  glk_.def(
+    "save_ply",
+    [](const std::string& filename, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points) {
+      if (points.cols() != 3 && points.cols() != 4) {
+        std::cerr << "points must be 3 or 4 columns (cols=" << points.cols() << ")" << std::endl;
+        return false;
       }
-      return nullptr;
-    });
 
-  glk_.def("load_ply", &glk::load_ply, py::arg("filename"));
-  glk_.def("save_ply", &glk::save_ply, py::arg("filename"), py::arg("ply"), py::arg("binary") = true);
-  glk_.def("save_ply", [](const std::string& filename, const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points) {
-    if (points.cols() != 3 && points.cols() != 4) {
-      std::cerr << "points must be 3 or 4 columns (cols=" << points.cols() << ")" << std::endl;
-      return false;
-    }
+      if (points.cols() == 3) {
+        return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 3, 1>*>(points.data()), points.rows());
+      } else {
+        return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 4, 1>*>(points.data()), points.rows());
+      }
+    },
+    py::arg("filename"),
+    py::arg("points"),
+    R"doc(Save points to a binary PLY file.
 
-    if (points.cols() == 3) {
-      return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 3, 1>*>(points.data()), points.rows());
-    } else {
-      return glk::save_ply_binary(filename, reinterpret_cast<const Eigen::Matrix<float, 4, 1>*>(points.data()), points.rows());
-    }
-  });
+Args:
+    filename: File path.
+    points: Point positions (N x 3 or N x 4 array).
+
+Returns:
+    True if successful, False otherwise.
+)doc");
 }

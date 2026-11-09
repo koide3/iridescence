@@ -121,21 +121,25 @@ void define_imgui(py::module_& m) {
   // structs
   py::class_<ImVec2>(imgui_, "ImVec2", py::buffer_protocol())
     .def_buffer([](ImVec2& m) -> py::buffer_info { return py::buffer_info(&m.x, sizeof(float), py::format_descriptor<float>::format(), 1, {2}, {sizeof(float)}); })
-    .def(py::init([](float x, float y) { return std::make_unique<ImVec2>(x, y); }))
-    .def(py::init([](py::array_t<float> x) {
-      auto r = x.unchecked<1>();
-      return std::make_unique<ImVec2>(r(0), r(1));
-    }))
+    .def(py::init([](float x, float y) { return std::make_unique<ImVec2>(x, y); }), py::arg("x"), py::arg("y"))
+    .def(
+      py::init([](py::array_t<float> x) {
+        auto r = x.unchecked<1>();
+        return std::make_unique<ImVec2>(r(0), r(1));
+      }),
+      py::arg("xy"))
     .def_readwrite("x", &ImVec2::x)
     .def_readwrite("y", &ImVec2::y);
 
   py::class_<ImVec4>(imgui_, "ImVec4", py::buffer_protocol())
     .def_buffer([](ImVec4& m) -> py::buffer_info { return py::buffer_info(&m.x, sizeof(float), py::format_descriptor<float>::format(), 1, {4}, {sizeof(float)}); })
-    .def(py::init([](float x, float y, float z, float w) { return std::make_unique<ImVec4>(x, y, z, w); }))
-    .def(py::init([](py::array_t<float> x) {
-      auto r = x.unchecked<1>();
-      return std::make_unique<ImVec4>(r(0), r(1), r(2), r(3));
-    }))
+    .def(py::init([](float x, float y, float z, float w) { return std::make_unique<ImVec4>(x, y, z, w); }), py::arg("x"), py::arg("y"), py::arg("z"), py::arg("w"))
+    .def(
+      py::init([](py::array_t<float> x) {
+        auto r = x.unchecked<1>();
+        return std::make_unique<ImVec4>(r(0), r(1), r(2), r(3));
+      }),
+      py::arg("xyzw"))
     .def_readwrite("x", &ImVec4::x)
     .def_readwrite("y", &ImVec4::y)
     .def_readwrite("z", &ImVec4::z)
@@ -1184,15 +1188,22 @@ void define_imgui(py::module_& m) {
   imgui_.def("get_foreground_draw_list", [] { return ImGui::GetForegroundDrawList(); }, py::return_value_policy::reference);
 
   // Miscellaneous Utilities
-  imgui_.def("is_rect_visible", [](const Eigen::Vector2f& size) {
-    ImVec2 sz(size[0], size[1]);
-    return ImGui::IsRectVisible(sz);
-  });
-  imgui_.def("is_rect_visible_pos_size", [](const Eigen::Vector2f& pos, const Eigen::Vector2f& size) {
-    ImVec2 p(pos[0], pos[1]);
-    ImVec2 sz(size[0], size[1]);
-    return ImGui::IsRectVisible(p, sz);
-  });
+  imgui_.def(
+    "is_rect_visible",
+    [](const Eigen::Vector2f& size) {
+      ImVec2 sz(size[0], size[1]);
+      return ImGui::IsRectVisible(sz);
+    },
+    py::arg("size"));
+  imgui_.def(
+    "is_rect_visible_pos_size",
+    [](const Eigen::Vector2f& pos, const Eigen::Vector2f& size) {
+      ImVec2 p(pos[0], pos[1]);
+      ImVec2 sz(size[0], size[1]);
+      return ImGui::IsRectVisible(p, sz);
+    },
+    py::arg("pos"),
+    py::arg("size"));
   imgui_.def("get_time", &ImGui::GetTime);
   imgui_.def("get_frame_count", &ImGui::GetFrameCount);
 

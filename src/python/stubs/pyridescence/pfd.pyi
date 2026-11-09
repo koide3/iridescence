@@ -2,7 +2,7 @@
 """
 from __future__ import annotations
 __all__: list[str] = ['notify', 'open_file', 'save_file', 'select_folder']
-def notify(arg0: str, arg1: str) -> None:
+def notify(title: str, message: str) -> None:
     ...
 def open_file(title: str, default_path: str = '') -> str:
     ...
