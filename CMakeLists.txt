@@ -363,6 +363,14 @@ if(BUILD_PYTHON_BINDINGS)
 
   # install stubs in src/python/stubs
   install(DIRECTORY src/python/stubs/ DESTINATION ${PYTHON_INSTALL_DIR})
+
+  # install example sources (cpp and py) into the wheel
+  if(DEFINED SKBUILD_PROJECT_NAME)
+    install(DIRECTORY src/example/
+      DESTINATION ${CMAKE_INSTALL_DATADIR}/iridescence/examples
+      FILES_MATCHING PATTERN "*.cpp" PATTERN "*.py"
+    )
+  endif()
 endif()
 
 #############

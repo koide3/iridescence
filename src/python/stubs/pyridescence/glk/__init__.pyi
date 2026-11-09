@@ -4,9 +4,8 @@ from __future__ import annotations
 import numpy
 import pyridescence.guik
 import typing
-import typing_extensions
 from . import primitives
-__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'Drawable', 'DrawableContainer', 'ElevationMap', 'ElevationMapBuilder', 'GLSLShader', 'GREAN_YELLOW', 'GridMap', 'HELIX', 'IndexedPointCloudBuffer', 'JET', 'Lines', 'MeshRenderingOptions', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PUBUGN', 'PointCloudBuffer', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'VEGETATION','VoxelMap', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
+__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CHAR', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'DOUBLE', 'Drawable', 'DrawableContainer', 'ElevationMap', 'ElevationMapBuilder', 'FLOAT', 'GLSLShader', 'GREAN_YELLOW', 'GridMap', 'HELIX', 'INT', 'IndexedPointCloudBuffer', 'JET', 'Lines', 'MeshRenderingOptions', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PLYGenericPropertyBuffer', 'PLYPropertyType', 'PUBUGN', 'PointCloudBuffer', 'PointNormalsBuffer', 'SHORT', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'UCHAR', 'UINT', 'USHORT', 'VEGETATION', 'VoxelMap', 'VoxelMapOptions', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
 class COLORMAP:
     """
     Members:
@@ -105,12 +104,6 @@ class DrawableContainer(Drawable):
     Shader settings stored in the container are applied right before drawing the corresponding drawable and are not restored afterward,
     thus they also affect the subsequent drawables in the container that do not have their own shader settings.
     """
-    skip_model_matrix: bool
-    """
-    If True, the model matrices of the shader settings stored in the container are not applied.
-    """
-    def __len__(self) -> int:
-        ...
     @typing.overload
     def __init__(self, skip_model_matrix_setting: bool = True) -> None:
         """
@@ -120,7 +113,7 @@ class DrawableContainer(Drawable):
             skip_model_matrix_setting: If True, the model matrices of the shader settings stored in the container are not applied.
         """
     @typing.overload
-    def __init__(self, drawables: list[Drawable], skip_model_matrix_setting: bool = True) -> None:
+    def __init__(self, drawables: list[typing.Any], skip_model_matrix_setting: bool = True) -> None:
         """
         Create a container with drawables.
         
@@ -128,12 +121,14 @@ class DrawableContainer(Drawable):
             drawables: List of drawables to be added to the container.
             skip_model_matrix_setting: If True, the model matrices of the shader settings stored in the container are not applied.
         """
+    def __len__(self) -> int:
+        ...
     def clear(self) -> None:
         """
         Clear all drawables in the container.
         """
     @typing.overload
-    def push_back(self, drawable: Drawable) -> None:
+    def push_back(self, drawable: typing.Any) -> None:
         """
         Add a drawable to the container.
         
@@ -141,7 +136,7 @@ class DrawableContainer(Drawable):
             drawable: Drawable to be added.
         """
     @typing.overload
-    def push_back(self, drawable: Drawable, shader_setting: pyridescence.guik.ShaderSetting) -> None:
+    def push_back(self, drawable: typing.Any, shader_setting: pyridescence.guik.ShaderSetting) -> None:
         """
         Add a drawable to the container with a shader setting.
         
@@ -155,9 +150,168 @@ class DrawableContainer(Drawable):
         """
         Number of drawables in the container.
         """
+    @property
+    def skip_model_matrix(self) -> bool:
+        """
+        If True, the model matrices of the shader settings stored in the container are not applied.
+        """
+    @skip_model_matrix.setter
+    def skip_model_matrix(self, arg0: bool) -> None:
+        ...
+class ElevationMap(Drawable):
+    """
+    Elevation map drawable.
+    """
+    def __init__(self, builder: ElevationMapBuilder, options: MeshRenderingOptions = ...) -> None:
+        """
+        Create an elevation map.
+        
+        Args:
+            builder: Builder containing the elevation map data.
+            options: Rendering options.
+        """
+class ElevationMapBuilder:
+    """
+    Builder for an elevation map.
+    """
+    color_map: numpy.ndarray[numpy.float32[m, n]]
+    elevation_map: numpy.ndarray[numpy.float32[m, n]]
+    def __init__(self, resolution: float, size: numpy.ndarray[numpy.int32[2, 1]], origin: numpy.ndarray[numpy.float32[2, 1]]) -> None:
+        """
+        Create an elevation map builder.
+        
+        Args:
+            resolution: Resolution of the map (size of each cell).
+            size: Size of the map in number of cells (width, height).
+            origin: Top-left corner of the map in world coordinates.
+        """
+    def calc_cell_indices(self, cells: numpy.ndarray[numpy.float32]) -> numpy.ndarray[numpy.uint64]:
+        """
+        Calculate the cell indices for a given set of cells.
+        
+        Args:
+            cells: Cells for which to calculate the indices (N x M array, M >= 2). cells[i, 0] and cells[i, 1] are the x and y coordinates of the cell in world coordinates.
+        
+        Returns:
+            Indices of the cells in the elevation map.
+        """
+    def calc_cmap_gradient(self, window_size: int = 3) -> None:
+        """
+        Replace the color map with its gradient magnitude.
+        
+        Args:
+            window_size: Size of the filter window (3, 5, or 7).
+        """
+    def filter_elevation_map(self, process_valid_cells: bool = True, window_size: int = 3) -> None:
+        """
+        Apply local averaging filter to the elevation (and color) map.
+        
+        Args:
+            process_valid_cells: If True, all cells are processed (smoothed). If False, only invalid cells (NaN) are processed.
+            window_size: Size of the filter window (3, 5, or 7).
+        """
+    def set_cmap(self, cells: numpy.ndarray[numpy.float32], cmap_index: int, cell_indices: numpy.ndarray[numpy.uint64], average: bool = False) -> None:
+        """
+        Set the color values for the given cells in the elevation map.
+        
+        Args:
+            cells: Cells (N x M array, or 1-dimensional array of size N).
+            cmap_index: Column index of the color value in cells (i.e., cells[i, cmap_index] is the color value of i-th cell).
+            cell_indices: Indices of the cells in the elevation map (calculated by calc_cell_indices()).
+            average: If False, the color values are set directly. Otherwise, the color values of each cell are averaged.
+        """
+    def set_elevation(self, cells: numpy.ndarray[numpy.float32], elevation_index: int, cell_indices: numpy.ndarray[numpy.uint64], average: bool = False) -> None:
+        """
+        Set the elevation values for the given cells in the elevation map.
+        
+        Args:
+            cells: Cells (N x M array, or 1-dimensional array of size N).
+            elevation_index: Column index of the elevation value in cells (i.e., cells[i, elevation_index] is the elevation value of i-th cell).
+            cell_indices: Indices of the cells in the elevation map (calculated by calc_cell_indices()).
+            average: If False, the elevation values are set directly. Otherwise, the elevation values of each cell are averaged.
+        """
+    @property
+    def count_map(self) -> numpy.ndarray[numpy.float32[m, n]]:
+        ...
+    @property
+    def origin(self) -> numpy.ndarray[numpy.float32[2, 1]]:
+        ...
+    @property
+    def resolution(self) -> float:
+        ...
+    @property
+    def size(self) -> numpy.ndarray[numpy.int32[2, 1]]:
+        ...
 class GLSLShader:
+    """
+    Wrapper for OpenGL shader programs.
+    
+    Building a shader program:
+        shader = glk.GLSLShader()
+        shader.attach_source("vertex_shader.glsl", gl.VERTEX_SHADER)
+        shader.attach_source("fragment_shader.glsl", gl.FRAGMENT_SHADER)
+        shader.link_program()
+    
+    Shader source code can also be given as a string with attach_source_code().
+    
+    Getting attribute and uniform locations:
+        shader.use()
+        position_loc = shader.attrib("position")
+        model_matrix_loc = shader.uniform("model_matrix")
+        shader.unuse()
+    
+    Copying (cached) uniform variables from another shader:
+        src_shader.copy_cached_uniforms(dst_shader)
+    """
+    def __init__(self) -> None:
+        ...
+    @typing.overload
+    def attach_source(self, filename: str, shader_type: int, include_filenames: list[str] = [], defines: str = '', replaces: list[tuple[str, str]] = []) -> bool:
+        """
+        Attach shader source code from a file, with optional include files, defines, and replacements.
+        
+        Args:
+            filename: Filename of the shader source file to attach.
+            shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+            include_filenames: Filenames of the include files to be inserted into the shader source code.
+            defines: Preprocessor definitions to be added to the shader source code.
+            replaces: Pairs of strings representing text replacements to be made in the shader source code.
+        
+        Returns:
+            True if the shader source file was successfully attached, False otherwise.
+        """
+    @typing.overload
+    def attach_source(self, filenames: list[str], shader_type: int, include_filenames: list[str] = [], defines: str = '', replaces: list[tuple[str, str]] = []) -> bool:
+        """
+        Attach shader source code from multiple files, with optional include files, defines, and replacements.
+        
+        Args:
+            filenames: Filenames of the shader source files to attach.
+            shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+            include_filenames: Filenames of the include files to be inserted into the shader source code.
+            defines: Preprocessor definitions to be added to the shader source code.
+            replaces: Pairs of strings representing text replacements to be made in the shader source code.
+        
+        Returns:
+            True if all shader source files were successfully attached, False otherwise.
+        """
+    def attach_source_code(self, source_code: str, shader_type: int) -> bool:
+        """
+        Attach shader source code from a string.
+        
+        Args:
+            source_code: Source code text.
+            shader_type: Type of shader (e.g., gl.VERTEX_SHADER, gl.FRAGMENT_SHADER).
+        
+        Returns:
+            True if the shader source code was successfully attached, False otherwise.
+        """
     def attrib(self, name: str) -> int:
         ...
+    def copy_cached_uniforms(self, other: GLSLShader) -> None:
+        """
+        Copy the cached uniform variables of this shader to other. other must be in use (other.use()) when calling this.
+        """
     def get_uniform4f(self, name: str) -> numpy.ndarray[numpy.float32[4, 1]]:
         ...
     def get_uniform_matrix4f(self, name: str) -> numpy.ndarray[numpy.float32[4, 4]]:
@@ -167,7 +321,22 @@ class GLSLShader:
     def get_uniformi(self, name: str) -> int:
         ...
     def id(self) -> int:
+        """
+        OpenGL shader program ID.
+        """
+    @typing.overload
+    def init(self, shader_path: str) -> bool:
         ...
+    @typing.overload
+    def init(self, vertex_shader_path: str, fragment_shader_path: str) -> bool:
+        ...
+    @typing.overload
+    def init(self, vertex_shader_paths: list[str], fragment_shader_paths: list[str]) -> bool:
+        ...
+    def link_program(self) -> bool:
+        """
+        Link attached shaders into a shader program. Returns True if linking is successful.
+        """
     @typing.overload
     def set_uniform(self, name: str, value: int) -> None:
         ...
@@ -198,49 +367,13 @@ class GLSLShader:
     def uniform(self, name: str) -> int:
         ...
     def unuse(self) -> None:
-        ...
+        """
+        Unuse the shader.
+        """
     def use(self) -> None:
-        ...
-class ElevationMap(Drawable):
-    def __init__(self, builder: ElevationMapBuilder, options: MeshRenderingOptions = ...) -> None:
-        ...
-class ElevationMapBuilder:
-    def __init__(self, resolution: float, size: numpy.ndarray[numpy.int32[2, 1]], origin: numpy.ndarray[numpy.float32[2, 1]]) -> None:
-        ...
-    def calc_cell_indices(self, cells: numpy.ndarray[numpy.float32]) -> numpy.ndarray[numpy.uint64]:
-        ...
-    def calc_cmap_gradient(self, window_size: int = 3) -> None:
-        ...
-    def filter_elevation_map(self, process_valid_cells: bool = True, window_size: int = 3) -> None:
-        ...
-    def set_cmap(self, cells: numpy.ndarray[numpy.float32], cmap_index: int, cell_indices: numpy.ndarray[numpy.uint64], average: bool = False) -> None:
-        ...
-    def set_elevation(self, cells: numpy.ndarray[numpy.float32], elevation_index: int, cell_indices: numpy.ndarray[numpy.uint64], average: bool = False) -> None:
-        ...
-    @property
-    def color_map(self) -> numpy.ndarray[numpy.float32[m, n]]:
-        ...
-    @color_map.setter
-    def color_map(self, arg1: numpy.ndarray[numpy.float32[m, n]]) -> None:
-        ...
-    @property
-    def count_map(self) -> numpy.ndarray[numpy.float32[m, n]]:
-        ...
-    @property
-    def elevation_map(self) -> numpy.ndarray[numpy.float32[m, n]]:
-        ...
-    @elevation_map.setter
-    def elevation_map(self, arg1: numpy.ndarray[numpy.float32[m, n]]) -> None:
-        ...
-    @property
-    def origin(self) -> numpy.ndarray[numpy.float32[2, 1]]:
-        ...
-    @property
-    def resolution(self) -> float:
-        ...
-    @property
-    def size(self) -> numpy.ndarray[numpy.int32[2, 1]]:
-        ...
+        """
+        Use the shader in the OpenGL context.
+        """
 class GridMap(Drawable):
     """
     Drawable that represents a 2D grid map with color values.
@@ -321,7 +454,7 @@ class GridMap(Drawable):
     RGBA: typing.ClassVar[GridMap.ColorMode]  # value = <ColorMode.RGBA: 4>
     TURBO: typing.ClassVar[GridMap.ColorMode]  # value = <ColorMode.TURBO: 1>
     @typing.overload
-    def __init__(self, resolution: float, values: numpy.ndarray[numpy.float32], alpha: float = 1.0, mode: GridMap.ColorMode = GridMap.ColorMode.PROB, scale: float = 1.0) -> None:
+    def __init__(self, resolution: float, values: numpy.ndarray[numpy.float32], alpha: float = 1.0, mode: GridMap.ColorMode = ..., scale: float = 1.0) -> None:
         """
         Create a grid map from float values.
         
@@ -333,7 +466,7 @@ class GridMap(Drawable):
             scale: Scale factor for the color values. Ignored if mode is RGBA.
         """
     @typing.overload
-    def __init__(self, resolution: float, values: numpy.ndarray[numpy.uint8], alpha: int = 255, mode: GridMap.ColorMode = GridMap.ColorMode.PROB) -> None:
+    def __init__(self, resolution: float, values: numpy.ndarray[numpy.uint8], alpha: int = 255, mode: GridMap.ColorMode = ...) -> None:
         """
         Create a grid map from uint8 values.
         
@@ -344,7 +477,7 @@ class GridMap(Drawable):
             mode: Color mode for interpreting the values.
         """
     @typing.overload
-    def update_color(self, values: numpy.ndarray[numpy.float32], alpha: float = 1.0, mode: GridMap.ColorMode = GridMap.ColorMode.PROB, scale: float = 1.0) -> None:
+    def update_color(self, values: numpy.ndarray[numpy.float32], alpha: float = 1.0, mode: GridMap.ColorMode = ..., scale: float = 1.0) -> None:
         """
         Update the colors with float values.
         
@@ -357,7 +490,7 @@ class GridMap(Drawable):
             scale: Scale factor for the color values. Ignored if mode is RGBA.
         """
     @typing.overload
-    def update_color(self, values: numpy.ndarray[numpy.uint8], alpha: int = 255, mode: GridMap.ColorMode = GridMap.ColorMode.PROB) -> None:
+    def update_color(self, values: numpy.ndarray[numpy.uint8], alpha: int = 255, mode: GridMap.ColorMode = ...) -> None:
         """
         Update the colors with uint8 values.
         
@@ -373,7 +506,7 @@ class IndexedPointCloudBuffer(Drawable):
     Drawable that represents a point cloud with an index buffer.
     It is useful for rendering a subset of points without duplicating the point cloud data.
     """
-    def __init__(self, cloud_buffer: PointCloudBuffer, indices: numpy.ndarray[numpy.int64] | typing.Sequence[int]) -> None:
+    def __init__(self, cloud_buffer: PointCloudBuffer, indices: typing.Any) -> None:
         """
         Create an indexed point cloud buffer.
         
@@ -392,6 +525,9 @@ class IndexedPointCloudBuffer(Drawable):
         Number of indices.
         """
 class Lines(Drawable):
+    """
+    Drawable to draw a set of lines as thick polygons (width in world units).
+    """
     @typing.overload
     def __init__(self, thickness: float, vertices: list[numpy.ndarray[numpy.float32[3, 1]]], colors: list[numpy.ndarray[numpy.float32[4, 1]]]) -> None:
         ...
@@ -402,6 +538,9 @@ class Lines(Drawable):
     def __init__(self, x: numpy.ndarray[numpy.float32[m, 1]] = ..., y: numpy.ndarray[numpy.float32[m, 1]] = ..., z: numpy.ndarray[numpy.float32[m, 1]] = ..., c: numpy.ndarray[numpy.float32[m, 1]] = ..., width: float = 0.10000000149011612, line_strip: bool = True) -> None:
         ...
 class MeshRenderingOptions:
+    """
+    Options for rendering meshes.
+    """
     draw_edges: bool
     draw_faces: bool
     edge_line_width: float
@@ -419,6 +558,13 @@ class NaiveScreenSpaceAmbientOcclusion(ScreenEffect):
     def __init__(self) -> None:
         ...
 class PLYData:
+    """
+    PLY data.
+    
+    When saving, primary properties (vertices, normals...) are first written, and then the generic properties are written to the file.
+    If a property exists in both generic and primary properties, the primary property is prioritized
+    (e.g., vertices[:, 0] overwrites properties[name == "x"]).
+    """
     colors: numpy.ndarray[numpy.float32[m, n]]
     comments: list[str]
     indices: numpy.ndarray[numpy.int32[m, 1]]
@@ -427,12 +573,97 @@ class PLYData:
     vertices: numpy.ndarray[numpy.float32[m, n]]
     def __init__(self) -> None:
         ...
+    def get_prop(self, name: str) -> PLYGenericPropertyBuffer:
+        """
+        Get a generic property by name. Returns None if not found.
+        """
+    @property
+    def properties(self) -> list[PLYGenericPropertyBuffer]:
+        ...
+class PLYGenericPropertyBuffer:
+    def as_double(self) -> list[float]:
+        ...
+    def as_float(self) -> list[float]:
+        ...
+    def as_int16(self) -> list[int]:
+        ...
+    def as_int32(self) -> list[int]:
+        ...
+    def as_int8(self) -> list[str]:
+        ...
+    def as_uint16(self) -> list[int]:
+        ...
+    def as_uint32(self) -> list[int]:
+        ...
+    def as_uint8(self) -> list[int]:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def size(self) -> int:
+        ...
+    @property
+    def type(self) -> PLYPropertyType:
+        ...
+class PLYPropertyType:
+    """
+    Members:
+    
+      CHAR
+    
+      UCHAR
+    
+      SHORT
+    
+      USHORT
+    
+      INT
+    
+      UINT
+    
+      FLOAT
+    
+      DOUBLE
+    """
+    CHAR: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.CHAR: 0>
+    DOUBLE: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.DOUBLE: 7>
+    FLOAT: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.FLOAT: 6>
+    INT: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.INT: 4>
+    SHORT: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.SHORT: 2>
+    UCHAR: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.UCHAR: 1>
+    UINT: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.UINT: 5>
+    USHORT: typing.ClassVar[PLYPropertyType]  # value = <PLYPropertyType.USHORT: 3>
+    __members__: typing.ClassVar[dict[str, PLYPropertyType]]  # value = {'CHAR': <PLYPropertyType.CHAR: 0>, 'UCHAR': <PLYPropertyType.UCHAR: 1>, 'SHORT': <PLYPropertyType.SHORT: 2>, 'USHORT': <PLYPropertyType.USHORT: 3>, 'INT': <PLYPropertyType.INT: 4>, 'UINT': <PLYPropertyType.UINT: 5>, 'FLOAT': <PLYPropertyType.FLOAT: 6>, 'DOUBLE': <PLYPropertyType.DOUBLE: 7>}
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+    def __getstate__(self) -> int:
+        ...
+    def __hash__(self) -> int:
+        ...
+    def __index__(self) -> int:
+        ...
+    def __init__(self, value: int) -> None:
+        ...
+    def __int__(self) -> int:
+        ...
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+    def __repr__(self) -> str:
+        ...
+    def __setstate__(self, state: int) -> None:
+        ...
+    def __str__(self) -> str:
+        ...
+    @property
+    def name(self) -> str:
+        ...
+    @property
+    def value(self) -> int:
+        ...
 class PointCloudBuffer(Drawable):
     @typing.overload
     def __init__(self, points: numpy.ndarray[numpy.float32]) -> None:
-        ...
-    @typing.overload
-    def __init__(self, arg0: list[numpy.ndarray[numpy.float32[3, 1]]]) -> None:
         ...
     @typing.overload
     def __init__(self, points: list[numpy.ndarray[numpy.float32[3, 1]]]) -> None:
@@ -440,23 +671,23 @@ class PointCloudBuffer(Drawable):
     def add_buffer(self, attribute_name: str, data: numpy.ndarray[numpy.float32[m, n]]) -> None:
         ...
     @typing.overload
+    def add_color(self, colors: numpy.ndarray[numpy.float32]) -> None:
+        ...
+    @typing.overload
     def add_color(self, colors: list[numpy.ndarray[numpy.float32[3, 1]]]) -> None:
         ...
     @typing.overload
     def add_color(self, colors: list[numpy.ndarray[numpy.float32[4, 1]]]) -> None:
-        ...
-    @typing.overload
-    def add_color(self, colors: numpy.ndarray[numpy.float32]) -> None:
         ...
     def add_colormap(self, cmap: list[float], scale: float = 1.0) -> None:
         ...
     def add_intensity(self, colormap: COLORMAP, intensities: list[float], scale: float = 1.0) -> None:
         ...
     @typing.overload
-    def add_normals(self, normals: list[numpy.ndarray[numpy.float32[3, 1]]]) -> None:
+    def add_normals(self, normals: numpy.ndarray[numpy.float32]) -> None:
         ...
     @typing.overload
-    def add_normals(self, normals: numpy.ndarray[numpy.float32]) -> None:
+    def add_normals(self, normals: list[numpy.ndarray[numpy.float32[3, 1]]]) -> None:
         ...
     def set_colormap_buffer(self, colormap_buffer: str) -> None:
         ...
@@ -536,20 +767,6 @@ class ScreenSpaceLighting(ScreenEffect):
             ...
         @property
         def value(self) -> int:
-            ...
-    class VoxelMapOptions:
-        def __init__(self):
-            ...
-        def set_voxel_alpha(self, alpha: float):
-            ...
-        def set_voxel_color(self, color: numpy.ndarray[np.int32[4,1]]):
-            ...
-        def set_edge_alpha(self, alpha: float):
-            ...
-        def set_edge_color(self, color: numpy.ndarray[np.int32[4,1]]):
-            ...
-    class VoxelMap(Drawable):
-        def __init__(voxels: numpy.ndarray[np.int32[m, 3]], int num_voxels, voxel_resolution: float, voxel_options:VoxelMapOptions = VoxelMapOptions()):
             ...
     class IRIDESCENCE_MODEL:
         """
@@ -689,20 +906,29 @@ class ScreenSpaceLighting(ScreenEffect):
     def __init__(self) -> None:
         ...
     def num_lights(self) -> int:
+        """
+        Number of lights.
+        """
+    def set_albedo(self, albedo: float) -> None:
         ...
-    def set_albedo(self, arg0: float) -> None:
+    def set_diffuse_model(self, model: ScreenSpaceLighting.DIFFUSE_MODEL) -> None:
         ...
-    def set_diffuse_model(self, arg0: ScreenSpaceLighting.DIFFUSE_MODEL) -> None:
+    def set_iridescence_model(self, model: ScreenSpaceLighting.IRIDESCENCE_MODEL) -> None:
         ...
-    def set_iridescence_model(self, arg0: ScreenSpaceLighting.IRIDESCENCE_MODEL) -> None:
+    def set_light(self, i: int, pos: numpy.ndarray[numpy.float32[3, 1]], color: numpy.ndarray[numpy.float32[4, 1]]) -> None:
+        """
+        Set a point light.
+        
+        Args:
+            i: Light index.
+            pos: Light position.
+            color: Light color (RGBA).
+        """
+    def set_occlusion_model(self, model: ScreenSpaceLighting.OCCLUSION_MODEL) -> None:
         ...
-    def set_light(self, arg0: int, arg1: numpy.ndarray[numpy.float32[3, 1]], arg2: numpy.ndarray[numpy.float32[4, 1]]) -> None:
+    def set_roughness(self, roughness: float) -> None:
         ...
-    def set_occlusion_model(self, arg0: ScreenSpaceLighting.OCCLUSION_MODEL) -> None:
-        ...
-    def set_roughness(self, arg0: float) -> None:
-        ...
-    def set_specular_model(self, arg0: ScreenSpaceLighting.SPECULAR_MODEL) -> None:
+    def set_specular_model(self, model: ScreenSpaceLighting.SPECULAR_MODEL) -> None:
         ...
 class Texture:
     """
@@ -793,22 +1019,64 @@ class Texture:
         Unbind GL_TEXTURE_2D of the specified texture unit (e.g., gl.TEXTURE0 + 1). The active texture unit is set to gl.TEXTURE0 afterwards.
         """
 class ThinLines(Drawable):
+    """
+    Drawable to draw a set of lines with GL_LINES (fixed width in pixels).
+    """
     @typing.overload
-    def __init__(self, points: numpy.ndarray[numpy.float32], line_strip: bool = False) -> None:
+    def __init__(self, points: numpy.ndarray[numpy.float32], line_strip: bool = False, line_width: float = 1.0) -> None:
         ...
     @typing.overload
-    def __init__(self, points: numpy.ndarray[numpy.float32], colors: numpy.ndarray[numpy.float32], line_strip: bool = False) -> None:
+    def __init__(self, points: numpy.ndarray[numpy.float32], colors: numpy.ndarray[numpy.float32], line_strip: bool = False, line_width: float = 1.0) -> None:
         ...
     @typing.overload
-    def __init__(self, points: list[numpy.ndarray[numpy.float32[3, 1]]], line_strip: bool = False) -> None:
+    def __init__(self, points: list[numpy.ndarray[numpy.float32[3, 1]]], line_strip: bool = False, line_width: float = 1.0) -> None:
         ...
     @typing.overload
-    def __init__(self, points: list[numpy.ndarray[numpy.float32[3, 1]]], colors: list[numpy.ndarray[numpy.float32[4, 1]]], line_strip: bool = False) -> None:
+    def __init__(self, points: list[numpy.ndarray[numpy.float32[3, 1]]], colors: list[numpy.ndarray[numpy.float32[4, 1]]], line_strip: bool = False, line_width: float = 1.0) -> None:
         ...
     @typing.overload
-    def __init__(self, x: numpy.ndarray[numpy.float32[m, 1]] = ..., y: numpy.ndarray[numpy.float32[m, 1]] = ..., z: numpy.ndarray[numpy.float32[m, 1]] = ..., c: numpy.ndarray[numpy.float32[m, 1]] = ..., line_strip: bool = True) -> None:
+    def __init__(self, x: numpy.ndarray[numpy.float32[m, 1]] = ..., y: numpy.ndarray[numpy.float32[m, 1]] = ..., z: numpy.ndarray[numpy.float32[m, 1]] = ..., c: numpy.ndarray[numpy.float32[m, 1]] = ..., line_strip: bool = True, line_width: float = 1.0) -> None:
         ...
     def set_line_width(self, width: float) -> None:
+        ...
+class VoxelMap(Drawable):
+    """
+    Drawable that represents a set of voxels as cubes.
+    """
+    @typing.overload
+    def __init__(self, voxels: numpy.ndarray[numpy.int32], resolution: float, mesh_options: MeshRenderingOptions = ...) -> None:
+        """
+        Create a voxel map.
+        
+        Args:
+            voxels: Integer coordinates of the voxels (N x 3 array).
+            resolution: Size of each voxel (cube) in world units.
+            mesh_options: Rendering options for the voxels and edges.
+        """
+    @typing.overload
+    def __init__(self, voxels: list[numpy.ndarray[numpy.int32[3, 1]]], resolution: float, voxel_options: MeshRenderingOptions = ...) -> None:
+        """
+        Create a voxel map.
+        
+        Args:
+            voxels: List of integer coordinates of the voxels.
+            resolution: Size of each voxel (cube) in world units.
+            voxel_options: Rendering options for the voxels and edges.
+        """
+class VoxelMapOptions:
+    """
+    Deprecated. Use MeshRenderingOptions instead.
+    """
+    edge_line_width: float
+    def __init__(self) -> None:
+        ...
+    def set_edge_alpha(self, alpha: float) -> None:
+        ...
+    def set_edge_color(self, color: numpy.ndarray[numpy.float32[4, 1]]) -> None:
+        ...
+    def set_voxel_alpha(self, alpha: float) -> None:
+        ...
+    def set_voxel_color(self, color: numpy.ndarray[numpy.float32[4, 1]]) -> None:
         ...
 def colormap(colormap_type: COLORMAP, x: int) -> numpy.ndarray[numpy.int32[4, 1]]:
     ...
@@ -819,38 +1087,101 @@ def colormap_categoricalf(colormap_type: COLORMAP, x: int, num_categories: int) 
 def colormapf(colormap_type: COLORMAP, x: float) -> numpy.ndarray[numpy.float32[4, 1]]:
     ...
 def create_pointcloud_buffer(points: numpy.ndarray[numpy.float32[m, 3]], colors: numpy.ndarray[numpy.float32[m, 4]] = ...) -> PointCloudBuffer:
-    ...
+    """
+    Create a point cloud buffer.
+    
+    Args:
+        points: Point positions (N x 3 array).
+        colors: Point colors (N x 4 array). Ignored if the number of rows differs from that of points.
+    """
 def create_texture(image_uint8: numpy.ndarray[numpy.uint8]) -> Texture:
-    ...
+    """
+    Create an RGBA8 texture from a uint8 image.
+    
+    Args:
+        image_uint8: Image of shape (height, width) or (height, width, channels).
+                     3- and 4-channel images are interpreted as BGR and BGRA (OpenCV order).
+    
+    Returns:
+        Created texture, or None if the image shape is invalid.
+    """
 def create_texture_f(image_float: numpy.ndarray[numpy.float32]) -> Texture:
-    ...
+    """
+    Create an RGBA8 texture from a float image.
+    
+    Args:
+        image_float: Image of shape (height, width) or (height, width, channels) with values in [0, 1].
+                     3- and 4-channel images are interpreted as BGR and BGRA (OpenCV order).
+    
+    Returns:
+        Created texture, or None if the image shape is invalid.
+    """
 def get_data_path() -> str:
-    ...
+    """
+    Get the path to the data directory (shaders, fonts, etc.).
+    """
 def load_ply(filename: str) -> PLYData:
-    ...
+    """
+    Load a PLY file.
+    
+    Args:
+        filename: File path.
+    
+    Returns:
+        PLY data if successful, None otherwise.
+    """
 @typing.overload
 def save_ply(filename: str, ply: PLYData, binary: bool = True) -> bool:
-    ...
+    """
+    Save a PLY file.
+    
+    Args:
+        filename: File path.
+        ply: PLY data.
+        binary: If True, save in binary format. Otherwise, save in ASCII format.
+    
+    Returns:
+        True if successful, False otherwise.
+    """
 @typing.overload
-def save_ply(arg0: str, arg1: numpy.ndarray[numpy.float32[m, n]]) -> bool:
-    ...
-def set_data_path(arg0: str) -> None:
-    ...
+def save_ply(filename: str, points: numpy.ndarray[numpy.float32[m, n]]) -> bool:
+    """
+    Save points to a binary PLY file.
+    
+    Args:
+        filename: File path.
+        points: Point positions (N x 3 or N x 4 array).
+    
+    Returns:
+        True if successful, False otherwise.
+    """
+def set_data_path(data_path: str) -> None:
+    """
+    Set the path to the data directory (shaders, fonts, etc.).
+    """
 AUTUMN: COLORMAP  # value = <COLORMAP.AUTUMN: 6>
 BLUE_RED: COLORMAP  # value = <COLORMAP.BLUE_RED: 9>
+CHAR: PLYPropertyType  # value = <PLYPropertyType.CHAR: 0>
 CIVIDIS: COLORMAP  # value = <COLORMAP.CIVIDIS: 2>
 COOL_WARM: COLORMAP  # value = <COLORMAP.COOL_WARM: 17>
 CURL: COLORMAP  # value = <COLORMAP.CURL: 16>
+DOUBLE: PLYPropertyType  # value = <PLYPropertyType.DOUBLE: 7>
+FLOAT: PLYPropertyType  # value = <PLYPropertyType.FLOAT: 6>
 GREAN_YELLOW: COLORMAP  # value = <COLORMAP.GREAN_YELLOW: 8>
 HELIX: COLORMAP  # value = <COLORMAP.HELIX: 13>
+INT: PLYPropertyType  # value = <PLYPropertyType.INT: 4>
 JET: COLORMAP  # value = <COLORMAP.JET: 1>
 OCEAN: COLORMAP  # value = <COLORMAP.OCEAN: 3>
 PASTEL: COLORMAP  # value = <COLORMAP.PASTEL: 12>
 PHASE: COLORMAP  # value = <COLORMAP.PHASE: 14>
 PUBUGN: COLORMAP  # value = <COLORMAP.PUBUGN: 10>
+SHORT: PLYPropertyType  # value = <PLYPropertyType.SHORT: 2>
 SPRING: COLORMAP  # value = <COLORMAP.SPRING: 4>
 SUMMER: COLORMAP  # value = <COLORMAP.SUMMER: 5>
 TURBID: COLORMAP  # value = <COLORMAP.TURBID: 11>
 TURBO: COLORMAP  # value = <COLORMAP.TURBO: 0>
+UCHAR: PLYPropertyType  # value = <PLYPropertyType.UCHAR: 1>
+UINT: PLYPropertyType  # value = <PLYPropertyType.UINT: 5>
+USHORT: PLYPropertyType  # value = <PLYPropertyType.USHORT: 3>
 VEGETATION: COLORMAP  # value = <COLORMAP.VEGETATION: 15>
 WINTER: COLORMAP  # value = <COLORMAP.WINTER: 7>
