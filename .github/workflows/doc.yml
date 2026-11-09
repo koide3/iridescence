@@ -7,14 +7,18 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: write  # required by mkdocs gh-deploy to push the gh-pages branch
+
 jobs:
   gendoc:
     name: Generate documentation
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
 
       - name: Configure Git Credentials
@@ -31,10 +35,15 @@ jobs:
       - name: Generate documentation
         run: cd docs && make all
       
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site
           path: ./site/*
 
+      # Credentials are not persisted by actions/checkout; provide them only for the push step
       - name: Deploy documentation
-        run: cd docs && make deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          cd docs && make deploy

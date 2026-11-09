@@ -5,6 +5,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions: {}  # GITHUB_TOKEN is not used (dispatch uses secrets.PAT)
+
 jobs:
   dispatch:
     strategy:
@@ -13,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
           token: ${{ secrets.PAT }}
           repository: ${{ matrix.repo }}
