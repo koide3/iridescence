@@ -300,6 +300,12 @@ std::shared_ptr<glk::Texture> texture = ...;
 mesh->set_texture(texture);
 ```
 
+## Grid map, Elevation map, 3D Voxel map
+
+See [src/example/02_light_viewer_maps.cpp](https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_maps.cpp)
+
+<img src="https://github.com/user-attachments/assets/66f8f475-126d-4a2e-8ce6-db729c790805" />
+
 ## 2D Drawings
 
 **guik::HoveredDrawings** projects 3D object positions on the screen and draws 2D primitives on the projected positions.

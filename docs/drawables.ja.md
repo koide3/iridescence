@@ -310,6 +310,13 @@ std::shared_ptr<glk::Texture> texture = ...;
 mesh->set_texture(texture);
 ```
 
+## Grid map, Elevation map, 3D Voxel map
+
+[src/example/02_light_viewer_maps.cpp](https://github.com/koide3/iridescence/blob/master/src/example/02_light_viewer_maps.cpp)参照
+
+<img src="https://github.com/user-attachments/assets/66f8f475-126d-4a2e-8ce6-db729c790805" />
+
+
 ## 2Dオブジェクト
 
 **guik::HoveredDrawings** は三次元座標位置を画面に投影し、投影された画面上位置に2Dプリミティブを描画します。

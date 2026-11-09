@@ -30,6 +30,16 @@ GLSLShader::~GLSLShader() {
   }
 }
 
+bool GLSLShader::attach_source_code(const std::string& source_code, GLuint shader_type) {
+  GLuint shader = create_shader(source_code, shader_type);
+  if (shader == GL_FALSE) {
+    return false;
+  }
+
+  shaders.push_back(shader);
+  return true;
+}
+
 bool GLSLShader::attach_source(
   const std::string& filename,
   const std::unordered_set<std::string>& include_filenames,
@@ -58,7 +68,7 @@ bool GLSLShader::attach_source(
   const std::vector<std::pair<std::string, std::string>>& replaces,
   GLuint shader_type) {
   for (const auto& filename : filenames) {
-    if (!attach_source(filename, include_filenames, defines, shader_type)) {
+    if (!attach_source(filename, include_filenames, defines, replaces, shader_type)) {
       return false;
     }
   }
@@ -201,6 +211,18 @@ bool GLSLShader::init(const std::vector<std::string>& vertex_shader_paths, const
   return link_program();
 }
 
+GLuint GLSLShader::id() const {
+  return shader_program;
+}
+
+void GLSLShader::use() const {
+  glUseProgram(shader_program);
+}
+
+void GLSLShader::unuse() const {
+  glUseProgram(0);
+}
+
 GLint GLSLShader::attrib(std::uint64_t name, const char* debug_msg) {
   auto found = std::find_if(attrib_cache.begin(), attrib_cache.end(), [&name](const auto& pair) { return pair.first == name; });
   if (found != attrib_cache.end()) {
@@ -307,14 +329,71 @@ void GLSLShader::set_subroutine(GLenum shader_type, const std::string& loc, cons
   glUniformSubroutinesuiv(shader_type, num_subroutines, indices.data());
 }
 
+GLuint GLSLShader::create_shader(const std::string& source, GLuint shader_type, const std::string& filename) {
+  GLuint shader_id = glCreateShader(shader_type);
+
+  GLint result = GL_FALSE;
+  int info_log_length = 0;
+
+  char const* source_ptr = source.c_str();
+  glShaderSource(shader_id, 1, &source_ptr, nullptr);
+  glCompileShader(shader_id);
+
+  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
+  glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+
+  std::vector<char> error_message(info_log_length);
+  glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
+
+  const auto split_lines = [](const std::string& text) {
+    std::vector<std::string> tokens;
+
+    size_t loc = 0;
+    size_t found = 0;
+
+    do {
+      found = text.find_first_of('\n', loc);
+      tokens.push_back(text.substr(loc, found - loc));
+      loc = found + 1;
+    } while (found != std::string::npos);
+
+    return tokens;
+  };
+
+  if (result != GL_TRUE) {
+    std::cerr << bold_red << "error : failed to compile shader " << filename << "\033[0m" << std::endl;
+
+    std::vector<std::string> source_lines = split_lines(source);
+    std::vector<std::string> error_lines = split_lines(std::string(error_message.begin(), error_message.end()));
+
+    for (const auto& error_line : error_lines) {
+      std::cerr << error_line << std::endl;
+
+      std::smatch matched;
+      if (std::regex_search(error_line, matched, std::regex("[0-9]+\\(([0-9]+)\\) : (error|warning)"))) {
+        const int line = std::stoi(matched.str(1)) - 1;
+
+        if (line < source_lines.size()) {
+          std::cout << console::cyan << "       :            : L" << line << "= " << source_lines[line] << console::reset << std::endl;
+        } else {
+          std::cout << console::cyan << "       :            : L" << line << "= out of source" << console::reset << std::endl;
+        }
+      }
+    }
+
+    glDeleteShader(shader_id);
+    return GL_FALSE;
+  }
+
+  return shader_id;
+}
+
 GLuint GLSLShader::read_shader_from_file(
   const std::string& filename,
   const std::unordered_map<std::string, std::string>& include_map,
   const std::string& defines,
   const std::vector<std::pair<std::string, std::string>>& replaces,
   GLuint shader_type) {
-  GLuint shader_id = glCreateShader(shader_type);
-
   const auto read_source = [](const std::string& filename) -> std::string {
     std::ifstream ifs(filename);
     if (!ifs) {
@@ -370,58 +449,7 @@ GLuint GLSLShader::read_shader_from_file(
     source = std::regex_replace(source, std::regex(replace.first), replace.second);
   }
 
-  GLint result = GL_FALSE;
-  int info_log_length = 0;
-
-  char const* source_ptr = source.c_str();
-  glShaderSource(shader_id, 1, &source_ptr, nullptr);
-  glCompileShader(shader_id);
-
-  glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
-  glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
-
-  std::vector<char> error_message(info_log_length);
-  glGetShaderInfoLog(shader_id, info_log_length, nullptr, error_message.data());
-
-  const auto split_lines = [](const std::string& text) {
-    std::vector<std::string> tokens;
-
-    size_t loc = 0;
-    size_t found = 0;
-
-    do {
-      found = text.find_first_of('\n', loc);
-      tokens.push_back(text.substr(loc, found - loc));
-      loc = found + 1;
-    } while (found != std::string::npos);
-
-    return tokens;
-  };
-
-  if (result != GL_TRUE) {
-    const std::string error_text(error_message.begin(), error_message.end());
-    std::cerr << bold_red << "error : failed to compile shader " << filename << "\033[0m" << std::endl;
-
-    std::vector<std::string> source_lines = split_lines(source);
-    std::vector<std::string> error_lines = split_lines(std::string(error_message.begin(), error_message.end()));
-
-    for (const auto& error_line : error_lines) {
-      std::cerr << error_line << std::endl;
-
-      std::smatch matched;
-      if (std::regex_search(error_line, matched, std::regex("[0-9]+\\(([0-9]+)\\) : (error|warning)"))) {
-        const int line = std::stoi(matched.str(1)) - 1;
-
-        if (line < source_lines.size()) {
-          std::cout << console::cyan << "       :            : L" << line << "= " << source_lines[line] << console::reset << std::endl;
-        } else {
-          std::cout << console::cyan << "       :            : L" << line << "= out of source" << console::reset << std::endl;
-        }
-      }
-    }
-  }
-
-  return shader_id;
+  return create_shader(source, shader_type, filename);
 }
 
 int GLSLShader::get_uniformi(std::uint64_t name) {

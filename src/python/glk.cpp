@@ -228,6 +228,12 @@ void define_glk(py::module_& m) {
   gl_.attr("MIRRORED_REPEAT") = py::int_(static_cast<int>(GL_MIRRORED_REPEAT));
   gl_.attr("REPEAT") = py::int_(static_cast<int>(GL_REPEAT));
   gl_.attr("TEXTURE0") = py::int_(static_cast<int>(GL_TEXTURE0));
+  gl_.attr("VERTEX_SHADER") = py::int_(static_cast<int>(GL_VERTEX_SHADER));
+  gl_.attr("FRAGMENT_SHADER") = py::int_(static_cast<int>(GL_FRAGMENT_SHADER));
+  gl_.attr("GEOMETRY_SHADER") = py::int_(static_cast<int>(GL_GEOMETRY_SHADER));
+  gl_.attr("TESS_CONTROL_SHADER") = py::int_(static_cast<int>(GL_TESS_CONTROL_SHADER));
+  gl_.attr("TESS_EVALUATION_SHADER") = py::int_(static_cast<int>(GL_TESS_EVALUATION_SHADER));
+  gl_.attr("COMPUTE_SHADER") = py::int_(static_cast<int>(GL_COMPUTE_SHADER));
 
   // enums
   py::enum_<glk::COLORMAP>(glk_, "COLORMAP")
@@ -254,6 +260,52 @@ void define_glk(py::module_& m) {
   // classes
   // glk::GLSLShader
   py::class_<glk::GLSLShader>(glk_, "GLSLShader")
+    .def(py::init<>())
+    .def(
+      "attach_source",
+      [](
+        glk::GLSLShader& shader,
+        const std::string& filename,
+        GLuint shader_type,
+        const std::vector<std::string>& include_filenames,
+        const std::string& defines,
+        const std::vector<std::pair<std::string, std::string>>& replaces) {
+        return shader.attach_source(filename, {include_filenames.begin(), include_filenames.end()}, defines, replaces, shader_type);
+      },
+      py::arg("filename"),
+      py::arg("shader_type"),
+      py::arg("include_filenames") = std::vector<std::string>(),
+      py::arg("defines") = "",
+      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>())
+    .def(
+      "attach_source",
+      [](
+        glk::GLSLShader& shader,
+        const std::vector<std::string>& filenames,
+        GLuint shader_type,
+        const std::vector<std::string>& include_filenames,
+        const std::string& defines,
+        const std::vector<std::pair<std::string, std::string>>& replaces) {
+        return shader.attach_source(filenames, {include_filenames.begin(), include_filenames.end()}, defines, replaces, shader_type);
+      },
+      py::arg("filenames"),
+      py::arg("shader_type"),
+      py::arg("include_filenames") = std::vector<std::string>(),
+      py::arg("defines") = "",
+      py::arg("replaces") = std::vector<std::pair<std::string, std::string>>())
+    .def("attach_source_code", &glk::GLSLShader::attach_source_code, py::arg("source_code"), py::arg("shader_type"))
+    .def("link_program", &glk::GLSLShader::link_program)
+    .def("init", py::overload_cast<const std::string&>(&glk::GLSLShader::init), py::arg("shader_path"))
+    .def(
+      "init",
+      py::overload_cast<const std::string&, const std::string&>(&glk::GLSLShader::init),
+      py::arg("vertex_shader_path"),
+      py::arg("fragment_shader_path"))
+    .def(
+      "init",
+      py::overload_cast<const std::vector<std::string>&, const std::vector<std::string>&>(&glk::GLSLShader::init),
+      py::arg("vertex_shader_paths"),
+      py::arg("fragment_shader_paths"))
     .def("id", &glk::GLSLShader::id)
     .def("use", &glk::GLSLShader::use)
     .def("unuse", &glk::GLSLShader::unuse)
@@ -263,6 +315,7 @@ void define_glk(py::module_& m) {
     .def("get_uniformf", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniformf(name); }, py::arg("name"))
     .def("get_uniform4f", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform4f(name); }, py::arg("name"))
     .def("get_uniform_matrix4f", [](glk::GLSLShader& shader, const std::string& name) { return shader.get_uniform_matrix4f(name); }, py::arg("name"))
+    .def("copy_cached_uniforms", &glk::GLSLShader::copy_cached_uniforms, py::arg("other"))
     // Float vector overloads come before int ones so that lists and float64 arrays are converted to float vectors.
     // Pass np.int32 arrays to set integer vector uniforms.
     .def("set_uniform", [](glk::GLSLShader& shader, const std::string& name, int value) { shader.set_uniform(name, value); }, py::arg("name"), py::arg("value"))

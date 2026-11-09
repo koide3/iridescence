@@ -19,6 +19,33 @@
 namespace glk {
 
 /// @brief GLSLShader is a wrapper for OpenGL shader programs.
+/// @details
+/// Building a shader program
+/// --- Option 1: From source files ---
+/// auto shader = std::make_shared<glk::GLSLShader>();
+/// shader->attach_source("vertex_shader.glsl", GL_VERTEX_SHADER);
+/// shader->attach_source("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+/// shader->link_program();
+/// --- Option 2: From source files ---
+/// std::string vs_source = "...";  // Vertex shader source code
+/// std::string fs_source = "...";  // Fragment shader source code
+/// shader->attach_source(vs_source, GL_VERTEX_SHADER);
+/// shader->attach_source(fs_source, GL_FRAGMENT_SHADER);
+/// shader->link_program();
+///
+/// Getting attribute and uniform locations
+/// ---
+/// shader->use();
+/// GLint position_loc = shader->attrib("position");
+/// GLint color_loc = shader->attrib("color");
+/// GLint model_matrix_loc = shader->uniform("model_matrix");
+/// shader->unuse();
+/// ---
+///
+/// Copying (cached) uniform variables from another shader
+/// ---
+/// dst_shader->copy_cached_uniforms(src_shader);
+/// ---
 class GLSLShader {
 public:
   GLSLShader();
@@ -36,6 +63,14 @@ public:
     const std::string& defines,
     const std::vector<std::pair<std::string, std::string>>& replaces,
     GLuint shader_type);
+
+  /// @brief Attach shader source code from multiple files, with optional include files, defines, and replacements.
+  /// @param filenames          Filenames of the shader source files to attach.
+  /// @param include_filenames  Filenames of the include files to be inserted into the shader source code.
+  /// @param defines            Preprocessor definitions to be added to the shader source code.
+  /// @param replaces           Pairs of strings representing text replacements to be made in the shader source code.
+  /// @param shader_type        Type of shader (e.g., GL_VERTEX_SHADER, GL_FRAGMENT_SHADER).
+  /// @return                   True if all shader source files were successfully attached, false otherwise.
   bool attach_source(
     const std::vector<std::string>& filenames,
     const std::unordered_set<std::string>& include_filenames,
@@ -43,17 +78,28 @@ public:
     const std::vector<std::pair<std::string, std::string>>& replaces,
     GLuint shader_type);
 
+  /// @brief Attach shader source code from a string
+  /// @param source_code  Source code text
+  /// @param shader_type  Type of shader
+  /// @return             True if the shader source code was successfully attached, false otherwise.
+  bool attach_source_code(const std::string& source_code, GLuint shader_type);
+
   bool add_feedback_varying(const std::string& name);
 
+  /// @brief Link attached shaders into a shader program.
+  /// @return true if linking is successful, false otherwise.
   bool link_program();
 
   bool init(const std::string& shader_path);
   bool init(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
   bool init(const std::vector<std::string>& vertex_shader_paths, const std::vector<std::string>& fragment_shader_paths);
 
-  GLuint id() const { return shader_program; }
-  void use() const { glUseProgram(shader_program); }
-  void unuse() const { glUseProgram(0); }
+  /// @brief Returns shader ID
+  GLuint id() const;
+  /// @brief Use the shader in the OpenGL context
+  void use() const;
+  /// @brief Unuse the shader
+  void unuse() const;
 
   GLint attrib(std::uint64_t name, const char* debug_msg = nullptr);
   GLint attrib(const std::string& name);
@@ -162,6 +208,8 @@ public:
   void set_subroutine(GLenum shader_type, const std::string& loc, const std::string& func);
 
 private:
+  GLuint create_shader(const std::string& source, GLuint shader_type, const std::string& filename = "");
+
   GLuint read_shader_from_file(
     const std::string& filename,
     const std::unordered_map<std::string, std::string>& include_map,
