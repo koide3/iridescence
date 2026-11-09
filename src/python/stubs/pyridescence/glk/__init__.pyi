@@ -572,7 +572,7 @@ class ScreenSpaceLighting(ScreenEffect):
         def set_edge_color(self, color: numpy.ndarray[np.int32[4,1]]):
             ...
     class VoxelMap(Drawable):
-        def __init__(voxels: numpy.ndarray[np.int32[m, 3]], int num_voxels, voxel_resolution: float, voxel_options:VoxelMapOptions = VoxelMapOptions()):
+        def __init__(voxels: numpy.ndarray[np.int32[m, 3]], num_voxels: int, voxel_resolution: float, voxel_options:VoxelMapOptions = VoxelMapOptions()):
             ...
     class IRIDESCENCE_MODEL:
         """
