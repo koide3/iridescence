@@ -100,9 +100,9 @@ def update_points():
     attributes['intensities'] = cloud.intensities
     attributes['intensity_colormap'] = cmap_type
     setting = guik.VertexColor(model)
-  else:  # Per-point scalar values converted to colors with the viewer's colormap on GPU (color_mode=4: VERTEX_COLORMAP)
+  else:  # Per-point scalar values converted to colors with the viewer's colormap on GPU
     attributes['cmaps'] = cloud.cmaps
-    setting = guik.Rainbow(model).set_color_mode(4).add('cmap_range', numpy.array([0.0, 0.5 * cloud.extent], dtype=numpy.float32))
+    setting = guik.VertexColorMap(model).add('cmap_range', numpy.array([0.0, 0.5 * cloud.extent], dtype=numpy.float32))
 
   # Point shape: size in meters (metric) or pixels (screenspace), and circle or rectangle
   setting.set_point_shape(point_size, metric, circle)

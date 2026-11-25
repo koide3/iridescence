@@ -374,6 +374,25 @@ The coloring band can be changed by setting `z_range` param (e.g., add("z_range"
       py::arg("trans") = Eigen::Vector3f::Zero(),
       py::arg("rot") = Eigen::Matrix3f::Identity());
 
+  // guik::VertexColorMap
+  py::class_<guik::VertexColorMap, guik::ShaderSetting, std::shared_ptr<guik::VertexColorMap>>(
+    guik_,
+    "VertexColorMap",
+    R"doc(Vertex colormap scheme that assigns colors by applying the viewer colormap to per-vertex scalar values
+(e.g., cmaps of update_points and the color map of glk.ElevationMap). The value range is given by the "cmap_range" parameter.)doc")
+    .def(py::init<>())
+    .def(py::init<Eigen::Matrix4f>(), py::arg("model_matrix"))
+    .def(
+      py::init([](float scale, const Eigen::Vector3f& trans, const Eigen::Matrix3f& rot) {
+        Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+        mat.block<3, 3>(0, 0) = scale * rot;
+        mat.block<3, 1>(0, 3) = trans;
+        return new guik::VertexColorMap(mat);
+      }),
+      py::arg("scale") = 1.0,
+      py::arg("trans") = Eigen::Vector3f::Zero(),
+      py::arg("rot") = Eigen::Matrix3f::Identity());
+
   // guik::FlatColor
   py::class_<guik::FlatColor, guik::ShaderSetting, std::shared_ptr<guik::FlatColor>>(guik_, "FlatColor", R"doc(Flat coloring scheme that assigns a single color to the object.
 If the alpha value is less than 0.999, the object is rendered as transparent.
@@ -670,8 +689,32 @@ The camera always looks at the sensor position, with user-controlled azimuth/ele
     .def("resize", &guik::Application::resize, py::arg("size"))
     .def("set_title", &guik::Application::set_title, py::arg("title"))
     .def("framebuffer_size", &guik::Application::framebuffer_size)
-    .def("spin", &guik::Application::spin)
-    .def("spin_once", &guik::Application::spin_once)
+    // The GIL is released while spinning so that other Python threads can run.
+    // Python callbacks (UI callbacks, drawable filters, invoked tasks, Python-derived drawables) re-acquire it by themselves.
+    .def(
+      "spin",
+      [](guik::Application& app) {
+        // Equivalent to Application::spin(), but lets Python handle signals (e.g., Ctrl-C) between frames
+        while (true) {
+          bool ok = false;
+          {
+            py::gil_scoped_release release;
+            ok = app.spin_once();
+          }
+          if (!ok) {
+            break;
+          }
+          if (PyErr_CheckSignals() != 0) {
+            throw py::error_already_set();
+          }
+        }
+      },
+      "Spin the viewer until it is closed. The GIL is released while rendering, and KeyboardInterrupt (Ctrl-C) is raised between frames.")
+    .def(
+      "spin_once",
+      &guik::Application::spin_once,
+      py::call_guard<py::gil_scoped_release>(),
+      "Render one frame. Returns False if the viewer is closed. The GIL is released while rendering.")
     .def("close", &guik::Application::close)
     .def("closed", &guik::Application::closed);
 
@@ -1311,8 +1354,8 @@ Args:
     size: Canvas size of the sub viewer. If (-1, -1), the default size is used.
 )doc")
 
-    .def("spin_until_click", &guik::LightViewer::spin_until_click, "Spin the viewer until a mouse click event is received.")
-    .def("toggle_spin_once", &guik::LightViewer::toggle_spin_once, "Spin the viewer until a toggle flag is set to true.")
+    .def("spin_until_click", &guik::LightViewer::spin_until_click, py::call_guard<py::gil_scoped_release>(), "Spin the viewer until a mouse click event is received.")
+    .def("toggle_spin_once", &guik::LightViewer::toggle_spin_once, py::call_guard<py::gil_scoped_release>(), "Spin the viewer until a toggle flag is set to true.")
     .def("invoke", &guik::LightViewer::invoke, py::arg("func"), "Invoke a task in the visualization thread.")
     .def("invoke_after_rendering", &guik::LightViewer::invoke_after_rendering, py::arg("func"), "Invoke a task after rendering in the visualization thread.")
     .def("invoke_once", &guik::LightViewer::invoke_once, py::arg("label"), py::arg("func"), "Invoke a labeled task only once in the life time of the viewer.")

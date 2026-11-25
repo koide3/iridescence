@@ -136,6 +136,8 @@ int main(int argc, char** argv) {
 
 ### Python : Minimum example
 
+The Python package ships a usage guide for coding agents ([AGENTS.md](src/python/pyridescence/AGENTS.md)) along with type stubs and examples in the package directory.
+
 ```py
 #!/usr/bin/python3
 import numpy

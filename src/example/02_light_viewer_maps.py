@@ -26,14 +26,14 @@ viewer.update_coord('gridmap_coord', guik.VertexColor().translate(-5.0, -5.0, 0.
 hover.add_text_on('gridmap', '2D grid map')
 
 # glk.ElevationMap (from 3D surface points)
-# Rainbow().set_color_mode(4) is equivalent to guik::VertexColorMap in C++ (color from the vertex colormap attribute)
+# guik.VertexColorMap colors the surface with the vertex colormap attribute (set_cmap / color_map of the builder)
 elev_map_builder = glk.ElevationMapBuilder(resolution, (width, height), (0.0, 0.0))
 cell_indices = elev_map_builder.calc_cell_indices(surface_points)
 elev_map_builder.set_elevation(surface_points, 2, cell_indices)
 elev_map_builder.set_cmap(surface_points, 2, cell_indices)
 
 elev_map = glk.ElevationMap(elev_map_builder, glk.MeshRenderingOptions())
-viewer.update_drawable('elevation_map', elev_map, guik.Rainbow().set_color_mode(4).translate(0.0, -5.0 - width_m / 2.0, 0.0))
+viewer.update_drawable('elevation_map', elev_map, guik.VertexColorMap().translate(0.0, -5.0 - width_m / 2.0, 0.0))
 viewer.update_coord('elevation_map_coord', guik.VertexColor().translate(0.0, -5.0 - width_m / 2.0, 0.0))
 hover.add_text_on('elevation_map', '3D elevation map')
 
@@ -43,7 +43,7 @@ elev_map2_builder.elevation_map = elevation
 elev_map2_builder.color_map = 4.0 * elevation
 
 elev_map2 = glk.ElevationMap(elev_map2_builder, glk.MeshRenderingOptions().set_edge_color([0.0, 0.0, 1.0, 0.2]))
-viewer.update_drawable('elevation_map2', elev_map2, guik.Rainbow().set_color_mode(4).translate(0.0, 0.0, 0.0))
+viewer.update_drawable('elevation_map2', elev_map2, guik.VertexColorMap().translate(0.0, 0.0, 0.0))
 viewer.update_coord('elevation_map2_coord', guik.VertexColor().translate(0.0, 0.0, 0.0))
 hover.add_text_on('elevation_map2', '3D elevation map')
 

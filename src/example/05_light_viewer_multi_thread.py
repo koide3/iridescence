@@ -39,6 +39,5 @@ viewer = guik.LightViewer.instance()
 thread = threading.Thread(target=run, daemon=True)
 thread.start()
 
-# Use spin_once() in a Python loop instead of spin() so that the background Python thread can take the GIL between frames.
-while viewer.spin_once():
-  pass
+# The GIL is released while the viewer is rendering, so the background Python thread keeps running during spin().
+viewer.spin()

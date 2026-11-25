@@ -343,6 +343,20 @@ class TextureColor(ShaderSetting):
     @typing.overload
     def __init__(self, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, trans: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 1]"] = ..., rot: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 3]"] = ...) -> None:
         ...
+class VertexColorMap(ShaderSetting):
+    """
+    Vertex colormap scheme that assigns colors by applying the viewer colormap to per-vertex scalar values
+    (e.g., cmaps of update_points and the color map of glk.ElevationMap). The value range is given by the "cmap_range" parameter.
+    """
+    @typing.overload
+    def __init__(self) -> None:
+        ...
+    @typing.overload
+    def __init__(self, model_matrix: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"]) -> None:
+        ...
+    @typing.overload
+    def __init__(self, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, trans: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 1]"] = ..., rot: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 3]"] = ...) -> None:
+        ...
 class FlatColor(ShaderSetting):
     """
     Flat coloring scheme that assigns a single color to the object.
@@ -644,9 +658,13 @@ class Application:
     def show_window(self) -> None:
         ...
     def spin(self) -> None:
-        ...
+        """
+        Spin the viewer until it is closed. The GIL is released while rendering, and KeyboardInterrupt (Ctrl-C) is raised between frames.
+        """
     def spin_once(self) -> bool:
-        ...
+        """
+        Render one frame. Returns False if the viewer is closed. The GIL is released while rendering.
+        """
     def window_size(self) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[2, 1]"]:
         ...
 class LightViewerContext:
