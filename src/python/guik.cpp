@@ -4,6 +4,8 @@
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 
+#include <optional>
+#include <Eigen/Geometry>
 #include <filesystem>
 
 #include <glk/path.hpp>
@@ -24,10 +26,62 @@
 #include <guik/viewer/light_viewer.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
+#include "py_drawable.hpp"
 
 namespace py = pybind11;
 
 static bool is_first = true;
+
+using RowMatrixXf = Eigen::Matrix<float, -1, -1, Eigen::RowMajor>;
+
+/// @brief Data pointer of an optional per-point attribute, or nullptr if it is not given or empty.
+template <typename T>
+const float* optional_attribute_data(const std::optional<T>& attr) {
+  return (attr && attr->size() != 0) ? attr->data() : nullptr;
+}
+
+/// @brief Validate inputs of update_points with optional attributes. Prints a warning and returns false if invalid.
+bool validate_point_attributes(
+  const RowMatrixXf& points,
+  const std::optional<RowMatrixXf>& normals,
+  const std::optional<RowMatrixXf>& colors,
+  const std::optional<Eigen::VectorXf>& intensities,
+  const std::optional<Eigen::VectorXf>& cmaps) {
+  if (points.cols() != 3 && points.cols() != 4) {
+    std::cerr << "warning: points must be Nx3 or Nx4" << std::endl;
+    return false;
+  }
+
+  const auto check_rows = [&](const auto& attr, const char* attr_name) {
+    if (!optional_attribute_data(attr) || attr->rows() == points.rows()) {
+      return true;
+    }
+    std::cerr << "warning: " << attr_name << " must have the same number of rows as points (" << attr->rows() << " vs " << points.rows() << ")" << std::endl;
+    return false;
+  };
+  const auto check_cols = [&](const std::optional<RowMatrixXf>& attr, const char* attr_name) {
+    if (!optional_attribute_data(attr) || attr->cols() == 3 || attr->cols() == 4) {
+      return true;
+    }
+    std::cerr << "warning: " << attr_name << " must be Nx3 or Nx4" << std::endl;
+    return false;
+  };
+
+  if (!check_rows(normals, "normals") || !check_cols(normals, "normals")) {
+    return false;
+  }
+  if (!check_rows(colors, "colors") || !check_cols(colors, "colors")) {
+    return false;
+  }
+  if (!check_rows(intensities, "intensities") || !check_rows(cmaps, "cmaps")) {
+    return false;
+  }
+  if (optional_attribute_data(colors) && optional_attribute_data(intensities)) {
+    std::cerr << "warning: colors and intensities cannot be given at the same time (both are written to vert_color)" << std::endl;
+    return false;
+  }
+  return true;
+}
 
 template <typename Color>
 void define_flat_color(py::module_& guik_, const std::string& name) {
@@ -448,12 +502,12 @@ The camera always looks at the sensor position, with user-controlled azimuth/ele
 )doc")
     .def(
       "set_sensor_pose",
-      [](guik::SensorViewCameraControl& control, const Eigen::Isometry3f& T_world_sensor) { control.set_sensor_pose(T_world_sensor); },
+      [](guik::SensorViewCameraControl& control, const Eigen::Matrix4f& T_world_sensor) { control.set_sensor_pose(Eigen::Isometry3f(T_world_sensor)); },
       py::arg("T_world_sensor"),
       "Set the raw sensor pose (T_world_sensor, 4x4 matrix).")
     .def(
       "set_sensor_camera_transform",
-      [](guik::SensorViewCameraControl& control, const Eigen::Isometry3f& T_sensor_camera) { control.set_sensor_camera_transform(T_sensor_camera); },
+      [](guik::SensorViewCameraControl& control, const Eigen::Matrix4f& T_sensor_camera) { control.set_sensor_camera_transform(Eigen::Isometry3f(T_sensor_camera)); },
       py::arg("T_sensor_camera"),
       "Set the transform from sensor frame to camera frame (T_sensor_camera, 4x4 matrix).")
     .def(
@@ -823,8 +877,10 @@ Args:
     .def("use_fps_camera_control", &guik::LightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0, "Use FPS game-like camera control.")
     .def(
       "use_sensor_view_camera_control",
-      &guik::LightViewerContext::use_sensor_view_camera_control,
-      py::arg("T_sensor_camera"),
+      [](guik::LightViewerContext& context, const Eigen::Matrix4f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+        return context.use_sensor_view_camera_control(Eigen::Isometry3f(T_sensor_camera), smoothing_factor_trans, smoothing_factor_rot);
+      },
+      py::arg("T_sensor_camera") = (Eigen::Translation3f(-5.0f, 0.0f, 0.1f) * Eigen::Isometry3f::Identity()).matrix(),
       py::arg("smoothing_factor_trans") = 0.75,
       py::arg("smoothing_factor_rot") = 0.9,
       R"doc(Use sensor-view camera control that follows a given sensor pose (set via SensorViewCameraControl.set_sensor_pose()).
@@ -950,6 +1006,76 @@ Args:
 
 Returns:
     Created PointCloudBuffer, or None if points has an invalid shape.
+)doc")
+
+    .def(
+      "update_points",
+      [](
+        guik::LightViewerContext& context,
+        const std::string& name,
+        const RowMatrixXf& points,
+        const std::optional<RowMatrixXf>& normals,
+        const std::optional<RowMatrixXf>& colors,
+        const std::optional<Eigen::VectorXf>& intensities,
+        const std::optional<Eigen::VectorXf>& cmaps,
+        const guik::ShaderSetting& shader_setting,
+        glk::COLORMAP intensity_colormap) -> std::shared_ptr<glk::PointCloudBuffer> {
+        if (!validate_point_attributes(points, normals, colors, intensities, cmaps)) {
+          return nullptr;
+        }
+
+        const int num_points = points.rows();
+        auto cloud_buffer = std::make_shared<glk::PointCloudBuffer>(points.data(), sizeof(float) * points.cols(), num_points);
+
+        if (const float* data = optional_attribute_data(normals)) {
+          cloud_buffer->add_normals(data, sizeof(float) * normals->cols(), num_points);
+        }
+
+        if (const float* data = optional_attribute_data(colors)) {
+          if (colors->cols() == 4) {
+            cloud_buffer->add_color(data, sizeof(float) * 4, num_points);
+          } else {
+            Eigen::Matrix<float, -1, 4, Eigen::RowMajor> colors4(num_points, 4);
+            colors4.leftCols<3>() = *colors;
+            colors4.col(3).setOnes();
+            cloud_buffer->add_color(colors4.data(), sizeof(float) * 4, num_points);
+          }
+        }
+
+        if (const float* data = optional_attribute_data(intensities)) {
+          cloud_buffer->add_intensity(intensity_colormap, data, num_points);
+        }
+
+        if (const float* data = optional_attribute_data(cmaps)) {
+          cloud_buffer->add_colormap(data, sizeof(float), num_points);
+        }
+
+        context.update_drawable(name, cloud_buffer, shader_setting);
+        return cloud_buffer;
+      },
+      py::arg("name"),
+      py::arg("points"),
+      py::arg("normals") = py::none(),
+      py::arg("colors") = py::none(),
+      py::arg("intensities") = py::none(),
+      py::arg("cmaps") = py::none(),
+      py::arg("shader_setting") = guik::ShaderSetting(),
+      py::arg("intensity_colormap") = glk::COLORMAP::TURBO,
+      R"doc(Register or update a point cloud buffer with optional per-point attributes.
+Attributes that are None or empty (e.g., shape (0, 0)) are ignored.
+
+Args:
+    name: Drawable name.
+    points: Point positions (N x 3 or N x 4 array).
+    normals: Point normals (N x 3 or N x 4 array). Optional.
+    colors: Point colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+    intensities: Point intensities (N array). Optional. Converted to vertex colors with intensity_colormap (expected range [0, 1]). Cannot be used with colors.
+    cmaps: Per-point colormap values (N array). Optional. Rendered with VERTEX_COLORMAP mode.
+    shader_setting: Shader setting.
+    intensity_colormap: Colormap used to convert intensities to vertex colors.
+
+Returns:
+    Created PointCloudBuffer, or None if any input has an invalid shape.
 )doc")
 
     .def(
@@ -1445,6 +1571,19 @@ Args:
     callback: Callback function. If None, the callback with the given name is removed.
 )doc")
     .def("remove_ui_callback", &guik::AsyncLightViewerContext::remove_ui_callback, py::arg("callback_name"), "Remove a UI callback function.")
+    .def(
+      "register_drawable_filter",
+      &guik::AsyncLightViewerContext::register_drawable_filter,
+      py::arg("filter_name"),
+      py::arg("filter"),
+      R"doc(Register a drawable filter. Drawables for which filter(name) returns False are not rendered.
+The filter function is called in the viewer thread.
+
+Args:
+    filter_name: Filter name.
+    filter: Filter function that takes a drawable name and returns a bool. If None, the filter with the given name is removed.
+)doc")
+    .def("remove_drawable_filter", &guik::AsyncLightViewerContext::remove_drawable_filter, py::arg("filter_name"), "Remove a drawable filter.")
 
     .def("disable_xy_grid", &guik::AsyncLightViewerContext::disable_xy_grid, "Disable XY grid drawing.")
     .def("enable_xy_grid", &guik::AsyncLightViewerContext::enable_xy_grid, "Enable XY grid drawing.")
@@ -1534,8 +1673,10 @@ Args:
     .def("use_fps_camera_control", &guik::AsyncLightViewerContext::use_fps_camera_control, py::arg("fovy_deg") = 60.0, "Use FPS game-like camera control.")
     .def(
       "use_sensor_view_camera_control",
-      &guik::AsyncLightViewerContext::use_sensor_view_camera_control,
-      py::arg("T_sensor_camera"),
+      [](guik::AsyncLightViewerContext& context, const Eigen::Matrix4f& T_sensor_camera, double smoothing_factor_trans, double smoothing_factor_rot) {
+        context.use_sensor_view_camera_control(Eigen::Isometry3f(T_sensor_camera), smoothing_factor_trans, smoothing_factor_rot);
+      },
+      py::arg("T_sensor_camera") = (Eigen::Translation3f(-5.0f, 0.0f, 0.1f) * Eigen::Isometry3f::Identity()).matrix(),
       py::arg("smoothing_factor_trans") = 0.75,
       py::arg("smoothing_factor_rot") = 0.9,
       R"doc(Use TPS-like sensor-view camera control.
@@ -1561,6 +1702,60 @@ Args:
       py::arg("far") = 1000.0f,
       "Use orthographic projection control.")
 
+    .def(
+      "update_drawable",
+      [](guik::AsyncLightViewerContext& context, const std::string& name, const std::shared_ptr<glk::Drawable>& drawable, const guik::ShaderSetting& shader_setting) {
+        // The drawable is released in the viewer thread, so Python-derived drawables must be released with the GIL
+        context.update_drawable(name, make_gil_safe_drawable(drawable), shader_setting);
+      },
+      py::arg("name"),
+      py::arg("drawable"),
+      py::arg("shader_setting") = guik::ShaderSetting(),
+      R"doc(Register or update a drawable. The drawable is registered in the viewer thread.
+
+The drawable must not require an OpenGL context at construction.
+Use glk.DelayedConstructor or emplace_drawable() to construct OpenGL-based drawables (e.g., glk.Mesh) in the viewer thread.
+
+Args:
+    name: Drawable name. If a drawable with the same name exists, it is replaced.
+    drawable: Drawable.
+    shader_setting: Shader setting. It is copied, and later changes to it are not reflected.
+)doc")
+    .def(
+      "emplace_drawable",
+      [](guik::AsyncLightViewerContext& context, const std::string& name, const py::object& cls, const py::args& args, const py::kwargs& kwargs) {
+        // shader_setting is consumed here, and the remaining kwargs are passed to cls
+        py::dict cls_kwargs = py::reinterpret_steal<py::dict>(PyDict_Copy(kwargs.ptr()));
+        guik::ShaderSetting shader_setting;
+        if (cls_kwargs.contains("shader_setting")) {
+          shader_setting = cls_kwargs["shader_setting"].cast<guik::ShaderSetting>();
+          PyDict_DelItemString(cls_kwargs.ptr(), "shader_setting");
+        }
+
+        auto drawable = make_py_delayed_constructor(cls, args, py::kwargs(std::move(cls_kwargs)));
+        context.update_drawable(name, drawable, shader_setting);
+        return drawable;
+      },
+      py::arg("name"),
+      py::arg("cls"),
+      R"doc(Construct a drawable as cls(*args, **kwargs) in the viewer thread and register it.
+This is a shorthand for update_drawable(name, glk.DelayedConstructor(cls, *args, **kwargs), shader_setting).
+
+Example:
+    viewer.emplace_drawable('mesh', glk.Mesh, vertices, indices, shader_setting=guik.Rainbow())
+
+Args:
+    name: Drawable name. If a drawable with the same name exists, it is replaced.
+    cls: Drawable class (or any callable returning a glk.Drawable).
+    *args: Positional arguments for cls.
+    **kwargs: Keyword arguments for cls. The keyword argument "shader_setting" is not passed to cls but used as the shader setting of the drawable.
+
+Returns:
+    glk.DelayedConstructor registered in the viewer. Use constructed() / get() to access the constructed drawable.
+
+Note:
+    The arguments are held by reference (not copied) until the construction in the viewer thread.
+)doc")
     .def("update_drawable_setting", &guik::AsyncLightViewerContext::update_drawable_setting, py::arg("name"), py::arg("setting"), "Update a drawable's shader setting.")
 
     .def(
@@ -1591,16 +1786,22 @@ Args:
         const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& points,
         const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& colors,
         const guik::ShaderSetting& shader_setting) {
-        if (points.cols() != 3 && points.cols() != 4) {
-          std::cerr << "warning: points must be Nx3 or Nx4" << std::endl;
-          return;
-        }
-        if (colors.cols() != 3 && colors.cols() != 4) {
-          std::cerr << "warning: colors must be Nx3 or Nx4" << std::endl;
+        if (!validate_point_attributes(points, std::nullopt, colors, std::nullopt, std::nullopt)) {
           return;
         }
 
-        context.update_points(name, points.data(), sizeof(float) * points.cols(), colors.data(), sizeof(float) * colors.cols(), points.rows(), shader_setting);
+        context.update_points(
+          name,
+          points.data(),
+          sizeof(float) * points.cols(),
+          nullptr,
+          0,
+          colors.size() ? colors.data() : nullptr,
+          sizeof(float) * colors.cols(),
+          nullptr,
+          nullptr,
+          points.rows(),
+          shader_setting);
       },
       py::arg("name"),
       py::arg("points"),
@@ -1613,6 +1814,59 @@ Args:
     points: Point positions (N x 3 or N x 4 array).
     colors: Point colors (N x 3 or N x 4 array).
     shader_setting: Shader setting.
+)doc")
+    .def(
+      "update_points",
+      [](
+        guik::AsyncLightViewerContext& context,
+        const std::string& name,
+        const RowMatrixXf& points,
+        const std::optional<RowMatrixXf>& normals,
+        const std::optional<RowMatrixXf>& colors,
+        const std::optional<Eigen::VectorXf>& intensities,
+        const std::optional<Eigen::VectorXf>& cmaps,
+        const guik::ShaderSetting& shader_setting,
+        glk::COLORMAP intensity_colormap) {
+        if (!validate_point_attributes(points, normals, colors, intensities, cmaps)) {
+          return;
+        }
+
+        const float* normals_data = optional_attribute_data(normals);
+        const float* colors_data = optional_attribute_data(colors);
+        context.update_points(
+          name,
+          points.data(),
+          sizeof(float) * points.cols(),
+          normals_data,
+          normals_data ? sizeof(float) * normals->cols() : 0,
+          colors_data,
+          colors_data ? sizeof(float) * colors->cols() : 0,
+          optional_attribute_data(intensities),
+          optional_attribute_data(cmaps),
+          points.rows(),
+          shader_setting,
+          intensity_colormap);
+      },
+      py::arg("name"),
+      py::arg("points"),
+      py::arg("normals") = py::none(),
+      py::arg("colors") = py::none(),
+      py::arg("intensities") = py::none(),
+      py::arg("cmaps") = py::none(),
+      py::arg("shader_setting") = guik::ShaderSetting(),
+      py::arg("intensity_colormap") = glk::COLORMAP::TURBO,
+      R"doc(Register or update a point cloud buffer with optional per-point attributes.
+Attributes that are None or empty (e.g., shape (0, 0)) are ignored.
+
+Args:
+    name: Drawable name.
+    points: Point positions (N x 3 or N x 4 array).
+    normals: Point normals (N x 3 or N x 4 array). Optional.
+    colors: Point colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+    intensities: Point intensities (N array). Optional. Converted to vertex colors with intensity_colormap (expected range [0, 1]). Cannot be used with colors.
+    cmaps: Per-point colormap values (N array). Optional. Rendered with VERTEX_COLORMAP mode.
+    shader_setting: Shader setting.
+    intensity_colormap: Colormap used to convert intensities to vertex colors.
 )doc")
     .def(
       "update_normal_dists",
@@ -1835,10 +2089,10 @@ Args:
     title: Window title.
 )doc")
 
-    .def_static("destroy", &guik::AsyncLightViewer::destroy, "Destroy the viewer in the background thread.")
-    .def_static("wait", &guik::AsyncLightViewer::wait, "Wait for the viewer to be closed.")
-    .def_static("wait_until_click", &guik::AsyncLightViewer::wait_until_click, "Wait for a break button to be clicked.")
-    .def_static("toggle_wait", &guik::AsyncLightViewer::toggle_wait, "Wait while a toggle checkbox is checked.")
+    .def_static("destroy", &guik::AsyncLightViewer::destroy, py::call_guard<py::gil_scoped_release>(), "Destroy the viewer in the background thread.")
+    .def_static("wait", &guik::AsyncLightViewer::wait, py::call_guard<py::gil_scoped_release>(), "Wait for the viewer to be closed.")
+    .def_static("wait_until_click", &guik::AsyncLightViewer::wait_until_click, py::call_guard<py::gil_scoped_release>(), "Wait for a break button to be clicked.")
+    .def_static("toggle_wait", &guik::AsyncLightViewer::toggle_wait, py::call_guard<py::gil_scoped_release>(), "Wait while a toggle checkbox is checked.")
 
     .def("clear_images", &guik::AsyncLightViewer::clear_images, "Clear all images.")
     .def("remove_image", &guik::AsyncLightViewer::remove_image, py::arg("name"), "Remove an image by name.")
@@ -1869,6 +2123,8 @@ Args:
       },
       py::arg("name"),
       py::arg("size") = std::make_tuple(-1, -1),
+      // This waits for the viewer thread, which may need the GIL (e.g., Python UI callbacks and DelayedConstructor)
+      py::call_guard<py::gil_scoped_release>(),
       R"doc(Create or get an async sub viewer context.
 
 Args:
@@ -2030,13 +2286,17 @@ Args:
     background: If True, the viewer window is created in the background (invisible).
     title: Window title.
 )doc");
-  guik_.def("async_destroy", &guik::async_destroy, "Destroy the async viewer");
-  guik_.def("async_wait", &guik::async_wait, "Wait for the async viewer to be closed.");
+  guik_.def("async_destroy", &guik::async_destroy, py::call_guard<py::gil_scoped_release>(), "Destroy the async viewer");
+  guik_.def("async_wait", &guik::async_wait, py::call_guard<py::gil_scoped_release>(), "Wait for the async viewer to be closed.");
   guik_.def("async_running", &guik::async_running, "Check if the async viewer is currently running");
 
   auto atexit = py::module_::import("atexit");
   atexit.attr("register")(py::cpp_function([]() {
-    guik::async_destroy();
+    {
+      // The async viewer thread may need the GIL to finish (e.g., Python UI callbacks and Python-derived drawables)
+      py::gil_scoped_release release;
+      guik::async_destroy();
+    }
     guik::destroy();
   }));
 }

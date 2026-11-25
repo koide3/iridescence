@@ -4,10 +4,12 @@
 #include <pybind11/eigen.h>
 
 #include <iostream>
+#include <optional>
 #include <cstring>
 #include <algorithm>
 #include <glk/path.hpp>
 #include <glk/lines.hpp>
+#include <glk/mesh.hpp>
 #include <glk/texture.hpp>
 #include <glk/thin_lines.hpp>
 #include <glk/pointcloud_buffer.hpp>
@@ -17,6 +19,7 @@
 #include <glk/elevation_map.hpp>
 #include <glk/gridmap.hpp>
 #include <glk/drawable_container.hpp>
+#include <glk/delayed_constructor.hpp>
 #include <glk/io/ply_io.hpp>
 #include <glk/mesh_rendering_options.hpp>
 #include <glk/primitives/primitives.hpp>
@@ -436,6 +439,37 @@ Returns:
   // glk::Drawable
   py::class_<glk::Drawable, PyDrawable, py::smart_holder>(glk_, "Drawable").def(py::init<>()).def("draw", &glk::Drawable::draw, py::arg("shader"));
 
+  // glk::DelayedConstructor
+  py::class_<glk::DelayedConstructor, glk::Drawable, py::smart_holder>(
+    glk_,
+    "DelayedConstructor",
+    R"doc(Drawable that constructs the actual drawable upon the first draw() call in the rendering thread.
+This allows creating a drawable without an OpenGL context, e.g., to pass it to AsyncLightViewer.
+
+Example:
+    x = glk.DelayedConstructor(glk.Mesh, vertices, indices)  # glk.Mesh is not constructed yet
+    guik.async_viewer().update_drawable('mesh', x)            # glk.Mesh(vertices, indices) is constructed in the viewer thread
+
+Note:
+    The arguments are held by reference (not copied) until the construction. Modifying them before the first draw() affects the constructed drawable.
+    The construction is attempted only once. If it fails, an error is printed and nothing is drawn.
+)doc")
+    .def(
+      py::init([](const py::object& cls, const py::args& args, const py::kwargs& kwargs) { return make_py_delayed_constructor(cls, args, kwargs); }),
+      py::arg("cls"),
+      R"doc(Create a delayed constructor.
+
+Args:
+    cls: Drawable class (or any callable returning a glk.Drawable) to be called as cls(*args, **kwargs) upon the first draw().
+    *args: Positional arguments for cls.
+    **kwargs: Keyword arguments for cls.
+)doc")
+    .def("constructed", &glk::DelayedConstructor::constructed, "Check if the drawable has been constructed.")
+    .def(
+      "get",
+      [](const glk::DelayedConstructor& self) { return std::const_pointer_cast<glk::Drawable>(self.get()); },
+      "Get the constructed drawable (None if not constructed yet).");
+
   // glk::ThinLines
   py::class_<glk::ThinLines, glk::Drawable, py::smart_holder>(glk_, "ThinLines", "Drawable to draw a set of lines with GL_LINES (fixed width in pixels).")
     .def(
@@ -613,6 +647,101 @@ Returns:
       py::arg("c") = Eigen::VectorXf(),
       py::arg("width") = 0.1f,
       py::arg("line_strip") = true);
+
+  // glk::Mesh
+  py::class_<glk::Mesh, glk::Drawable, py::smart_holder>(glk_, "Mesh", "Triangle mesh drawable.")
+    .def(
+      py::init([](
+                 const Eigen::Matrix<float, -1, -1, Eigen::RowMajor>& vertices,
+                 const py::array_t<int, py::array::c_style | py::array::forcecast>& indices,
+                 const std::optional<Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>& normals,
+                 const std::optional<Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>& colors,
+                 const std::optional<Eigen::Matrix<float, -1, -1, Eigen::RowMajor>>& tex_coords,
+                 bool wireframe) {
+        const int num_vertices = vertices.rows();
+        if (vertices.cols() != 3 && vertices.cols() != 4) {
+          throw py::value_error("vertices must be Nx3 or Nx4");
+        }
+
+        // indices: (M, 3) or (3M,) array of triangle vertex indices
+        if (indices.size() % 3 != 0 || (indices.ndim() == 2 && indices.shape(1) != 3) || indices.ndim() > 2) {
+          throw py::value_error("indices must be an Mx3 or 3M array");
+        }
+        const int num_indices = indices.size();
+        const int* indices_data = indices.data();
+        for (int i = 0; i < num_indices; i++) {
+          if (indices_data[i] < 0 || indices_data[i] >= num_vertices) {
+            throw py::value_error("indices must be in [0, num_vertices) (indices[" + std::to_string(i) + "]=" + std::to_string(indices_data[i]) + ")");
+          }
+        }
+
+        const auto is_given = [](const auto& attr) { return attr && attr->size() != 0; };
+        const auto check_rows = [&](const auto& attr, const std::string& name) {
+          if (is_given(attr) && attr->rows() != num_vertices) {
+            throw py::value_error(name + " must have the same number of rows as vertices");
+          }
+        };
+        check_rows(normals, "normals");
+        check_rows(colors, "colors");
+        check_rows(tex_coords, "tex_coords");
+
+        if (is_given(normals) && normals->cols() != 3 && normals->cols() != 4) {
+          throw py::value_error("normals must be Nx3 or Nx4");
+        }
+        if (is_given(colors) && colors->cols() != 3 && colors->cols() != 4) {
+          throw py::value_error("colors must be Nx3 or Nx4");
+        }
+        if (is_given(tex_coords) && tex_coords->cols() != 2) {
+          throw py::value_error("tex_coords must be Nx2");
+        }
+
+        // Colors are passed to the shader as RGBA
+        Eigen::Matrix<float, -1, 4, Eigen::RowMajor> colors4;
+        if (is_given(colors)) {
+          colors4.resize(num_vertices, 4);
+          colors4.leftCols<3>() = colors->leftCols<3>();
+          if (colors->cols() == 4) {
+            colors4.col(3) = colors->col(3);
+          } else {
+            colors4.col(3).setOnes();
+          }
+        }
+
+        return std::make_shared<glk::Mesh>(
+          vertices.data(),
+          sizeof(float) * vertices.cols(),
+          is_given(normals) ? normals->data() : nullptr,
+          is_given(normals) ? sizeof(float) * normals->cols() : 0,
+          is_given(colors) ? colors4.data() : nullptr,
+          sizeof(float) * 4,
+          is_given(tex_coords) ? tex_coords->data() : nullptr,
+          sizeof(float) * 2,
+          num_vertices,
+          indices_data,
+          num_indices,
+          wireframe);
+      }),
+      py::arg("vertices"),
+      py::arg("indices"),
+      py::arg("normals") = py::none(),
+      py::arg("colors") = py::none(),
+      py::arg("tex_coords") = py::none(),
+      py::arg("wireframe") = false,
+      R"doc(Create a triangle mesh. This requires an OpenGL context (use glk.DelayedConstructor or AsyncLightViewer.emplace_drawable() for AsyncLightViewer).
+
+Args:
+    vertices: Vertex positions (N x 3 or N x 4 array).
+    indices: Triangle vertex indices (M x 3 or 3M array).
+    normals: Vertex normals (N x 3 or N x 4 array). Optional. Required for shading-based rendering (e.g., normal-based lighting effects).
+    colors: Vertex colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+    tex_coords: Texture coordinates (N x 2 array). Optional. Rendered with TEXTURE_COLOR mode and a texture set by set_texture().
+    wireframe: If True, the mesh is rendered as a wireframe.
+)doc")
+    .def(
+      "set_texture",
+      [](glk::Mesh& mesh, const std::shared_ptr<glk::Texture>& texture) { mesh.set_texture(texture); },
+      py::arg("texture"),
+      "Set a texture to be rendered with tex_coords in TEXTURE_COLOR mode.");
 
   // glk::PointCloudBuffer
   py::class_<glk::PointCloudBuffer, glk::Drawable, py::smart_holder>(glk_, "PointCloudBuffer")
