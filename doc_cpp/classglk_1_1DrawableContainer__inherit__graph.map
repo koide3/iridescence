@@ -1,0 +1,5 @@
+<map id="glk::DrawableContainer" name="glk::DrawableContainer">
+<area shape="rect" id="Node000001" title="Container to store multiple drawables and draw them in order. It can also store a shader setting for ..." alt="" coords="5,81,180,109"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1Drawable.html" title=" " alt="" coords="37,5,148,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,47,95,82,90,80,91,51"/>
+</map>

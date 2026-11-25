@@ -1,0 +1,5 @@
+<map id="guik::VertexColor" name="guik::VertexColor">
+<area shape="rect" id="Node000001" title="Vertex color scheme that assigns colors based on vertex color attributes." alt="" coords="13,81,146,109"/>
+<area shape="rect" id="Node000002" href="$structguik_1_1ShaderSetting.html" title="Shader setting class that holds rendering settings." alt="" coords="5,5,154,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,47,82,81,77,80,78,51"/>
+</map>

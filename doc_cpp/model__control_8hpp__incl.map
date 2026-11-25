@@ -1,0 +1,11 @@
+<map id="/home/runner/work/iridescence/iridescence/include/guik/model_control.hpp" name="/home/runner/work/iridescence/iridescence/include/guik/model_control.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="79,5,302,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,115,80,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,67,78,109,75,104,139,68"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="103,115,174,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,66,155,103,152,99,171,69"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="198,115,290,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="210,65,231,102,226,101,207,70"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="314,115,440,143"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="253,65,339,108,334,108,252,70"/>
+</map>

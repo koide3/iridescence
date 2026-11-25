@@ -1,0 +1,9 @@
+<map id="/home/runner/work/iridescence/iridescence/include/glk/primitives/cube.hpp" name="/home/runner/work/iridescence/iridescence/include/glk/primitives/cube.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,228,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="11,115,62,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,66,60,105,56,101,88,69"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,115,148,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,65,119,100,114,98,115,69"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="172,115,264,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="151,65,195,104,189,105,149,70"/>
+</map>

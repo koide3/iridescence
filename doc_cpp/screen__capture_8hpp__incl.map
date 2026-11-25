@@ -1,0 +1,20 @@
+<map id="/home/runner/work/iridescence/iridescence/include/guik/screen_capture.hpp" name="/home/runner/work/iridescence/iridescence/include/guik/screen_capture.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="141,5,364,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="235,191,297,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,52,83,65,35,84,19,96,10,109,9,124,19,141,31,152,51,161,104,177,164,189,222,198,217,199,164,194,102,182,49,166,28,156,14,144,4,125,5,107,15,92,32,79,81,60,143,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="29,115,105,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,70,109,110,106,106,192,65"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="130,115,196,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="225,66,188,106,185,102,221,69"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="221,115,284,143"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="254,65,255,100,250,98,251,70"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="309,115,388,143"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="285,65,326,104,321,104,284,70"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="412,115,504,143"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="321,65,417,108,412,109,321,70"/>
+<area shape="rect" id="Node000008" href="$concurrent__queue_8hpp.html" title=" " alt="" coords="527,115,725,143"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="364,62,559,110,554,112,364,67"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="564,144,312,196,311,191,558,143"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="594,191,658,218"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="628,141,628,177,624,173,624,145"/>
+</map>

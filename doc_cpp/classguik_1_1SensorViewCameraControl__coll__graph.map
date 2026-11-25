@@ -1,0 +1,5 @@
+<map id="guik::SensorViewCameraControl" name="guik::SensorViewCameraControl">
+<area shape="rect" id="Node000001" title="Camera control that orbits around a tracked sensor pose. The camera always looks at the sensor positi..." alt="" coords="5,81,237,109"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1CameraControl.html" title="Base class for camera control. This class defines the interface for controlling the camera in the vie..." alt="" coords="43,5,199,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,47,123,82,119,79,119,51"/>
+</map>

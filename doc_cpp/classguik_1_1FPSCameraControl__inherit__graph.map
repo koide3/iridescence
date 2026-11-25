@@ -1,0 +1,7 @@
+<map id="guik::FPSCameraControl" name="guik::FPSCameraControl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="87,81,266,109"/>
+<area shape="rect" id="Node000002" href="$classguik_1_1CameraControl.html" title="Base class for camera control. This class defines the interface for controlling the camera in the vie..." alt="" coords="5,5,161,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,40,162,80,157,81,111,45"/>
+<area shape="rect" id="Node000003" href="$classguik_1_1ProjectionControl.html" title=" " alt="" coords="185,5,354,33"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="244,42,194,83,192,78,239,44"/>
+</map>

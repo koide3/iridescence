@@ -1,0 +1,29 @@
+<map id="guik::ShaderSetting" name="guik::ShaderSetting">
+<area shape="rect" id="Node000001" title="Shader setting class that holds rendering settings." alt="" coords="5,291,154,318"/>
+<area shape="rect" id="Node000002" href="$structguik_1_1FlatColor.html" title="Flat coloring scheme that assigns a single color to the object. If the alpha value is less than 0...." alt="" coords="224,187,340,214"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,279,152,252,201,225,234,213,230,216,203,230,155,256,114,284"/>
+<area shape="rect" id="Node000011" href="$structguik_1_1Rainbow.html" title="Rainbow coloring scheme that assigns colors to the height (z&#45;value) of pixels of the object...." alt="" coords="226,239,339,266"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="150,284,227,265,223,269,152,289"/>
+<area shape="rect" id="Node000012" href="$structguik_1_1TextureColor.html" title="Texture color scheme that assigns colors based on the binded texture." alt="" coords="213,291,352,318"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="169,302,215,303,210,306,170,307"/>
+<area shape="rect" id="Node000013" href="$structguik_1_1VertexColor.html" title="Vertex color scheme that assigns colors based on vertex color attributes." alt="" coords="216,343,349,370"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="151,320,228,341,223,343,151,325"/>
+<area shape="rect" id="Node000014" href="$structguik_1_1VertexColorMap.html" title="Vertex colormap scheme that assigns colors based on vertex colormap attributes." alt="" coords="202,395,363,422"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="113,325,155,353,203,379,235,394,229,394,201,384,152,357,112,330"/>
+<area shape="rect" id="Node000003" href="$structguik_1_1FlatBlack.html" title="Flat black color." alt="" coords="424,5,542,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="298,172,343,108,374,74,409,44,435,32,431,35,413,48,378,78,347,112,302,175"/>
+<area shape="rect" id="Node000004" href="$structguik_1_1FlatBlue.html" title="Flat blue color." alt="" coords="428,57,539,85"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="308,174,353,134,410,96,439,84,435,87,412,100,357,139,311,178"/>
+<area shape="rect" id="Node000005" href="$structguik_1_1FlatDarkGray.html" title="Flat dark gray color." alt="" coords="411,109,555,137"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="332,178,410,147,446,136,441,139,412,152,334,183"/>
+<area shape="rect" id="Node000006" href="$structguik_1_1FlatGray.html" title="Flat light gray color." alt="" coords="426,161,540,189"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="355,189,428,181,424,183,357,194"/>
+<area shape="rect" id="Node000007" href="$structguik_1_1FlatGreen.html" title="Flat green color." alt="" coords="422,213,544,241"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="355,208,424,218,419,220,356,213"/>
+<area shape="rect" id="Node000008" href="$structguik_1_1FlatOrange.html" title="Flat orange color." alt="" coords="418,265,548,293"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="345,217,364,225,412,250,444,265,438,265,410,255,362,230,345,223"/>
+<area shape="rect" id="Node000009" href="$structguik_1_1FlatRed.html" title="Flat red color." alt="" coords="430,317,537,345"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="354,218,365,225,382,245,390,265,397,284,413,302,433,317,428,316,409,307,392,286,385,267,377,248,361,229,354,224"/>
+<area shape="rect" id="Node000010" href="$structguik_1_1FlatWhite.html" title="Flat white color." alt="" coords="423,369,543,397"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="355,218,365,225,378,242,386,259,390,291,394,323,401,339,413,355,431,369,426,368,409,358,396,342,389,325,385,292,380,260,374,245,361,229,354,223"/>
+</map>

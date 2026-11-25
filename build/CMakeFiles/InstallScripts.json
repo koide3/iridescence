@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/runner/work/iridescence/iridescence/docs/build/cmake_install.cmake",
+		"/home/runner/work/iridescence/iridescence/docs/build/thirdparty/pybind11/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

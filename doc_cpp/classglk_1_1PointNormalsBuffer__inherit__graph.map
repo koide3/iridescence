@@ -1,0 +1,5 @@
+<map id="glk::PointNormalsBuffer" name="glk::PointNormalsBuffer">
+<area shape="rect" id="Node000001" title="PointNormalsBuffer is a drawable that represents a point cloud with normals." alt="" coords="5,81,182,109"/>
+<area shape="rect" id="Node000002" href="$classglk_1_1Drawable.html" title=" " alt="" coords="38,5,149,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,47,96,82,91,80,92,51"/>
+</map>

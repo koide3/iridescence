@@ -1,0 +1,5 @@
+<map id="guik::TextureColor" name="guik::TextureColor">
+<area shape="rect" id="Node000001" title="Texture color scheme that assigns colors based on the binded texture." alt="" coords="10,81,149,109"/>
+<area shape="rect" id="Node000002" href="$structguik_1_1ShaderSetting.html" title="Shader setting class that holds rendering settings." alt="" coords="5,5,154,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,47,82,81,77,80,78,51"/>
+</map>
