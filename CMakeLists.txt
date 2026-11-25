@@ -359,7 +359,7 @@ install(FILES
 if(BUILD_PYTHON_BINDINGS)
   # Python package layout (pyridescence/):
   #   _pyridescence.*  : extension module
-  #   __init__.py, *.pyi, py.typed : src/python/pyridescence
+  #   __init__.py, *.pyi, py.typed, AGENTS.md (usage guide for coding agents) : src/python/pyridescence
   #   data/            : shaders, textures, models
   #   examples/        : python examples
   # Only the "python" component is installed into the wheel (see pyproject.toml).

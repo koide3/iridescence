@@ -30,6 +30,13 @@ public:
   /// @param name Callback name
   void remove_ui_callback(const std::string& name);
 
+  /// @brief Register a drawable filter.
+  /// @param filter_name  Filter name
+  /// @param filter       Filter function. If null, the filter with the given name is removed.
+  void register_drawable_filter(const std::string& filter_name, const std::function<bool(const std::string&)>& filter = 0);
+  /// @brief Remove a drawable filter.
+  void remove_drawable_filter(const std::string& filter_name);
+
   /// @brief Disable XY grid drawing.
   void disable_xy_grid() { set_draw_xy_grid(false); }
   /// @brief Enable XY grid drawing.
@@ -116,6 +123,13 @@ public:
   /// @brief Use orthographic projection control.
   void use_orthographic_projection_control(float width = 10.0f, float near_ = 1.0f, float far_ = 1000.0f);
 
+  /// @brief Register or update a drawable. The drawable is registered in the viewer thread.
+  /// @note  The drawable must not require an OpenGL context at construction (e.g., use glk::DelayedConstructor),
+  ///        and it is released in the viewer thread.
+  /// @param name           Drawable name
+  /// @param drawable       Drawable
+  /// @param shader_setting Shader setting
+  void update_drawable(const std::string& name, const glk::Drawable::ConstPtr& drawable, const ShaderSetting& shader_setting = ShaderSetting());
   /// @brief Update a drawable's shader setting.
   void update_drawable_setting(const std::string& name, const ShaderSetting& shader_setting);
 
@@ -137,6 +151,33 @@ public:
 
   /// @brief Register or update a point cloud buffer with colors.
   void update_points(const std::string& name, const float* vertices, int vertex_stride, const float* colors, int color_stride, int num_points, const ShaderSetting& shader_setting);
+  /// @brief Register or update a point cloud buffer with optional per-point attributes.
+  ///        Attributes given as nullptr are not added. All data are copied before returning.
+  /// @param name               Drawable name
+  /// @param vertices           Point positions (3 or 4 floats per point)
+  /// @param vertex_stride      Stride (in bytes) between points
+  /// @param normals            Point normals (3 or 4 floats per point, nullable)
+  /// @param normal_stride      Stride (in bytes) between normals
+  /// @param colors             Point colors (3 (RGB) or 4 (RGBA) floats per point, nullable)
+  /// @param color_stride       Stride (in bytes) between colors (sizeof(float) * 3 or sizeof(float) * 4)
+  /// @param intensities        Point intensities (1 float per point, nullable). Converted to vertex colors with intensity_colormap.
+  /// @param cmaps              Per-point colormap values (1 float per point, nullable)
+  /// @param num_points         Number of points
+  /// @param shader_setting     Shader setting
+  /// @param intensity_colormap Colormap used to convert intensities to vertex colors
+  void update_points(
+    const std::string& name,
+    const float* vertices,
+    int vertex_stride,
+    const float* normals,
+    int normal_stride,
+    const float* colors,
+    int color_stride,
+    const float* intensities,
+    const float* cmaps,
+    int num_points,
+    const ShaderSetting& shader_setting,
+    glk::COLORMAP intensity_colormap = glk::COLORMAP::TURBO);
   /// @brief Register or update a point cloud buffer with colors.
   template <typename ScalarV, int DimV, typename ScalarC, int DimC>
   void update_points(

@@ -1,4 +1,6 @@
 #include <thread>
+#include <glk/thin_lines.hpp>
+#include <glk/delayed_constructor.hpp>
 #include <guik/viewer/async_light_viewer.hpp>
 
 int main(int argc, char** argv) {
@@ -20,6 +22,19 @@ int main(int argc, char** argv) {
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
   async_viewer->update_wire_sphere("sphere3", guik::FlatBlue().translate(4.0f, 0.0f, 0.0f));
+
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::vector<Eigen::Vector3f> line;
+  for (double y = -1.0; y <= 1.0; y += 0.01) {
+    line.emplace_back(std::sin(y * 10.0) * 0.1 + 6.0, y, 0.0);
+  }
+
+  // We cannot directly create glk::ThinLines here because it creates OpenGL buffers that must be done in the viewer thread
+  // auto dline = std::make_shared<glk::ThinLines>(line, true);
+
+  // Instead, we can use glk::DelayedConstructor to make the construction in the viewer thread in lazy manner
+  auto dline = std::make_shared<glk::DelayedConstructor>([line] { return std::make_shared<glk::ThinLines>(line, true); });
+  async_viewer->update_drawable("line", dline, guik::FlatOrange());
 
   // Register a UI callback, which will be called in the viewer thread.
   async_viewer->register_ui_callback("ui_callback", [] {

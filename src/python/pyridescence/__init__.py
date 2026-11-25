@@ -1,3 +1,9 @@
+"""Python bindings of Iridescence, a 3D visualization library for rapid prototyping of 3D algorithms.
+
+A usage guide for coding agents (AGENTS.md), type stubs (*.pyi), and runnable examples (examples/)
+are installed in the package directory: os.path.dirname(pyridescence.__file__)
+"""
+
 import sys as _sys
 
 from . import _pyridescence

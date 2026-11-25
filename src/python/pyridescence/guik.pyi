@@ -343,6 +343,20 @@ class TextureColor(ShaderSetting):
     @typing.overload
     def __init__(self, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, trans: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 1]"] = ..., rot: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 3]"] = ...) -> None:
         ...
+class VertexColorMap(ShaderSetting):
+    """
+    Vertex colormap scheme that assigns colors by applying the viewer colormap to per-vertex scalar values
+    (e.g., cmaps of update_points and the color map of glk.ElevationMap). The value range is given by the "cmap_range" parameter.
+    """
+    @typing.overload
+    def __init__(self) -> None:
+        ...
+    @typing.overload
+    def __init__(self, model_matrix: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"]) -> None:
+        ...
+    @typing.overload
+    def __init__(self, scale: typing.SupportsFloat | typing.SupportsIndex = 1.0, trans: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 1]"] = ..., rot: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 3]"] = ...) -> None:
+        ...
 class FlatColor(ShaderSetting):
     """
     Flat coloring scheme that assigns a single color to the object.
@@ -549,13 +563,11 @@ class SensorViewCameraControl(CameraControl):
     Camera control that orbits around a tracked sensor pose.
     The camera always looks at the sensor position, with user-controlled azimuth/elevation and distance scaling.
     """
-    @staticmethod
-    def set_sensor_camera_transform(*args, **kwargs) -> None:
+    def set_sensor_camera_transform(self, T_sensor_camera: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"]) -> None:
         """
         Set the transform from sensor frame to camera frame (T_sensor_camera, 4x4 matrix).
         """
-    @staticmethod
-    def set_sensor_pose(*args, **kwargs) -> None:
+    def set_sensor_pose(self, T_world_sensor: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"]) -> None:
         """
         Set the raw sensor pose (T_world_sensor, 4x4 matrix).
         """
@@ -646,17 +658,20 @@ class Application:
     def show_window(self) -> None:
         ...
     def spin(self) -> None:
-        ...
+        """
+        Spin the viewer until it is closed. The GIL is released while rendering, and KeyboardInterrupt (Ctrl-C) is raised between frames.
+        """
     def spin_once(self) -> bool:
-        ...
+        """
+        Render one frame. Returns False if the viewer is closed. The GIL is released while rendering.
+        """
     def window_size(self) -> typing.Annotated[numpy.typing.NDArray[numpy.int32], "[2, 1]"]:
         ...
 class LightViewerContext:
     """
     Viewer context (the main viewer or a sub viewer).
     """
-    @staticmethod
-    def use_sensor_view_camera_control(*args, **kwargs) -> SensorViewCameraControl:
+    def use_sensor_view_camera_control(self, T_sensor_camera: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"] = ..., smoothing_factor_trans: typing.SupportsFloat | typing.SupportsIndex = 0.75, smoothing_factor_rot: typing.SupportsFloat | typing.SupportsIndex = 0.9) -> SensorViewCameraControl:
         """
         Use sensor-view camera control that follows a given sensor pose (set via SensorViewCameraControl.set_sensor_pose()).
         
@@ -978,6 +993,7 @@ class LightViewerContext:
             sigma: Size of the ellipsoids in standard deviations (e.g., 3.0 renders 3-sigma ellipsoids).
             shader_setting: Shader setting.
         """
+    @typing.overload
     def update_points(self, name: str, points: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"], shader_setting: ShaderSetting) -> pyridescence.glk.PointCloudBuffer:
         """
         Register or update a point cloud buffer.
@@ -989,6 +1005,25 @@ class LightViewerContext:
         
         Returns:
             Created PointCloudBuffer, or None if points has an invalid shape.
+        """
+    @typing.overload
+    def update_points(self, name: str, points: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"], normals: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, colors: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, intensities: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, 1]"] | None = None, cmaps: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, 1]"] | None = None, shader_setting: ShaderSetting = ..., intensity_colormap: pyridescence.glk.COLORMAP = ...) -> pyridescence.glk.PointCloudBuffer:
+        """
+        Register or update a point cloud buffer with optional per-point attributes.
+        Attributes that are None or empty (e.g., shape (0, 0)) are ignored.
+        
+        Args:
+            name: Drawable name.
+            points: Point positions (N x 3 or N x 4 array).
+            normals: Point normals (N x 3 or N x 4 array). Optional.
+            colors: Point colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+            intensities: Point intensities (N array). Optional. Converted to vertex colors with intensity_colormap (expected range [0, 1]). Cannot be used with colors.
+            cmaps: Per-point colormap values (N array). Optional. Rendered with VERTEX_COLORMAP mode.
+            shader_setting: Shader setting.
+            intensity_colormap: Colormap used to convert intensities to vertex colors.
+        
+        Returns:
+            Created PointCloudBuffer, or None if any input has an invalid shape.
         """
     def update_sphere(self, name: str, shader_setting: ShaderSetting) -> None:
         """
@@ -1252,8 +1287,7 @@ class AsyncLightViewerContext:
     All OpenGL operations are called in the viewer thread through invoke().
     Note that async operations come at a cost of data copy.
     """
-    @staticmethod
-    def use_sensor_view_camera_control(*args, **kwargs) -> None:
+    def use_sensor_view_camera_control(self, T_sensor_camera: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[4, 4]"] = ..., smoothing_factor_trans: typing.SupportsFloat | typing.SupportsIndex = 0.75, smoothing_factor_rot: typing.SupportsFloat | typing.SupportsIndex = 0.9) -> None:
         """
         Use TPS-like sensor-view camera control.
         
@@ -1282,6 +1316,26 @@ class AsyncLightViewerContext:
         """
         Disable XY grid drawing.
         """
+    def emplace_drawable(self, name: str, cls: collections.abc.Callable[..., pyridescence.glk.Drawable], *args, **kwargs) -> pyridescence.glk.DelayedConstructor:
+        """
+        Construct a drawable as cls(*args, **kwargs) in the viewer thread and register it.
+        This is a shorthand for update_drawable(name, glk.DelayedConstructor(cls, *args, **kwargs), shader_setting).
+        
+        Example:
+            viewer.emplace_drawable('mesh', glk.Mesh, vertices, indices, shader_setting=guik.Rainbow())
+        
+        Args:
+            name: Drawable name. If a drawable with the same name exists, it is replaced.
+            cls: Drawable class (or any callable returning a glk.Drawable).
+            *args: Positional arguments for cls.
+            **kwargs: Keyword arguments for cls. The keyword argument "shader_setting" is not passed to cls but used as the shader setting of the drawable.
+        
+        Returns:
+            glk.DelayedConstructor registered in the viewer. Use constructed() / get() to access the constructed drawable.
+        
+        Note:
+            The arguments are held by reference (not copied) until the construction in the viewer thread.
+        """
     def enable_xy_grid(self) -> None:
         """
         Enable XY grid drawing.
@@ -1293,6 +1347,15 @@ class AsyncLightViewerContext:
     def lookat(self, pt: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[3, 1]"]) -> None:
         """
         Make the camera look at a point.
+        """
+    def register_drawable_filter(self, filter_name: str, filter: collections.abc.Callable[[str], bool]) -> None:
+        """
+        Register a drawable filter. Drawables for which filter(name) returns False are not rendered.
+        The filter function is called in the viewer thread.
+        
+        Args:
+            filter_name: Filter name.
+            filter: Filter function that takes a drawable name and returns a bool. If None, the filter with the given name is removed.
         """
     def register_ui_callback(self, callback_name: str, callback: collections.abc.Callable[[], None]) -> None:
         """
@@ -1309,6 +1372,10 @@ class AsyncLightViewerContext:
         Args:
             pattern: Drawable name, or a regular expression if regex is True.
             regex: If True, all drawables whose names match pattern are removed.
+        """
+    def remove_drawable_filter(self, filter_name: str) -> None:
+        """
+        Remove a drawable filter.
         """
     def remove_ui_callback(self, callback_name: str) -> None:
         """
@@ -1358,6 +1425,18 @@ class AsyncLightViewerContext:
     def update_cube(self, name: str, shader_setting: ShaderSetting) -> None:
         """
         Register or update a cube primitive.
+        """
+    def update_drawable(self, name: str, drawable: pyridescence.glk.Drawable, shader_setting: ShaderSetting = ...) -> None:
+        """
+        Register or update a drawable. The drawable is registered in the viewer thread.
+        
+        The drawable must not require an OpenGL context at construction.
+        Use glk.DelayedConstructor or emplace_drawable() to construct OpenGL-based drawables (e.g., glk.Mesh) in the viewer thread.
+        
+        Args:
+            name: Drawable name. If a drawable with the same name exists, it is replaced.
+            drawable: Drawable.
+            shader_setting: Shader setting. It is copied, and later changes to it are not reflected.
         """
     def update_drawable_setting(self, name: str, setting: ShaderSetting) -> None:
         """
@@ -1415,6 +1494,22 @@ class AsyncLightViewerContext:
             points: Point positions (N x 3 or N x 4 array).
             colors: Point colors (N x 3 or N x 4 array).
             shader_setting: Shader setting.
+        """
+    @typing.overload
+    def update_points(self, name: str, points: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"], normals: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, colors: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, intensities: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, 1]"] | None = None, cmaps: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, 1]"] | None = None, shader_setting: ShaderSetting = ..., intensity_colormap: pyridescence.glk.COLORMAP = ...) -> None:
+        """
+        Register or update a point cloud buffer with optional per-point attributes.
+        Attributes that are None or empty (e.g., shape (0, 0)) are ignored.
+        
+        Args:
+            name: Drawable name.
+            points: Point positions (N x 3 or N x 4 array).
+            normals: Point normals (N x 3 or N x 4 array). Optional.
+            colors: Point colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+            intensities: Point intensities (N array). Optional. Converted to vertex colors with intensity_colormap (expected range [0, 1]). Cannot be used with colors.
+            cmaps: Per-point colormap values (N array). Optional. Rendered with VERTEX_COLORMAP mode.
+            shader_setting: Shader setting.
+            intensity_colormap: Colormap used to convert intensities to vertex colors.
         """
     def update_sphere(self, name: str, shader_setting: ShaderSetting) -> None:
         """

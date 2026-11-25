@@ -7,7 +7,7 @@ import numpy.typing
 import pyridescence.guik
 import typing
 from . import primitives
-__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CHAR', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'DOUBLE', 'Drawable', 'DrawableContainer', 'ElevationMap', 'ElevationMapBuilder', 'FLOAT', 'GLSLShader', 'GREAN_YELLOW', 'GridMap', 'HELIX', 'INT', 'IndexedPointCloudBuffer', 'JET', 'Lines', 'MeshRenderingOptions', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PLYGenericPropertyBuffer', 'PLYPropertyType', 'PUBUGN', 'PointCloudBuffer', 'PointNormalsBuffer', 'SHORT', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'UCHAR', 'UINT', 'USHORT', 'VEGETATION', 'VoxelMap', 'VoxelMapOptions', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
+__all__: list[str] = ['AUTUMN', 'BLUE_RED', 'CHAR', 'CIVIDIS', 'COLORMAP', 'COOL_WARM', 'CURL', 'DOUBLE', 'DelayedConstructor', 'Drawable', 'DrawableContainer', 'ElevationMap', 'ElevationMapBuilder', 'FLOAT', 'GLSLShader', 'GREAN_YELLOW', 'GridMap', 'HELIX', 'INT', 'IndexedPointCloudBuffer', 'JET', 'Lines', 'Mesh', 'MeshRenderingOptions', 'NaiveScreenSpaceAmbientOcclusion', 'OCEAN', 'PASTEL', 'PHASE', 'PLYData', 'PLYGenericPropertyBuffer', 'PLYPropertyType', 'PUBUGN', 'PointCloudBuffer', 'PointNormalsBuffer', 'SHORT', 'SPRING', 'SUMMER', 'ScreenEffect', 'ScreenSpaceAmbientOcclusion', 'ScreenSpaceLighting', 'TURBID', 'TURBO', 'Texture', 'ThinLines', 'UCHAR', 'UINT', 'USHORT', 'VEGETATION', 'VoxelMap', 'VoxelMapOptions', 'WINTER', 'colormap', 'colormap_categorical', 'colormap_categoricalf', 'colormapf', 'create_pointcloud_buffer', 'create_texture', 'create_texture_f', 'get_data_path', 'load_ply', 'primitives', 'save_ply', 'set_data_path']
 class COLORMAP:
     """
     Members:
@@ -238,6 +238,56 @@ class Drawable:
         ...
     def draw(self, shader: GLSLShader) -> None:
         ...
+class DelayedConstructor(Drawable):
+    """
+    Drawable that constructs the actual drawable upon the first draw() call in the rendering thread.
+    This allows creating a drawable without an OpenGL context, e.g., to pass it to AsyncLightViewer.
+    
+    Example:
+        x = glk.DelayedConstructor(glk.Mesh, vertices, indices)  # glk.Mesh is not constructed yet
+        guik.async_viewer().update_drawable('mesh', x)            # glk.Mesh(vertices, indices) is constructed in the viewer thread
+    
+    Note:
+        The arguments are held by reference (not copied) until the construction. Modifying them before the first draw() affects the constructed drawable.
+        The construction is attempted only once. If it fails, an error is printed and nothing is drawn.
+    """
+    def __init__(self, cls: collections.abc.Callable[..., Drawable], *args, **kwargs) -> None:
+        """
+        Create a delayed constructor.
+        
+        Args:
+            cls: Drawable class (or any callable returning a glk.Drawable) to be called as cls(*args, **kwargs) upon the first draw().
+            *args: Positional arguments for cls.
+            **kwargs: Keyword arguments for cls.
+        """
+    def constructed(self) -> bool:
+        """
+        Check if the drawable has been constructed.
+        """
+    def get(self) -> Drawable | None:
+        """
+        Get the constructed drawable (None if not constructed yet).
+        """
+class Mesh(Drawable):
+    """
+    Triangle mesh drawable.
+    """
+    def __init__(self, vertices: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"], indices: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], normals: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, colors: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, tex_coords: typing.Annotated[numpy.typing.ArrayLike, numpy.float32, "[m, n]"] | None = None, wireframe: bool = False) -> None:
+        """
+        Create a triangle mesh. This requires an OpenGL context (use glk.DelayedConstructor or AsyncLightViewer.emplace_drawable() for AsyncLightViewer).
+        
+        Args:
+            vertices: Vertex positions (N x 3 or N x 4 array).
+            indices: Triangle vertex indices (M x 3 or 3M array).
+            normals: Vertex normals (N x 3 or N x 4 array). Optional. Required for shading-based rendering (e.g., normal-based lighting effects).
+            colors: Vertex colors (N x 3 or N x 4 array, RGB(A) in [0, 1]). Alpha is set to 1 for N x 3. Optional. Rendered with VERTEX_COLOR mode.
+            tex_coords: Texture coordinates (N x 2 array). Optional. Rendered with TEXTURE_COLOR mode and a texture set by set_texture().
+            wireframe: If True, the mesh is rendered as a wireframe.
+        """
+    def set_texture(self, texture: Texture) -> None:
+        """
+        Set a texture to be rendered with tex_coords in TEXTURE_COLOR mode.
+        """
 class ThinLines(Drawable):
     """
     Drawable to draw a set of lines with GL_LINES (fixed width in pixels).
